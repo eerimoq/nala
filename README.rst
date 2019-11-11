@@ -141,7 +141,7 @@ Getting started
 ---------------
 
 The command-line utility provides two essential commands that should
-make it possible to integrate Narmock in any kind of build system.
+make it possible to integrate Nala in any kind of build system.
 
 .. code-block::
 
@@ -158,27 +158,27 @@ make it possible to integrate Narmock in any kind of build system.
 Generating mocks
 ----------------
 
-The `narmock -g` command finds the functions mocked in your code and
+The `nala -g` command finds the functions mocked in your code and
 generates a `__mocks__.c` file and a `__mocks__.h` file that
 respectively define and declare all the required mocks.
 
 .. code-block:: bash
 
-   $ gcc -E *.c | narmock -g
+   $ gcc -E *.c | nala -g
 
-Narmock requires source code to be expanded by the preprocessor. You
+Nala requires source code to be expanded by the preprocessor. You
 can directly pipe the output of `gcc -E` to the command-line utility.
 
 Retrieving linker flags
 -----------------------
 
-The `narmock -f` command reads the generated `__mocks__.h` file and
+The `nala -f` command reads the generated `__mocks__.h` file and
 outputs the necessary linker flags for linking all your source files
 together.
 
 .. code-block:: bash
 
-   $ gcc $(narmock -f) *.c
+   $ gcc $(nala -f) *.c
 
 Mock API
 --------
@@ -226,8 +226,8 @@ Module functions
 
 .. code-block::
 
-   narmock_reset_all_mocks()            - reset everything
-   narmock_assert_all_mocks_completed() - completion checks
+   nala_reset_all_mocks()            - reset everything
+   nala_assert_all_mocks_completed() - completion checks
 
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
