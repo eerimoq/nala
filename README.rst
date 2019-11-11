@@ -22,31 +22,30 @@ Features
 Installation
 ============
 
-Nala is distributed as an `amalgamated`_ source file and header:
+.. code-block:: bash
 
-- `nala.h`_
-- `nala.c`_
-
-Drop the two files in your project, make sure `nala.c` is compiled
-and linked just like the other source files of your test program and
-you should be good to go.
+   $ pip install nala
 
 Example
 =======
 
-First of all, download ``nala.[hc]``.
+Use ``nala init`` to create a test suite in the current directory.
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ wget https://raw.githubusercontent.com/eerimoq/nala/master/dist/nala.h
-   $ wget https://raw.githubusercontent.com/eerimoq/nala/master/dist/nala.c
+   $ mkdir test
+   $ cd test
+   $ nala init
 
-Create ``main.c`` and write a test case using all assertions and
-capturing output.
+The test suite is found in ``main.c`` and contains two tests; the
+first uses all assertions and captures output, and second mocks the
+time function.
 
 .. code-block:: c
 
+   #include <time.h>
    #include "nala.h"
+   #include "__mocks__.h"
 
    TEST(assertions)
    {
@@ -70,20 +69,28 @@ capturing output.
        ASSERT_EQ(stderrput, "err!\n");
    }
 
+   TEST(mock_time)
+   {
+       time_mock_once(42);
+
+       ASSERT_EQ(time(NULL), 42);
+   }
+
 Build and run the test.
 
 .. code-block:: text
 
-   $ gcc *.c && ./a.out
+   $ make
    std!
    err!
 
    Test results:
 
      PASSED assertions (0.38 ms)
+     PASSED mock_time (0.28 ms)
 
-   Tests: 1 passed, 1 total
-   Time: 0.38 ms
+   Tests: 2 passed, 2 total
+   Time: 0.65 ms
 
 Debugging tips
 ==============
@@ -110,75 +117,20 @@ All commands are shown below for the test called ``foo``.
 Mocking
 =======
 
-Nala finds the functions mocked in your tests and generates mocks with
-a slick API.
-
-.. code-block:: c
-
-   #include <time.h>
-
-   #include "__mocks__.h"
-   #include "narwhal.h"
-
-   TEST(example)
-   {
-       time_mock_once(42);
-
-       ASSERT_EQ(time(NULL), 42);
-   }
-
-Installation
-------------
-
-Clone the repository and run the narwhal script from the clone. Also
-install dependencies with `pip`.
-
-.. code-block::
-
-   $ pip install nala
-
-Getting started
----------------
-
-The command-line utility provides two essential commands that should
-make it possible to integrate Nala in any kind of build system.
-
-.. code-block::
-
-   usage: nala [-h] (-g [<code>] | -f) [-d <directory>]
-
-   A minimal mocking utility for C projects.
-
-   optional arguments:
-     -h, --help      show this help message and exit
-     -g [<code>]     generate mocks
-     -f              output linker flags
-     -d <directory>  mocks directory
-
 Generating mocks
 ----------------
 
-The ``nala -g`` command finds the functions mocked in your code and
-generates a ``__mocks__.c`` file and a ``__mocks__.h`` file that
-respectively define and declare all the required mocks.
+The ``nala generate_mocks`` command finds the functions mocked in your
+code and generates ``__mocks__.h``, ``__mocks__.c`` and
+``__mocks__.ld``. The first two files declare and define mocks, while
+the last file contains linker flags.
 
 .. code-block:: bash
 
-   $ gcc -E *.c | nala -g
+   $ gcc -E *.c | nala generate_mocks
 
 Nala requires source code to be expanded by the preprocessor. You can
 directly pipe the output of ``gcc -E`` to the command-line utility.
-
-Retrieving linker flags
------------------------
-
-The ``nala -f`` command reads the generated ``__mocks__.h`` file and
-outputs the necessary linker flags for linking all your source files
-together.
-
-.. code-block:: bash
-
-   $ gcc $(nala -f) *.c
 
 Mock API
 --------
@@ -186,7 +138,7 @@ Mock API
 The created mocks provides the following functions.
 
 For all functions
-%%%%%%%%%%%%%%%%%
+^^^^^^^^^^^^^^^^^
 
 .. code-block::
 
@@ -202,7 +154,7 @@ For all functions
    <func>_mock_assert_completed()    - completion checks
 
 For selected function parameters
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block::
 
@@ -212,7 +164,7 @@ For selected function parameters
    <func>_mock_set_<param>_out(*, size_t)        - value on return
 
 For variadic functions
-%%%%%%%%%%%%%%%%%%%%%%
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block::
 
@@ -222,7 +174,7 @@ For variadic functions
    <func>_mock_set_va_arg_out_at(uint, *, size_t) - value on return
 
 Module functions
-%%%%%%%%%%%%%%%%
+^^^^^^^^^^^^^^^^
 
 .. code-block::
 
