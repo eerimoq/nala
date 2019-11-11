@@ -158,21 +158,21 @@ make it possible to integrate Nala in any kind of build system.
 Generating mocks
 ----------------
 
-The `nala -g` command finds the functions mocked in your code and
-generates a `__mocks__.c` file and a `__mocks__.h` file that
+The ``nala -g`` command finds the functions mocked in your code and
+generates a ``__mocks__.c`` file and a ``__mocks__.h`` file that
 respectively define and declare all the required mocks.
 
 .. code-block:: bash
 
    $ gcc -E *.c | nala -g
 
-Nala requires source code to be expanded by the preprocessor. You
-can directly pipe the output of `gcc -E` to the command-line utility.
+Nala requires source code to be expanded by the preprocessor. You can
+directly pipe the output of ``gcc -E`` to the command-line utility.
 
 Retrieving linker flags
 -----------------------
 
-The `nala -f` command reads the generated `__mocks__.h` file and
+The ``nala -f`` command reads the generated ``__mocks__.h`` file and
 outputs the necessary linker flags for linking all your source files
 together.
 
