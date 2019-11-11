@@ -1,4 +1,5 @@
 |buildstatus|_
+|codecov|_
 
 About
 =====
@@ -108,6 +109,9 @@ All commands are shown below for the test called ``foo``.
 
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
+
+.. |codecov| image:: https://codecov.io/gh/eerimoq/nala/branch/master/graph/badge.svg
+.. _codecov: https://codecov.io/gh/eerimoq/nala
 
 .. _narwhal: https://github.com/vberlier/narwhal
 .. _narmock: https://github.com/vberlier/narmock
