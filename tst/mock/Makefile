@@ -1,6 +1,14 @@
 ASAN_FLAGS = -fsanitize=address
 INC += -I../../dist
-CFLAGS = $(INC) -Wextra -Wconversion -g -Og $(ASAN_FLAGS)
+CFLAGS = \
+	$(INC) \
+	-Wextra \
+	-Wconversion \
+	-g \
+	-Og \
+	$(ASAN_FLAGS) \
+	-fprofile-arcs \
+	-ftest-coverage
 NALA ?= PYTHONPATH=../.. python3 -m nala
 
 test:

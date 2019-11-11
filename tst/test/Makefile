@@ -1,3 +1,10 @@
+CFLAGS += \
+	-fprofile-arcs \
+	-ftest-coverage \
+	-Wall \
+	-Wextra \
+	-Og \
+	-g
 SRC = \
 	../../src/nala.c \
 	../../src/diff/diff.c \
@@ -9,5 +16,5 @@ SRC = \
 	main.c
 
 all:
-	$(CC) -I../../include $(SRC) -Wall -Wextra -Og -g -o main
+	$(CC) -I../../include $(SRC) $(CFLAGS) -o main
 	./main
