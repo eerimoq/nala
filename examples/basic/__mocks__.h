@@ -1,7 +1,7 @@
 /*
 Mocks header file
 
-Generated with Narmock v0.2.12 (https://github.com/vberlier/narmock)
+Generated with Nala v0.3.0 (https://github.com/vberlier/nala)
 Do not edit manually
 */
 
@@ -12,15 +12,15 @@ Do not edit manually
 
 #include <time.h>
 
-#ifndef _NARMOCK_RESET_ALL_MOCKS
-#define _NARMOCK_RESET_ALL_MOCKS 1
-void narmock_reset_all_mocks(void);
+#ifndef _NALA_RESET_ALL_MOCKS
+#define _NALA_RESET_ALL_MOCKS 1
+void nala_reset_all_mocks(void);
 #endif
 
-void narmock_assert_all_mocks_completed(void);
+void nala_assert_all_mocks_completed(void);
 
-// NARMOCK_DECLARATION time
-// NARMOCK_LINKER_FLAGS -Wl,--wrap=time
+// NALA_DECLARATION time
+// NALA_LINKER_FLAGS -Wl,--wrap=time
 
 void time_mock(time_t return_value);
 void time_mock_once(time_t return_value);

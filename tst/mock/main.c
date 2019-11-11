@@ -5,9 +5,9 @@
 #include <unistd.h>
 
 #include "subprocess.h"
+#include "nala.h"
 #include "__mocks__.h"
 #include "dummy_functions.h"
-#include "nala.h"
 
 static void function_error_in_subprocess(void (*entry)(void *arg_p))
 {

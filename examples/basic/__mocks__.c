@@ -1,21 +1,21 @@
 /*
 Mocks source file
 
-Generated with Narmock v0.2.12 (https://github.com/vberlier/narmock)
+Generated with Nala v0.3.0 (https://github.com/vberlier/nala)
 Do not edit manually
 */
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-#include "narwhal.h"
+#include "nala.h"
 
 #include <errno.h>
 #include <stddef.h>
 
 #include "__mocks__.h"
 
-#define _NARMOCK_INSTANCES_APPEND(list, item_p) \
+#define _NALA_INSTANCES_APPEND(list, item_p) \
     do {                                        \
         if ((list).head_p == NULL) {            \
             (list).head_p = instance_p;         \
@@ -26,7 +26,7 @@ Do not edit manually
         (list).tail_p = instance_p;             \
     } while (0);
 
-#define _NARMOCK_INSTANCES_POP(list, instance_pp)       \
+#define _NALA_INSTANCES_POP(list, instance_pp)       \
     do {                                                \
         *(instance_pp) = (list).head_p;                 \
                                                         \
@@ -39,14 +39,14 @@ Do not edit manually
         }                                               \
     } while (0);
 
-typedef struct _narmock_set_param _narmock_set_param;
+typedef struct _nala_set_param _nala_set_param;
 
-struct _narmock_set_param {
+struct _nala_set_param {
     void *buf_p;
     size_t size;
 };
 
-static void *_narmock_malloc(size_t size)
+static void *_nala_malloc(size_t size)
 {
     void *buf_p;
 
@@ -60,42 +60,42 @@ static void *_narmock_malloc(size_t size)
     return (buf_p);
 }
 
-enum _narmock_va_arg_item_type_t {
-    _narmock_va_arg_item_type_d_t = 0,
-    _narmock_va_arg_item_type_u_t,
-    _narmock_va_arg_item_type_p_t
+enum _nala_va_arg_item_type_t {
+    _nala_va_arg_item_type_d_t = 0,
+    _nala_va_arg_item_type_u_t,
+    _nala_va_arg_item_type_p_t
 };
 
-struct _narmock_va_arg_item_t {
-    enum _narmock_va_arg_item_type_t type;
+struct _nala_va_arg_item_t {
+    enum _nala_va_arg_item_type_t type;
     bool ignore_in;
     union {
         int d;
         unsigned int u;
         void *p_p;
     };
-    _narmock_set_param in;
-    _narmock_set_param out;
-    struct _narmock_va_arg_item_t *next_p;
+    _nala_set_param in;
+    _nala_set_param out;
+    struct _nala_va_arg_item_t *next_p;
 };
 
-struct _narmock_va_arg_list_t {
-    struct _narmock_va_arg_item_t *head_p;
-    struct _narmock_va_arg_item_t *tail_p;
+struct _nala_va_arg_list_t {
+    struct _nala_va_arg_item_t *head_p;
+    struct _nala_va_arg_item_t *tail_p;
     unsigned int length;
 };
 
-void _narmock_va_arg_list_init(struct _narmock_va_arg_list_t *self_p)
+void _nala_va_arg_list_init(struct _nala_va_arg_list_t *self_p)
 {
     self_p->head_p = NULL;
     self_p->tail_p = NULL;
     self_p->length = 0;
 }
 
-void _narmock_va_arg_list_destroy(struct _narmock_va_arg_list_t *self_p)
+void _nala_va_arg_list_destroy(struct _nala_va_arg_list_t *self_p)
 {
-    struct _narmock_va_arg_item_t *item_p;
-    struct _narmock_va_arg_item_t *tmp_p;
+    struct _nala_va_arg_item_t *item_p;
+    struct _nala_va_arg_item_t *tmp_p;
 
     item_p = self_p->head_p;
 
@@ -114,8 +114,8 @@ void _narmock_va_arg_list_destroy(struct _narmock_va_arg_list_t *self_p)
     }
 }
 
-void _narmock_va_arg_list_append(struct _narmock_va_arg_list_t *self_p,
-                                 struct _narmock_va_arg_item_t *item_p)
+void _nala_va_arg_list_append(struct _nala_va_arg_list_t *self_p,
+                                 struct _nala_va_arg_item_t *item_p)
 {
     self_p->length++;
 
@@ -129,12 +129,12 @@ void _narmock_va_arg_list_append(struct _narmock_va_arg_list_t *self_p,
     self_p->tail_p = item_p;
 }
 
-struct _narmock_va_arg_item_t *_narmock_va_arg_list_get(
-    struct _narmock_va_arg_list_t *self_p,
+struct _nala_va_arg_item_t *_nala_va_arg_list_get(
+    struct _nala_va_arg_list_t *self_p,
     unsigned int index)
 {
     unsigned int i;
-    struct _narmock_va_arg_item_t *item_p;
+    struct _nala_va_arg_item_t *item_p;
 
     if (index >= self_p->length) {
         fprintf(stderr,
@@ -154,31 +154,31 @@ struct _narmock_va_arg_item_t *_narmock_va_arg_list_get(
     return (item_p);
 }
 
-struct _narmock_va_arg_item_t *_narmock_parse_va_arg(const char **format_pp,
+struct _nala_va_arg_item_t *_nala_parse_va_arg(const char **format_pp,
                                                      va_list vl)
 {
-    struct _narmock_va_arg_item_t *item_p;
+    struct _nala_va_arg_item_t *item_p;
 
-    item_p = _narmock_malloc(sizeof(*item_p));
+    item_p = _nala_malloc(sizeof(*item_p));
     item_p->in.buf_p = NULL;
     item_p->out.buf_p = NULL;
 
     switch (**format_pp) {
 
     case 'd':
-        item_p->type = _narmock_va_arg_item_type_d_t;
+        item_p->type = _nala_va_arg_item_type_d_t;
         item_p->ignore_in = false;
         item_p->d = va_arg(vl, int);
         break;
 
     case 'u':
-        item_p->type = _narmock_va_arg_item_type_u_t;
+        item_p->type = _nala_va_arg_item_type_u_t;
         item_p->ignore_in = false;
         item_p->u = va_arg(vl, unsigned int);
         break;
 
     case 'p':
-        item_p->type = _narmock_va_arg_item_type_p_t;
+        item_p->type = _nala_va_arg_item_type_p_t;
         item_p->ignore_in = true;
         item_p->p_p = NULL;
         break;
@@ -195,27 +195,27 @@ struct _narmock_va_arg_item_t *_narmock_parse_va_arg(const char **format_pp,
     return (item_p);
 }
 
-int _narmock_parse_va_list(struct _narmock_va_arg_list_t *list_p,
+int _nala_parse_va_list(struct _nala_va_arg_list_t *list_p,
                            const char *format_p,
                            va_list vl)
 {
     int res;
-    struct _narmock_va_arg_item_t *item_p;
+    struct _nala_va_arg_item_t *item_p;
 
     res = 1;
-    _narmock_va_arg_list_init(list_p);
+    _nala_va_arg_list_init(list_p);
 
     while (res == 1) {
         if (*format_p == '\0') {
             res = 0;
         } else if (*format_p == '%') {
             format_p++;
-            item_p = _narmock_parse_va_arg(&format_p, vl);
+            item_p = _nala_parse_va_arg(&format_p, vl);
 
             if (item_p == NULL) {
                 res = -1;
             } else {
-                _narmock_va_arg_list_append(list_p, item_p);
+                _nala_va_arg_list_append(list_p, item_p);
             }
         } else {
             res = -1;
@@ -225,7 +225,7 @@ int _narmock_parse_va_list(struct _narmock_va_arg_list_t *list_p,
     return (res);
 }
 
-void _narmock_va_arg_list_assert_d(struct _narmock_va_arg_item_t *item_p,
+void _nala_va_arg_list_assert_d(struct _nala_va_arg_item_t *item_p,
                                    int value)
 {
     if (!item_p->ignore_in) {
@@ -233,7 +233,7 @@ void _narmock_va_arg_list_assert_d(struct _narmock_va_arg_item_t *item_p,
     }
 }
 
-void _narmock_va_arg_list_assert_u(struct _narmock_va_arg_item_t *item_p,
+void _nala_va_arg_list_assert_u(struct _nala_va_arg_item_t *item_p,
                                    unsigned int value)
 {
     if (!item_p->ignore_in) {
@@ -241,7 +241,7 @@ void _narmock_va_arg_list_assert_u(struct _narmock_va_arg_item_t *item_p,
     }
 }
 
-void _narmock_va_arg_list_assert_p(struct _narmock_va_arg_item_t *item_p,
+void _nala_va_arg_list_assert_p(struct _nala_va_arg_item_t *item_p,
                                    void *value_p)
 {
     if (!item_p->ignore_in) {
@@ -257,27 +257,27 @@ void _narmock_va_arg_list_assert_p(struct _narmock_va_arg_item_t *item_p,
     }
 }
 
-void _narmock_va_arg_list_assert(struct _narmock_va_arg_list_t *self_p,
+void _nala_va_arg_list_assert(struct _nala_va_arg_list_t *self_p,
                                  va_list vl)
 {
     unsigned int i;
-    struct _narmock_va_arg_item_t *item_p;
+    struct _nala_va_arg_item_t *item_p;
 
     item_p = self_p->head_p;
 
     for (i = 0; i < self_p->length; i++) {
         switch (item_p->type) {
 
-        case _narmock_va_arg_item_type_d_t:
-            _narmock_va_arg_list_assert_d(item_p, va_arg(vl, int));
+        case _nala_va_arg_item_type_d_t:
+            _nala_va_arg_list_assert_d(item_p, va_arg(vl, int));
             break;
 
-        case _narmock_va_arg_item_type_u_t:
-            _narmock_va_arg_list_assert_u(item_p, va_arg(vl, unsigned int));
+        case _nala_va_arg_item_type_u_t:
+            _nala_va_arg_list_assert_u(item_p, va_arg(vl, unsigned int));
             break;
 
-        case _narmock_va_arg_item_type_p_t:
-            _narmock_va_arg_list_assert_p(item_p, va_arg(vl, void *));
+        case _nala_va_arg_item_type_p_t:
+            _nala_va_arg_list_assert_p(item_p, va_arg(vl, void *));
             break;
 
         default:
@@ -290,58 +290,58 @@ void _narmock_va_arg_list_assert(struct _narmock_va_arg_list_t *self_p,
     }
 }
 
-void narmock_reset_all_mocks(void)
+void nala_reset_all_mocks(void)
 {
     time_mock_reset();
 }
 
-void narmock_assert_all_mocks_completed(void)
+void nala_assert_all_mocks_completed(void)
 {
     time_mock_assert_completed();
 }
 
-// NARMOCK_IMPLEMENTATION time
+// NALA_IMPLEMENTATION time
 
 time_t __real_time(time_t *__timer);
 
-typedef struct _narmock_data_type_for_time _narmock_data_type_for_time;
+typedef struct _nala_data_type_for_time _nala_data_type_for_time;
 
-struct _narmock_data_type_for_time
+struct _nala_data_type_for_time
 {
     time_t *__timer;
     time_t return_value;
     bool ignore___timer_in;
-    _narmock_set_param __timer_in;
-    _narmock_set_param __timer_out;
+    _nala_set_param __timer_in;
+    _nala_set_param __timer_out;
     int errno_value;
     time_t (*implementation)(time_t *__timer);
 };
 
-typedef struct _narmock_instance_type_for_time _narmock_instance_type_for_time;
+typedef struct _nala_instance_type_for_time _nala_instance_type_for_time;
 
-struct _narmock_instance_type_for_time
+struct _nala_instance_type_for_time
 {
-    _narmock_data_type_for_time data;
-    _narmock_instance_type_for_time *next_p;
+    _nala_data_type_for_time data;
+    _nala_instance_type_for_time *next_p;
 };
 
-typedef struct _narmock_instances_type_for_time _narmock_instances_type_for_time;
+typedef struct _nala_instances_type_for_time _nala_instances_type_for_time;
 
-struct _narmock_instances_type_for_time {
-    _narmock_instance_type_for_time *head_p;
-    _narmock_instance_type_for_time *tail_p;
+struct _nala_instances_type_for_time {
+    _nala_instance_type_for_time *head_p;
+    _nala_instance_type_for_time *tail_p;
 };
 
-typedef struct _narmock_state_type_for_time _narmock_state_type_for_time;
+typedef struct _nala_state_type_for_time _nala_state_type_for_time;
 
-struct _narmock_state_type_for_time
+struct _nala_state_type_for_time
 {
     int mode;
-    _narmock_data_type_for_time data;
-    _narmock_instances_type_for_time instances;
+    _nala_data_type_for_time data;
+    _nala_instances_type_for_time instances;
 };
 
-static _narmock_state_type_for_time _narmock_state_for_time =
+static _nala_state_type_for_time _nala_state_for_time =
 {
     .mode = 0,
     .instances = {
@@ -352,16 +352,16 @@ static _narmock_state_type_for_time _narmock_state_for_time =
 
 time_t __wrap_time(time_t *__timer)
 {
-    struct _narmock_instance_type_for_time *instance_p;
+    struct _nala_instance_type_for_time *instance_p;
     time_t return_value;
 
-    switch (_narmock_state_for_time.mode) {
+    switch (_nala_state_for_time.mode) {
 
     case 1:
-        _NARMOCK_INSTANCES_POP(_narmock_state_for_time.instances, &instance_p);
+        _NALA_INSTANCES_POP(_nala_state_for_time.instances, &instance_p);
 
         if (instance_p == NULL) {
-            NARWHAL_TEST_FAILURE(
+            NALA_TEST_FAILURE(
                     "time() called more times than expected.\n");
         }
 
@@ -390,12 +390,12 @@ time_t __wrap_time(time_t *__timer)
 
     case 2:
         return_value =
-        _narmock_state_for_time.data.implementation(__timer);
+        _nala_state_for_time.data.implementation(__timer);
         break;
 
     case 3:
-        return_value = _narmock_state_for_time.data.return_value;
-        errno = _narmock_state_for_time.data.errno_value;
+        return_value = _nala_state_for_time.data.return_value;
+        errno = _nala_state_for_time.data.errno_value;
         break;
 
     case 4:
@@ -414,19 +414,19 @@ time_t __wrap_time(time_t *__timer)
 
 void time_mock(time_t return_value)
 {
-    _narmock_state_for_time.mode = 3;
-    _narmock_state_for_time.data.__timer = NULL;
-    _narmock_state_for_time.data.ignore___timer_in = true;
-    _narmock_state_for_time.data.return_value = return_value;
-    _narmock_state_for_time.data.errno_value = 0;
+    _nala_state_for_time.mode = 3;
+    _nala_state_for_time.data.__timer = NULL;
+    _nala_state_for_time.data.ignore___timer_in = true;
+    _nala_state_for_time.data.return_value = return_value;
+    _nala_state_for_time.data.errno_value = 0;
 }
 
 void time_mock_once(time_t return_value)
 {
-    struct _narmock_instance_type_for_time *instance_p;
+    struct _nala_instance_type_for_time *instance_p;
 
-    _narmock_state_for_time.mode = 1;
-    instance_p = _narmock_malloc(sizeof(*instance_p));
+    _nala_state_for_time.mode = 1;
+    instance_p = _nala_malloc(sizeof(*instance_p));
     instance_p->data.__timer_out.buf_p = NULL;
     instance_p->data.__timer_out.size = 0;
     instance_p->data.__timer_in.buf_p = NULL;
@@ -437,39 +437,39 @@ void time_mock_once(time_t return_value)
     instance_p->data.errno_value = 0;
     instance_p->next_p = NULL;
 
-    _NARMOCK_INSTANCES_APPEND(_narmock_state_for_time.instances,
+    _NALA_INSTANCES_APPEND(_nala_state_for_time.instances,
                               instance_p);
 }
 
 void time_mock_ignore_in(time_t return_value)
 {
-    _narmock_state_for_time.mode = 3;
-    _narmock_state_for_time.data.ignore___timer_in = true;
-    _narmock_state_for_time.data.return_value = return_value;
-    _narmock_state_for_time.data.errno_value = 0;
+    _nala_state_for_time.mode = 3;
+    _nala_state_for_time.data.ignore___timer_in = true;
+    _nala_state_for_time.data.return_value = return_value;
+    _nala_state_for_time.data.errno_value = 0;
 }
 
 void time_mock_set_errno(int errno_value)
 {
-    struct _narmock_instance_type_for_time *instance_p;
+    struct _nala_instance_type_for_time *instance_p;
 
-    instance_p = _narmock_state_for_time.instances.tail_p;
+    instance_p = _nala_state_for_time.instances.tail_p;
 
     if (instance_p != NULL) {
         instance_p->data.errno_value = errno_value;
     } else {
-        _narmock_state_for_time.data.errno_value = errno_value;
+        _nala_state_for_time.data.errno_value = errno_value;
     }
 }
 
 void time_mock_set___timer_in(const void *buf_p, size_t size)
 {
-    struct _narmock_instance_type_for_time *instance_p;
+    struct _nala_instance_type_for_time *instance_p;
 
-    instance_p = _narmock_state_for_time.instances.tail_p;
+    instance_p = _nala_state_for_time.instances.tail_p;
 
     if (instance_p != NULL) {
-        instance_p->data.__timer_in.buf_p = _narmock_malloc(size);
+        instance_p->data.__timer_in.buf_p = _nala_malloc(size);
         instance_p->data.__timer_in.size = size;
         memcpy(instance_p->data.__timer_in.buf_p,
                buf_p,
@@ -484,9 +484,9 @@ void time_mock_set___timer_in(const void *buf_p, size_t size)
 
 void time_mock_set___timer_in_pointer(time_t *__timer)
 {
-    struct _narmock_instance_type_for_time *instance_p;
+    struct _nala_instance_type_for_time *instance_p;
 
-    instance_p = _narmock_state_for_time.instances.tail_p;
+    instance_p = _nala_state_for_time.instances.tail_p;
 
     if (instance_p != NULL) {
         instance_p->data.ignore___timer_in = false;
@@ -501,12 +501,12 @@ void time_mock_set___timer_in_pointer(time_t *__timer)
 
 void time_mock_set___timer_out(const void *buf_p, size_t size)
 {
-    struct _narmock_instance_type_for_time *instance_p;
+    struct _nala_instance_type_for_time *instance_p;
 
-    instance_p = _narmock_state_for_time.instances.tail_p;
+    instance_p = _nala_state_for_time.instances.tail_p;
 
     if (instance_p != NULL) {
-        instance_p->data.__timer_out.buf_p = _narmock_malloc(size);
+        instance_p->data.__timer_out.buf_p = _nala_malloc(size);
         instance_p->data.__timer_out.size = size;
         memcpy(instance_p->data.__timer_out.buf_p, buf_p, size);
     } else {
@@ -519,31 +519,31 @@ void time_mock_set___timer_out(const void *buf_p, size_t size)
 
 void time_mock_none(void)
 {
-    _narmock_state_for_time.mode = 4;
+    _nala_state_for_time.mode = 4;
 }
 
 void time_mock_implementation(time_t (*implementation)(time_t *__timer))
 {
-    _narmock_state_for_time.mode = 2;
-    _narmock_state_for_time.data.implementation = implementation;
+    _nala_state_for_time.mode = 2;
+    _nala_state_for_time.data.implementation = implementation;
 }
 
 void time_mock_disable(void)
 {
-    _narmock_state_for_time.mode = 0;
+    _nala_state_for_time.mode = 0;
 }
 
 void time_mock_reset(void)
 {
-    _narmock_state_for_time.mode = 0;
-    _narmock_state_for_time.instances.head_p = NULL;
-    _narmock_state_for_time.instances.tail_p = NULL;
+    _nala_state_for_time.mode = 0;
+    _nala_state_for_time.instances.head_p = NULL;
+    _nala_state_for_time.instances.tail_p = NULL;
 }
 
 void time_mock_assert_completed(void)
 {
-    if (_narmock_state_for_time.instances.head_p != NULL) {
-        NARWHAL_TEST_FAILURE(
+    if (_nala_state_for_time.instances.head_p != NULL) {
+        NALA_TEST_FAILURE(
             "time() called fewer times than expected.\n");
     }
 }

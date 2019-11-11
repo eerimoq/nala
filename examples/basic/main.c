@@ -1,7 +1,6 @@
 #include <time.h>
-
+#include "nala.h"
 #include "__mocks__.h"
-#include "narwhal.h"
 
 TEST(example)
 {
