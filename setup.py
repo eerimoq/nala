@@ -31,5 +31,5 @@ setup(name='nala',
       ],
       include_package_data=True,
       entry_points = {
-          'console_scripts': ['nala=nala.__init__:main']
+          'console_scripts': ['nala=nala.cli:main']
       })
