@@ -3,9 +3,9 @@
 About
 =====
 
-A `C` test framework.
+A test framework for `C` projects.
 
-Based on https://github.com/vberlier/nala.
+Based on `narwhal`_ and `narmock`_.
 
 Features
 --------
@@ -108,6 +108,9 @@ All commands are shown below for the test called ``foo``.
 
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
+
+.. _narwhal: https://github.com/vberlier/narwhal
+.. _narmock: https://github.com/vberlier/narmock
 
 .. _amalgamated: https://sqlite.org/amalgamation.html
 .. _nala.h: https://raw.githubusercontent.com/eerimoq/nala/master/dist/nala.h
