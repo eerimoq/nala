@@ -34,9 +34,9 @@ Alternatively, if mocking is not needed, you can download the
 - `nala.h`_
 - `nala.c`_
 
-Drop the two files in your project, make sure `nala.c` is compiled and
-linked just like the other source files of your test program and you
-should be good to go.
+Drop the two files in your project, make sure ``nala.c`` is compiled
+and linked just like the other source files of your test program and
+you should be good to go.
 
 Example
 =======
