@@ -107,6 +107,128 @@ All commands are shown below for the test called ``foo``.
    (gdb) set follow-fork-mode child
    (gdb) c
 
+Mocking
+=======
+
+Nala finds the functions mocked in your tests and generates mocks with
+a slick API.
+
+.. code-block:: c
+
+   #include <time.h>
+
+   #include "__mocks__.h"
+   #include "narwhal.h"
+
+   TEST(example)
+   {
+       time_mock_once(42);
+
+       ASSERT_EQ(time(NULL), 42);
+   }
+
+Installation
+------------
+
+Clone the repository and run the narwhal script from the clone. Also
+install dependencies with `pip`.
+
+.. code-block::
+
+   $ pip install nala
+
+Getting started
+---------------
+
+The command-line utility provides two essential commands that should
+make it possible to integrate Narmock in any kind of build system.
+
+.. code-block::
+
+   usage: nala [-h] (-g [<code>] | -f) [-d <directory>]
+
+   A minimal mocking utility for C projects.
+
+   optional arguments:
+     -h, --help      show this help message and exit
+     -g [<code>]     generate mocks
+     -f              output linker flags
+     -d <directory>  mocks directory
+
+Generating mocks
+----------------
+
+The `narmock -g` command finds the functions mocked in your code and
+generates a `__mocks__.c` file and a `__mocks__.h` file that
+respectively define and declare all the required mocks.
+
+.. code-block:: bash
+
+   $ gcc -E *.c | narmock -g
+
+Narmock requires source code to be expanded by the preprocessor. You
+can directly pipe the output of `gcc -E` to the command-line utility.
+
+Retrieving linker flags
+-----------------------
+
+The `narmock -f` command reads the generated `__mocks__.h` file and
+outputs the necessary linker flags for linking all your source files
+together.
+
+.. code-block:: bash
+
+   $ gcc $(narmock -f) *.c
+
+Mock API
+--------
+
+The created mocks provides the following functions.
+
+For all functions
+%%%%%%%%%%%%%%%%%
+
+.. code-block::
+
+   <func>_mock(<params>, <res>)      - check parameters and return
+   <func>_mock_once(<params>, <res>) - check parameters and return once (per call)
+   <func>_mock_ignore_in(<res>)      - ignore parameters and return
+   <func>_mock_ignore_in_once(<res>) - ignore parameters and return once (per call)
+   <func>_mock_none()                - no calls allowed
+   <func>_mock_set_errno(int)        - errno on return
+   <func>_mock_implementation(*)     - replace implementation
+   <func>_mock_disable()             - call real implementation
+   <func>_mock_reset()               - mock reset
+   <func>_mock_assert_completed()    - completion checks
+
+For selected function parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+.. code-block::
+
+   <func>_mock_ignore_<param>_in()               - ignore on input
+   <func>_mock_set_<param>_in(*, size_t)         - check on input
+   <func>_mock_set_<param>_in_pointer(*, size_t) - check pointer (the address) on input
+   <func>_mock_set_<param>_out(*, size_t)        - value on return
+
+For variadic functions
+%%%%%%%%%%%%%%%%%%%%%%
+
+.. code-block::
+
+   <func>_mock_ignore_va_arg_in_at(uint)          - ignore on input
+   <func>_mock_set_va_arg_in_at(uint, *, size_t)  - check on input
+   <func>_mock_set_va_arg_in_pointer_at(uint, *)  - check pointer on input
+   <func>_mock_set_va_arg_out_at(uint, *, size_t) - value on return
+
+Module functions
+%%%%%%%%%%%%%%%%
+
+.. code-block::
+
+   narmock_reset_all_mocks()            - reset everything
+   narmock_assert_all_mocks_completed() - completion checks
+
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
 
