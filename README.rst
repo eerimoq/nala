@@ -1,7 +1,7 @@
 |buildstatus|_
 |codecov|_
 
-🦁 nala
+🦁 Nala
 =======
 
 A test framework for `C` projects.
