@@ -1,0 +1,53 @@
+/*
+Mocks header file
+
+Generated with Nala v{{ nala_version }} (https://github.com/vberlier/nala)
+Do not edit manually
+*/
+
+#ifndef {{ guard_name }}
+#define {{ guard_name }}
+
+#include <stdarg.h>
+{{ includes }}
+#ifndef _NALA_RESET_ALL_MOCKS
+#define _NALA_RESET_ALL_MOCKS 1
+void nala_reset_all_mocks(void);
+#endif
+
+void nala_assert_all_mocks_completed(void);
+{% for mock in mocks %}
+
+{{ mock.DECL_MARKER }} {{ mock.func_name }}
+{{ mock.FLAGS_MARKER }} {{ mock.linker_flags }}
+
+{% if mock.is_variadic_func %}
+{{ mock.variadic_func_real_wrapper_decl | render }};
+{% endif %}
+{{mock.mock_func | render}};
+{{mock.mock_once_func | render}};
+void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}});
+void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}});
+{{mock.set_errno_func | render}};
+{% for param in mock.ignore_params %}
+void {{mock.func_name}}_mock_ignore_{{param}}_in(void);
+{% endfor %}
+{% for param in mock.set_params %}
+void {{mock.func_name}}_mock_set_{{param.name}}_in(const void *buf_p, size_t size);
+void {{mock.func_name}}_mock_set_{{param.name}}_in_pointer({{param | render}});
+void {{mock.func_name}}_mock_set_{{param.name}}_out(const void *buf_p, size_t size);
+{% endfor %}
+{% if mock.is_variadic_func %}
+void {{mock.func_name}}_mock_ignore_va_arg_in_at(unsigned int index);
+void {{mock.func_name}}_mock_set_va_arg_in_at(unsigned int index, const void *buf_p, size_t size);
+void {{mock.func_name}}_mock_set_va_arg_in_pointer_at(unsigned int index, const void *buf_p);
+void {{mock.func_name}}_mock_set_va_arg_out_at(unsigned int index, const void *buf_p, size_t size);
+{% endif %}
+void {{mock.func_name}}_mock_none(void);
+void {{mock.func_name}}_mock_implementation({{mock.implementation_decl | render}});
+void {{mock.func_name}}_mock_disable(void);
+void {{mock.func_name}}_mock_reset(void);
+void {{mock.func_name}}_mock_assert_completed(void);
+{% endfor %}
+
+#endif

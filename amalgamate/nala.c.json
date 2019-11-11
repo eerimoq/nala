@@ -1,0 +1,13 @@
+{
+    "project": "nala.c",
+    "target": "dist/nala.c",
+    "sources": [
+        "src/nala.c",
+        "src/subprocess.c",
+        "src/traceback.c",
+        "src/utils.c",
+        "src/diff/diff.c",
+        "src/hexdump/hexdump.c"
+    ],
+    "include_paths": []
+}

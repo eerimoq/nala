@@ -1,0 +1,8 @@
+{
+    "project": "nala.h",
+    "target":"dist/nala.h",
+    "sources":[
+        "include/nala.h"
+    ],
+    "include_paths":[]
+}
