@@ -38,7 +38,8 @@ def collect_mocked_functions(expanded_source_code):
 
     if functions:
         for function in functions:
-            print("error:", f"'{function}' undeclared", file=sys.stderr)
+            print(f"error: '{function}' undeclared", file=sys.stderr)
+
         sys.exit(1)
 
 
