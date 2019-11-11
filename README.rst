@@ -1,15 +1,15 @@
 |buildstatus|_
 |codecov|_
 
-About
-=====
+🦁 nala
+=======
 
 A test framework for `C` projects.
 
 Based on `narwhal`_ and `narmock`_.
 
 Features
---------
+========
 
 - Automatic test discovery
 - Use the same generic assertions everywhere
