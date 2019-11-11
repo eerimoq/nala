@@ -15,7 +15,7 @@ Features
 - Assertion failures reported as diffs
 - Easy-to-use output capturing utilities
 - Amalgamated source file and header ready to drop in your project
-- Mocking support with [Narmock](https://github.com/eerimoq/narmock)
+- Mocking support
 - Works well with errors reported by sanitizers
 
 Installation
