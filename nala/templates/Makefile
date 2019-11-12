@@ -6,4 +6,5 @@ test: nala_mocks.h
 	./a.out
 
 nala_mocks.h: main.c
+	[ -f nala_mocks.h ] || touch nala_mocks.h
 	$(CC) -E main.c | $(NALA) generate_mocks

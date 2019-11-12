@@ -5,7 +5,10 @@ CFLAGS += -Wextra
 CFLAGS += $(ASAN_FLAGS)
 NALA ?= PYTHONPATH=../.. python3 -m nala
 
-test:
-	$(CPP) $(INC) main.c | $(NALA) generate_mocks
+test: nala_mocks.h
 	$(CC) $(CFLAGS) $$(cat nala_mocks.ld) *.c ../../nala/dist/nala.c -o main
 	./main
+
+nala_mocks.h: main.c
+	[ -f nala_mocks.h ] || (touch nala_mocks.h)
+	$(CC) $(INC) -E main.c | $(NALA) generate_mocks

@@ -26,20 +26,14 @@ def copy_nala():
     shutil.copyfile(os.path.join(DIST_DIR, 'nala.c'), 'nala.c')
 
 
-def touch_mocks_h():
-    with open('nala_mocks.h', 'w') as fout:
-        pass
-
-
 def do_init(args):
+    os.mkdir(args.name)
+    os.chdir(args.name)
     generate_main_c()
     generate_makefile()
     copy_nala()
-    touch_mocks_h()
-    expanded_code = subprocess.check_output(['gcc', '-E', 'main.c'])
-    generate_mocks(expanded_code.decode('utf-8'))
 
-    print("Run 'make' to build and run the test suite!")
+    print(f"Run 'make -C {args.name}' to build and run the test suite!")
 
 
 def do_generate_mocks(args):
@@ -74,6 +68,7 @@ def main():
     subparser = subparsers.add_parser(
         'init',
         description='Create a test suite in current directory.')
+    subparser.add_argument('name', help='Test suite name.')
     subparser.set_defaults(func=do_init)
 
     subparser = subparsers.add_parser('generate_mocks',
