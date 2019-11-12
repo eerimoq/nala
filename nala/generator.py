@@ -1,9 +1,5 @@
 """Module in charge of generating mocks."""
 
-
-__all__ = ["GeneratedMock", "FileGenerator"]
-
-
 import os
 import re
 from copy import deepcopy
@@ -337,6 +333,8 @@ class FileGenerator:
                 self.local_includes.add(mocked_function.include.path)
 
     def write_to_directory(self, directory):
+        os.makedirs(directory, exist_ok=True)
+        
         header_filename = os.path.join(directory, self.HEADER_FILE)
         source_filename = os.path.join(directory, self.SOURCE_FILE)
         linker_filename = os.path.join(directory, self.LINKER_FILE)

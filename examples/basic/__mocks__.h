@@ -1,7 +1,7 @@
 /*
 Mocks header file
 
-Generated with Nala version 0.7.0 (https://github.com/eerimoq/nala)
+Generated with Nala version 0.8.0 (https://github.com/eerimoq/nala)
 Do not edit manually
 */
 

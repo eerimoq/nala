@@ -52,7 +52,7 @@ def do_generate_mocks(args):
             with open(infile, 'r') as fin:
                 expanded_code += fin.read()
 
-    generate_mocks(expanded_code)
+    generate_mocks(expanded_code, args.outdir)
 
 
 def main():
@@ -78,6 +78,9 @@ def main():
 
     subparser = subparsers.add_parser('generate_mocks',
                                       description='Generate mocks.')
+    subparser.add_argument('-o', '--outdir',
+                           default='.',
+                           help='Output directory (default: %(default)s).')
     subparser.add_argument(
         'infiles',
         nargs='*',
