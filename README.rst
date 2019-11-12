@@ -18,6 +18,7 @@ Features
 - Amalgamated source file and header ready to drop in your project
 - Mocking support
 - Works well with errors reported by sanitizers
+- Test isolation with fork()
 
 Installation
 ============
