@@ -8,7 +8,8 @@ import os
 import re
 from copy import deepcopy
 
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment
+from jinja2 import PackageLoader
 from pycparser import c_ast as node
 from pycparser.c_generator import CGenerator
 

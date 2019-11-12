@@ -1,20 +1,11 @@
 """Module in charge of detecting mock usage in expanded source code."""
 
-
-__all__ = [
-    "collect_mocked_functions",
-    "IncludeDirective",
-    "MockedFunction",
-    "Token",
-    "ForgivingDeclarationParser",
-]
-
-
 import os
 import sys
 import re
 from collections import defaultdict
-from typing import NamedTuple, List, Tuple
+from typing import NamedTuple
+from typing import Tuple
 
 from pycparser import c_ast as node
 from pycparser.c_parser import CParser
