@@ -10,5 +10,5 @@ test: nala_mocks.h
 	./main
 
 nala_mocks.h: main.c
-	[ -f nala_mocks.h ] || (touch nala_mocks.h)
+	[ -f nala_mocks.h ] || touch nala_mocks.h
 	$(CC) $(INC) -E main.c | $(NALA) generate_mocks
