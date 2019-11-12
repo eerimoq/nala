@@ -20,7 +20,6 @@ void nala_reset_all_mocks(void);
 void nala_assert_all_mocks_completed(void);
 
 // NALA_DECLARATION time
-// NALA_LINKER_FLAGS -Wl,--wrap=time
 
 void time_mock(time_t return_value);
 void time_mock_once(time_t return_value);

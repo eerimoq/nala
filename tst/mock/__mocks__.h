@@ -25,7 +25,6 @@ void nala_reset_all_mocks(void);
 void nala_assert_all_mocks_completed(void);
 
 // NALA_DECLARATION add
-// NALA_LINKER_FLAGS -Wl,--wrap=add
 
 void add_mock(int x, int y, int return_value);
 void add_mock_once(int x, int y, int return_value);
@@ -41,7 +40,6 @@ void add_mock_reset(void);
 void add_mock_assert_completed(void);
 
 // NALA_DECLARATION compose_twice
-// NALA_LINKER_FLAGS -Wl,--wrap=compose_twice
 
 void compose_twice_mock(DummyStruct *return_value);
 void compose_twice_mock_once(DummyStruct *return_value);
@@ -61,7 +59,6 @@ void compose_twice_mock_reset(void);
 void compose_twice_mock_assert_completed(void);
 
 // NALA_DECLARATION edit_number
-// NALA_LINKER_FLAGS -Wl,--wrap=edit_number
 
 void edit_number_mock(int number, DummyStruct *return_value);
 void edit_number_mock_once(int number, DummyStruct *return_value);
@@ -79,7 +76,6 @@ void edit_number_mock_reset(void);
 void edit_number_mock_assert_completed(void);
 
 // NALA_DECLARATION fopen
-// NALA_LINKER_FLAGS -Wl,--wrap=fopen
 
 void fopen_mock(const char *__filename, const char *__modes, FILE *return_value);
 void fopen_mock_once(const char *__filename, const char *__modes, FILE *return_value);
@@ -101,7 +97,6 @@ void fopen_mock_reset(void);
 void fopen_mock_assert_completed(void);
 
 // NALA_DECLARATION io_control
-// NALA_LINKER_FLAGS -Wl,--wrap=io_control
 
 int io_control_mock_va_arg_real(int kind, va_list __nala_va_list);
 void io_control_mock(int kind, int return_value, const char *vafmt_p, ...);
@@ -121,7 +116,6 @@ void io_control_mock_reset(void);
 void io_control_mock_assert_completed(void);
 
 // NALA_DECLARATION mount
-// NALA_LINKER_FLAGS -Wl,--wrap=mount
 
 void mount_mock(const char *__special_file, const char *__dir, const char *__fstype, unsigned long int __rwflag, int return_value);
 void mount_mock_once(const char *__special_file, const char *__dir, const char *__fstype, unsigned long int __rwflag, int return_value);
@@ -151,7 +145,6 @@ void mount_mock_reset(void);
 void mount_mock_assert_completed(void);
 
 // NALA_DECLARATION pipe
-// NALA_LINKER_FLAGS -Wl,--wrap=pipe
 
 void pipe_mock(int return_value);
 void pipe_mock_once(int return_value);
@@ -168,7 +161,6 @@ void pipe_mock_reset(void);
 void pipe_mock_assert_completed(void);
 
 // NALA_DECLARATION time
-// NALA_LINKER_FLAGS -Wl,--wrap=time
 
 void time_mock(time_t return_value);
 void time_mock_once(time_t return_value);

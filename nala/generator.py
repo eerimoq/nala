@@ -188,13 +188,6 @@ def read_nala_c():
 class GeneratedMock:
     DECL_MARKER = "// NALA_DECLARATION"
     IMPL_MARKER = "// NALA_IMPLEMENTATION"
-    FLAGS_MARKER = "// NALA_LINKER_FLAGS"
-
-    FLAGS_REGEX = re.compile(fr"^{FLAGS_MARKER}\s+(.+)$", re.MULTILINE)
-
-    @classmethod
-    def extract_flags(cls, mock_declarations):
-        return cls.FLAGS_REGEX.findall(mock_declarations)
 
     def __init__(self, function):
         self.function = function
@@ -203,7 +196,6 @@ class GeneratedMock:
 
         self.wrapped_func = f"__wrap_{self.func_name}"
         self.real_func = f"__real_{self.func_name}"
-        self.linker_flags = f"-Wl,--wrap={self.func_name}"
 
         self.state_name = f"_nala_state_for_{self.func_name}"
         self.state_type = f"_nala_state_type_for_{self.func_name}"

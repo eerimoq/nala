@@ -19,7 +19,6 @@ void nala_assert_all_mocks_completed(void);
 {% for mock in mocks %}
 
 {{ mock.DECL_MARKER }} {{ mock.func_name }}
-{{ mock.FLAGS_MARKER }} {{ mock.linker_flags }}
 
 {% if mock.is_variadic_func %}
 {{ mock.variadic_func_real_wrapper_decl | render }};

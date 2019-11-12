@@ -15,7 +15,7 @@ Do not edit manually
 
 #include "__mocks__.h"
 
-#define _NALA_INSTANCES_APPEND(list, item_p) \
+#define _NALA_INSTANCES_APPEND(list, item_p)    \
     do {                                        \
         if ((list).head_p == NULL) {            \
             (list).head_p = instance_p;         \
@@ -26,7 +26,7 @@ Do not edit manually
         (list).tail_p = instance_p;             \
     } while (0);
 
-#define _NALA_INSTANCES_POP(list, instance_pp)       \
+#define _NALA_INSTANCES_POP(list, instance_pp)          \
     do {                                                \
         *(instance_pp) = (list).head_p;                 \
                                                         \
