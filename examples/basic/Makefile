@@ -7,5 +7,5 @@ NALA ?= PYTHONPATH=../.. python3 -m nala
 
 test:
 	$(CPP) $(INC) main.c | $(NALA) generate_mocks
-	$(CC) $(CFLAGS) $$(cat __mocks__.ld) *.c ../../nala/dist/nala.c -o main
+	$(CC) $(CFLAGS) $$(cat nala_mocks.ld) *.c ../../nala/dist/nala.c -o main
 	./main

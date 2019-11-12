@@ -42,7 +42,7 @@ you should be good to go.
 Example
 =======
 
-Use ``nala init`` to create a test suite in the current directory.
+Use ``nala init`` to create a test suite in the ``test`` directory.
 
 .. code-block:: bash
 
@@ -52,14 +52,14 @@ Use ``nala init`` to create a test suite in the current directory.
    Run 'make' to build and run the test suite!
 
 The test suite is found in ``main.c`` and contains two tests; the
-first uses all assertions and captures output, and second mocks the
-time function.
+first uses all assertions and captures output, and the second mocks
+the time function.
 
 .. code-block:: c
 
    #include <time.h>
    #include "nala.h"
-   #include "__mocks__.h"
+   #include "nala_mocks.h"
 
    TEST(assertions)
    {
@@ -135,8 +135,8 @@ Generating mocks
 ----------------
 
 The ``nala generate_mocks`` command finds the functions mocked in your
-code and generates ``__mocks__.h``, ``__mocks__.c`` and
-``__mocks__.ld``. The first two files declare and define mocks, while
+code and generates ``nala_mocks.h``, ``nala_mocks.c`` and
+``nala_mocks.ld``. The first two files declare and define mocks, while
 the last file contains linker flags.
 
 .. code-block:: bash

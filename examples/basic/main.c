@@ -1,6 +1,6 @@
 #include <time.h>
 #include "nala.h"
-#include "__mocks__.h"
+#include "nala_mocks.h"
 
 TEST(example)
 {

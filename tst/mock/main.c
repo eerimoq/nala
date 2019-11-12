@@ -6,7 +6,7 @@
 
 #include "subprocess.h"
 #include "nala.h"
-#include "__mocks__.h"
+#include "nala_mocks.h"
 #include "dummy_functions.h"
 
 static void function_error_in_subprocess(void (*entry)(void *arg_p))

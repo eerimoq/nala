@@ -302,9 +302,9 @@ class GeneratedMock:
 
 class FileGenerator:
 
-    HEADER_FILE = "__mocks__.h"
-    SOURCE_FILE = "__mocks__.c"
-    LINKER_FILE = "__mocks__.ld"
+    HEADER_FILE = "nala_mocks.h"
+    SOURCE_FILE = "nala_mocks.c"
+    LINKER_FILE = "nala_mocks.ld"
 
     def __init__(self):
         self.code_generator = CGenerator()

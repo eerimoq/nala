@@ -13,7 +13,7 @@ Do not edit manually
 #include <errno.h>
 #include <stddef.h>
 
-#include "__mocks__.h"
+#include "nala_mocks.h"
 
 #define _NALA_INSTANCES_APPEND(list, item_p)    \
     do {                                        \

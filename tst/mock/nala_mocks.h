@@ -5,8 +5,8 @@ Generated with Nala version 0.8.0 (https://github.com/eerimoq/nala)
 Do not edit manually
 */
 
-#ifndef MOCKS_H
-#define MOCKS_H
+#ifndef NALA_MOCKS_H
+#define NALA_MOCKS_H
 
 #include <stdarg.h>
 

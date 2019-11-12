@@ -27,7 +27,7 @@ def copy_nala():
 
 
 def touch_mocks_h():
-    with open('__mocks__.h', 'w') as fout:
+    with open('nala_mocks.h', 'w') as fout:
         pass
 
 
