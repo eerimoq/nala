@@ -226,7 +226,6 @@ void nala_free_diff_matrix(NalaDiffMatrix *diff_matrix);
 #include <stdlib.h>
 
 char *nala_hexdump(const uint8_t *buffer, size_t size, size_t bytes_per_row);
-size_t nala_optimal_bytes_per_row(size_t element_size, size_t target, size_t range);
 
 #endif
 
@@ -237,8 +236,6 @@ size_t nala_optimal_bytes_per_row(size_t element_size, size_t target, size_t ran
 #include <stdbool.h>
 #include <stdio.h>
 
-size_t nala_util_read_stream(FILE *stream, char **buffer);
-bool nala_is_short_string(const char *string);
 int nala_min_int(int a, int b);
 size_t nala_min_size_t(size_t a, size_t b);
 size_t nala_count_chars(const char *string, char chr);
@@ -1289,45 +1286,12 @@ void nala_traceback_print(const char *prefix_p)
         }
     }
 }
-// #include "utils.h"
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+// #include "utils.h"
 
-size_t nala_util_read_stream(FILE *stream, char **output_buffer)
-{
-    char buffer[256];
-    size_t output_length = 0;
-
-    size_t read_count = fread(buffer, 1, sizeof(buffer) - 1, stream);
-    buffer[read_count] = '\0';
-
-    if (read_count > 0) {
-        *output_buffer = malloc(read_count + 1);
-        memcpy(*output_buffer, buffer, read_count + 1);
-    }
-
-    output_length = read_count;
-
-    while (read_count + 1 == sizeof(buffer)) {
-        read_count = fread(buffer, 1, sizeof(buffer) - 1, stream);
-        buffer[read_count] = '\0';
-        output_length += read_count;
-
-        *output_buffer = realloc(*output_buffer, output_length + 1);
-        memcpy(*output_buffer + output_length - read_count, buffer, read_count + 1);
-    }
-
-    return output_length;
-}
-
-bool nala_is_short_string(const char *string)
-{
-    return strlen(string) < 64 && strchr(string, '\n') == NULL;
-}
 
 int nala_min_int(int a, int b)
 {
@@ -1387,8 +1351,6 @@ const char *nala_next_lines(const char *string, size_t lines)
 #include <stdbool.h>
 #include <stdio.h>
 
-size_t nala_util_read_stream(FILE *stream, char **buffer);
-bool nala_is_short_string(const char *string);
 int nala_min_int(int a, int b);
 size_t nala_min_size_t(size_t a, size_t b);
 size_t nala_count_chars(const char *string, char chr);
@@ -1740,45 +1702,4 @@ char *nala_hexdump(const uint8_t *buffer, size_t size, size_t bytes_per_row)
     fclose(stream);
 
     return dump;
-}
-
-size_t nala_optimal_bytes_per_row(size_t element_size, size_t target, size_t range)
-{
-    size_t min = target - range;
-    size_t max = target + range;
-
-    if (element_size < min) {
-        return (size_t)((double)target / (double)element_size + 0.5) * element_size;
-    }
-
-    if (element_size > max) {
-        if (element_size % target == 0) {
-            return target;
-        }
-
-        size_t div_min = target;
-        size_t div_max = target;
-
-        while (div_min > min || div_max < max) {
-            if (div_min > min) {
-                div_min--;
-
-                if (element_size % div_min == 0) {
-                    return div_min;
-                }
-            }
-
-            if (div_max < max) {
-                div_max++;
-
-                if (element_size % div_max == 0) {
-                    return div_max;
-                }
-            }
-        }
-
-        return target;
-    }
-
-    return element_size;
 }
