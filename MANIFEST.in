@@ -1,2 +1,4 @@
 include LICENSE
 include Makefile
+include nala/dist/*
+include nala/templates/*

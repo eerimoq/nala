@@ -1,7 +1,7 @@
 /*
 Mocks header file
 
-Generated with Nala v0.3.0 (https://github.com/vberlier/nala)
+Generated with Nala version 0.4.0 (https://github.com/vberlier/nala)
 Do not edit manually
 */
 

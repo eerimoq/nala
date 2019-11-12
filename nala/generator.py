@@ -329,8 +329,10 @@ class GeneratedMock:
 
 
 class FileGenerator:
-    SOURCE_FILE = "__mocks__.c"
+
     HEADER_FILE = "__mocks__.h"
+    SOURCE_FILE = "__mocks__.c"
+    LINKER_FILE = "__mocks__.ld"
 
     def __init__(self):
         self.code_generator = CGenerator()
@@ -342,8 +344,8 @@ class FileGenerator:
         )
         self.jinja_env.filters["render"] = self.code_generator.visit
 
-        self.source_template = self.jinja_env.get_template(f"{self.SOURCE_FILE}.jinja2")
         self.header_template = self.jinja_env.get_template(f"{self.HEADER_FILE}.jinja2")
+        self.source_template = self.jinja_env.get_template(f"{self.SOURCE_FILE}.jinja2")
 
         self.mocks = []
         self.system_includes = set()
@@ -359,34 +361,39 @@ class FileGenerator:
                 self.local_includes.add(mocked_function.include.path)
 
     def write_to_directory(self, directory):
-        source_filename = os.path.join(directory, self.SOURCE_FILE)
         header_filename = os.path.join(directory, self.HEADER_FILE)
+        source_filename = os.path.join(directory, self.SOURCE_FILE)
+        linker_filename = os.path.join(directory, self.LINKER_FILE)
 
         mocks = list(sorted(self.mocks, key=lambda m: m.func_name))
-
-        source_code = self.source_template.render(
-            nala_version=__version__,
-            includes=generate_includes(
-                {"stddef.h", "errno.h"}, {header_filename}, directory
-            ),
-            nala_c=read_nala_c(),
-            mocks=mocks,
-        )
 
         header_code = self.header_template.render(
             nala_version=__version__,
             guard_name=get_guard_name(header_filename),
             includes=generate_includes(
-                self.system_includes, self.local_includes, directory
-            ),
-            mocks=mocks,
-        )
+                self.system_includes, self.local_includes, directory),
+            mocks=mocks)
 
-        with open(source_filename, "w") as source_file:
-            source_file.write(source_code.strip() + "\n")
+        source_code = self.source_template.render(
+            nala_version=__version__,
+            includes=generate_includes(
+                {"stddef.h", "errno.h"}, {header_filename}, directory),
+            nala_c=read_nala_c(),
+            mocks=mocks)
 
-        with open(header_filename, "w") as header_file:
-            header_file.write(header_code.strip() + "\n")
+        with open(header_filename, "w") as fout:
+            fout.write(header_code.strip())
+            fout.write('\n')
+
+        with open(source_filename, "w") as fout:
+            fout.write(source_code.strip())
+            fout.write('\n')
+
+        with open(linker_filename, "w") as fout:
+            fout.write(' '.join([
+                f'-Wl,--wrap={mock.function.name}'
+                for mock in mocks
+            ]))
 
     @classmethod
     def read_declarations(cls, directory):

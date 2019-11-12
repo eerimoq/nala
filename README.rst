@@ -48,6 +48,7 @@ Use ``nala init`` to create a test suite in the current directory.
    $ mkdir test
    $ cd test
    $ nala init
+   Run 'make' to build and run the test suite!
 
 The test suite is found in ``main.c`` and contains two tests; the
 first uses all assertions and captures output, and second mocks the
@@ -88,7 +89,7 @@ time function.
        ASSERT_EQ(time(NULL), 42);
    }
 
-Build and run the test.
+Build and run the tests.
 
 .. code-block:: text
 
@@ -203,5 +204,5 @@ Module functions
 .. _narmock: https://github.com/vberlier/narmock
 
 .. _amalgamated: https://sqlite.org/amalgamation.html
-.. _nala.h: https://raw.githubusercontent.com/eerimoq/nala/master/dist/nala.h
-.. _nala.c: https://raw.githubusercontent.com/eerimoq/nala/master/dist/nala.c
+.. _nala.h: https://raw.githubusercontent.com/eerimoq/nala/master/nala/dist/nala.h
+.. _nala.c: https://raw.githubusercontent.com/eerimoq/nala/master/nala/dist/nala.c

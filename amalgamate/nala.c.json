@@ -1,6 +1,6 @@
 {
     "project": "nala.c",
-    "target": "dist/nala.c",
+    "target": "nala/dist/nala.c",
     "sources": [
         "src/nala.c",
         "src/subprocess.c",

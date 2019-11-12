@@ -1,0 +1,1 @@
+-Wl,--wrap=add -Wl,--wrap=compose_twice -Wl,--wrap=edit_number -Wl,--wrap=fopen -Wl,--wrap=io_control -Wl,--wrap=mount -Wl,--wrap=pipe -Wl,--wrap=time

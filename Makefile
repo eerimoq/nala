@@ -3,7 +3,8 @@
 all:
 	$(MAKE) dist
 	$(MAKE) test
-	$(CC) dist/nala.c
+	$(CC) nala/dist/nala.c
+	$(MAKE) -C examples/basic
 
 test:
 	$(MAKE) -C tst

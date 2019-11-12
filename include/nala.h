@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define VERSION "0.4.0"
+
 #define TEST(name)                                      \
     void name(void);                                    \
     void name ## _before_fork() {}                      \
