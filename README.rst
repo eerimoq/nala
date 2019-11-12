@@ -42,16 +42,14 @@ you should be good to go.
 Example
 =======
 
-Use ``nala init`` to create a test suite in the ``test`` directory.
+Use ``nala init`` to create a test suite named ``foo``.
 
 .. code-block:: bash
 
-   $ mkdir test
-   $ cd test
-   $ nala init
-   Run 'make' to build and run the test suite!
+   $ nala init foo
+   Run 'make -C foo' to build and run the test suite!
 
-The test suite is found in ``main.c`` and contains two tests; the
+The test suite is found in ``foo/main.c`` and contains two tests; the
 first uses all assertions and captures output, and the second mocks
 the time function.
 
@@ -94,7 +92,7 @@ Build and run the tests.
 
 .. code-block:: text
 
-   $ make
+   $ make -s -C foo
    std!
    err!
 

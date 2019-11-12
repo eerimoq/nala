@@ -109,3 +109,6 @@ venv.bak/
 main
 *.gcno
 *.gcda
+nala_mocks.h
+nala_mocks.c
+nala_mocks.ld
