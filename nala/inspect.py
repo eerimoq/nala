@@ -3,7 +3,6 @@
 import os
 import sys
 import re
-from collections import defaultdict
 from typing import NamedTuple
 from typing import Tuple
 
@@ -13,6 +12,7 @@ from pycparser.plyparser import ParseError
 
 
 GETTER_REGEX = re.compile(r"(void )?(\w+?)_mock_once\s*\(")
+
 
 def collect_mocked_functions(expanded_source_code):
     """Yield all the mocked functions used in the expanded source code."""
@@ -32,30 +32,6 @@ def collect_mocked_functions(expanded_source_code):
             print(f"error: '{function}' undeclared", file=sys.stderr)
 
         sys.exit(1)
-
-
-def rename_arguments(function_declaration):
-    if not function_declaration.type.args:
-        return function_declaration
-
-    for i, param in enumerate(function_declaration.type.args.params):
-        param_type = param.type
-
-        if (
-            not param.name
-            and isinstance(param_type.type, node.IdentifierType)
-            and param_type.type.names == ["void"]
-        ):
-            continue
-
-        param.name = f"arg{i + 1}"
-
-        while not isinstance(param_type, node.TypeDecl):
-            param_type = param_type.type
-
-        param_type.declname = param.name
-
-    return function_declaration
 
 
 class IncludeDirective(NamedTuple):
@@ -116,7 +92,7 @@ class Token(NamedTuple):
             "static",
             "auto",
             "register",
-            "__extension__",
+            "__extension__"
         )
 
 
@@ -149,8 +125,7 @@ class ForgivingDeclarationParser:
 
     regex = re.compile(
         "|".join(f"(?P<{token}>{pattern})" for token, pattern in tokens.items()),
-        flags=re.MULTILINE,
-    )
+        flags=re.MULTILINE)
 
     def __init__(self, source_code, functions=None):
         self.source_code = source_code
@@ -184,9 +159,8 @@ class ForgivingDeclarationParser:
             if self.functions is not None and not self.functions:
                 break
 
-            while self.current and not (
-                self.current.is_punctuation(";", "}") and not self.bracket_stack
-            ):
+            while (self.current and not (self.current.is_punctuation(";", "}")
+                                         and not self.bracket_stack)):
                 self.next()
 
     def next(self):
@@ -238,9 +212,8 @@ class ForgivingDeclarationParser:
     def parse_typedef(self):
         start_index = self.current.span[0]
 
-        while self.current and not (
-            self.current.is_punctuation(";") and not self.bracket_stack
-        ):
+        while (self.current
+               and not (self.current.is_punctuation(";") and not self.bracket_stack)):
             self.next()
 
         self.typedefs.append(self.source_code[start_index : self.current.span[1]])
@@ -255,12 +228,10 @@ class ForgivingDeclarationParser:
         start_index = self.current.span[0]
         return_type = []
 
-        while (
-            self.current
-            and not self.current.is_punctuation("(")
-            or self.next()
-            and self.current.is_punctuation("*")
-        ):
+        while (self.current
+               and not self.current.is_punctuation("(")
+               or self.next()
+               and self.current.is_punctuation("*")):
             if not self.bracket_stack and self.current.is_punctuation(";"):
                 return None
 
@@ -275,12 +246,10 @@ class ForgivingDeclarationParser:
         if self.functions is not None and func_name not in self.functions:
             return None
 
-        while (
-            self.current
-            and self.bracket_stack
-            or self.next()
-            and self.current.is_punctuation("(")
-        ):
+        while (self.current
+               and self.bracket_stack
+               or self.next()
+               and self.current.is_punctuation("(")):
             self.next()
 
         signature = self.source_code[start_index : self.previous.span[1]] + ";"
@@ -297,10 +266,8 @@ class ForgivingDeclarationParser:
             return MockedFunction(
                 func_name,
                 file_ast.ext[-1],
-                IncludeDirective.from_source_context(self.source_context),
-            )
+                IncludeDirective.from_source_context(self.source_context))
 
     def erase_code_section(self, begin, end):
         self.source_code = (
-            self.source_code[:begin] + " " * (end - begin) + self.source_code[end:]
-        )
+            self.source_code[:begin] + " " * (end - begin) + self.source_code[end:])

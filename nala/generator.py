@@ -71,24 +71,6 @@ def function_ptr_decl(name, return_type, parameters):
     )
 
 
-def void_params():
-    return [decl(None, node.TypeDecl(None, [], node.IdentifierType(["void"])))]
-
-
-def void_param():
-    return [node.TypeDecl(None, [], node.IdentifierType(["void"]))]
-
-
-def set_params():
-    return [
-        decl(None,
-             node.PtrDecl([], node.TypeDecl('buf_p',
-                                            ['const'],
-                                            node.IdentifierType(['void'])))),
-        decl(None, node.TypeDecl('size', [], node.IdentifierType(["size_t"])))
-    ]
-
-
 def bool_param(name):
     return decl(name, node.TypeDecl(name, [], node.IdentifierType(["bool"])))
 
@@ -160,6 +142,7 @@ def create_mock_params(params, return_value):
 
 def get_guard_name(filename):
     slug = re.sub(r"[^a-zA-Z0-9]", "_", os.path.normpath(os.path.relpath(filename)))
+
     return re.sub(r"_+", "_", slug).upper().strip("_")
 
 
@@ -387,8 +370,3 @@ class FileGenerator:
                 f'-Wl,--wrap={mock.function.name}'
                 for mock in mocks
             ]))
-
-    @classmethod
-    def read_declarations(cls, directory):
-        with open(os.path.join(directory, cls.HEADER_FILE)) as header_file:
-            return header_file.read()
