@@ -218,7 +218,9 @@ class ForgivingDeclarationParser:
                and not (self.current.is_punctuation(";") and not self.bracket_stack)):
             self.next()
 
-        self.typedefs.append(self.source_code[start_index : self.current.span[1]])
+        code = self.source_code[start_index : self.current.span[1]]
+        # typedef __signed__ char __s8;
+        self.typedefs.append(code.replace('__signed__', 'signed'))
 
     def parse_function_declaration(self):
         if self.bracket_stack:
