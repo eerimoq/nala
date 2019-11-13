@@ -8,7 +8,7 @@ all:
 	! $(MAKE) -C examples/failures
 	rm -rf my-suite
 	PYTHONPATH=. python3 -m nala init my-suite
-	$(MAKE) -C my-suite
+	$(MAKE) -C my-suite NALA="PYTHONPATH=.. python3 -m nala"
 
 test:
 	$(MAKE) -C tst
