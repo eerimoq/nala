@@ -5,6 +5,7 @@ all:
 	$(MAKE) test
 	$(CC) nala/dist/nala.c
 	$(MAKE) -C examples/basic
+	! $(MAKE) -C examples/failures
 
 test:
 	$(MAKE) -C tst

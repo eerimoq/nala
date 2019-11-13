@@ -7,6 +7,7 @@
         }                                       \
                                                 \
         (list).tail_p = instance_p;             \
+        (list).length++;                        \
     } while (0);
 
 #define _NALA_INSTANCES_POP(list, instance_pp)          \
@@ -19,6 +20,8 @@
             if ((*(instance_pp))->next_p == NULL) {     \
                 (list).tail_p = NULL;                   \
             }                                           \
+                                                        \
+            (list).length--;                            \
         }                                               \
     } while (0);
 

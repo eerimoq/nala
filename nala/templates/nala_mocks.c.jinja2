@@ -65,6 +65,7 @@ typedef struct _nala_instances_type_for_{{mock.func_name}} _nala_instances_type_
 struct _nala_instances_type_for_{{mock.func_name}} {
     _nala_instance_type_for_{{mock.func_name}} *head_p;
     _nala_instance_type_for_{{mock.func_name}} *tail_p;
+    int length;
 };
 
 typedef struct {{mock.state_type}} {{mock.state_type}};
@@ -81,7 +82,8 @@ static {{mock.state_type}} {{mock.state_name}} =
     .mode = 0,
     .instances = {
         .head_p = NULL,
-        .tail_p = NULL
+        .tail_p = NULL,
+        .length = 0
     }
 };
 
@@ -552,13 +554,20 @@ void {{mock.func_name}}_mock_reset(void)
     {{mock.state_name}}.mode = 0;
     {{mock.state_name}}.instances.head_p = NULL;
     {{mock.state_name}}.instances.tail_p = NULL;
+    {{mock.state_name}}.instances.length = 0;
 }
 
 void {{mock.func_name}}_mock_assert_completed(void)
 {
-    if ({{mock.state_name}}.instances.head_p != NULL) {
-        NALA_TEST_FAILURE(
-            "{{mock.func_name}}() called fewer times than expected.\n");
+    char message[1024];
+
+    if ({{mock.state_name}}.instances.length != 0) {
+        snprintf(&message[0],
+                 sizeof(message),
+                 "{{mock.func_name}}() called fewer times than expected. %d call(s) "
+                 "missing.\n",
+                 {{mock.state_name}}.instances.length);
+        NALA_TEST_FAILURE(&message[0]);
     }
 }
 {% endfor %}
