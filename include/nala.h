@@ -66,6 +66,7 @@
 
 #define NALA_BINARY_ASSERTION(left, right, check, format, formatter)    \
     if (!check((left), (right))) {                                      \
+        nala_reset_all_mocks();                                         \
         char _nala_assert_format[512];                                  \
                                                                         \
         snprintf(&_nala_assert_format[0],                               \
@@ -224,6 +225,7 @@
 #define ASSERT_MEMORY(left, right, size)                        \
     do {                                                        \
         if (memcmp((left), (right), (size)) != 0) {             \
+            nala_reset_all_mocks();                             \
             NALA_TEST_FAILURE(nala_format_memory((left),        \
                                                  (right),       \
                                                  (size)));      \
@@ -232,10 +234,15 @@
 
 #define ASSERT(cond)                            \
     if (!(cond)) {                              \
+        nala_reset_all_mocks();                 \
         NALA_TEST_FAILURE(strdup("Assert.\n")); \
     }
 
-#define FAIL() NALA_TEST_FAILURE(strdup("Fail.\n"))
+#define FAIL()                                  \
+    do {                                        \
+        nala_reset_all_mocks();                 \
+        NALA_TEST_FAILURE(strdup("Fail.\n"));   \
+    } while (0);
 
 #define CAPTURE_OUTPUT(stdout_name, stderr_name)                        \
     int stdout_name ## i;                                               \
@@ -280,5 +287,7 @@ __attribute__ ((noreturn)) void nala_test_failure(const char *file_p,
 void nala_register_test(struct nala_test_t *test_p);
 
 int nala_run_tests(void);
+
+void nala_reset_all_mocks(void);
 
 #endif

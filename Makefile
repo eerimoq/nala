@@ -6,6 +6,9 @@ all:
 	$(CC) nala/dist/nala.c
 	$(MAKE) -C examples/basic
 	! $(MAKE) -C examples/failures
+	rm -rf my-suite
+	PYTHONPATH=. python3 -m nala init my-suite
+	$(MAKE) -C my-suite
 
 test:
 	$(MAKE) -C tst

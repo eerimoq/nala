@@ -296,6 +296,10 @@ __attribute__ ((weak)) void nala_assert_all_mocks_completed(void)
 {
 }
 
+__attribute__ ((weak)) void nala_reset_all_mocks(void)
+{
+}
+
 static void capture_output_init(struct capture_output_t *self_p,
                                 FILE *file_p)
 {
@@ -528,6 +532,7 @@ static void test_entry(void *arg_p)
         }
     }
 
+    nala_reset_all_mocks();
     capture_output_destroy(&capture_stdout);
     capture_output_destroy(&capture_stderr);
 

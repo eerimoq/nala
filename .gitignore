@@ -112,3 +112,5 @@ main
 nala_mocks.h
 nala_mocks.c
 nala_mocks.ld
+/a.out
+/my-suite
