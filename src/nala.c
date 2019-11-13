@@ -584,8 +584,10 @@ const char *nala_format_string(const char *format_p, ...)
     va_end(vl);
 
     file_p = open_memstream(&buf_p, &size);
+    color_start(file_p, ANSI_COLOR_RED);
     fprintf(file_p, format_p, left_p, right_p);
-    fprintf(file_p, " See diff for details.\n");
+    fprintf(file_p, "            See diff for details.\n");
+    color_reset(file_p);
     print_string_diff(file_p, left_p, right_p);
     fputc('\0', file_p);
     fclose(file_p);
