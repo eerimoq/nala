@@ -835,7 +835,7 @@ const char *nala_format_memory(const void *left_p,
     char *right_hexdump_p;
 
     file_p = open_memstream(&buf_p, &file_size);
-    fprintf(file_p, "Memory mismatch. See diff for details.\n");
+    fprintf(file_p, COLOR_BOLD(RED, "Memory mismatch. See diff for details.\n"));
     left_hexdump_p = nala_hexdump(left_p, size, 16);
     right_hexdump_p = nala_hexdump(right_p, size, 16);
     print_string_diff(file_p, right_hexdump_p, left_hexdump_p);
