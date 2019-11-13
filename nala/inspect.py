@@ -11,7 +11,8 @@ from pycparser.c_parser import CParser
 from pycparser.plyparser import ParseError
 
 
-GETTER_REGEX = re.compile(r"(void )?(\w+?)_mock_once\s*\(")
+GETTER_REGEX = re.compile(
+    r"(void )?(\w+?)(_mock|_mock_once|_mock_ignore_in|_mock_ignore_in_once)\s*\(")
 
 
 def collect_mocked_functions(expanded_source_code):
@@ -20,7 +21,8 @@ def collect_mocked_functions(expanded_source_code):
     functions = set()
 
     for match in GETTER_REGEX.finditer(expanded_source_code):
-        void, function_name = match.groups()
+        void = match.group(1)
+        function_name = match.group(2)
 
         if void is None:
             functions.add(function_name)

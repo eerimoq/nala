@@ -7,6 +7,8 @@ NALA_C_FUNCTIONS = [
     'malloc',
     'free',
     'printf',
+    'fprintf',
+    'snprintf',
     'fseek',
     'ftell',
     'fflush',
@@ -16,11 +18,11 @@ NALA_C_FUNCTIONS = [
     'fclose',
     'exit',
     'fgets',
-    'snprintf',
     'memcpy',
     'strcmp',
     'strncmp',
-    'strdup'
+    'strdup',
+    'perror'
 ]
 
 
@@ -32,7 +34,7 @@ def generate_mocks(expanded_code, output_directory):
     generator = FileGenerator()
 
     for function in collect_mocked_functions(expanded_code):
-        if function in NALA_C_FUNCTIONS:
+        if function.name in NALA_C_FUNCTIONS:
             raise Exception(
                 f"'{function.name}()' cannot be mocked as it is used by Nala.")
 

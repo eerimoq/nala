@@ -38,6 +38,9 @@ TEST(add_function)
     ASSERT_EQ(add(0, 0), 42);
     ASSERT_EQ(add(1, 0), 42);
     ASSERT_EQ(add(1, 1), 42);
+
+    add_mock_ignore_in_once(41);
+    ASSERT_EQ(add(5, -1), 41);
 }
 
 static void add_function_error_wrong_x_entry(void *arg_p)

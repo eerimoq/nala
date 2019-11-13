@@ -308,7 +308,7 @@ static {{mock.state_type}} {{mock.state_name}} =
     instance_p->next_p = NULL;
 
     _NALA_INSTANCES_APPEND({{mock.state_name}}.instances,
-                              instance_p);
+                           instance_p);
 }
 
 void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
@@ -327,6 +327,43 @@ void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
     {{mock.state_name}}.data.return_value = return_value;
     {% endif %}
     {{mock.state_name}}.data.errno_value = 0;
+}
+
+void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
+{
+    struct _nala_instance_type_for_{{mock.func_name}} *instance_p;
+
+    {{mock.state_name}}.mode = 1;
+    instance_p = _nala_malloc(sizeof(*instance_p));
+    {% for param in mock.set_params %}
+    instance_p->data.{{param.name}}_out.buf_p = NULL;
+    instance_p->data.{{param.name}}_out.size = 0;
+    instance_p->data.{{param.name}}_in.buf_p = NULL;
+    instance_p->data.{{param.name}}_in.size = 0;
+    {% endfor %}
+    {% if mock.is_variadic_func %}
+    instance_p->data.vafmt_p = "";
+    _nala_va_arg_list_init(&instance_p->data.va_arg_list);
+    {% endif %}
+    {% for param in mock.char_pointer_params %}
+    instance_p->data.{{param.name}} = NULL;
+    instance_p->data.ignore_{{param.name}}_in = true;
+    {% endfor %}
+    {% for param in mock.pointer_params %}
+    instance_p->data.{{param.name}} = NULL;
+    instance_p->data.ignore_{{param.name}}_in = true;
+    {% endfor %}
+    {% for param in mock.non_pointer_params %}
+    instance_p->data.ignore_{{param.name}}_in = true;
+    {% endfor %}
+    {% if mock.return_value %}
+    instance_p->data.return_value = return_value;
+    {% endif %}
+    instance_p->data.errno_value = 0;
+    instance_p->next_p = NULL;
+
+    _NALA_INSTANCES_APPEND({{mock.state_name}}.instances,
+                           instance_p);
 }
 
 {{mock.set_errno_func | render}}
