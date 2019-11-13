@@ -123,12 +123,10 @@ struct _nala_va_arg_item_t *_nala_va_arg_list_get(
     struct _nala_va_arg_item_t *item_p;
 
     if (index >= self_p->length) {
-        fprintf(stderr,
-                "error: Trying to access variable argument at index %u when\n"
-                "       only %u exists.\n",
-                index,
-                self_p->length);
-        FAIL();
+        NALA_TEST_FAILURE(nala_format(
+            "Trying to access variable argument at index %u when only %u exists.\n",
+            index,
+            self_p->length));
     }
 
     item_p = self_p->head_p;
@@ -171,7 +169,7 @@ struct _nala_va_arg_item_t *_nala_parse_va_arg(const char **format_pp,
 
     default:
         free(item_p);
-        FAIL();
+        NALA_TEST_FAILURE("Nala internal error.\n");
         exit(1);
         break;
     }
@@ -267,7 +265,7 @@ void _nala_va_arg_list_assert(struct _nala_va_arg_list_t *self_p,
             break;
 
         default:
-            FAIL();
+            NALA_TEST_FAILURE("Nala internal failure.\n");
             exit(1);
             break;
         }

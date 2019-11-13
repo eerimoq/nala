@@ -100,8 +100,8 @@ static {{mock.state_type}} {{mock.state_name}} =
         _NALA_INSTANCES_POP({{mock.state_name}}.instances, &instance_p);
 
         if (instance_p == NULL) {
-            NALA_TEST_FAILURE(
-                    "{{mock.func_name}}() called more times than expected.\n");
+            NALA_TEST_FAILURE(nala_format(
+                    "{{mock.func_name}}() called more times than expected.\n"));
         }
 
         {% for param in mock.char_pointer_params %}
@@ -216,7 +216,7 @@ static {{mock.state_type}} {{mock.state_name}} =
     {% if mock.is_variadic_func %}
 
     if (vafmt_p == NULL) {
-        FAIL();
+        NALA_TEST_FAILURE(nala_format("Variadic format cannot be NULL.\n"));
     }
 
     {{mock.state_name}}.data.vafmt_p = vafmt_p;
@@ -270,7 +270,7 @@ static {{mock.state_type}} {{mock.state_name}} =
     {% if mock.is_variadic_func %}
 
     if (vafmt_p == NULL) {
-        FAIL();
+        NALA_TEST_FAILURE(nala_format("Variadic format cannot be NULL.\n"));
     }
 
     instance_p->data.vafmt_p = vafmt_p;
@@ -391,10 +391,9 @@ void {{mock.func_name}}_mock_ignore_{{param}}_in(void)
     if (instance_p != NULL) {
         instance_p->data.ignore_{{param}}_in = true;
     } else {
-        fprintf(stderr,
-                "error: {{mock.func_name}}_mock_ignore_{{param}}_in(...) not\n"
-                "       implemented for mock state.\n");
-        FAIL();
+        NALA_TEST_FAILURE(nala_format(
+            "{{mock.func_name}}_mock_ignore_{{param}}_in(...) not implemented "
+            "for mock state.\n"));
     }
 }
 {% endfor %}
@@ -413,10 +412,9 @@ void {{mock.func_name}}_mock_set_{{param.name}}_in(const void *buf_p, size_t siz
                buf_p,
                size);
     } else {
-        fprintf(stderr,
-                "error: {{mock.func_name}}_mock_set_{{param.name}}_in(...) not\n"
-                "       implemented for mock state.\n");
-        FAIL();
+        NALA_TEST_FAILURE(nala_format(
+            "{{mock.func_name}}_mock_set_{{param.name}}_in(...) not implemented "
+            "for mock state.\n"));
     }
 }
 
@@ -430,10 +428,9 @@ void {{mock.func_name}}_mock_set_{{param.name}}_in_pointer({{param | render}})
         instance_p->data.ignore_{{param.name}}_in = false;
         instance_p->data.{{param.name}} = {{param.name}};
     } else {
-        fprintf(stderr,
-                "error: {{mock.func_name}}_mock_set_{{param.name}}_in_pointer(...) not\n"
-                "       implemented for mock state.\n");
-        FAIL();
+        NALA_TEST_FAILURE(nala_format(
+            "{{mock.func_name}}_mock_set_{{param.name}}_in_pointer(...) not "
+            "implemented for mock state.\n"));
     }
 }
 
@@ -448,10 +445,9 @@ void {{mock.func_name}}_mock_set_{{param.name}}_out(const void *buf_p, size_t si
         instance_p->data.{{param.name}}_out.size = size;
         memcpy(instance_p->data.{{param.name}}_out.buf_p, buf_p, size);
     } else {
-        fprintf(stderr,
-                "error: {{mock.func_name}}_mock_set_{{param.name}}_out(...) not\n"
-                "       implemented for mock state.\n");
-        FAIL();
+        NALA_TEST_FAILURE(nala_format(
+            "{{mock.func_name}}_mock_set_{{param.name}}_out(...) not "
+            "implemented for mock state.\n"));
     }
 }
 {% endfor %}
@@ -468,10 +464,9 @@ void {{mock.func_name}}_mock_ignore_va_arg_in_at(unsigned int index)
         item_p = _nala_va_arg_list_get(&instance_p->data.va_arg_list, index);
         item_p->ignore_in = true;
     } else {
-        fprintf(stderr,
-                "error: {{mock.func_name}}_mock_ignore_va_arg_in_at(...) not\n"
-                "       implemented for mock state.\n");
-        FAIL();
+        NALA_TEST_FAILURE(nala_format(
+            "{{mock.func_name}}_mock_ignore_va_arg_in_at(...) not "
+            "implemented for mock state.\n"));
     }
 }
 
@@ -488,10 +483,9 @@ void {{mock.func_name}}_mock_set_va_arg_in_at(unsigned int index, const void *bu
         item_p->in.size = size;
         memcpy(item_p->in.buf_p, buf_p, size);
     } else {
-        fprintf(stderr,
-                "error: {{mock.func_name}}_mock_set_va_arg_in_at(...) not\n"
-                "       implemented for mock state.\n");
-        FAIL();
+        NALA_TEST_FAILURE(nala_format(
+            "{{mock.func_name}}_mock_set_va_arg_in_at(...) not implemented "
+            "for mock state.\n"));
     }
 }
 
@@ -505,10 +499,9 @@ void {{mock.func_name}}_mock_set_va_arg_in_pointer_at(unsigned int index, const 
     instance_p = {{mock.state_name}}.instances.tail_p;
 
     if (instance_p == NULL) {
-        fprintf(stderr,
-                "error: {{mock.func_name}}_mock_set_va_arg_in_pointer_at(...) not\n"
-                "       implemented for mock state.\n");
-        FAIL();
+        NALA_TEST_FAILURE(nala_format(
+            "{{mock.func_name}}_mock_set_va_arg_in_pointer_at(...) not implemented "
+            "for mock state.\n"));
     }
 }
 
@@ -525,10 +518,9 @@ void {{mock.func_name}}_mock_set_va_arg_out_at(unsigned int index, const void *b
         item_p->out.size = size;
         memcpy(item_p->out.buf_p, buf_p, size);
     } else {
-        fprintf(stderr,
-                "error: {{mock.func_name}}_mock_set_va_arg_out_at(...) not\n"
-                "       implemented for mock state.\n");
-        FAIL();
+        NALA_TEST_FAILURE(nala_format(
+            "{{mock.func_name}}_mock_set_va_arg_out_at(...) not implemented "
+            "for mock state.\n"));
     }
 }
 {% endif %}
@@ -559,15 +551,11 @@ void {{mock.func_name}}_mock_reset(void)
 
 void {{mock.func_name}}_mock_assert_completed(void)
 {
-    char message[1024];
-
     if ({{mock.state_name}}.instances.length != 0) {
-        snprintf(&message[0],
-                 sizeof(message),
-                 "{{mock.func_name}}() called fewer times than expected. %d call(s) "
-                 "missing.\n",
-                 {{mock.state_name}}.instances.length);
-        NALA_TEST_FAILURE(&message[0]);
+        NALA_TEST_FAILURE(nala_format(
+             "{{mock.func_name}}() called fewer times than expected. %d call(s) "
+             "missing.\n",
+             {{mock.state_name}}.instances.length));
     }
 }
 {% endfor %}

@@ -69,6 +69,16 @@ __attribute__ ((weak)) void nala_reset_all_mocks(void)
 {
 }
 
+static void color_start(FILE *file_p, const char *color_p)
+{
+    fprintf(file_p, "%s%s%s", ANSI_RESET, ANSI_BOLD, color_p);
+}
+
+static void color_reset(FILE *file_p)
+{
+    fprintf(file_p, "%s", ANSI_RESET);
+}
+
 static void capture_output_init(struct capture_output_t *self_p,
                                 FILE *file_p)
 {
@@ -363,15 +373,22 @@ bool nala_check_string_equal(const char *actual_p, const char *expected_p)
 
 const char *nala_format(const char *format_p, ...)
 {
-    char buf[1024];
     va_list vl;
+    size_t size;
+    char *buf_p;
+    FILE *file_p;
 
+    nala_reset_all_mocks();
+    file_p = open_memstream(&buf_p, &size);
+    color_start(file_p, ANSI_COLOR_RED);
     va_start(vl, format_p);
-    vsnprintf(&buf[0], sizeof(buf), format_p, vl);
+    vfprintf(file_p, format_p, vl);
     va_end(vl);
-    buf[sizeof(buf) - 1] = '\0';
+    color_reset(file_p);
+    fputc('\0', file_p);
+    fclose(file_p);
 
-    return strdup(&buf[0]);
+    return (buf_p);
 }
 
 static const char *display_inline_diff(FILE *file_p,
