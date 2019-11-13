@@ -6,6 +6,16 @@ typedef struct DummyStruct
     int number;
 } DummyStruct;
 
+struct struct_param_type
+{
+    int number;
+};
+
+enum enum_param_type
+{
+    enum_param_type_a = 0
+};
+
 int add(int x, int y);
 void output_message(const char *message);
 void keep_args_output_message(const char *message);
@@ -18,5 +28,7 @@ DummyStruct *compose_twice(DummyStruct *dummy_struct,
 DummyStruct *add_two(DummyStruct *dummy_struct);
 DummyStruct *(*return_add_one(void))(DummyStruct *dummy_struct);
 int io_control(int kind, ...);
+void struct_param(struct struct_param_type *data);
+void enum_param(enum enum_param_type value);
 
 #endif

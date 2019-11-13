@@ -25,6 +25,8 @@ def is_char_pointer(param):
     elif isinstance(param.type, node.PtrDecl):
         if isinstance(param.type.type, node.FuncDecl):
             return False
+        elif isinstance(param.type.type.type, node.Struct):
+            return False
         elif param.type.type.type.names[0] == 'char':
             return True
         else:
@@ -38,7 +40,7 @@ def is_char_pointer_or_non_pointer(param):
         return False
     elif is_char_pointer(param):
         return True
-    elif isinstance(param.type, (node.PtrDecl, node.ArrayDecl)):
+    elif is_pointer(param):
         return False
     else:
         return True
@@ -47,7 +49,9 @@ def is_char_pointer_or_non_pointer(param):
 def is_void(param):
     if is_ellipsis(param):
         return False
-    elif isinstance(param.type, (node.PtrDecl, node.ArrayDecl)):
+    elif is_pointer(param):
+        return False
+    elif is_enum(param):
         return False
     else:
         return param.type.type.names[0] == 'void'
@@ -55,6 +59,10 @@ def is_void(param):
 
 def is_pointer(param):
     return isinstance(param.type, (node.PtrDecl, node.ArrayDecl))
+
+
+def is_enum(param):
+    return isinstance(param.type.type, node.Enum)
 
 
 def decl(name, type):
@@ -334,7 +342,7 @@ class FileGenerator:
 
     def write_to_directory(self, directory):
         os.makedirs(directory, exist_ok=True)
-        
+
         header_filename = os.path.join(directory, self.HEADER_FILE)
         source_filename = os.path.join(directory, self.SOURCE_FILE)
         linker_filename = os.path.join(directory, self.LINKER_FILE)

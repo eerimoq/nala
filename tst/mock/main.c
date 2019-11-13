@@ -344,3 +344,15 @@ TEST(compose_twice_function)
     ASSERT_EQ(compose_twice(dummy_ptr, add_one), dummy_ptr);
     ASSERT_EQ(dummy_struct.number, 3);
 }
+
+TEST(struct_param_function)
+{
+    struct_param_mock();
+    struct_param(NULL);
+}
+
+TEST(enum_param_function)
+{
+    enum_param_mock(enum_param_type_a);
+    enum_param(enum_param_type_a);
+}

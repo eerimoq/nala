@@ -59,3 +59,13 @@ int io_control(int kind, ...)
 {
     return (kind);
 }
+
+void struct_param(struct struct_param_type *data)
+{
+    (void)data;
+}
+
+void enum_param(enum enum_param_type value)
+{
+    (void)value;
+}
