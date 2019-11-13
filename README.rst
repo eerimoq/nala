@@ -42,7 +42,7 @@ you should be good to go.
 Example
 =======
 
-Use ``nala init`` to create a test suite named ``foo``.
+Use ``nala init`` to create a test suite called ``foo``.
 
 .. code-block:: bash
 
