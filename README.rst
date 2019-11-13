@@ -116,12 +116,13 @@ then run the program until it stops at the breakpoint. Before
 continuing the program execution, tell GDB to follow the forked test
 process by setting ``follow-fork-mode`` to ``child``.
 
-All commands are shown below for the test called ``foo``.
+All commands are shown below for the ``assertions`` test in the
+example above.
 
 .. code-block::
 
    $ gdb ./a.out
-   (gdb) b foo_before_fork
+   (gdb) b assertions_before_fork
    (gdb) r
    (gdb) set follow-fork-mode child
    (gdb) c
