@@ -4,6 +4,7 @@ CFLAGS += $(INC)
 CFLAGS += -Wextra
 CFLAGS += -g
 CFLAGS += -O0
+CFLAGS += -no-pie
 CFLAGS += $(ASAN_FLAGS)
 NALA ?= PYTHONPATH=../.. python3 -m nala
 

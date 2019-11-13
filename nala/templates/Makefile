@@ -2,7 +2,7 @@ SRC = nala_mocks.c nala.c main.c
 NALA = nala
 
 test: nala_mocks.h
-	$(CC) $$(cat nala_mocks.ld) -g -Og $(SRC)
+	$(CC) $$(cat nala_mocks.ld) -g -O0 -no-pie $(SRC)
 	./a.out
 
 nala_mocks.h: main.c
