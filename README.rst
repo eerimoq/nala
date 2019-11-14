@@ -72,13 +72,13 @@ the time function.
        ASSERT_MEMORY("abcd", "abcd", 5);
        ASSERT(1 == 1);
 
-       CAPTURE_OUTPUT(stdoutput, stderrput) {
+       CAPTURE_OUTPUT(output, errput) {
            printf("std!\n");
            fprintf(stderr, "err!\n");
        }
 
-       ASSERT_EQ(stdoutput, "std!\n");
-       ASSERT_EQ(stderrput, "err!\n");
+       ASSERT_EQ(output, "std!\n");
+       ASSERT_EQ(errput, "err!\n");
    }
 
    TEST(mock_time)
