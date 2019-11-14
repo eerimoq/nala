@@ -30,5 +30,6 @@ DummyStruct *(*return_add_one(void))(DummyStruct *dummy_struct);
 int io_control(int kind, ...);
 void struct_param(struct struct_param_type *data);
 void enum_param(enum enum_param_type value);
+int call(int (*callback)(int value));
 
 #endif

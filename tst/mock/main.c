@@ -74,7 +74,7 @@ TEST(add_function_set_callback)
     add_mock_set_callback(add_function_set_callback_callback);
 
     ASSERT_EQ(add(10, 13), 23);
-              
+
     ASSERT_EQ(add_function_set_callback_callback_x, 10);
     ASSERT_EQ(add_function_set_callback_callback_y, 13);
 }
@@ -393,4 +393,10 @@ TEST(enum_param_function)
 {
     enum_param_mock(enum_param_type_a);
     enum_param(enum_param_type_a);
+}
+
+TEST(call_function)
+{
+    call_mock_once(4);
+    ASSERT_EQ(call(NULL), 4);
 }

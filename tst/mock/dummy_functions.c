@@ -69,3 +69,8 @@ void enum_param(enum enum_param_type value)
 {
     (void)value;
 }
+
+int call(int (*callback)(int value))
+{
+    return (callback(1));
+}
