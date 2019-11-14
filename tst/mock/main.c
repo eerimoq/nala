@@ -56,6 +56,29 @@ TEST(add_function_error_wrong_x)
     function_error_in_subprocess(add_function_error_wrong_x_entry);
 }
 
+static int add_function_set_callback_callback_x;
+static int add_function_set_callback_callback_y;
+
+static void add_function_set_callback_callback(int x, int y)
+{
+    add_function_set_callback_callback_x = x;
+    add_function_set_callback_callback_y = y;
+}
+
+TEST(add_function_set_callback)
+{
+    add_function_set_callback_callback_x = 0;
+    add_function_set_callback_callback_y = 0;
+
+    add_mock_once(10, 13, 23);
+    add_mock_set_callback(add_function_set_callback_callback);
+
+    ASSERT_EQ(add(10, 13), 23);
+              
+    ASSERT_EQ(add_function_set_callback_callback_x, 10);
+    ASSERT_EQ(add_function_set_callback_callback_y, 13);
+}
+
 TEST(time_function)
 {
     time_t start = time(NULL);
@@ -220,6 +243,15 @@ TEST(set_errno)
     ASSERT_EQ(errno, 0);
 }
 
+static bool variadic_function_callback_called;
+
+void variadic_function_callback(int kind, va_list vl)
+{
+    ASSERT_EQ(kind, 1);
+    ASSERT_EQ(va_arg(vl, int), 10);
+    variadic_function_callback_called = true;
+}
+
 TEST(variadic_function)
 {
     int bar_1;
@@ -264,6 +296,12 @@ TEST(variadic_function)
 
     io_control_mock_once(5, 0, "");
     ASSERT_EQ(io_control(5), 0);
+
+    io_control_mock_once(1, 2, "%d", 10);
+    io_control_mock_set_callback(variadic_function_callback);
+    variadic_function_callback_called = false;
+    ASSERT_EQ(io_control(1, 10), 2);
+    ASSERT_EQ(variadic_function_callback_called, true);
 }
 
 int io_control_mock_va_arg_real(int kind, va_list __nala_va_list)

@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define VERSION "0.16.0"
+#define VERSION "0.17.0"
 
 #define TEST(name)                                      \
     void name(void);                                    \
@@ -65,19 +65,24 @@
     default: "%p")
 
 #define NALA_BINARY_ASSERTION(left, right, check, format, formatter)    \
-    if (!check((left), (right))) {                                      \
-        nala_reset_all_mocks();                                         \
-        char _nala_assert_format[512];                                  \
+    do {                                                                \
+        __typeof__(left) _nala_assert_left = (left);                    \
+        __typeof__(right) _nala_assert_right = (right);                 \
                                                                         \
-        snprintf(&_nala_assert_format[0],                               \
-                 sizeof(_nala_assert_format),                           \
-                 format,                                                \
-                 NALA_PRINT_FORMAT(left),                               \
-                 NALA_PRINT_FORMAT(right));                             \
-        NALA_TEST_FAILURE(formatter(_nala_assert_format,                \
-                                    (left),                             \
-                                    (right)));                          \
-    }                                                                   \
+        if (!check(_nala_assert_left, _nala_assert_right)) {            \
+            nala_reset_all_mocks();                                     \
+            char _nala_assert_format[512];                              \
+                                                                        \
+            snprintf(&_nala_assert_format[0],                           \
+                     sizeof(_nala_assert_format),                       \
+                     format,                                            \
+                     NALA_PRINT_FORMAT(_nala_assert_left),              \
+                     NALA_PRINT_FORMAT(_nala_assert_right));            \
+            NALA_TEST_FAILURE(formatter(_nala_assert_format,            \
+                                        _nala_assert_left,              \
+                                        _nala_assert_right));           \
+        }                                                               \
+    } while (0);
 
 #define NALA_CHECK_EQ(left, right)                      \
     _Generic(                                           \

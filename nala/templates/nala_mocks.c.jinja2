@@ -50,6 +50,7 @@ struct _nala_data_type_for_{{mock.func_name}}
     {% endif %}
     int errno_value;
     {{mock.implementation_decl | render}};
+    {{mock.callback_decl | render}};
 };
 
 typedef struct _nala_instance_type_for_{{mock.func_name}} _nala_instance_type_for_{{mock.func_name}};
@@ -150,6 +151,18 @@ static {{mock.state_type}} {{mock.state_name}} =
 
         {% endif %}
         errno = instance_p->data.errno_value;
+
+        if (instance_p->data.callback != NULL) {
+        {% if mock.is_variadic_func %}
+            va_list __nala_vl;
+            va_start(__nala_vl, {{mock.va_list_start_arg_name}});
+            instance_p->data.callback({{mock.forward_args}});
+            va_end(__nala_vl);
+        {% else %}
+            instance_p->data.callback({{mock.forward_args}});
+        {% endif %}
+        }
+
         {% if mock.return_value %}
         return_value = instance_p->data.return_value;
         {% endif %}
@@ -180,6 +193,18 @@ static {{mock.state_type}} {{mock.state_name}} =
         return_value = {{mock.state_name}}.data.return_value;
         {% endif %}
         errno = {{mock.state_name}}.data.errno_value;
+
+        if ({{mock.state_name}}.data.callback != NULL) {
+        {% if mock.is_variadic_func %}
+            va_list __nala_vl;
+            va_start(__nala_vl, {{mock.va_list_start_arg_name}});
+            {{mock.state_name}}.data.callback({{mock.forward_args}});
+            va_end(__nala_vl);
+        {% else %}
+            {{mock.state_name}}.data.callback({{mock.forward_args}});
+        {% endif %}
+        }
+
         break;
 
     case 4:
@@ -253,6 +278,7 @@ static {{mock.state_type}} {{mock.state_name}} =
     {{mock.state_name}}.data.return_value = return_value;
     {% endif %}
     {{mock.state_name}}.data.errno_value = 0;
+    {{mock.state_name}}.data.callback = NULL;
 }
 
 {{mock.mock_once_func | render}}
@@ -307,6 +333,7 @@ static {{mock.state_type}} {{mock.state_name}} =
     instance_p->data.return_value = return_value;
     {% endif %}
     instance_p->data.errno_value = 0;
+    instance_p->data.callback = NULL;
     instance_p->next_p = NULL;
 
     _NALA_INSTANCES_APPEND({{mock.state_name}}.instances,
@@ -329,6 +356,7 @@ void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
     {{mock.state_name}}.data.return_value = return_value;
     {% endif %}
     {{mock.state_name}}.data.errno_value = 0;
+    {{mock.state_name}}.data.callback = NULL;
 }
 
 void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
@@ -362,6 +390,7 @@ void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
     instance_p->data.return_value = return_value;
     {% endif %}
     instance_p->data.errno_value = 0;
+    instance_p->data.callback = NULL;
     instance_p->next_p = NULL;
 
     _NALA_INSTANCES_APPEND({{mock.state_name}}.instances,
@@ -378,6 +407,19 @@ void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
         instance_p->data.errno_value = errno_value;
     } else {
         {{mock.state_name}}.data.errno_value = errno_value;
+    }
+}
+
+void {{mock.func_name}}_mock_set_callback({{mock.callback_decl | render}})
+{
+    struct _nala_instance_type_for_{{mock.func_name}} *instance_p;
+
+    instance_p = {{mock.state_name}}.instances.tail_p;
+
+    if (instance_p != NULL) {
+        instance_p->data.callback = callback;
+    } else {
+        {{mock.state_name}}.data.callback = callback;
     }
 }
 {% for param in mock.ignore_params %}

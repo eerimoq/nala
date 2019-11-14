@@ -98,6 +98,10 @@ def is_variadic_func(params):
         return is_ellipsis(params[-1])
 
 
+def void_type(name):
+    return node.TypeDecl(name, [], node.IdentifierType(['void']))
+
+
 def rename_return_type(return_type, name):
     return_type = deepcopy(return_type)
     type_decl = return_type
@@ -244,6 +248,10 @@ class GeneratedMock:
                 "errno_value",
                 node.TypeDecl("errno_value", [], node.IdentifierType(["int"])),
             )])
+        self.callback_decl = function_ptr_decl(
+            "callback",
+            void_type("callback"),
+            create_implementation_params(self.func_params))
         self.variadic_func_real_wrapper_decl = node.FuncDecl(
             node.ParamList(create_implementation_params(self.func_params)),
             node.TypeDecl(
@@ -292,12 +300,8 @@ class GeneratedMock:
             self.set_params.append(param)
 
     def void_function_decl(self, name, parameters):
-        return node.FuncDecl(
-            node.ParamList(parameters),
-            node.TypeDecl(
-                name,
-                [],
-                node.IdentifierType(['void'])))
+        return node.FuncDecl(node.ParamList(parameters),
+                             void_type(name))
 
     def rename_function(self, name):
         return decl(
