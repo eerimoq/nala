@@ -101,7 +101,7 @@ void _nala_va_arg_list_destroy(struct _nala_va_arg_list_t *self_p)
 }
 
 void _nala_va_arg_list_append(struct _nala_va_arg_list_t *self_p,
-                                 struct _nala_va_arg_item_t *item_p)
+                              struct _nala_va_arg_item_t *item_p)
 {
     self_p->length++;
 
@@ -139,7 +139,7 @@ struct _nala_va_arg_item_t *_nala_va_arg_list_get(
 }
 
 struct _nala_va_arg_item_t *_nala_parse_va_arg(const char **format_pp,
-                                                     va_list vl)
+                                               va_list vl)
 {
     struct _nala_va_arg_item_t *item_p;
 
@@ -180,8 +180,8 @@ struct _nala_va_arg_item_t *_nala_parse_va_arg(const char **format_pp,
 }
 
 int _nala_parse_va_list(struct _nala_va_arg_list_t *list_p,
-                           const char *format_p,
-                           va_list vl)
+                        const char *format_p,
+                        va_list vl)
 {
     int res;
     struct _nala_va_arg_item_t *item_p;
@@ -210,7 +210,7 @@ int _nala_parse_va_list(struct _nala_va_arg_list_t *list_p,
 }
 
 void _nala_va_arg_list_assert_d(struct _nala_va_arg_item_t *item_p,
-                                   int value)
+                                int value)
 {
     if (!item_p->ignore_in) {
         ASSERT_EQ(item_p->d, value);
@@ -218,7 +218,7 @@ void _nala_va_arg_list_assert_d(struct _nala_va_arg_item_t *item_p,
 }
 
 void _nala_va_arg_list_assert_u(struct _nala_va_arg_item_t *item_p,
-                                   unsigned int value)
+                                unsigned int value)
 {
     if (!item_p->ignore_in) {
         ASSERT_EQ(item_p->u, value);
@@ -226,23 +226,23 @@ void _nala_va_arg_list_assert_u(struct _nala_va_arg_item_t *item_p,
 }
 
 void _nala_va_arg_list_assert_p(struct _nala_va_arg_item_t *item_p,
-                                   void *value_p)
+                                void *value_p)
 {
     if (!item_p->ignore_in) {
         ASSERT_EQ(item_p->p_p, value_p);
     }
 
-    if (item_p->out.buf_p != NULL) {
-        memcpy(value_p, item_p->out.buf_p, item_p->out.size);
-    }
-
     if (item_p->in.buf_p != NULL) {
         ASSERT_MEMORY(value_p, item_p->in.buf_p, item_p->in.size);
+    }
+
+    if (item_p->out.buf_p != NULL) {
+        memcpy(value_p, item_p->out.buf_p, item_p->out.size);
     }
 }
 
 void _nala_va_arg_list_assert(struct _nala_va_arg_list_t *self_p,
-                                 va_list vl)
+                              va_list vl)
 {
     unsigned int i;
     struct _nala_va_arg_item_t *item_p;
