@@ -166,6 +166,7 @@ For all functions
    <func>_mock_reset()               - mock reset
    <func>_mock_assert_completed()    - completion checks
    <func>_mock_set_callback(*)       - additional checks and/or actions
+   <func>_mock_set_in_filter(*)      - filter input pointer parameters
 
 For selected function parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

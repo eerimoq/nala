@@ -6,6 +6,7 @@ CFLAGS = \
 	-Wconversion \
 	-g \
 	-Og \
+	-no-pie \
 	$(ASAN_FLAGS) \
 	-fprofile-arcs \
 	-ftest-coverage

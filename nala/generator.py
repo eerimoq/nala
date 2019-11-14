@@ -252,6 +252,10 @@ class GeneratedMock:
             "callback",
             void_type("callback"),
             create_implementation_params(self.func_params))
+        self.in_filter_decl = function_ptr_decl(
+            "in_filter",
+            void_type("in_filter"),
+            create_implementation_params(self.func_params))
         self.variadic_func_real_wrapper_decl = node.FuncDecl(
             node.ParamList(create_implementation_params(self.func_params)),
             node.TypeDecl(

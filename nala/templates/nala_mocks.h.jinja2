@@ -29,6 +29,7 @@ void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}});
 void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}});
 {{mock.set_errno_func | render}};
 void {{mock.func_name}}_mock_set_callback({{mock.callback_decl | render}});
+void {{mock.func_name}}_mock_set_in_filter({{mock.in_filter_decl | render}});
 {% for param in mock.ignore_params %}
 void {{mock.func_name}}_mock_ignore_{{param}}_in(void);
 {% endfor %}

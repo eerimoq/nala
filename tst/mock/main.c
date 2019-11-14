@@ -400,3 +400,28 @@ TEST(call_function)
     call_mock_once(4);
     ASSERT_EQ(call(NULL), 4);
 }
+
+static void in_out_filter(int *two_values_p)
+{
+    two_values_p[1] = 0;
+}
+
+TEST(in_out_function)
+{
+    /* First in, second out. */
+    int values[2];
+
+    in_out_mock_once();
+    in_out_mock_set_in_filter(in_out_filter);
+    values[0] = 2;
+    values[1] = 0;
+    in_out_mock_set_two_values_p_in(&values[0], sizeof(values));
+    values[0] = 2;
+    values[1] = 1;
+    in_out_mock_set_two_values_p_out(&values[0], sizeof(values));
+    values[0] = 2;
+    values[1] = -1; /* Different from 0. Set to 0 in filter
+                       function. */
+    in_out(&values[0]);
+    ASSERT_EQ(values[1], 1)
+}

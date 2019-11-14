@@ -74,3 +74,8 @@ int call(int (*callback)(int value))
 {
     return (callback(1));
 }
+
+void in_out(int *two_values_p)
+{
+    two_values_p[1] = (2 * two_values_p[0]);
+}
