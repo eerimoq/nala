@@ -104,6 +104,11 @@ Build and run the tests.
    Tests: 2 passed, 2 total
    Time: 0.65 ms
 
+Compiler flags
+==============
+
+Pass ``-no-pie -g -O0`` to the compiler for better error reporting.
+
 Debugging tips
 ==============
 
@@ -174,7 +179,7 @@ For selected function parameters
 .. code-block::
 
    <func>_mock_ignore_<param>_in()               - ignore on input
-   <func>_mock_set_<param>_in(*, size_t)         - check on input
+   <func>_mock_set_<param>_in(*, size_t)         - check on input (after filter)
    <func>_mock_set_<param>_in_pointer(*, size_t) - check pointer (the address) on input
    <func>_mock_set_<param>_out(*, size_t)        - value on return
 

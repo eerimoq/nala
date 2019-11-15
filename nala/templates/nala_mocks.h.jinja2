@@ -10,11 +10,7 @@ Do not edit manually
 
 #include <stdarg.h>
 {{ includes }}
-#ifndef _NALA_RESET_ALL_MOCKS
-#define _NALA_RESET_ALL_MOCKS 1
 void nala_reset_all_mocks(void);
-#endif
-
 void nala_assert_all_mocks_completed(void);
 {% for mock in mocks %}
 
