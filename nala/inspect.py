@@ -12,7 +12,7 @@ from pycparser.plyparser import ParseError
 
 
 GETTER_REGEX = re.compile(
-    r"(void )?(\w+?)(_mock|_mock_once|_mock_ignore_in|_mock_ignore_in_once)\s*\(")
+    r"(void )?(\w+?)(_mock|_mock_once|_mock_ignore_in|_mock_ignore_in_once|_mock_none)\s*\(")
 
 
 def collect_mocked_functions(expanded_source_code):
