@@ -426,6 +426,8 @@ static void print_location_context(const char *filename_p, size_t line_number)
     size_t first_line;
     size_t i;
 
+    printf("  Location context:\n\n");
+
     file_p = fopen(filename_p, "r");
 
     if (file_p == NULL) {
@@ -644,13 +646,13 @@ static const char *display_inline_diff(FILE *file_p,
                      sizeof(line_prefix),
                      COLOR(RED, "- ") COLOR_BOLD(RED, "%ld"),
                      *line_number);
-            fprintf(file_p, "   %37s" COLOR(RED, " |  "), line_prefix);
+            fprintf(file_p, " %37s" COLOR(RED, " |  "), line_prefix);
         } else {
             snprintf(line_prefix,
                      sizeof(line_prefix),
                      COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"),
                      *line_number);
-            fprintf(file_p, "   %37s" COLOR(GREEN, " |  "), line_prefix);
+            fprintf(file_p, " %37s" COLOR(GREEN, " |  "), line_prefix);
         }
 
         while (index - line_index < line_length) {
@@ -722,7 +724,7 @@ static void print_string_diff(FILE *file_p,
 
                 if (original_lines < 7 || (i < 2 && chunk_index > 0) ||
                     (original_lines - i < 3 && chunk_index < diff.size - 1)) {
-                    fprintf(file_p, COLOR(MAGENTA, "%6zu"), line_number);
+                    fprintf(file_p, COLOR(MAGENTA, "%8zu"), line_number);
                     fprintf(file_p, " |  %.*s\n", (int)(original_next - original), original);
                 } else if (i == 2) {
                     fprintf(file_p, "   :\n");
@@ -769,10 +771,10 @@ static void print_string_diff(FILE *file_p,
                          COLOR(RED, "- ") COLOR_BOLD(RED, "%ld"),
                          line_number);
 
-                printf("   %37s", line_prefix);
-                printf(COLOR(RED, " |  ") COLOR_BOLD(RED, "%.*s\n"),
-                       (int)(original_next - original),
-                       original);
+                fprintf(file_p, " %37s", line_prefix);
+                fprintf(file_p, COLOR(RED, " |  ") COLOR_BOLD(RED, "%.*s\n"),
+                        (int)(original_next - original),
+                        original);
 
                 original = original_next + 1;
             }
@@ -786,10 +788,10 @@ static void print_string_diff(FILE *file_p,
                          COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"),
                          line_number);
 
-                printf("   %37s", line_prefix);
-                printf(COLOR(GREEN, " |  ") COLOR_BOLD(GREEN, "%.*s\n"),
-                       (int)(modified_next - modified),
-                       modified);
+                fprintf(file_p, " %37s", line_prefix);
+                fprintf(file_p, COLOR(GREEN, " |  ") COLOR_BOLD(GREEN, "%.*s\n"),
+                        (int)(modified_next - modified),
+                        modified);
 
                 line_number++;
                 modified = modified_next + 1;
@@ -798,6 +800,7 @@ static void print_string_diff(FILE *file_p,
     }
 
     free(diff.chunks);
+    fprintf(file_p, "\n");
 }
 
 const char *nala_format_string(const char *format_p, ...)
@@ -866,7 +869,7 @@ void nala_test_failure(const char *file_p,
     printf("\n");
     printf("%s failed:\n\n", current_test_p->name_p);
     printf("  Location: " COLOR_BOLD(GREEN, "%s:%d:\n"), file_p, line);
-    printf("  Error:    %s\n", message_p);
+    printf("  Error:    %s", message_p);
     print_location_context(file_p, (size_t)line);
     nala_traceback_print("  ");
     printf("\n");
