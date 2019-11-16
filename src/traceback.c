@@ -27,12 +27,18 @@
  */
 
 #include <stdio.h>
+#include <stdint.h>
 #include <execinfo.h>
 #include "traceback.h"
 #include <stdlib.h>
 #include <unistd.h>
 
 #define DEPTH_MAX 100
+
+static void *fixaddr(void *address_p)
+{
+    return ((void *)(((uintptr_t)address_p) - 1));
+}
 
 void nala_traceback_print(const char *prefix_p)
 {
@@ -43,6 +49,10 @@ void nala_traceback_print(const char *prefix_p)
     ssize_t size;
     int res;
     int i;
+
+    if (prefix_p == NULL) {
+        prefix_p = "";
+    }
 
     depth = backtrace(&addresses[0], DEPTH_MAX);
 
@@ -66,7 +76,7 @@ void nala_traceback_print(const char *prefix_p)
                  sizeof(command),
                  "addr2line -f -p -e %s %p",
                  &exe[0],
-                 addresses[i]);
+                 fixaddr(addresses[i]));
         command[sizeof(command) - 1] = '\0';
 
         res = system(&command[0]);

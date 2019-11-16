@@ -133,7 +133,7 @@ void nala_subprocess_result_free(struct nala_subprocess_result_t *self_p);
  * This file is part of the traceback project.
  */
 
-#define NALA_TRACEBACK_VERSION "0.1.0"
+#define NALA_TRACEBACK_VERSION "0.2.0"
 
 /**
  * Print a traceback.
@@ -1268,6 +1268,7 @@ void nala_subprocess_result_free(struct nala_subprocess_result_t *self_p)
  */
 
 #include <stdio.h>
+#include <stdint.h>
 #include <execinfo.h>
 // #include "traceback.h"
 
@@ -1275,6 +1276,11 @@ void nala_subprocess_result_free(struct nala_subprocess_result_t *self_p)
 #include <unistd.h>
 
 #define DEPTH_MAX 100
+
+static void *fixaddr(void *address_p)
+{
+    return ((void *)(((uintptr_t)address_p) - 1));
+}
 
 void nala_traceback_print(const char *prefix_p)
 {
@@ -1285,6 +1291,10 @@ void nala_traceback_print(const char *prefix_p)
     ssize_t size;
     int res;
     int i;
+
+    if (prefix_p == NULL) {
+        prefix_p = "";
+    }
 
     depth = backtrace(&addresses[0], DEPTH_MAX);
 
@@ -1308,7 +1318,7 @@ void nala_traceback_print(const char *prefix_p)
                  sizeof(command),
                  "addr2line -f -p -e %s %p",
                  &exe[0],
-                 addresses[i]);
+                 fixaddr(addresses[i]));
         command[sizeof(command) - 1] = '\0';
 
         res = system(&command[0]);

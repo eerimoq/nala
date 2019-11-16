@@ -26,7 +26,7 @@
  * This file is part of the traceback project.
  */
 
-#define NALA_TRACEBACK_VERSION "0.1.0"
+#define NALA_TRACEBACK_VERSION "0.2.0"
 
 /**
  * Print a traceback.

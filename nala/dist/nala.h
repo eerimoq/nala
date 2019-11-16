@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define VERSION "0.25.0"
+#define VERSION "0.26.0"
 
 #define TEST(name)                                      \
     void name(void);                                    \
