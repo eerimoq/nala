@@ -232,8 +232,7 @@ class GeneratedMock:
             if isinstance(return_type, node.TypeDecl)
             and isinstance(return_type.type, node.IdentifierType)
             and return_type.type.names[0] == "void"
-            else "return_value"
-        )
+            else "return_value")
 
         if self.is_variadic_func:
             self.va_list_start_arg_name = self.func_params[-2].name
@@ -243,16 +242,16 @@ class GeneratedMock:
         self.return_value_decl = decl(
             self.return_value,
             rename_return_type(return_type, self.return_value))
+        mock_params = self.create_mock_params()
         self.implementation_decl = function_ptr_decl(
             "implementation",
             rename_return_type(return_type, "implementation"),
             create_implementation_params(self.func_params))
-        self.mock_func = self.void_function_decl(
-            f'{self.func_name}_mock',
-            self.create_mock_params(self.func_params, self.return_value_decl))
+        self.mock_func = self.void_function_decl(f'{self.func_name}_mock',
+                                                 mock_params)
         self.mock_once_func = self.void_function_decl(
             f'{self.func_name}_mock_once',
-            self.create_mock_params(self.func_params, self.return_value_decl))
+            mock_params)
         self.set_errno_func = self.void_function_decl(
             f'{self.func_name}_mock_set_errno',
             [decl(
@@ -369,11 +368,11 @@ class GeneratedMock:
                 if item.name == name:
                     return item
 
-    def create_mock_params(self, params, return_value):
+    def create_mock_params(self):
         once_params = []
         variable_arguments_params = []
 
-        for param in params:
+        for param in self.func_params:
             if is_void(param):
                 continue
             elif self.is_struct(param):
@@ -391,8 +390,8 @@ class GeneratedMock:
                                                node.IdentifierType(["char"])))))
                 variable_arguments_params.append(param)
 
-        if not is_void(return_value):
-            once_params.append(return_value)
+        if not is_void(self.return_value_decl):
+            once_params.append(self.return_value_decl)
 
         once_params += variable_arguments_params
 

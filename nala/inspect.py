@@ -267,7 +267,7 @@ class ForgivingDeclarationParser:
         else:
             if self.functions is not None:
                 self.functions.remove(func_name)
-                
+
             return MockedFunction(
                 func_name,
                 file_ast.ext[-1],
