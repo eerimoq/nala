@@ -201,6 +201,11 @@ Module functions
    nala_reset_all_mocks()            - reset everything
    nala_assert_all_mocks_completed() - completion checks
 
+Limitations
+-----------
+
+- Structs and unions passed by value are ignored.
+
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
 
