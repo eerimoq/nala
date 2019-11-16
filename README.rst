@@ -107,7 +107,10 @@ Build and run the tests.
 Compiler flags
 ==============
 
-Pass ``-no-pie -g -O0`` to the compiler for better error reporting.
+Pass ``-no-pie -g -O0 -fsanitize=address`` to the compiler for better
+error reporting.
+
+Read more about sanitizers here: https://en.wikipedia.org/wiki/AddressSanitizer
 
 Debugging tips
 ==============
