@@ -406,7 +406,7 @@ static void buf_p_assert(int *actual_p, const void *buf_p, size_t size)
     const int *expected_p;
 
     expected_p = buf_p;
-    
+
     ASSERT_EQ(actual_p[0], expected_p[0]);
 }
 
@@ -427,4 +427,32 @@ TEST(in_out_function)
     values[1] = -1; /* Different from 0. values[1] not asserted. */
     in_out(&values[0]);
     ASSERT_EQ(values[1], 1)
+}
+
+TEST(struct_param_and_return_type_function)
+{
+    struct struct_param_type value;
+
+    value.number = 1;
+    value = struct_param_and_return_type(value);
+    ASSERT_EQ(value.number, 2);
+
+    value.number = 1;
+    struct_param_and_return_type_mock_once(value);
+    value = struct_param_and_return_type(value);
+    ASSERT_EQ(value.number, 1);
+}
+
+TEST(union_param_and_return_type_function)
+{
+    union union_type value;
+
+    value.a.number = 1;
+    value = union_param_and_return_type(value);
+    ASSERT_EQ(value.a.number, 2);
+
+    value.a.number = 1;
+    union_param_and_return_type_mock_once(value);
+    value = union_param_and_return_type(value);
+    ASSERT_EQ(value.a.number, 1);
 }

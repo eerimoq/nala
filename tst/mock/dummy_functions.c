@@ -79,3 +79,17 @@ void in_out(int *buf_p)
 {
     buf_p[1] = (2 * buf_p[0]);
 }
+
+struct struct_param_type struct_param_and_return_type(struct struct_param_type arg)
+{
+    arg.number++;
+
+    return (arg);
+}
+
+union union_type union_param_and_return_type(union union_type arg)
+{
+    arg.a.number++;
+
+    return (arg);
+}

@@ -16,6 +16,11 @@ enum enum_param_type
     enum_param_type_a = 0
 };
 
+union union_type
+{
+    struct struct_param_type a;
+};
+
 int add(int x, int y);
 void output_message(const char *message);
 void keep_args_output_message(const char *message);
@@ -32,5 +37,7 @@ void struct_param(struct struct_param_type *data);
 void enum_param(enum enum_param_type value);
 int call(int (*callback)(int value));
 void in_out(int *buf_p);
+struct struct_param_type struct_param_and_return_type(struct struct_param_type arg);
+union union_type union_param_and_return_type(union union_type arg);
 
 #endif

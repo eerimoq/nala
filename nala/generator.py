@@ -46,12 +46,30 @@ def is_char_pointer_or_non_pointer(param):
         return True
 
 
+def is_struct(param):
+    try:
+        return isinstance(param.type.type, node.Struct)
+    except AttributeError:
+        False
+
+
+def is_union(param):
+    try:
+        return isinstance(param.type.type, node.Union)
+    except AttributeError:
+        False
+
+
 def is_void(param):
     if is_ellipsis(param):
         return False
     elif is_pointer(param):
         return False
     elif is_enum(param):
+        return False
+    elif is_struct(param):
+        return False
+    elif is_union(param):
         return False
     else:
         return param.type.type.names[0] == 'void'
@@ -147,6 +165,10 @@ def create_mock_params(params, return_value):
 
     for param in params:
         if is_void(param):
+            continue
+        elif is_struct(param):
+            continue
+        elif is_union(param):
             continue
         elif is_char_pointer_or_non_pointer(param):
             once_params.append(param)
@@ -271,10 +293,6 @@ class GeneratedMock:
             "callback",
             void_type("callback"),
             create_implementation_params(self.func_params))
-        self.in_filter_decl = function_ptr_decl(
-            "in_filter",
-            void_type("in_filter"),
-            create_implementation_params(self.func_params))
         self.variadic_func_real_wrapper_decl = node.FuncDecl(
             node.ParamList(create_implementation_params(self.func_params)),
             node.TypeDecl(
@@ -298,6 +316,10 @@ class GeneratedMock:
 
         for param in self.func_params:
             if is_ellipsis(param):
+                continue
+            elif is_struct(param):
+                continue
+            elif is_union(param):
                 continue
 
             if not param.name:
