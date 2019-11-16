@@ -159,36 +159,6 @@ def create_implementation_params(params):
     ]
 
 
-def create_mock_params(params, return_value):
-    once_params = []
-    variable_arguments_params = []
-
-    for param in params:
-        if is_void(param):
-            continue
-        elif is_struct(param):
-            continue
-        elif is_union(param):
-            continue
-        elif is_char_pointer_or_non_pointer(param):
-            once_params.append(param)
-        elif is_ellipsis(param):
-            variable_arguments_params.append(decl(
-                None,
-                node.PtrDecl([],
-                             node.TypeDecl("vafmt_p",
-                                           ['const'],
-                                           node.IdentifierType(["char"])))))
-            variable_arguments_params.append(param)
-
-    if not is_void(return_value):
-        once_params.append(return_value)
-
-    once_params += variable_arguments_params
-
-    return once_params
-
-
 def get_guard_name(filename):
     slug = re.sub(r"[^a-zA-Z0-9]", "_", os.path.normpath(os.path.relpath(filename)))
 
@@ -279,10 +249,10 @@ class GeneratedMock:
             create_implementation_params(self.func_params))
         self.mock_func = self.void_function_decl(
             f'{self.func_name}_mock',
-            create_mock_params(self.func_params, self.return_value_decl))
+            self.create_mock_params(self.func_params, self.return_value_decl))
         self.mock_once_func = self.void_function_decl(
             f'{self.func_name}_mock_once',
-            create_mock_params(self.func_params, self.return_value_decl))
+            self.create_mock_params(self.func_params, self.return_value_decl))
         self.set_errno_func = self.void_function_decl(
             f'{self.func_name}_mock_set_errno',
             [decl(
@@ -317,9 +287,9 @@ class GeneratedMock:
         for param in self.func_params:
             if is_ellipsis(param):
                 continue
-            elif is_struct(param):
+            elif self.is_struct(param):
                 continue
-            elif is_union(param):
+            elif self.is_union(param):
                 continue
 
             if not param.name:
@@ -356,6 +326,77 @@ class GeneratedMock:
                 self.func_decl.args, rename_return_type(self.func_decl.type, name)
             ),
         )
+
+    def is_struct(self, param):
+        try:
+            if isinstance(param.type.type, node.Struct):
+                return True
+        except AttributeError:
+            pass
+
+        try:
+            name = param.type.type.names[0]
+            typedef = self.lookup_typedef(name)
+
+            if isinstance(typedef.type.type, node.Struct):
+                return True
+        except AttributeError:
+            pass
+
+        return False
+
+    def is_union(self, param):
+        try:
+            if isinstance(param.type.type, node.Union):
+                return True
+        except AttributeError:
+            pass
+
+        try:
+            name = param.type.type.names[0]
+            typedef = self.lookup_typedef(name)
+
+            if isinstance(typedef.type.type, node.Union):
+                return True
+        except AttributeError:
+            pass
+
+        return False
+
+    def lookup_typedef(self, name):
+        for item in self.function.file_ast:
+            if isinstance(item, node.Typedef):
+                if item.name == name:
+                    return item
+
+    def create_mock_params(self, params, return_value):
+        once_params = []
+        variable_arguments_params = []
+
+        for param in params:
+            if is_void(param):
+                continue
+            elif self.is_struct(param):
+                continue
+            elif self.is_union(param):
+                continue
+            elif is_char_pointer_or_non_pointer(param):
+                once_params.append(param)
+            elif is_ellipsis(param):
+                variable_arguments_params.append(decl(
+                    None,
+                    node.PtrDecl([],
+                                 node.TypeDecl("vafmt_p",
+                                               ['const'],
+                                               node.IdentifierType(["char"])))))
+                variable_arguments_params.append(param)
+
+        if not is_void(return_value):
+            once_params.append(return_value)
+
+        once_params += variable_arguments_params
+
+        return once_params
 
 
 class FileGenerator:

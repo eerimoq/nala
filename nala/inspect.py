@@ -73,6 +73,7 @@ class MockedFunction(NamedTuple):
     name: str
     declaration: node.FuncDecl
     include: IncludeDirective
+    file_ast: node.FileAST
 
 
 class Token(NamedTuple):
@@ -266,11 +267,12 @@ class ForgivingDeclarationParser:
         else:
             if self.functions is not None:
                 self.functions.remove(func_name)
-
+                
             return MockedFunction(
                 func_name,
                 file_ast.ext[-1],
-                IncludeDirective.from_source_context(self.source_context))
+                IncludeDirective.from_source_context(self.source_context),
+                file_ast)
 
     def erase_code_section(self, begin, end):
         self.source_code = (

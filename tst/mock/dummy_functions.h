@@ -21,6 +21,10 @@ union union_type
     struct struct_param_type a;
 };
 
+typedef union union_type union_type;
+
+typedef struct struct_param_type struct_param_type;
+
 int add(int x, int y);
 void output_message(const char *message);
 void keep_args_output_message(const char *message);
@@ -39,5 +43,7 @@ int call(int (*callback)(int value));
 void in_out(int *buf_p);
 struct struct_param_type struct_param_and_return_type(struct struct_param_type arg);
 union union_type union_param_and_return_type(union union_type arg);
+struct_param_type typedef_struct_param_and_return_type(struct_param_type arg);
+union_type typedef_union_param_and_return_type(union_type arg);
 
 #endif

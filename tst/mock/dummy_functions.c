@@ -93,3 +93,17 @@ union union_type union_param_and_return_type(union union_type arg)
 
     return (arg);
 }
+
+struct_param_type typedef_struct_param_and_return_type(struct_param_type arg)
+{
+    arg.number++;
+
+    return (arg);
+}
+
+union_type typedef_union_param_and_return_type(union_type arg)
+{
+    arg.a.number++;
+
+    return (arg);
+}

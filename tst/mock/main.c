@@ -456,3 +456,31 @@ TEST(union_param_and_return_type_function)
     value = union_param_and_return_type(value);
     ASSERT_EQ(value.a.number, 1);
 }
+
+TEST(typedef_struct_param_and_return_type_function)
+{
+    struct_param_type value;
+
+    value.number = 1;
+    value = typedef_struct_param_and_return_type(value);
+    ASSERT_EQ(value.number, 2);
+
+    value.number = 1;
+    typedef_struct_param_and_return_type_mock_once(value);
+    value = typedef_struct_param_and_return_type(value);
+    ASSERT_EQ(value.number, 1);
+}
+
+TEST(typedef_union_param_and_return_type_function)
+{
+    union_type value;
+
+    value.a.number = 1;
+    value = typedef_union_param_and_return_type(value);
+    ASSERT_EQ(value.a.number, 2);
+
+    value.a.number = 1;
+    typedef_union_param_and_return_type_mock_once(value);
+    value = typedef_union_param_and_return_type(value);
+    ASSERT_EQ(value.a.number, 1);
+}
