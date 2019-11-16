@@ -25,12 +25,12 @@ void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}});
 void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}});
 {{mock.set_errno_func | render}};
 void {{mock.func_name}}_mock_set_callback({{mock.callback_decl | render}});
-void {{mock.func_name}}_mock_set_in_filter({{mock.in_filter_decl | render}});
 {% for param in mock.ignore_params %}
 void {{mock.func_name}}_mock_ignore_{{param}}_in(void);
 {% endfor %}
 {% for param in mock.set_params %}
 void {{mock.func_name}}_mock_set_{{param.name}}_in(const void *buf_p, size_t size);
+void {{mock.func_name}}_mock_set_{{param.name}}_in_assert(void (*callback)({{param | render}}, const void *nala_buf_p, size_t nala_size));
 void {{mock.func_name}}_mock_set_{{param.name}}_in_pointer({{param | render}});
 void {{mock.func_name}}_mock_set_{{param.name}}_out(const void *buf_p, size_t size);
 {% endfor %}

@@ -171,7 +171,6 @@ For all functions
    <func>_mock_reset()               - mock reset
    <func>_mock_assert_completed()    - completion checks
    <func>_mock_set_callback(*)       - additional checks and/or actions
-   <func>_mock_set_in_filter(*)      - filter input pointer parameters
 
 For selected function parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -179,7 +178,8 @@ For selected function parameters
 .. code-block::
 
    <func>_mock_ignore_<param>_in()               - ignore on input
-   <func>_mock_set_<param>_in(*, size_t)         - check on input (after filter)
+   <func>_mock_set_<param>_in(*, size_t)         - check on input
+   <func>_mock_set_<param>_in_assert(*)          - custom assert function on input
    <func>_mock_set_<param>_in_pointer(*, size_t) - check pointer (the address) on input
    <func>_mock_set_<param>_out(*, size_t)        - value on return
 

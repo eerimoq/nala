@@ -31,6 +31,6 @@ int io_control(int kind, ...);
 void struct_param(struct struct_param_type *data);
 void enum_param(enum enum_param_type value);
 int call(int (*callback)(int value));
-void in_out(int *two_values_p);
+void in_out(int *buf_p);
 
 #endif

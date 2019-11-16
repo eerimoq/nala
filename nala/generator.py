@@ -86,6 +86,24 @@ def set_member(name):
                               node.IdentifierType(["_nala_set_param"])))
 
 
+def assert_member(param):
+    name = f'{param.name}_in_assert'
+
+    return function_ptr_decl(
+        name,
+        void_type(name),
+        [
+            param,
+            decl('nala_buf_p',
+                 node.PtrDecl([],
+                              node.TypeDecl('nala_buf_p',
+                                            ['const'],
+                                            node.IdentifierType(["void"])))),
+            decl('nala_size',
+                 node.TypeDecl('nala_size', [], node.IdentifierType(["size_t"])))
+        ])
+
+
 def va_list_param(name):
     return decl(None,
                 node.TypeDecl(name, [], node.IdentifierType(["va_list"])))
@@ -110,6 +128,7 @@ def rename_return_type(return_type, name):
         type_decl = type_decl.type
 
     type_decl.declname = name
+
     return return_type
 
 
@@ -300,6 +319,7 @@ class GeneratedMock:
                 continue
 
             self.instance_members.append(set_member(f'{param.name}_in'))
+            self.instance_members.append(assert_member(param))
             self.instance_members.append(set_member(f'{param.name}_out'))
             self.set_params.append(param)
 

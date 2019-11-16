@@ -401,9 +401,13 @@ TEST(call_function)
     ASSERT_EQ(call(NULL), 4);
 }
 
-static void in_out_filter(int *two_values_p)
+static void buf_p_assert(int *actual_p, const void *buf_p, size_t size)
 {
-    two_values_p[1] = 0;
+    const int *expected_p;
+
+    expected_p = buf_p;
+    
+    ASSERT_EQ(actual_p[0], expected_p[0]);
 }
 
 TEST(in_out_function)
@@ -412,16 +416,15 @@ TEST(in_out_function)
     int values[2];
 
     in_out_mock_once();
-    in_out_mock_set_in_filter(in_out_filter);
     values[0] = 2;
     values[1] = 0;
-    in_out_mock_set_two_values_p_in(&values[0], sizeof(values));
+    in_out_mock_set_buf_p_in(&values[0], sizeof(values));
+    in_out_mock_set_buf_p_in_assert(buf_p_assert);
     values[0] = 2;
     values[1] = 1;
-    in_out_mock_set_two_values_p_out(&values[0], sizeof(values));
+    in_out_mock_set_buf_p_out(&values[0], sizeof(values));
     values[0] = 2;
-    values[1] = -1; /* Different from 0. Set to 0 in filter
-                       function. */
+    values[1] = -1; /* Different from 0. values[1] not asserted. */
     in_out(&values[0]);
     ASSERT_EQ(values[1], 1)
 }
