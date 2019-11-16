@@ -95,11 +95,8 @@ Build and run the tests.
    $ make -s -C foo
    std!
    err!
-
-   Test results:
-
-     PASSED assertions (0.38 ms)
-     PASSED mock_time (0.28 ms)
+   PASSED assertions (0.38 ms)
+   PASSED mock_time (0.28 ms)
 
    Tests: 2 passed, 2 total
    Time: 0.65 ms
