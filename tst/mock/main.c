@@ -267,6 +267,12 @@ TEST(variadic_function)
     io_control_mock_ignore_va_arg_in_at(0);
     ASSERT_EQ(io_control(2, 6), 1);
 
+    io_control_mock_once(1, 2, "%ld", 6);
+    ASSERT_EQ(io_control(1, 6l), 2);
+
+    io_control_mock_once(2, 3, "%lu", 7);
+    ASSERT_EQ(io_control(2, 7lu), 3);
+
     io_control_mock_once(3, 0, "%p");
     ASSERT_EQ(io_control(3, NULL), 0);
 
