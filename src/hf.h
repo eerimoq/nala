@@ -28,24 +28,24 @@
 
 #include <unistd.h>
 
-#define HF_VERSION "0.1.0"
+#define NALA_HF_VERSION "0.1.0"
 
 /**
  * Get the username of the currently logged in user. Returns the
  * current username, the default username, or NULL if the current user
  * cannot be determined and default_p is NULL.
  */
-char *hf_get_username(char *buf_p, size_t size, const char *default_p);
+char *nala_hf_get_username(char *buf_p, size_t size, const char *default_p);
 
 /**
  * Get the hostname. Returns the hostname, the default hostname, or
  * NULL if the hostname cannot be determined and default_p is NULL.
  */
-char *hf_get_hostname(char *buf_p, size_t size, const char *default_p);
+char *nala_hf_get_hostname(char *buf_p, size_t size, const char *default_p);
 
 /**
  * Format given timespan in milliseconds into given buffer.
  */
-char *hf_format_timespan(char *buf_p,
-                         size_t size,
-                         unsigned long long timespan_ms);
+char *nala_hf_format_timespan(char *buf_p,
+                              size_t size,
+                              unsigned long long timespan_ms);

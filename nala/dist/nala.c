@@ -275,27 +275,27 @@ const char *nala_next_lines(const char *string, size_t lines);
 
 #include <unistd.h>
 
-#define HF_VERSION "0.1.0"
+#define NALA_HF_VERSION "0.1.0"
 
 /**
  * Get the username of the currently logged in user. Returns the
  * current username, the default username, or NULL if the current user
  * cannot be determined and default_p is NULL.
  */
-char *hf_get_username(char *buf_p, size_t size, const char *default_p);
+char *nala_hf_get_username(char *buf_p, size_t size, const char *default_p);
 
 /**
  * Get the hostname. Returns the hostname, the default hostname, or
  * NULL if the hostname cannot be determined and default_p is NULL.
  */
-char *hf_get_hostname(char *buf_p, size_t size, const char *default_p);
+char *nala_hf_get_hostname(char *buf_p, size_t size, const char *default_p);
 
 /**
  * Format given timespan in milliseconds into given buffer.
  */
-char *hf_format_timespan(char *buf_p,
-                         size_t size,
-                         unsigned long long timespan_ms);
+char *nala_hf_format_timespan(char *buf_p,
+                              size_t size,
+                              unsigned long long timespan_ms);
 
 
 #define ANSI_COLOR_RED "\x1b[31m"
@@ -357,23 +357,23 @@ static const char *get_node(void)
 {
     static char buf[128];
 
-    return (hf_get_hostname(&buf[0], sizeof(buf), "*** unknown ***"));
+    return (nala_hf_get_hostname(&buf[0], sizeof(buf), "*** unknown ***"));
 }
 
 static const char *get_user(void)
 {
     static char buf[128];
 
-    return (hf_get_username(&buf[0], sizeof(buf), "*** unknown ***"));
+    return (nala_hf_get_username(&buf[0], sizeof(buf), "*** unknown ***"));
 }
 
 static const char *format_timespan(float elapsed_time_ms)
 {
     static char buf[128];
 
-    return (hf_format_timespan(&buf[0],
-                               sizeof(buf),
-                               (unsigned long long)elapsed_time_ms));
+    return (nala_hf_format_timespan(&buf[0],
+                                    sizeof(buf),
+                                    (unsigned long long)elapsed_time_ms));
 }
 
 static void color_start(FILE *file_p, const char *color_p)
@@ -1498,7 +1498,7 @@ void nala_traceback_print(const char *prefix_p)
 
 #define TIME_UNITS_MAX 7
 
-char *hf_get_username(char *buf_p, size_t size, const char *default_p)
+char *nala_hf_get_username(char *buf_p, size_t size, const char *default_p)
 {
     char *res_p;
     struct passwd *passwd_p;
@@ -1525,7 +1525,7 @@ char *hf_get_username(char *buf_p, size_t size, const char *default_p)
     return (res_p);
 }
 
-char *hf_get_hostname(char *buf_p, size_t size, const char *default_p)
+char *nala_hf_get_hostname(char *buf_p, size_t size, const char *default_p)
 {
     int res;
     char *res_p;
@@ -1594,9 +1594,9 @@ const char *get_delimiter(bool is_first, bool is_last)
     }
 }
 
-char *hf_format_timespan(char *buf_p,
-                         size_t size,
-                         unsigned long long timespan_ms)
+char *nala_hf_format_timespan(char *buf_p,
+                              size_t size,
+                              unsigned long long timespan_ms)
 {
     int i;
     unsigned long long count;

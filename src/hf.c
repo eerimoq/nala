@@ -34,7 +34,7 @@
 
 #define TIME_UNITS_MAX 7
 
-char *hf_get_username(char *buf_p, size_t size, const char *default_p)
+char *nala_hf_get_username(char *buf_p, size_t size, const char *default_p)
 {
     char *res_p;
     struct passwd *passwd_p;
@@ -61,7 +61,7 @@ char *hf_get_username(char *buf_p, size_t size, const char *default_p)
     return (res_p);
 }
 
-char *hf_get_hostname(char *buf_p, size_t size, const char *default_p)
+char *nala_hf_get_hostname(char *buf_p, size_t size, const char *default_p)
 {
     int res;
     char *res_p;
@@ -130,9 +130,9 @@ const char *get_delimiter(bool is_first, bool is_last)
     }
 }
 
-char *hf_format_timespan(char *buf_p,
-                         size_t size,
-                         unsigned long long timespan_ms)
+char *nala_hf_format_timespan(char *buf_p,
+                              size_t size,
+                              unsigned long long timespan_ms)
 {
     int i;
     unsigned long long count;

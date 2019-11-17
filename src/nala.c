@@ -74,23 +74,23 @@ static const char *get_node(void)
 {
     static char buf[128];
 
-    return (hf_get_hostname(&buf[0], sizeof(buf), "*** unknown ***"));
+    return (nala_hf_get_hostname(&buf[0], sizeof(buf), "*** unknown ***"));
 }
 
 static const char *get_user(void)
 {
     static char buf[128];
 
-    return (hf_get_username(&buf[0], sizeof(buf), "*** unknown ***"));
+    return (nala_hf_get_username(&buf[0], sizeof(buf), "*** unknown ***"));
 }
 
 static const char *format_timespan(float elapsed_time_ms)
 {
     static char buf[128];
 
-    return (hf_format_timespan(&buf[0],
-                               sizeof(buf),
-                               (unsigned long long)elapsed_time_ms));
+    return (nala_hf_format_timespan(&buf[0],
+                                    sizeof(buf),
+                                    (unsigned long long)elapsed_time_ms));
 }
 
 static void color_start(FILE *file_p, const char *color_p)
