@@ -1583,7 +1583,7 @@ static struct time_unit_t time_units[TIME_UNITS_MAX] = {
     }
 };
 
-const char *get_delimiter(bool is_first, bool is_last)
+static const char *get_delimiter(bool is_first, bool is_last)
 {
     if (is_first) {
         return ("");
