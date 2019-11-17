@@ -1,4 +1,4 @@
-#define _NALA_INSTANCES_APPEND(list, item_p)    \
+#define NALA_INSTANCES_APPEND(list, item_p)     \
     do {                                        \
         if ((list).head_p == NULL) {            \
             (list).head_p = instance_p;         \
@@ -10,7 +10,7 @@
         (list).length++;                        \
     } while (0);
 
-#define _NALA_INSTANCES_POP(list, instance_pp)          \
+#define NALA_INSTANCES_POP(list, instance_pp)           \
     do {                                                \
         *(instance_pp) = (list).head_p;                 \
                                                         \
@@ -25,9 +25,15 @@
         }                                               \
     } while (0);
 
-typedef struct _nala_set_param _nala_set_param;
+#define NALA_STATE_RESET(state)                 \
+    do {                                        \
+        (state).mode = 0;                       \
+        (state).instances.head_p = NULL;        \
+        (state).instances.tail_p = NULL;        \
+        (state).instances.length = 0;           \
+    } while (0);
 
-struct _nala_set_param {
+struct nala_set_param {
     void *buf_p;
     size_t size;
 };
@@ -46,42 +52,42 @@ static void *_nala_malloc(size_t size)
     return (buf_p);
 }
 
-enum _nala_va_arg_item_type_t {
-    _nala_va_arg_item_type_d_t = 0,
-    _nala_va_arg_item_type_u_t,
-    _nala_va_arg_item_type_p_t
+enum nala_va_arg_item_type_t {
+    nala_va_arg_item_type_d_t = 0,
+    nala_va_arg_item_type_u_t,
+    nala_va_arg_item_type_p_t
 };
 
-struct _nala_va_arg_item_t {
-    enum _nala_va_arg_item_type_t type;
+struct nala_va_arg_item_t {
+    enum nala_va_arg_item_type_t type;
     bool ignore_in;
     union {
         int d;
         unsigned int u;
         void *p_p;
     };
-    _nala_set_param in;
-    _nala_set_param out;
-    struct _nala_va_arg_item_t *next_p;
+    struct nala_set_param in;
+    struct nala_set_param out;
+    struct nala_va_arg_item_t *next_p;
 };
 
-struct _nala_va_arg_list_t {
-    struct _nala_va_arg_item_t *head_p;
-    struct _nala_va_arg_item_t *tail_p;
+struct nala_va_arg_list_t {
+    struct nala_va_arg_item_t *head_p;
+    struct nala_va_arg_item_t *tail_p;
     unsigned int length;
 };
 
-void _nala_va_arg_list_init(struct _nala_va_arg_list_t *self_p)
+void nala_va_arg_list_init(struct nala_va_arg_list_t *self_p)
 {
     self_p->head_p = NULL;
     self_p->tail_p = NULL;
     self_p->length = 0;
 }
 
-void _nala_va_arg_list_destroy(struct _nala_va_arg_list_t *self_p)
+void nala_va_arg_list_destroy(struct nala_va_arg_list_t *self_p)
 {
-    struct _nala_va_arg_item_t *item_p;
-    struct _nala_va_arg_item_t *tmp_p;
+    struct nala_va_arg_item_t *item_p;
+    struct nala_va_arg_item_t *tmp_p;
 
     item_p = self_p->head_p;
 
@@ -100,8 +106,8 @@ void _nala_va_arg_list_destroy(struct _nala_va_arg_list_t *self_p)
     }
 }
 
-void _nala_va_arg_list_append(struct _nala_va_arg_list_t *self_p,
-                              struct _nala_va_arg_item_t *item_p)
+void nala_va_arg_list_append(struct nala_va_arg_list_t *self_p,
+                             struct nala_va_arg_item_t *item_p)
 {
     self_p->length++;
 
@@ -115,18 +121,18 @@ void _nala_va_arg_list_append(struct _nala_va_arg_list_t *self_p,
     self_p->tail_p = item_p;
 }
 
-struct _nala_va_arg_item_t *_nala_va_arg_list_get(
-    struct _nala_va_arg_list_t *self_p,
+struct nala_va_arg_item_t *nala_va_arg_list_get(
+    struct nala_va_arg_list_t *self_p,
     unsigned int index)
 {
     unsigned int i;
-    struct _nala_va_arg_item_t *item_p;
+    struct nala_va_arg_item_t *item_p;
 
     if (index >= self_p->length) {
         NALA_TEST_FAILURE(nala_format(
-            "Trying to access variable argument at index %u when only %u exists.\n",
-            index,
-            self_p->length));
+                              "Trying to access variable argument at index %u when only %u exists.\n",
+                              index,
+                              self_p->length));
     }
 
     item_p = self_p->head_p;
@@ -138,10 +144,10 @@ struct _nala_va_arg_item_t *_nala_va_arg_list_get(
     return (item_p);
 }
 
-struct _nala_va_arg_item_t *_nala_parse_va_arg(const char **format_pp,
-                                               va_list vl)
+struct nala_va_arg_item_t *nala_parse_va_arg(const char **format_pp,
+                                             va_list vl)
 {
-    struct _nala_va_arg_item_t *item_p;
+    struct nala_va_arg_item_t *item_p;
 
     item_p = _nala_malloc(sizeof(*item_p));
     item_p->in.buf_p = NULL;
@@ -150,19 +156,19 @@ struct _nala_va_arg_item_t *_nala_parse_va_arg(const char **format_pp,
     switch (**format_pp) {
 
     case 'd':
-        item_p->type = _nala_va_arg_item_type_d_t;
+        item_p->type = nala_va_arg_item_type_d_t;
         item_p->ignore_in = false;
         item_p->d = va_arg(vl, int);
         break;
 
     case 'u':
-        item_p->type = _nala_va_arg_item_type_u_t;
+        item_p->type = nala_va_arg_item_type_u_t;
         item_p->ignore_in = false;
         item_p->u = va_arg(vl, unsigned int);
         break;
 
     case 'p':
-        item_p->type = _nala_va_arg_item_type_p_t;
+        item_p->type = nala_va_arg_item_type_p_t;
         item_p->ignore_in = true;
         item_p->p_p = NULL;
         break;
@@ -179,27 +185,27 @@ struct _nala_va_arg_item_t *_nala_parse_va_arg(const char **format_pp,
     return (item_p);
 }
 
-int _nala_parse_va_list(struct _nala_va_arg_list_t *list_p,
-                        const char *format_p,
-                        va_list vl)
+int nala_parse_va_list(struct nala_va_arg_list_t *list_p,
+                       const char *format_p,
+                       va_list vl)
 {
     int res;
-    struct _nala_va_arg_item_t *item_p;
+    struct nala_va_arg_item_t *item_p;
 
     res = 1;
-    _nala_va_arg_list_init(list_p);
+    nala_va_arg_list_init(list_p);
 
     while (res == 1) {
         if (*format_p == '\0') {
             res = 0;
         } else if (*format_p == '%') {
             format_p++;
-            item_p = _nala_parse_va_arg(&format_p, vl);
+            item_p = nala_parse_va_arg(&format_p, vl);
 
             if (item_p == NULL) {
                 res = -1;
             } else {
-                _nala_va_arg_list_append(list_p, item_p);
+                nala_va_arg_list_append(list_p, item_p);
             }
         } else {
             res = -1;
@@ -209,24 +215,24 @@ int _nala_parse_va_list(struct _nala_va_arg_list_t *list_p,
     return (res);
 }
 
-void _nala_va_arg_list_assert_d(struct _nala_va_arg_item_t *item_p,
-                                int value)
+void nala_va_arg_list_assert_d(struct nala_va_arg_item_t *item_p,
+                               int value)
 {
     if (!item_p->ignore_in) {
         ASSERT_EQ(item_p->d, value);
     }
 }
 
-void _nala_va_arg_list_assert_u(struct _nala_va_arg_item_t *item_p,
-                                unsigned int value)
+void nala_va_arg_list_assert_u(struct nala_va_arg_item_t *item_p,
+                               unsigned int value)
 {
     if (!item_p->ignore_in) {
         ASSERT_EQ(item_p->u, value);
     }
 }
 
-void _nala_va_arg_list_assert_p(struct _nala_va_arg_item_t *item_p,
-                                void *value_p)
+void nala_va_arg_list_assert_p(struct nala_va_arg_item_t *item_p,
+                               void *value_p)
 {
     if (!item_p->ignore_in) {
         ASSERT_EQ(item_p->p_p, value_p);
@@ -241,27 +247,27 @@ void _nala_va_arg_list_assert_p(struct _nala_va_arg_item_t *item_p,
     }
 }
 
-void _nala_va_arg_list_assert(struct _nala_va_arg_list_t *self_p,
-                              va_list vl)
+void nala_va_arg_list_assert(struct nala_va_arg_list_t *self_p,
+                             va_list vl)
 {
     unsigned int i;
-    struct _nala_va_arg_item_t *item_p;
+    struct nala_va_arg_item_t *item_p;
 
     item_p = self_p->head_p;
 
     for (i = 0; i < self_p->length; i++) {
         switch (item_p->type) {
 
-        case _nala_va_arg_item_type_d_t:
-            _nala_va_arg_list_assert_d(item_p, va_arg(vl, int));
+        case nala_va_arg_item_type_d_t:
+            nala_va_arg_list_assert_d(item_p, va_arg(vl, int));
             break;
 
-        case _nala_va_arg_item_type_u_t:
-            _nala_va_arg_list_assert_u(item_p, va_arg(vl, unsigned int));
+        case nala_va_arg_item_type_u_t:
+            nala_va_arg_list_assert_u(item_p, va_arg(vl, unsigned int));
             break;
 
-        case _nala_va_arg_item_type_p_t:
-            _nala_va_arg_list_assert_p(item_p, va_arg(vl, void *));
+        case nala_va_arg_item_type_p_t:
+            nala_va_arg_list_assert_p(item_p, va_arg(vl, void *));
             break;
 
         default:
@@ -272,4 +278,22 @@ void _nala_va_arg_list_assert(struct _nala_va_arg_list_t *self_p,
 
         item_p = item_p->next_p;
     }
+}
+
+void nala_set_param_init(struct nala_set_param *self_p)
+{
+    self_p->buf_p = NULL;
+    self_p->size = 0;
+}
+
+void nala_set_param_buf(struct nala_set_param *self_p, const void *buf_p, size_t size)
+{
+    self_p->buf_p = _nala_malloc(size);
+    self_p->size = size;
+    memcpy(self_p->buf_p, buf_p, size);
+}
+
+void nala_set_param_string(struct nala_set_param *self_p, const char *string_p)
+{
+    nala_set_param_buf(self_p, string_p, strlen(string_p) + 1);
 }

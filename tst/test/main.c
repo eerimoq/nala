@@ -230,3 +230,13 @@ TEST(capture_output)
     ASSERT_EQ(output, "Foo!\n");
     ASSERT_EQ(errput, "Bar!\n");
 }
+
+static void fail_segfault_entry()
+{
+    (*((int *)0)) = 1;
+}
+
+TEST(fail_segfault)
+{
+    expect_error_in_subprocess(fail_segfault_entry, "");
+}

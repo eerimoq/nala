@@ -18,3 +18,8 @@ TEST(time_called_fewer_times_than_expected)
 
     ASSERT_EQ(time(NULL), 41);
 }
+
+TEST(segfault)
+{
+    (*((int *)0)) = 1;
+}

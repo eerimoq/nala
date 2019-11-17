@@ -101,7 +101,7 @@ def set_member(name):
     return decl(name,
                 node.TypeDecl(name,
                               [],
-                              node.IdentifierType(["_nala_set_param"])))
+                              node.IdentifierType(["struct nala_set_param"])))
 
 
 def assert_member(param):
@@ -200,9 +200,9 @@ class GeneratedMock:
         self.wrapped_func = f"__wrap_{self.func_name}"
         self.real_func = f"__real_{self.func_name}"
 
-        self.state_name = f"_nala_state_for_{self.func_name}"
-        self.state_type = f"_nala_state_type_for_{self.func_name}"
-        self.params_type = f"_nala_params_type_for_{self.func_name}"
+        self.state_name = f"nala_state_for_{self.func_name}"
+        self.state_type = f"nala_state_type_for_{self.func_name}"
+        self.params_type = f"struct nala_params_type_for_{self.func_name}"
 
         self.func_decl = self.function.declaration.type
         self.func_params = self.func_decl.args.params if self.func_decl.args else []
