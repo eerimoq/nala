@@ -70,6 +70,29 @@ __attribute__ ((weak)) void nala_reset_all_mocks(void)
 {
 }
 
+static const char *get_node(void)
+{
+    static char buf[128];
+
+    return (hf_get_hostname(&buf[0], sizeof(buf), "*** unknown ***"));
+}
+
+static const char *get_user(void)
+{
+    static char buf[128];
+
+    return (hf_get_username(&buf[0], sizeof(buf), "*** unknown ***"));
+}
+
+static const char *format_timespan(float elapsed_time_ms)
+{
+    static char buf[128];
+
+    return (hf_format_timespan(&buf[0],
+                               sizeof(buf),
+                               (unsigned long long)elapsed_time_ms));
+}
+
 static void color_start(FILE *file_p, const char *color_p)
 {
     fprintf(file_p, "%s%s%s", ANSI_RESET, ANSI_BOLD, color_p);
@@ -261,10 +284,10 @@ static const char *test_result(struct nala_test_t *test_p, bool color)
 
 static void print_test_result(struct nala_test_t *test_p)
 {
-    printf("%s %s (" COLOR_BOLD(YELLOW, "%.02f ms") ")",
+    printf("%s %s (" COLOR_BOLD(YELLOW, "%s") ")",
            test_result(test_p, true),
            test_p->name_p,
-           test_p->elapsed_time_ms);
+           format_timespan(test_p->elapsed_time_ms));
 
     if (test_p->signal_number != -1) {
         printf(" (signal: %d)", test_p->signal_number);
@@ -308,21 +331,8 @@ static void print_summary(struct nala_test_t *test_p,
     }
 
     printf("%d total\n", total);
-    printf("Time: " COLOR_BOLD(YELLOW, "%.02f ms") "\n", elapsed_time_ms);
-}
-
-static const char *get_node(void)
-{
-    static char buf[128];
-
-    return (hf_get_hostname(&buf[0], sizeof(buf), "*** unknown ***"));
-}
-
-static const char *get_user(void)
-{
-    static char buf[128];
-
-    return (hf_get_username(&buf[0], sizeof(buf), "*** unknown ***"));
+    printf("Time: " COLOR_BOLD(YELLOW, "%s") "\n",
+           format_timespan(elapsed_time_ms));
 }
 
 static void write_report_json(struct nala_test_t *test_p)
@@ -351,11 +361,11 @@ static void write_report_json(struct nala_test_t *test_p)
                 "            \"name\": \"%s\",\n"
                 "            \"description\": [],\n"
                 "            \"result\": \"%s\",\n"
-                "            \"execution_time\": \"%.02f ms\"\n"
+                "            \"execution_time\": \"%s\"\n"
                 "        }%s\n",
                 test_p->name_p,
                 test_result(test_p, false),
-                test_p->elapsed_time_ms,
+                format_timespan(test_p->elapsed_time_ms),
                 (test_p->next_p != NULL ? "," : ""));
         test_p = test_p->next_p;
     }

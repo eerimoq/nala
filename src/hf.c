@@ -27,8 +27,12 @@
  */
 
 #include <string.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include <pwd.h>
 #include "hf.h"
+
+#define TIME_UNITS_MAX 7
 
 char *hf_get_username(char *buf_p, size_t size, const char *default_p)
 {
@@ -76,4 +80,88 @@ char *hf_get_hostname(char *buf_p, size_t size, const char *default_p)
     buf_p[size - 1] = '\0';
 
     return (res_p);
+}
+
+/* Common time units, used for formatting of time spans. */
+struct time_unit_t {
+    unsigned long divider;
+    const char *unit_p;
+};
+
+static struct time_unit_t time_units[TIME_UNITS_MAX] = {
+    {
+        .divider = 60 * 60 * 24 * 7 * 52 * 1000ul,
+        .unit_p = "y"
+    },
+    {
+        .divider = 60 * 60 * 24 * 7 * 1000ul,
+        .unit_p = "w"
+    },
+    {
+        .divider = 60 * 60 * 24 * 1000ul,
+        .unit_p = "d"
+    },
+    {
+        .divider = 60 * 60 * 1000ul,
+        .unit_p = "h"
+    },
+    {
+        .divider = 60 * 1000ul,
+        .unit_p = "m"
+    },
+    {
+        .divider = 1000ul,
+        .unit_p = "s"
+    },
+    {
+        .divider = 1ul,
+        .unit_p = "ms"
+    }
+};
+
+const char *get_delimiter(bool is_first, bool is_last)
+{
+    if (is_first) {
+        return ("");
+    } else if (is_last) {
+        return (" and ");
+    } else {
+        return (", ");
+    }
+}
+
+char *hf_format_timespan(char *buf_p,
+                         size_t size,
+                         unsigned long long timespan_ms)
+{
+    int i;
+    unsigned long long count;
+    char buf[64];
+
+    strncpy(buf_p, "", size);
+
+    for (i = 0; i < TIME_UNITS_MAX; i++) {
+        count = (timespan_ms / time_units[i].divider);
+        timespan_ms -= (count * time_units[i].divider);
+
+        if (count == 0) {
+            continue;
+        }
+
+        snprintf(&buf[0],
+                 sizeof(buf),
+                 "%s%llu%s",
+                 get_delimiter(strlen(buf_p) == 0, timespan_ms == 0),
+                 count,
+                 time_units[i].unit_p);
+        strncat(buf_p, &buf[0], size);
+    }
+
+    if (strlen(buf_p) == 0) {
+        strncpy(buf_p, "0s", size);
+    }
+
+    buf_p[size - 1] = '\0';
+
+    return (buf_p);
 }

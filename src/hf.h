@@ -42,3 +42,10 @@ char *hf_get_username(char *buf_p, size_t size, const char *default_p);
  * NULL if the hostname cannot be determined and default_p is NULL.
  */
 char *hf_get_hostname(char *buf_p, size_t size, const char *default_p);
+
+/**
+ * Format given timespan in milliseconds into given buffer.
+ */
+char *hf_format_timespan(char *buf_p,
+                         size_t size,
+                         unsigned long long timespan_ms);

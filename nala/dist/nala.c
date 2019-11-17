@@ -290,6 +290,13 @@ char *hf_get_username(char *buf_p, size_t size, const char *default_p);
  */
 char *hf_get_hostname(char *buf_p, size_t size, const char *default_p);
 
+/**
+ * Format given timespan in milliseconds into given buffer.
+ */
+char *hf_format_timespan(char *buf_p,
+                         size_t size,
+                         unsigned long long timespan_ms);
+
 
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"
@@ -344,6 +351,29 @@ __attribute__ ((weak)) void nala_assert_all_mocks_completed(void)
 
 __attribute__ ((weak)) void nala_reset_all_mocks(void)
 {
+}
+
+static const char *get_node(void)
+{
+    static char buf[128];
+
+    return (hf_get_hostname(&buf[0], sizeof(buf), "*** unknown ***"));
+}
+
+static const char *get_user(void)
+{
+    static char buf[128];
+
+    return (hf_get_username(&buf[0], sizeof(buf), "*** unknown ***"));
+}
+
+static const char *format_timespan(float elapsed_time_ms)
+{
+    static char buf[128];
+
+    return (hf_format_timespan(&buf[0],
+                               sizeof(buf),
+                               (unsigned long long)elapsed_time_ms));
 }
 
 static void color_start(FILE *file_p, const char *color_p)
@@ -537,10 +567,10 @@ static const char *test_result(struct nala_test_t *test_p, bool color)
 
 static void print_test_result(struct nala_test_t *test_p)
 {
-    printf("%s %s (" COLOR_BOLD(YELLOW, "%.02f ms") ")",
+    printf("%s %s (" COLOR_BOLD(YELLOW, "%s") ")",
            test_result(test_p, true),
            test_p->name_p,
-           test_p->elapsed_time_ms);
+           format_timespan(test_p->elapsed_time_ms));
 
     if (test_p->signal_number != -1) {
         printf(" (signal: %d)", test_p->signal_number);
@@ -584,21 +614,8 @@ static void print_summary(struct nala_test_t *test_p,
     }
 
     printf("%d total\n", total);
-    printf("Time: " COLOR_BOLD(YELLOW, "%.02f ms") "\n", elapsed_time_ms);
-}
-
-static const char *get_node(void)
-{
-    static char buf[128];
-
-    return (hf_get_hostname(&buf[0], sizeof(buf), "*** unknown ***"));
-}
-
-static const char *get_user(void)
-{
-    static char buf[128];
-
-    return (hf_get_username(&buf[0], sizeof(buf), "*** unknown ***"));
+    printf("Time: " COLOR_BOLD(YELLOW, "%s") "\n",
+           format_timespan(elapsed_time_ms));
 }
 
 static void write_report_json(struct nala_test_t *test_p)
@@ -627,11 +644,11 @@ static void write_report_json(struct nala_test_t *test_p)
                 "            \"name\": \"%s\",\n"
                 "            \"description\": [],\n"
                 "            \"result\": \"%s\",\n"
-                "            \"execution_time\": \"%.02f ms\"\n"
+                "            \"execution_time\": \"%s\"\n"
                 "        }%s\n",
                 test_p->name_p,
                 test_result(test_p, false),
-                test_p->elapsed_time_ms,
+                format_timespan(test_p->elapsed_time_ms),
                 (test_p->next_p != NULL ? "," : ""));
         test_p = test_p->next_p;
     }
@@ -1473,9 +1490,13 @@ void nala_traceback_print(const char *prefix_p)
  */
 
 #include <string.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include <pwd.h>
 // #include "hf.h"
 
+
+#define TIME_UNITS_MAX 7
 
 char *hf_get_username(char *buf_p, size_t size, const char *default_p)
 {
@@ -1523,6 +1544,90 @@ char *hf_get_hostname(char *buf_p, size_t size, const char *default_p)
     buf_p[size - 1] = '\0';
 
     return (res_p);
+}
+
+/* Common time units, used for formatting of time spans. */
+struct time_unit_t {
+    unsigned long divider;
+    const char *unit_p;
+};
+
+static struct time_unit_t time_units[TIME_UNITS_MAX] = {
+    {
+        .divider = 60 * 60 * 24 * 7 * 52 * 1000ul,
+        .unit_p = "y"
+    },
+    {
+        .divider = 60 * 60 * 24 * 7 * 1000ul,
+        .unit_p = "w"
+    },
+    {
+        .divider = 60 * 60 * 24 * 1000ul,
+        .unit_p = "d"
+    },
+    {
+        .divider = 60 * 60 * 1000ul,
+        .unit_p = "h"
+    },
+    {
+        .divider = 60 * 1000ul,
+        .unit_p = "m"
+    },
+    {
+        .divider = 1000ul,
+        .unit_p = "s"
+    },
+    {
+        .divider = 1ul,
+        .unit_p = "ms"
+    }
+};
+
+const char *get_delimiter(bool is_first, bool is_last)
+{
+    if (is_first) {
+        return ("");
+    } else if (is_last) {
+        return (" and ");
+    } else {
+        return (", ");
+    }
+}
+
+char *hf_format_timespan(char *buf_p,
+                         size_t size,
+                         unsigned long long timespan_ms)
+{
+    int i;
+    unsigned long long count;
+    char buf[64];
+
+    strncpy(buf_p, "", size);
+
+    for (i = 0; i < TIME_UNITS_MAX; i++) {
+        count = (timespan_ms / time_units[i].divider);
+        timespan_ms -= (count * time_units[i].divider);
+
+        if (count == 0) {
+            continue;
+        }
+
+        snprintf(&buf[0],
+                 sizeof(buf),
+                 "%s%llu%s",
+                 get_delimiter(strlen(buf_p) == 0, timespan_ms == 0),
+                 count,
+                 time_units[i].unit_p);
+        strncat(buf_p, &buf[0], size);
+    }
+
+    if (strlen(buf_p) == 0) {
+        strncpy(buf_p, "0s", size);
+    }
+
+    buf_p[size - 1] = '\0';
+
+    return (buf_p);
 }
 #include <stdio.h>
 #include <stdlib.h>
