@@ -300,7 +300,7 @@ static {{mock.state_type}} {{mock.state_name}} =
     struct _nala_instance_type_for_{{mock.func_name}} *instance_p;
 
     {{mock.state_name}}.mode = 1;
-    instance_p = _nala_malloc(sizeof(*instance_p));
+    instance_p = nala_xmalloc(sizeof(*instance_p));
     {% for param in mock.set_params %}
     nala_set_param_init(&instance_p->data.params.{{param.name}}_out);
     nala_set_param_init(&instance_p->data.params.{{param.name}}_in);
@@ -376,7 +376,7 @@ void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
     struct _nala_instance_type_for_{{mock.func_name}} *instance_p;
 
     {{mock.state_name}}.mode = 1;
-    instance_p = _nala_malloc(sizeof(*instance_p));
+    instance_p = nala_xmalloc(sizeof(*instance_p));
     {% for param in mock.set_params %}
     nala_set_param_init(&instance_p->data.params.{{param.name}}_out);
     nala_set_param_init(&instance_p->data.params.{{param.name}}_in);
@@ -541,7 +541,7 @@ void {{mock.func_name}}_mock_set_va_arg_in_at(unsigned int index, const void *bu
 
     if (instance_p != NULL) {
         item_p = nala_va_arg_list_get(&instance_p->data.params._nala_va_arg_list, index);
-        item_p->in.buf_p = _nala_malloc(size);
+        item_p->in.buf_p = nala_xmalloc(size);
         item_p->in.size = size;
         memcpy(item_p->in.buf_p, buf_p, size);
     } else {
@@ -576,7 +576,7 @@ void {{mock.func_name}}_mock_set_va_arg_out_at(unsigned int index, const void *b
 
     if (instance_p != NULL) {
         item_p = nala_va_arg_list_get(&instance_p->data.params._nala_va_arg_list, index);
-        item_p->out.buf_p = _nala_malloc(size);
+        item_p->out.buf_p = nala_xmalloc(size);
         item_p->out.size = size;
         memcpy(item_p->out.buf_p, buf_p, size);
     } else {

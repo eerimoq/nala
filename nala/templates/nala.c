@@ -38,7 +38,7 @@ struct nala_set_param {
     size_t size;
 };
 
-static void *_nala_malloc(size_t size)
+static void *nala_xmalloc(size_t size)
 {
     void *buf_p;
 
@@ -149,7 +149,7 @@ struct nala_va_arg_item_t *nala_parse_va_arg(const char **format_pp,
 {
     struct nala_va_arg_item_t *item_p;
 
-    item_p = _nala_malloc(sizeof(*item_p));
+    item_p = nala_xmalloc(sizeof(*item_p));
     item_p->in.buf_p = NULL;
     item_p->out.buf_p = NULL;
 
@@ -288,7 +288,7 @@ void nala_set_param_init(struct nala_set_param *self_p)
 
 void nala_set_param_buf(struct nala_set_param *self_p, const void *buf_p, size_t size)
 {
-    self_p->buf_p = _nala_malloc(size);
+    self_p->buf_p = nala_xmalloc(size);
     self_p->size = size;
     memcpy(self_p->buf_p, buf_p, size);
 }
