@@ -1,4 +1,3 @@
-#include <pwd.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
@@ -14,6 +13,7 @@
 #include "diff/diff.h"
 #include "hexdump/hexdump.h"
 #include "utils.h"
+#include "hf.h"
 
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"
@@ -313,31 +313,16 @@ static void print_summary(struct nala_test_t *test_p,
 
 static const char *get_node(void)
 {
-    static char node[128];
-    int res;
+    static char buf[128];
 
-    res = gethostname(&node[0], sizeof(node));
-
-    if (res != 0) {
-        return ("*** unkonwn ***");
-    }
-
-    node[sizeof(node) - 1] = '\0';
-
-    return (&node[0]);
+    return (hf_get_hostname(&buf[0], sizeof(buf), "*** unknown ***"));
 }
 
-static const char *get_username(void)
+static const char *get_user(void)
 {
-    struct passwd *passwd_p;
+    static char buf[128];
 
-    passwd_p = getpwuid(geteuid());
-
-    if (passwd_p == NULL) {
-        return ("*** unkonwn ***");
-    }
-
-    return (passwd_p->pw_name);
+    return (hf_get_username(&buf[0], sizeof(buf), "*** unknown ***"));
 }
 
 static void write_report_json(struct nala_test_t *test_p)
@@ -358,7 +343,7 @@ static void write_report_json(struct nala_test_t *test_p)
             "    \"user\": \"%s\",\n"
             "    \"testcases\": [\n",
             get_node(),
-            get_username());
+            get_user());
 
     while (test_p != NULL) {
         fprintf(file_p,
@@ -682,7 +667,7 @@ const char *nala_format_string(const char *format_p, ...)
     fprintf(file_p, format_p, left_p, right_p);
     fprintf(file_p, "            See diff for details.\n");
     color_reset(file_p);
-    print_string_diff(file_p, left_p, right_p);
+    print_string_diff(file_p, right_p, left_p);
     fputc('\0', file_p);
     fclose(file_p);
 

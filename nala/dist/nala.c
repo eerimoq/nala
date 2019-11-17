@@ -1,4 +1,3 @@
-#include <pwd.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
@@ -244,6 +243,52 @@ const char *nala_next_line(const char *string);
 const char *nala_next_lines(const char *string, size_t lines);
 
 #endif
+
+// #include "hf.h"
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2019 Erik Moqvist
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use, copy,
+ * modify, merge, publish, distribute, sublicense, and/or sell copies
+ * of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+ * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * This file is part of the humanfriendly project.
+ */
+
+#include <unistd.h>
+
+#define HF_VERSION "0.1.0"
+
+/**
+ * Get the username of the currently logged in user. Returns the
+ * current username, the default username, or NULL if the current user
+ * cannot be determined and default_p is NULL.
+ */
+char *hf_get_username(char *buf_p, size_t size, const char *default_p);
+
+/**
+ * Get the hostname. Returns the hostname, the default hostname, or
+ * NULL if the hostname cannot be determined and default_p is NULL.
+ */
+char *hf_get_hostname(char *buf_p, size_t size, const char *default_p);
 
 
 #define ANSI_COLOR_RED "\x1b[31m"
@@ -544,31 +589,16 @@ static void print_summary(struct nala_test_t *test_p,
 
 static const char *get_node(void)
 {
-    static char node[128];
-    int res;
+    static char buf[128];
 
-    res = gethostname(&node[0], sizeof(node));
-
-    if (res != 0) {
-        return ("*** unkonwn ***");
-    }
-
-    node[sizeof(node) - 1] = '\0';
-
-    return (&node[0]);
+    return (hf_get_hostname(&buf[0], sizeof(buf), "*** unknown ***"));
 }
 
-static const char *get_username(void)
+static const char *get_user(void)
 {
-    struct passwd *passwd_p;
+    static char buf[128];
 
-    passwd_p = getpwuid(geteuid());
-
-    if (passwd_p == NULL) {
-        return ("*** unkonwn ***");
-    }
-
-    return (passwd_p->pw_name);
+    return (hf_get_username(&buf[0], sizeof(buf), "*** unknown ***"));
 }
 
 static void write_report_json(struct nala_test_t *test_p)
@@ -589,7 +619,7 @@ static void write_report_json(struct nala_test_t *test_p)
             "    \"user\": \"%s\",\n"
             "    \"testcases\": [\n",
             get_node(),
-            get_username());
+            get_user());
 
     while (test_p != NULL) {
         fprintf(file_p,
@@ -913,7 +943,7 @@ const char *nala_format_string(const char *format_p, ...)
     fprintf(file_p, format_p, left_p, right_p);
     fprintf(file_p, "            See diff for details.\n");
     color_reset(file_p);
-    print_string_diff(file_p, left_p, right_p);
+    print_string_diff(file_p, right_p, left_p);
     fputc('\0', file_p);
     fclose(file_p);
 
@@ -1413,6 +1443,86 @@ void nala_traceback_print(const char *prefix_p)
             return;
         }
     }
+}
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2019 Erik Moqvist
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use, copy,
+ * modify, merge, publish, distribute, sublicense, and/or sell copies
+ * of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+ * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * This file is part of the humanfriendly project.
+ */
+
+#include <string.h>
+#include <pwd.h>
+// #include "hf.h"
+
+
+char *hf_get_username(char *buf_p, size_t size, const char *default_p)
+{
+    char *res_p;
+    struct passwd *passwd_p;
+
+    res_p = buf_p;
+    passwd_p = getpwuid(geteuid());
+
+    if (passwd_p == NULL) {
+        if (default_p == NULL) {
+            res_p = NULL;
+        } else {
+            strncpy(buf_p, default_p, size);
+        }
+    } else {
+        strncpy(buf_p, passwd_p->pw_name, size);
+
+        if (size > 0) {
+            buf_p[size - 1] = '\0';
+        }
+    }
+
+    buf_p[size - 1] = '\0';
+
+    return (res_p);
+}
+
+char *hf_get_hostname(char *buf_p, size_t size, const char *default_p)
+{
+    int res;
+    char *res_p;
+
+    res_p = buf_p;
+    res = gethostname(buf_p, size);
+
+    if (res != 0) {
+        if (default_p == NULL) {
+            res_p = NULL;
+        } else {
+            strncpy(buf_p, default_p, size);
+        }
+    }
+
+    buf_p[size - 1] = '\0';
+
+    return (res_p);
 }
 #include <stdio.h>
 #include <stdlib.h>

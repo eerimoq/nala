@@ -12,6 +12,7 @@ SRC = \
 	../../src/hexdump/hexdump.c \
 	../../src/subprocess.c \
 	../../src/traceback.c \
+	../../src/hf.c \
 	subprocess.c \
 	main.c
 

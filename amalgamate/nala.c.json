@@ -5,6 +5,7 @@
         "src/nala.c",
         "src/subprocess.c",
         "src/traceback.c",
+        "src/hf.c",
         "src/utils.c",
         "src/diff/diff.c",
         "src/hexdump/hexdump.c"
