@@ -91,16 +91,7 @@ the time function.
 
 Build and run the tests.
 
-.. code-block:: text
-
-   $ make -s -C foo
-   std!
-   err!
-   PASSED assertions (0s)
-   PASSED mock_time (0s)
-
-   Tests: 2 passed, 2 total
-   Time: 0s
+.. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run.png
 
 Compiler flags
 ==============
