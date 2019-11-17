@@ -1,3 +1,4 @@
+#include <pwd.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
@@ -237,14 +238,22 @@ static void print_location_context(const char *filename_p, size_t line_number)
     fclose(file_p);
 }
 
-static const char *test_result(struct nala_test_t *test_p)
+static const char *test_result(struct nala_test_t *test_p, bool color)
 {
     const char *result_p;
 
     if (test_p->exit_code == 0) {
-        result_p = COLOR_BOLD(GREEN, "PASSED");
+        if (color) {
+            result_p = COLOR_BOLD(GREEN, "PASSED");
+        } else {
+            result_p = "PASSED";
+        }
     } else {
-        result_p = COLOR_BOLD(RED, "FAILED");
+        if (color) {
+            result_p = COLOR_BOLD(RED, "FAILED");
+        } else {
+            result_p = "FAILED";
+        }
     }
 
     return (result_p);
@@ -253,7 +262,7 @@ static const char *test_result(struct nala_test_t *test_p)
 static void print_test_result(struct nala_test_t *test_p)
 {
     printf("%s %s (" COLOR_BOLD(YELLOW, "%.02f ms") ")",
-           test_result(test_p),
+           test_result(test_p, true),
            test_p->name_p,
            test_p->elapsed_time_ms);
 
@@ -300,6 +309,76 @@ static void print_summary(struct nala_test_t *test_p,
 
     printf("%d total\n", total);
     printf("Time: " COLOR_BOLD(YELLOW, "%.02f ms") "\n", elapsed_time_ms);
+}
+
+static const char *get_node(void)
+{
+    static char node[128];
+    int res;
+
+    res = gethostname(&node[0], sizeof(node));
+
+    if (res != 0) {
+        return ("*** unkonwn ***");
+    }
+
+    node[sizeof(node) - 1] = '\0';
+
+    return (&node[0]);
+}
+
+static const char *get_username(void)
+{
+    struct passwd *passwd_p;
+
+    passwd_p = getpwuid(geteuid());
+
+    if (passwd_p == NULL) {
+        return ("*** unkonwn ***");
+    }
+
+    return (passwd_p->pw_name);
+}
+
+static void write_report_json(struct nala_test_t *test_p)
+{
+    FILE *file_p;
+
+    file_p = fopen("report.json", "w");
+
+    if (file_p == NULL) {
+        exit(1);
+    }
+
+    fprintf(file_p,
+            "{\n"
+            "    \"name\": \"-\",\n"
+            "    \"date\": \"-\",\n"
+            "    \"node\": \"%s\",\n"
+            "    \"user\": \"%s\",\n"
+            "    \"testcases\": [\n",
+            get_node(),
+            get_username());
+
+    while (test_p != NULL) {
+        fprintf(file_p,
+                "        {\n"
+                "            \"name\": \"%s\",\n"
+                "            \"description\": [],\n"
+                "            \"result\": \"%s\",\n"
+                "            \"execution_time\": \"%.02f ms\"\n"
+                "        }%s\n",
+                test_p->name_p,
+                test_result(test_p, false),
+                test_p->elapsed_time_ms,
+                (test_p->next_p != NULL ? "," : ""));
+        test_p = test_p->next_p;
+    }
+
+    fprintf(file_p,
+            "    ]\n"
+            "}\n");
+    fclose(file_p);
 }
 
 static void test_entry(void *arg_p)
@@ -375,6 +454,7 @@ static int run_tests(struct nala_test_t *tests_p)
     gettimeofday(&end_time, NULL);
     timersub(&end_time, &start_time, &elapsed_time);
     print_summary(tests_p, timeval_to_ms(&elapsed_time));
+    write_report_json(tests_p);
 
     return (res);
 }

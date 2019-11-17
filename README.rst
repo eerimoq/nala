@@ -19,6 +19,7 @@ Features
 - Mocking support
 - Works well with errors reported by sanitizers
 - Test isolation with fork()
+- JSON test report
 
 Installation
 ============

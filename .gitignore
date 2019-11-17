@@ -114,3 +114,4 @@ nala_mocks.c
 nala_mocks.ld
 /a.out
 /my-suite
+report.json
