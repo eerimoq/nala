@@ -174,7 +174,7 @@ For selected function parameters
    <func>_mock_set_<param>_in_assert(*)          - custom assert function on input
    <func>_mock_set_<param>_in_pointer(*, size_t) - check pointer (the address) on input
    <func>_mock_set_<param>_out(*, size_t)        - value on return
-   <func>_mock_set_<param>_out_callback(*)       - custom output copy function
+   <func>_mock_set_<param>_out_copy(*)           - custom output copy function
 
 For variadic functions
 ^^^^^^^^^^^^^^^^^^^^^^

@@ -33,7 +33,7 @@ void {{mock.func_name}}_mock_set_{{param.name}}_in(const void *buf_p, size_t siz
 void {{mock.func_name}}_mock_set_{{param.name}}_in_assert(void (*callback)({{param | render}}, const void *nala_buf_p, size_t nala_size));
 void {{mock.func_name}}_mock_set_{{param.name}}_in_pointer({{param | render}});
 void {{mock.func_name}}_mock_set_{{param.name}}_out(const void *buf_p, size_t size);
-void {{mock.func_name}}_mock_set_{{param.name}}_out_callback(void (*callback)({{param | render}}, const void *nala_buf_p, size_t nala_size));
+void {{mock.func_name}}_mock_set_{{param.name}}_out_copy(void (*callback)({{param | render}}, const void *nala_buf_p, size_t nala_size));
 {% endfor %}
 {% if mock.is_variadic_func %}
 void {{mock.func_name}}_mock_ignore_va_arg_in_at(unsigned int index);

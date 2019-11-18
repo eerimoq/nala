@@ -122,8 +122,8 @@ def in_assert_member(param):
         ])
 
 
-def out_callback_member(param):
-    name = f'{param.name}_out_callback'
+def out_copy_member(param):
+    name = f'{param.name}_out_copy'
 
     return function_ptr_decl(
         name,
@@ -330,7 +330,7 @@ class GeneratedMock:
             self.instance_members.append(set_member(f'{param.name}_in'))
             self.instance_members.append(in_assert_member(param))
             self.instance_members.append(set_member(f'{param.name}_out'))
-            self.instance_members.append(out_callback_member(param))
+            self.instance_members.append(out_copy_member(param))
             self.set_params.append(param)
 
     def void_function_decl(self, name, parameters):
