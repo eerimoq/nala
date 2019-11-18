@@ -28,7 +28,7 @@
 
 #include <unistd.h>
 
-#define NALA_HF_VERSION "0.1.0"
+#define NALA_HF_VERSION "0.2.0"
 
 /**
  * Get the username of the currently logged in user. Returns the

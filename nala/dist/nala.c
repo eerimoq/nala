@@ -275,7 +275,7 @@ const char *nala_next_lines(const char *string, size_t lines);
 
 #include <unistd.h>
 
-#define NALA_HF_VERSION "0.1.0"
+#define NALA_HF_VERSION "0.2.0"
 
 /**
  * Get the username of the currently logged in user. Returns the
@@ -1498,6 +1498,11 @@ void nala_traceback_print(const char *prefix_p)
 
 #define TIME_UNITS_MAX 7
 
+static void nala_hf_null_last(char *buf_p, size_t size)
+{
+    buf_p[size - 1] = '\0';
+}
+
 char *nala_hf_get_username(char *buf_p, size_t size, const char *default_p)
 {
     char *res_p;
@@ -1516,11 +1521,11 @@ char *nala_hf_get_username(char *buf_p, size_t size, const char *default_p)
         strncpy(buf_p, passwd_p->pw_name, size);
 
         if (size > 0) {
-            buf_p[size - 1] = '\0';
+            nala_hf_null_last(buf_p, size);
         }
     }
 
-    buf_p[size - 1] = '\0';
+    nala_hf_null_last(buf_p, size);
 
     return (res_p);
 }
@@ -1541,7 +1546,7 @@ char *nala_hf_get_hostname(char *buf_p, size_t size, const char *default_p)
         }
     }
 
-    buf_p[size - 1] = '\0';
+    nala_hf_null_last(buf_p, size);
 
     return (res_p);
 }
@@ -1599,10 +1604,12 @@ char *nala_hf_format_timespan(char *buf_p,
                               unsigned long long timespan_ms)
 {
     int i;
+    int res;
     unsigned long long count;
-    char buf[64];
+    size_t offset;
 
     strncpy(buf_p, "", size);
+    offset = 0;
 
     for (i = 0; i < TIME_UNITS_MAX; i++) {
         count = (timespan_ms / time_units[i].divider);
@@ -1612,20 +1619,23 @@ char *nala_hf_format_timespan(char *buf_p,
             continue;
         }
 
-        snprintf(&buf[0],
-                 sizeof(buf),
-                 "%s%llu%s",
-                 get_delimiter(strlen(buf_p) == 0, timespan_ms == 0),
-                 count,
-                 time_units[i].unit_p);
-        strncat(buf_p, &buf[0], size);
+        res = snprintf(&buf_p[offset],
+                       size - offset,
+                       "%s%llu%s",
+                       get_delimiter(strlen(buf_p) == 0, timespan_ms == 0),
+                       count,
+                       time_units[i].unit_p);
+        nala_hf_null_last(buf_p, size);
+
+        if (res > 0) {
+            offset += (size_t)res;
+        }
     }
 
     if (strlen(buf_p) == 0) {
         strncpy(buf_p, "0s", size);
+        nala_hf_null_last(buf_p, size);
     }
-
-    buf_p[size - 1] = '\0';
 
     return (buf_p);
 }
