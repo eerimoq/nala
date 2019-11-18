@@ -95,7 +95,7 @@ static const char *format_timespan(float elapsed_time_ms)
 
 static void color_start(FILE *file_p, const char *color_p)
 {
-    fprintf(file_p, "%s%s%s", ANSI_RESET, ANSI_BOLD, color_p);
+    fprintf(file_p, "%s%s%s", ANSI_RESET, color_p, ANSI_BOLD);
 }
 
 static void color_reset(FILE *file_p)

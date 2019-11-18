@@ -1,6 +1,16 @@
 #include "nala.h"
 #include "subprocess.h"
 
+#define BLD "\x1b[1m"
+#define RST "\x1b[0m"
+#define RD  "\x1b[31m"
+#define RED  RST RD
+#define GN  "\x1b[32m"
+#define MA "\x1b[35m"
+#define GRN  RST GN
+#define BRED RED BLD
+#define BGRN GRN BLD
+
 TEST(assert_eq)
 {
     ASSERT_EQ(1, 1);
@@ -107,10 +117,14 @@ static void assert_eq_error_string_entry()
 
 TEST(assert_eq_error_string)
 {
-    expect_error_in_subprocess(assert_eq_error_string_entry,
-                               "\"123\" is not equal to \"23\".");
-    expect_error_in_subprocess(assert_eq_error_string_entry,
-                               "Diff:");
+    expect_error_in_subprocess(
+        assert_eq_error_string_entry,
+        RST"  Error:    "BRED"\"123\" is not equal to \"23\".\n"
+        "            See diff for details.\n"
+        RST"  Diff:\n"
+        "\n"
+        "     "RED"- "RST BRED"1"RST RED" |  "RST"23\n"
+        "     "GRN"+ "RST BGRN"1"RST GRN" |  "RST BGRN"1"RST"23\n");
 }
 
 static void assert_ne_error_entry()
@@ -192,12 +206,34 @@ TEST(assert_not_substring_error)
 
 static void assert_memory_error_entry()
 {
-    ASSERT_MEMORY("1", "2", 2);
+    ASSERT_MEMORY("12345678901234567890123456789012345678901234567890"
+                  "12345678901234567890123456789012345678901234567890"
+                  "12345678901234567890123456789012345678901234567890",
+                  "X2345678901234567890123456789012345678901234567890"
+                  "12345678901234567890123456789012345678901234XX7890"
+                  "12345678901234567890123456789012345678901234567890",
+                  150);
 }
 
 TEST(assert_memory_error)
 {
-    expect_error_in_subprocess(assert_memory_error_entry, "");
+    expect_error_in_subprocess(
+        assert_memory_error_entry,
+        RST"  Error:    "BRED"Memory mismatch. See diff for details.\n"
+        RST"  Diff:\n"
+        "\n"
+        "     "RED"- "RST BRED"1"RST RED" |  "RST"000000  "BRED"58"RST" 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36  "BRED"X"RST"234567890123456\n"
+        "     "RST GN"+ "RST BGRN"1"RST RST GN" |  "RST"000000  "BGRN"31"RST" 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36  "BGRN"1"RST"234567890123456\n"
+        RST MA"       2"RST" |  000010  37 38 39 30 31 32 33 34 35 36 37 38 39 30 31 32  7890123456789012\n"
+        RST MA"       3"RST" |  000020  33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38  3456789012345678\n"
+        RST MA"       4"RST" |  000030  39 30 31 32 33 34 35 36 37 38 39 30 31 32 33 34  9012345678901234\n"
+        RST MA"       5"RST" |  000040  35 36 37 38 39 30 31 32 33 34 35 36 37 38 39 30  5678901234567890\n"
+        "     "RED"- "RST BRED"6"RST RED" |  "RST"000050  31 32 33 34 35 36 37 38 39 30 31 32 33 34 "BRED"58"RST" "BRED"58"RST"  12345678901234"BRED"XX"RST"\n"
+        "     "RST GN"+ "RST BGRN"6"RST RST GN" |  "RST"000050  31 32 33 34 35 36 37 38 39 30 31 32 33 34 "BGRN"35"RST" "BGRN"36"RST"  12345678901234"BGRN"56"RST"\n"
+        RST MA"       7"RST" |  000060  37 38 39 30 31 32 33 34 35 36 37 38 39 30 31 32  7890123456789012\n"
+        RST MA"       8"RST" |  000070  33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38  3456789012345678\n"
+        RST MA"       9"RST" |  000080  39 30 31 32 33 34 35 36 37 38 39 30 31 32 33 34  9012345678901234\n"
+        RST MA"      10"RST" |  000090  35 36 37 38 39 30 -- -- -- -- -- -- -- -- -- --  567890          \n");
 }
 
 static void assert_error_entry()
