@@ -490,3 +490,29 @@ TEST(typedef_union_param_and_return_type_function)
     value = typedef_union_param_and_return_type(value);
     ASSERT_EQ(value.a.number, 1);
 }
+
+static void double_pointer_out(int **value_pp, const void *buf_p, size_t size)
+{
+    **value_pp = *(const int *)buf_p;
+}
+
+TEST(double_pointer_function)
+{
+    int value;
+    int *value_p;
+
+    value = -1;
+    value_p = &value;
+    ASSERT_EQ(double_pointer(&value_p), 5);
+    ASSERT_EQ(value, 1);
+
+    value = -1;
+    value_p = &value;
+    double_pointer_mock_once(3);
+    value = 2;
+    double_pointer_mock_set_value_pp_out(&value, sizeof(value));
+    double_pointer_mock_set_value_pp_out_callback(double_pointer_out);
+    value = -1;
+    ASSERT_EQ(double_pointer(&value_p), 3);
+    ASSERT_EQ(value, 2);
+}

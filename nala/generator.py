@@ -23,7 +23,7 @@ def is_char_pointer(param):
     if is_ellipsis(param):
         return False
     elif isinstance(param.type, node.PtrDecl):
-        if isinstance(param.type.type, node.FuncDecl):
+        if isinstance(param.type.type, (node.FuncDecl, node.PtrDecl)):
             return False
         elif isinstance(param.type.type.type, node.Struct):
             return False
@@ -104,8 +104,26 @@ def set_member(name):
                               node.IdentifierType(["struct nala_set_param"])))
 
 
-def assert_member(param):
+def in_assert_member(param):
     name = f'{param.name}_in_assert'
+
+    return function_ptr_decl(
+        name,
+        void_type(name),
+        [
+            param,
+            decl('nala_buf_p',
+                 node.PtrDecl([],
+                              node.TypeDecl('nala_buf_p',
+                                            ['const'],
+                                            node.IdentifierType(["void"])))),
+            decl('nala_size',
+                 node.TypeDecl('nala_size', [], node.IdentifierType(["size_t"])))
+        ])
+
+
+def out_callback_member(param):
+    name = f'{param.name}_out_callback'
 
     return function_ptr_decl(
         name,
@@ -310,8 +328,9 @@ class GeneratedMock:
                 continue
 
             self.instance_members.append(set_member(f'{param.name}_in'))
-            self.instance_members.append(assert_member(param))
+            self.instance_members.append(in_assert_member(param))
             self.instance_members.append(set_member(f'{param.name}_out'))
+            self.instance_members.append(out_callback_member(param))
             self.set_params.append(param)
 
     def void_function_decl(self, name, parameters):

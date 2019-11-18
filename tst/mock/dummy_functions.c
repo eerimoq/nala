@@ -107,3 +107,10 @@ union_type typedef_union_param_and_return_type(union_type arg)
 
     return (arg);
 }
+
+int double_pointer(int **value_pp)
+{
+    **value_pp = 1;
+
+    return (5);
+}
