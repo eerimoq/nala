@@ -1,6 +1,8 @@
 #ifndef TEST_DUMMY_FUNCTIONS_H
 #define TEST_DUMMY_FUNCTIONS_H
 
+#include <stdarg.h>
+
 typedef struct DummyStruct
 {
     int number;
@@ -37,6 +39,7 @@ DummyStruct *compose_twice(DummyStruct *dummy_struct,
 DummyStruct *add_two(DummyStruct *dummy_struct);
 DummyStruct *(*return_add_one(void))(DummyStruct *dummy_struct);
 int io_control(int kind, ...);
+int io_vcontrol(int kind, va_list ap);
 void struct_param(struct struct_param_type *data);
 void enum_param(enum enum_param_type value);
 int call(int (*callback)(int value));

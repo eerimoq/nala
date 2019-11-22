@@ -60,6 +60,11 @@ int io_control(int kind, ...)
     return (kind);
 }
 
+int io_vcontrol(int kind, va_list ap)
+{
+    return (kind);
+}
+
 void struct_param(struct struct_param_type *data)
 {
     (void)data;

@@ -310,6 +310,24 @@ TEST(variadic_function)
     ASSERT_EQ(variadic_function_callback_called, true);
 }
 
+static int va_list_ellipsis(int kind, ...)
+{
+    int res;
+    va_list ap;
+
+    va_start(ap, kind);
+    res = io_vcontrol(kind, ap);
+    va_end(ap);
+
+    return (res);
+}
+
+TEST(va_list_function)
+{
+    io_vcontrol_mock_once(1, 3);
+    ASSERT_EQ(va_list_ellipsis(1, 5), 3);
+}
+
 int io_control_mock_va_arg_real(int kind, va_list __nala_va_list)
 {
     int res;

@@ -60,6 +60,13 @@ def is_union(param):
         False
 
 
+def is_va_list(param):
+    try:
+        return param.type.type.names[0] == 'va_list'
+    except AttributeError:
+        False
+
+
 def is_void(param):
     if is_ellipsis(param):
         return False
@@ -308,6 +315,8 @@ class GeneratedMock:
                 continue
             elif self.is_union(param):
                 continue
+            elif is_va_list(param):
+                continue
 
             if not param.name:
                 continue
@@ -397,6 +406,8 @@ class GeneratedMock:
             elif self.is_struct(param):
                 continue
             elif self.is_union(param):
+                continue
+            elif is_va_list(param):
                 continue
             elif is_char_pointer_or_non_pointer(param):
                 once_params.append(param)

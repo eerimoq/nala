@@ -199,6 +199,8 @@ Limitations
 
 - Structs and unions passed by value are ignored.
 
+- ``va_list`` parameters are ignored.
+
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
 
