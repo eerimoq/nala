@@ -137,7 +137,7 @@ the last file contains linker flags.
 
 Use ``--rename-parameters-file`` to rename function parameters, often
 useful when mocking standard library functions. If not given, Nala
-renames a few function parameters by default.
+renames `a few function parameters`_ by default.
 
 Use ``--no-rename-parameters`` not to rename any function
 parameters. Overrides ``--rename-parameters-file``.
@@ -220,3 +220,5 @@ Limitations
 .. _amalgamated: https://sqlite.org/amalgamation.html
 .. _nala.h: https://raw.githubusercontent.com/eerimoq/nala/master/nala/dist/nala.h
 .. _nala.c: https://raw.githubusercontent.com/eerimoq/nala/master/nala/dist/nala.c
+
+.. _a few function parameters: https://github.com/eerimoq/nala/blob/master/nala/rename_parameters.txt
