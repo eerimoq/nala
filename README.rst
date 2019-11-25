@@ -135,6 +135,13 @@ code and generates ``nala_mocks.h``, ``nala_mocks.c`` and
 ``nala_mocks.ld``. The first two files declare and define mocks, while
 the last file contains linker flags.
 
+Use ``--rename-parameters-file`` to rename function parameters, often
+useful when mocking standard library functions. If not given, Nala
+renames a few function parameters by default.
+
+Use ``--no-rename-parameters`` not to rename any function
+parameters. Overrides ``--rename-parameters-file``.
+
 .. code-block:: bash
 
    $ gcc -E *.c | nala generate_mocks
