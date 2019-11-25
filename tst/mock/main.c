@@ -87,7 +87,7 @@ TEST(time_function)
     ASSERT_EQ(time(NULL), 0);
 
     time_mock_once(0);
-    time_mock_set___timer_in_pointer(NULL);
+    time_mock_set_tloc_in_pointer(NULL);
     ASSERT_EQ(time(NULL), 0);
 
     time_mock_disable();
@@ -100,7 +100,7 @@ TEST(pipe_function_set_out)
     int res;
 
     pipe_mock_once(42);
-    pipe_mock_set___pipedes_out(fd, sizeof(fd));
+    pipe_mock_set_pipefd_out(fd, sizeof(fd));
     memset(&fd[0], 0, sizeof(fd));
 
     res = pipe(fd);
@@ -116,7 +116,7 @@ TEST(pipe_function_set_in)
     int res;
 
     pipe_mock_once(41);
-    pipe_mock_set___pipedes_in(fd, sizeof(fd));
+    pipe_mock_set_pipefd_in(fd, sizeof(fd));
 
     res = pipe(fd);
 
@@ -144,12 +144,12 @@ TEST(mount_function)
     ASSERT_EQ(mount("a", "b", "c", 0, ""), -1);
 
     mount_mock_once("a", "b", "c", 0, 0);
-    mount_mock_set___data_in("", 1);
+    mount_mock_set_data_in("", 1);
 
     ASSERT_EQ(mount("a", "b", "c", 0, ""), 0);
 
     mount_mock_once(NULL, "b", "c", 0, 0);
-    mount_mock_set___data_in("", 1);
+    mount_mock_set_data_in("", 1);
 
     ASSERT_EQ(mount(NULL, "b", "c", 0, ""), 0);
 }

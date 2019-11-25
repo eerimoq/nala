@@ -1,0 +1,8 @@
+# Overridden function parameter names.
+# In alphabetical order.
+
+getmntent(stream)
+pipe(pipefd)
+statvfs(path, buf)
+time(tloc)
+mount(source, target, filesystemtype, mountflags, data)

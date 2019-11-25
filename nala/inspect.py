@@ -15,7 +15,7 @@ GETTER_REGEX = re.compile(
     r"(void )?(\w+?)(_mock|_mock_once|_mock_ignore_in|_mock_ignore_in_once|_mock_none)\s*\(")
 
 
-def collect_mocked_functions(expanded_source_code):
+def collect_mocked_functions(expanded_source_code, rename_parameters_file):
     """Yield all the mocked functions used in the expanded source code."""
 
     functions = set()
@@ -27,7 +27,9 @@ def collect_mocked_functions(expanded_source_code):
         if void is None:
             functions.add(function_name)
 
-    yield from ForgivingDeclarationParser(expanded_source_code, functions)
+    yield from ForgivingDeclarationParser(expanded_source_code,
+                                          functions,
+                                          rename_parameters_file)
 
     if functions:
         for function in functions:
@@ -99,6 +101,51 @@ class Token(NamedTuple):
         )
 
 
+def load_param_names(filename):
+    param_names = {}
+
+    with open(filename, 'r') as fin:
+        for line in fin:
+            line = line.strip()
+
+            if not line:
+                continue
+
+            if line.startswith('#'):
+                continue
+
+            mo = re.match(r'([^(]+)\(([^)]+)\)', line)
+
+            if not mo:
+                raise Exception(f"Invalid parameter name line '{line}'.")
+
+            param_names[mo.group(1)] = [
+                param_name.strip()
+                for param_name in mo.group(2).split(',')
+            ]
+
+    return param_names
+
+
+def rename_parameters(function_declaration, param_names):
+    for i, param in enumerate(function_declaration.type.args.params):
+        param_type = param.type
+
+        if (not param.name
+            and isinstance(param_type.type, node.IdentifierType)
+            and param_type.type.names == ["void"]):
+            continue
+
+        param.name = param_names[i]
+
+        while not isinstance(param_type, node.TypeDecl):
+            param_type = param_type.type
+
+        param_type.declname = param.name
+
+    return function_declaration
+
+
 class ForgivingDeclarationParser:
     linemarker = re.compile(r'^# \d+ "((?:\\.|[^\\"])*)"((?: [1234])*)$')
 
@@ -130,7 +177,7 @@ class ForgivingDeclarationParser:
         "|".join(f"(?P<{token}>{pattern})" for token, pattern in tokens.items()),
         flags=re.MULTILINE)
 
-    def __init__(self, source_code, functions=None):
+    def __init__(self, source_code, functions=None, rename_parameters_file=None):
         self.source_code = source_code
         self.functions = functions
         self.token_stream = self.tokenize(source_code)
@@ -142,6 +189,10 @@ class ForgivingDeclarationParser:
         self.typedefs = ["typedef int __builtin_va_list;"]
 
         self.cparser = CParser()
+        self.param_names = {}
+
+        if rename_parameters_file is not None:
+            self.param_names = load_param_names(rename_parameters_file)
 
     @classmethod
     def tokenize(cls, source_code):
@@ -268,9 +319,17 @@ class ForgivingDeclarationParser:
             if self.functions is not None:
                 self.functions.remove(func_name)
 
+            param_names = self.param_names.get(func_name)
+
+            if param_names:
+                func_declaration = rename_parameters(file_ast.ext[-1],
+                                                     param_names)
+            else:
+                func_declaration = file_ast.ext[-1]
+
             return MockedFunction(
                 func_name,
-                file_ast.ext[-1],
+                func_declaration,
                 IncludeDirective.from_source_context(self.source_context),
                 file_ast)
 

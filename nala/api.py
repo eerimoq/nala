@@ -26,14 +26,14 @@ NALA_C_FUNCTIONS = [
 ]
 
 
-def generate_mocks(expanded_code, output_directory):
+def generate_mocks(expanded_code, output_directory, rename_parameters_file):
     """Identify mocked functions and generate the source and header files.
 
     """
 
     generator = FileGenerator()
 
-    for function in collect_mocked_functions(expanded_code):
+    for function in collect_mocked_functions(expanded_code, rename_parameters_file):
         if function.name in NALA_C_FUNCTIONS:
             raise Exception(
                 f"'{function.name}()' cannot be mocked as it is used by Nala.")

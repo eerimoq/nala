@@ -11,6 +11,7 @@ from .version import __version__
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 DIST_DIR = os.path.join(SCRIPT_DIR, 'dist')
 TEMPLATES_DIR = os.path.join(SCRIPT_DIR, 'templates')
+RENAME_PARAMETERS_TXT = os.path.join(SCRIPT_DIR, 'rename_parameters.txt')
 
 
 def generate_main_c():
@@ -46,7 +47,12 @@ def do_generate_mocks(args):
             with open(infile, 'r') as fin:
                 expanded_code += fin.read()
 
-    generate_mocks(expanded_code, args.outdir)
+    if args.no_rename_parameters:
+        rename_parameters_file = None
+    else:
+        rename_parameters_file = args.rename_parameters_file
+
+    generate_mocks(expanded_code, args.outdir, rename_parameters_file)
 
 
 def main():
@@ -76,6 +82,12 @@ def main():
     subparser.add_argument('-o', '--outdir',
                            default='.',
                            help='Output directory (default: %(default)s).')
+    subparser.add_argument('-r', '--rename-parameters-file',
+                           default=RENAME_PARAMETERS_TXT,
+                           help='Rename parameters file (default: %(default)s).')
+    subparser.add_argument('-R', '--no-rename-parameters',
+                           action='store_true',
+                           help='Do not rename any parameters.')
     subparser.add_argument(
         'infiles',
         nargs='*',
