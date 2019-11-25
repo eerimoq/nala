@@ -1,8 +1,14 @@
 # Overridden function parameter names.
 # In alphabetical order.
 
+endmntent(streamp)
 getmntent(stream)
+nftw(dirpath, fn, nopenfd, flags)
 pipe(pipefd)
+poll(fds, nfds, timeout)
+sendto(sockfd, buf, len, flags, dest_addr, addrlen)
+setsockopt(sockfd, level, optname, optval, optlen)
 statvfs(path, buf)
 time(tloc)
+timerfd_settime(fd, flags, new_value, old_value)
 mount(source, target, filesystemtype, mountflags, data)
