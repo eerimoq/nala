@@ -578,11 +578,11 @@ TEST(rename_parameters)
 {
     close_mock_ignore_in(0);
     endmntent_mock_ignore_in(0);
-    /* fclose_mock(stream); */
+    fclose_mock(0);
     fopen_mock_ignore_in(NULL);
     /* fread_mock(ptr, size, nmemb, stream); */
-    /* fseek_mock(stream, offset, whence); */
-    /* ftell_mock(stream); */
+    fseek_mock_ignore_in(0);
+    ftell_mock_ignore_in(0);
     fwrite_mock_ignore_in(0);
     getmntent_mock_ignore_in(NULL);
     mount_mock_ignore_in(0);
