@@ -1,8 +1,14 @@
 #include <err.h>
 #include <errno.h>
 #include <sys/mount.h>
+#include <sys/timerfd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/statvfs.h>
 #include <time.h>
 #include <unistd.h>
+#include <poll.h>
+#include <mntent.h>
 
 #include "subprocess.h"
 #include "nala.h"
@@ -20,7 +26,7 @@ static void function_error_in_subprocess(void (*entry)(void *arg_p))
 
 int fake_add(int x, int y)
 {
-    return x + y + 1;
+    return (x + y + 1);
 }
 
 TEST(add_function)
@@ -157,7 +163,8 @@ TEST(mount_function)
 DummyStruct *fake_edit_number(DummyStruct *dummy_struct, int number)
 {
     dummy_struct->number = 2 * number;
-    return dummy_struct + 1;
+
+    return (dummy_struct + 1);
 }
 
 TEST(implementation)
@@ -204,6 +211,38 @@ static void once_in_error_entry(void *arg_p)
 TEST(once_in_error)
 {
     function_error_in_subprocess(once_in_error_entry);
+}
+
+static void in_error_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    DummyStruct array[] = { { .number = 1 }, { .number = 2 } };
+
+    edit_number_mock(5, &array[1]);
+    edit_number_mock_set_dummy_struct_in(&array[1], sizeof(array));
+    edit_number(&array[0], 5);
+}
+
+TEST(in_error)
+{
+    function_error_in_subprocess(in_error_entry);
+}
+
+static void in_pointer_error_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    DummyStruct array[] = { { .number = 1 }, { .number = 2 } };
+
+    edit_number_mock(5, &array[1]);
+    edit_number_mock_set_dummy_struct_in_pointer(&array[1]);
+    edit_number(&array[0], 5);
+}
+
+TEST(in_pointer_error)
+{
+    function_error_in_subprocess(in_pointer_error_entry);
 }
 
 static void once_in_pointer_error_entry(void *arg_p)
@@ -533,4 +572,30 @@ TEST(double_pointer_function)
     value = -1;
     ASSERT_EQ(double_pointer(&value_p), 3);
     ASSERT_EQ(value, 2);
+}
+
+TEST(rename_parameters)
+{
+    close_mock_ignore_in(0);
+    endmntent_mock_ignore_in(0);
+    /* fclose_mock(stream); */
+    fopen_mock_ignore_in(NULL);
+    /* fread_mock(ptr, size, nmemb, stream); */
+    /* fseek_mock(stream, offset, whence); */
+    /* ftell_mock(stream); */
+    fwrite_mock_ignore_in(0);
+    getmntent_mock_ignore_in(NULL);
+    mount_mock_ignore_in(0);
+    /* nftw_mock(dirpath, fn, nopenfd, flags); */
+    pipe_mock_ignore_in(0);
+    poll_mock_ignore_in(0);
+    read_mock_ignore_in(0);
+    sendto_mock_ignore_in(0);
+    setsockopt_mock_ignore_in(0);
+    sleep_mock_ignore_in(0);
+    statvfs_mock_ignore_in(0);
+    time_mock_ignore_in(0);
+    timerfd_settime_mock_ignore_in(0);
+    usleep_mock_ignore_in(0);
+    write_mock_ignore_in(0);
 }

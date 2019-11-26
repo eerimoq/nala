@@ -1,14 +1,27 @@
-# Overridden function parameter names.
+# Function parameter names to rename.
+#
 # In alphabetical order.
+#
 
+close(fd)
 endmntent(streamp)
+fclose(stream)
+fopen(path, mode)
+fread(ptr, size, nmemb, stream)
+fseek(stream, offset, whence)
+ftell(stream)
+fwrite(ptr, size, nmemb, stream)
 getmntent(stream)
 mount(source, target, filesystemtype, mountflags, data)
 nftw(dirpath, fn, nopenfd, flags)
 pipe(pipefd)
 poll(fds, nfds, timeout)
+read(fd, buf, count)
 sendto(sockfd, buf, len, flags, dest_addr, addrlen)
 setsockopt(sockfd, level, optname, optval, optlen)
+sleep(seconds)
 statvfs(path, buf)
 time(tloc)
 timerfd_settime(fd, flags, new_value, old_value)
+usleep(usec)
+write(fd, buf, count)
