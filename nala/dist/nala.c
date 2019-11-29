@@ -133,7 +133,7 @@ void nala_subprocess_result_free(struct nala_subprocess_result_t *self_p);
  * This file is part of the traceback project.
  */
 
-#define NALA_TRACEBACK_VERSION "0.2.0"
+#define NALA_TRACEBACK_VERSION "0.3.0"
 
 /**
  * Print a traceback.
@@ -1446,7 +1446,6 @@ void nala_traceback_print(const char *prefix_p)
                  "addr2line -f -p -e %s %p",
                  &exe[0],
                  fixaddr(addresses[i]));
-        command[sizeof(command) - 1] = '\0';
 
         res = system(&command[0]);
 

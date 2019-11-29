@@ -77,7 +77,6 @@ void nala_traceback_print(const char *prefix_p)
                  "addr2line -f -p -e %s %p",
                  &exe[0],
                  fixaddr(addresses[i]));
-        command[sizeof(command) - 1] = '\0';
 
         res = system(&command[0]);
 
