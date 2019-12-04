@@ -208,6 +208,47 @@ Limitations
 
 - ``va_list`` parameters are ignored.
 
+Ideas
+=====
+
+Remaining mocked calls
+----------------------
+
+.. code-block:: text
+
+   test_close failed:
+
+     Location: nala_mocks.c:760
+     Error:    close() called fewer times than expected. 2 call(s) missing.
+     Remaining call(s):
+
+       close(fd=1): return (-1)
+       close(fd=4): return (0)
+       ...
+
+Failing mocked calls
+--------------------
+
+.. code-block:: text
+
+   test_close failed:
+
+     Location: nala_mocks.c:760
+     Error:    close(fd=1) is not equal to close(fd=2)
+
+   test_mount failed:
+
+     Location: nala_mocks.c:760
+     Error: mount(target="b") is not equal to mount(target="c")
+     Diff:
+
+         mount(source="a",
+       -       target="b",
+       +       target="c",
+               filesystemtype="c",
+               mountflags=0,
+               data=00): return (0)
+
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
 
