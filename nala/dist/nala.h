@@ -259,7 +259,7 @@
 #define FAIL()                                                  \
         do {                                                    \
         nala_reset_all_mocks();                                 \
-        NALA_TEST_FAILURE("false", nala_format("Fail.\n"));     \
+        NALA_TEST_FAILURE(NULL, nala_format("Fail.\n"));        \
     } while (0);
 
 #define CAPTURE_OUTPUT(stdout_name, stderr_name)                        \
