@@ -15,6 +15,8 @@
     void name ## _before_fork() {}                      \
     static struct nala_test_t nala_test_ ## name = {    \
         .name_p = #name,                                \
+        .file_p = __FILE__,                             \
+        .line = __LINE__,                               \
         .func = name,                                   \
         .before_fork_func = name ## _before_fork,       \
         .next_p = NULL                                  \
@@ -261,6 +263,8 @@
 
 struct nala_test_t {
     const char *name_p;
+    const char *file_p;
+    int line;
     void (*func)(void);
     void (*before_fork_func)(void);
     int exit_code;
