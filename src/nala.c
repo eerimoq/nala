@@ -206,7 +206,7 @@ static void print_signal_failure(struct nala_test_t *test_p)
 {
     printf("\n");
     printf("%s failed:\n\n", test_p->name_p);
-    printf("  Location: " COLOR_BOLD(GREEN, "unknown\n"));
+    printf("  Location: unknown\n");
     printf("  Error:    " COLOR_BOLD(RED, "Terminated by signal %d.\n"),
            test_p->signal_number);
 }
@@ -673,7 +673,7 @@ void nala_test_failure(const char *file_p,
     capture_output_destroy(&capture_stderr);
     printf("\n");
     printf("%s failed:\n\n", current_test_p->name_p);
-    printf("  Location: " COLOR_BOLD(GREEN, "%s:%d:\n"), file_p, line);
+    printf("  Location: %s:%d\n", file_p, line);
     printf("  Error:    %s", message_p);
     printf("\n");
     nala_traceback_print("  ");

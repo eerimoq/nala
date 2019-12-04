@@ -4,7 +4,8 @@ CFLAGS += \
 	-Wall \
 	-Wextra \
 	-Og \
-	-g
+	-g \
+	-no-pie
 SRC = \
 	../../src/nala.c \
 	../../src/diff/diff.c \

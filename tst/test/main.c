@@ -119,7 +119,7 @@ TEST(assert_eq_error_string)
 {
     expect_error_in_subprocess(
         assert_eq_error_string_entry,
-        RST"  Error:    "BRED"\"123\" is not equal to \"23\".\n"
+        "  Error:    "BRED"\"123\" is not equal to \"23\".\n"
         "            See diff for details.\n"
         RST"  Diff:\n"
         "\n"
@@ -219,7 +219,7 @@ TEST(assert_memory_error)
 {
     expect_error_in_subprocess(
         assert_memory_error_entry,
-        RST"  Error:    "BRED"Memory mismatch. See diff for details.\n"
+        "  Error:    "BRED"Memory mismatch. See diff for details.\n"
         RST"  Diff:\n"
         "\n"
         "     "RED"- "RST BRED"1"RST RED" |  "RST"000000  "BRED"58"RST" 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36  "BRED"X"RST"234567890123456\n"
