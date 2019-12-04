@@ -211,56 +211,6 @@ static void print_signal_failure(struct nala_test_t *test_p)
            test_p->signal_number);
 }
 
-static void print_location_context(const char *filename_p, size_t line_number)
-{
-    FILE *file_p;
-    char line_prefix[64];
-    char line[256];
-    size_t first_line;
-    size_t i;
-
-    printf("  Location context:\n\n");
-
-    file_p = fopen(filename_p, "r");
-
-    if (file_p == NULL) {
-        return;
-    }
-
-    if (line_number < 2) {
-        first_line = 1;
-    } else {
-        first_line = (line_number - 2);
-    }
-
-    for (i = 1; i < line_number + 3; i++) {
-        if (fgets(&line[0], sizeof(line), file_p) == NULL) {
-            goto out1;
-        }
-
-        if (i < first_line) {
-            continue;
-        }
-
-        if (i == line_number) {
-            snprintf(line_prefix,
-                     sizeof(line_prefix),
-                     "> " COLOR_BOLD(MAGENTA, "%ld"),
-                     i);
-            printf("  %23s", line_prefix);
-            printf(" |  " COLOR_BOLD(CYAN, "%s"), line);
-        } else {
-            printf("  " COLOR(MAGENTA, "%6zu"), i);
-            printf(" |  %s", line);
-        }
-    }
-
- out1:
-
-    printf("\n");
-    fclose(file_p);
-}
-
 static const char *test_result(struct nala_test_t *test_p, bool color)
 {
     const char *result_p;
@@ -725,7 +675,7 @@ void nala_test_failure(const char *file_p,
     printf("%s failed:\n\n", current_test_p->name_p);
     printf("  Location: " COLOR_BOLD(GREEN, "%s:%d:\n"), file_p, line);
     printf("  Error:    %s", message_p);
-    print_location_context(file_p, (size_t)line);
+    printf("\n");
     nala_traceback_print("  ");
     printf("\n");
     exit(1);
