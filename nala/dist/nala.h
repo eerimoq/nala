@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NALA_VERSION "0.39.0"
+#define NALA_VERSION "0.40.0"
 
 #define TEST(name)                                      \
     void name(void);                                    \
@@ -222,7 +222,7 @@
                           "%s is not greater or equal to %s.\n",        \
                           nala_format)
 
-#define ASSERT_SUBSTRING(substring, string)             \
+#define ASSERT_SUBSTRING(string, substring)             \
     NALA_BINARY_ASSERTION(string,                       \
                           "contains",                   \
                           substring,                    \
@@ -230,7 +230,7 @@
                           "%s doesn't contain %s.\n",   \
                           nala_format)
 
-#define ASSERT_NOT_SUBSTRING(substring, string)         \
+#define ASSERT_NOT_SUBSTRING(string, substring)         \
     NALA_BINARY_ASSERTION(string,                       \
                           "does not contain",           \
                           substring,                    \

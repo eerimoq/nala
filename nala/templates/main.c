@@ -10,8 +10,8 @@ TEST(assertions)
     ASSERT_LE(1, 1);
     ASSERT_GT(2L, 1L);
     ASSERT_GE(1, 1);
-    ASSERT_SUBSTRING("34", "12345");
-    ASSERT_NOT_SUBSTRING("4567", "12345");
+    ASSERT_SUBSTRING("12345", "34");
+    ASSERT_NOT_SUBSTRING("12345", "4567");
     ASSERT_MEMORY("abcd", "abcd", 5);
     ASSERT(1 == 1);
 

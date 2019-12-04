@@ -48,12 +48,12 @@ TEST(assert_ge)
 
 TEST(assert_substring)
 {
-    ASSERT_SUBSTRING("2", "123");
+    ASSERT_SUBSTRING("123", "2");
 }
 
 TEST(assert_not_substring)
 {
-    ASSERT_NOT_SUBSTRING("4", "123");
+    ASSERT_NOT_SUBSTRING("123", "4");
 }
 
 TEST(assert_memory)
@@ -95,7 +95,7 @@ static void expect_error_in_subprocess(void (*entry)(void),
 
     result_p = subprocess_call_output((subprocess_entry_t)entry, NULL);
     ASSERT_NE(result_p->exit_code, 0);
-    ASSERT_SUBSTRING(expect_stdout_p, result_p->stdout.buf_p);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, expect_stdout_p);
     subprocess_result_free(result_p);
 }
 
@@ -184,7 +184,7 @@ TEST(assert_ge_error)
 
 static void assert_substring_error_entry()
 {
-    ASSERT_SUBSTRING("4", "123");
+    ASSERT_SUBSTRING("123", "4");
 }
 
 TEST(assert_substring_error)
@@ -195,7 +195,7 @@ TEST(assert_substring_error)
 
 static void assert_not_substring_error_entry()
 {
-    ASSERT_NOT_SUBSTRING("3", "123");
+    ASSERT_NOT_SUBSTRING("123", "3");
 }
 
 TEST(assert_not_substring_error)
