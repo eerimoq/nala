@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NALA_VERSION "0.37.0"
+#define NALA_VERSION "0.38.0"
 
 #define TEST(name)                                      \
     void name(void);                                    \
