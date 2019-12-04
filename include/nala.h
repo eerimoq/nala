@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NALA_VERSION "0.38.0"
+#define NALA_VERSION "0.39.0"
 
 #define TEST(name)                                      \
     void name(void);                                    \
@@ -28,8 +28,8 @@
     }                                                   \
     void name(void)
 
-#define NALA_TEST_FAILURE(message_p)                    \
-    nala_test_failure(__FILE__, __LINE__, message_p)
+#define NALA_TEST_FAILURE(condition_p, message_p)                       \
+    nala_test_failure(condition_p, __FILE__, __LINE__, message_p)
 
 #define NALA_PRINT_FORMAT(value)                        \
     _Generic((value),                                   \
@@ -66,7 +66,7 @@
              bool: "%d",                                \
     default: "%p")
 
-#define NALA_BINARY_ASSERTION(left, right, check, format, formatter)    \
+#define NALA_BINARY_ASSERTION(left, cmp, right, check, format, formatter) \
     do {                                                                \
         __typeof__(left) _nala_assert_left = (left);                    \
         __typeof__(right) _nala_assert_right = (right);                 \
@@ -80,7 +80,8 @@
                      format,                                            \
                      NALA_PRINT_FORMAT(_nala_assert_left),              \
                      NALA_PRINT_FORMAT(_nala_assert_right));            \
-            NALA_TEST_FAILURE(formatter(_nala_assert_format,            \
+            NALA_TEST_FAILURE(#left " " cmp " " #right,                 \
+                              formatter(_nala_assert_format,            \
                                         _nala_assert_left,              \
                                         _nala_assert_right));           \
         }                                                               \
@@ -175,6 +176,7 @@
 
 #define ASSERT_EQ(left, right)                          \
     NALA_BINARY_ASSERTION(left,                         \
+                          "==",                         \
                           right,                        \
                           NALA_CHECK_EQ,                \
                           "%s is not equal to %s.\n",   \
@@ -182,6 +184,7 @@
 
 #define ASSERT_NE(left, right)                                  \
     NALA_BINARY_ASSERTION(left,                                 \
+                          "!=",                                 \
                           right,                                \
                           NALA_CHECK_NE,                        \
                           "%s is not different from %s.\n",     \
@@ -189,6 +192,7 @@
 
 #define ASSERT_LT(left, right)                          \
     NALA_BINARY_ASSERTION(left,                         \
+                          "<",                          \
                           right,                        \
                           NALA_CHECK_LT,                \
                           "%s is not less than %s.\n",  \
@@ -196,6 +200,7 @@
 
 #define ASSERT_LE(left, right)                                          \
     NALA_BINARY_ASSERTION(left,                                         \
+                          "<=",                                         \
                           right,                                        \
                           NALA_CHECK_LE,                                \
                           "%s is not less than or equal to %s.\n",      \
@@ -203,6 +208,7 @@
 
 #define ASSERT_GT(left, right)                                  \
     NALA_BINARY_ASSERTION(left,                                 \
+                          ">",                                  \
                           right,                                \
                           NALA_CHECK_GT,                        \
                           "%s is not greater than %s.\n",       \
@@ -210,45 +216,50 @@
 
 #define ASSERT_GE(left, right)                                          \
     NALA_BINARY_ASSERTION(left,                                         \
+                          ">=",                                         \
                           right,                                        \
                           NALA_CHECK_GE,                                \
                           "%s is not greater or equal to %s.\n",        \
                           nala_format)
 
-#define ASSERT_SUBSTRING(string, substring)             \
+#define ASSERT_SUBSTRING(substring, string)             \
     NALA_BINARY_ASSERTION(string,                       \
+                          "contains",                   \
                           substring,                    \
                           NALA_CHECK_SUBSTRING,         \
                           "%s doesn't contain %s.\n",   \
                           nala_format)
 
-#define ASSERT_NOT_SUBSTRING(string, substring)         \
+#define ASSERT_NOT_SUBSTRING(substring, string)         \
     NALA_BINARY_ASSERTION(string,                       \
+                          "does not contain",           \
                           substring,                    \
                           NALA_CHECK_NOT_SUBSTRING,     \
                           "%s contains %s.\n",          \
                           nala_format)
 
-#define ASSERT_MEMORY(left, right, size)                        \
-    do {                                                        \
-        if (memcmp((left), (right), (size)) != 0) {             \
-            nala_reset_all_mocks();                             \
-            NALA_TEST_FAILURE(nala_format_memory((left),        \
-                                                 (right),       \
-                                                 (size)));      \
-        }                                                       \
+#define ASSERT_MEMORY(left, right, size)                                \
+    do {                                                                \
+        if (memcmp((left), (right), (size)) != 0) {                     \
+            nala_reset_all_mocks();                                     \
+            NALA_TEST_FAILURE(                                          \
+                "memcmp(" #left ", " #right ", " #size ") != 0",        \
+                nala_format_memory((left),                              \
+                                   (right),                             \
+                                   (size)));                            \
+        }                                                               \
     } while (0)
 
-#define ASSERT(cond)                            \
-    if (!(cond)) {                              \
-        nala_reset_all_mocks();                 \
-        NALA_TEST_FAILURE(nala_format("Assert.\n")); \
+#define ASSERT(cond)                                             \
+    if (!(cond)) {                                               \
+        nala_reset_all_mocks();                                  \
+        NALA_TEST_FAILURE(#cond, nala_format("Assert.\n"));      \
     }
 
-#define FAIL()                                  \
-    do {                                        \
-        nala_reset_all_mocks();                 \
-        NALA_TEST_FAILURE(nala_format("Fail.\n"));   \
+#define FAIL()                                                  \
+        do {                                                    \
+        nala_reset_all_mocks();                                 \
+        NALA_TEST_FAILURE("false", nala_format("Fail.\n"));     \
     } while (0);
 
 #define CAPTURE_OUTPUT(stdout_name, stderr_name)                        \
@@ -283,13 +294,14 @@ const char *nala_format_memory(const void *left_p,
                                const void *right_p,
                                size_t size);
 
-bool nala_check_substring(const char *actual_p, const char *expected_p);
+bool nala_check_substring(const char *string_p, const char *substring_p);
 
 void nala_capture_output_start(char **stdout_pp, char **stderr_pp);
 
 void nala_capture_output_stop(void);
 
-__attribute__ ((noreturn)) void nala_test_failure(const char *file_p,
+__attribute__ ((noreturn)) void nala_test_failure(const char *condition_p,
+                                                  const char *file_p,
                                                   int line,
                                                   const char *message_p);
 

@@ -134,6 +134,7 @@ struct nala_va_arg_item_t *nala_va_arg_list_get(
 
     if (index >= self_p->length) {
         NALA_TEST_FAILURE(
+            NULL,
             nala_format(
                 "Trying to access variable argument at index %u when only %u exists.\n",
                 index,
@@ -170,6 +171,7 @@ void nala_parse_va_arg_long(const char **format_pp,
     default:
         free(item_p);
         NALA_TEST_FAILURE(
+            NULL,
             nala_format("Unsupported type specifier %%l%c.\n", **format_pp));
         exit(1);
         break;
@@ -205,6 +207,7 @@ void nala_parse_va_arg_non_long(const char **format_pp,
     default:
         free(item_p);
         NALA_TEST_FAILURE(
+            NULL,
             nala_format("Unsupported type specifier %%%c.\n", **format_pp));
         exit(1);
         break;
@@ -342,7 +345,7 @@ void nala_va_arg_list_assert(struct nala_va_arg_list_t *self_p,
             break;
 
         default:
-            NALA_TEST_FAILURE(nala_format("Nala internal failure.\n"));
+            NALA_TEST_FAILURE(NULL, nala_format("Nala internal failure.\n"));
             exit(1);
             break;
         }

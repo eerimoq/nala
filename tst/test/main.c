@@ -48,12 +48,12 @@ TEST(assert_ge)
 
 TEST(assert_substring)
 {
-    ASSERT_SUBSTRING("123", "2");
+    ASSERT_SUBSTRING("2", "123");
 }
 
 TEST(assert_not_substring)
 {
-    ASSERT_NOT_SUBSTRING("123", "4");
+    ASSERT_NOT_SUBSTRING("4", "123");
 }
 
 TEST(assert_memory)
@@ -95,7 +95,7 @@ static void expect_error_in_subprocess(void (*entry)(void),
 
     result_p = subprocess_call_output((subprocess_entry_t)entry, NULL);
     ASSERT_NE(result_p->exit_code, 0);
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, expect_stdout_p);
+    ASSERT_SUBSTRING(expect_stdout_p, result_p->stdout.buf_p);
     subprocess_result_free(result_p);
 }
 
@@ -119,8 +119,8 @@ TEST(assert_eq_error_string)
 {
     expect_error_in_subprocess(
         assert_eq_error_string_entry,
-        "  Error:    "BRED"\"123\" is not equal to \"23\".\n"
-        "            See diff for details.\n"
+        "  Error:     "BRED"\"123\" is not equal to \"23\".\n"
+        "             See diff for details.\n"
         RST"  Diff:\n"
         "\n"
         "     "RED"- "RST BRED"1"RST RED" |  "RST"23\n"
@@ -184,7 +184,7 @@ TEST(assert_ge_error)
 
 static void assert_substring_error_entry()
 {
-    ASSERT_SUBSTRING("123", "4");
+    ASSERT_SUBSTRING("4", "123");
 }
 
 TEST(assert_substring_error)
@@ -195,7 +195,7 @@ TEST(assert_substring_error)
 
 static void assert_not_substring_error_entry()
 {
-    ASSERT_NOT_SUBSTRING("123", "3");
+    ASSERT_NOT_SUBSTRING("3", "123");
 }
 
 TEST(assert_not_substring_error)
@@ -219,7 +219,7 @@ TEST(assert_memory_error)
 {
     expect_error_in_subprocess(
         assert_memory_error_entry,
-        "  Error:    "BRED"Memory mismatch. See diff for details.\n"
+        "  Error:     "BRED"Memory mismatch. See diff for details.\n"
         RST"  Diff:\n"
         "\n"
         "     "RED"- "RST BRED"1"RST RED" |  "RST"000000  "BRED"58"RST" 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36  "BRED"X"RST"234567890123456\n"

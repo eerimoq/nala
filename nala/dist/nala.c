@@ -488,8 +488,10 @@ static float timeval_to_ms(struct timeval *timeval_p)
 static void print_signal_failure(struct nala_test_t *test_p)
 {
     printf("\n");
-    printf("%s failed:\n\n", test_p->name_p);
+    printf("%s failed:\n", test_p->name_p);
+    printf("\n");
     printf("  Location: unknown\n");
+    printf("  Condition: signal caugt\n");
     printf("  Error:    " COLOR_BOLD(RED, "Terminated by signal %d.\n"),
            test_p->signal_number);
 }
@@ -908,7 +910,7 @@ const char *nala_format_string(const char *format_p, ...)
     file_p = open_memstream(&buf_p, &size);
     color_start(file_p, ANSI_COLOR_RED);
     fprintf(file_p, format_p, left_p, right_p);
-    fprintf(file_p, "            See diff for details.\n");
+    fprintf(file_p, "             See diff for details.\n");
     color_reset(file_p);
     print_string_diff(file_p, right_p, left_p);
     fputc('\0', file_p);
@@ -940,14 +942,15 @@ const char *nala_format_memory(const void *left_p,
     return (buf_p);
 }
 
-bool nala_check_substring(const char *actual_p, const char *expected_p)
+bool nala_check_substring(const char *string_p, const char *substring_p)
 {
-    return ((actual_p != NULL)
-            && (expected_p != NULL)
-            && (strstr(actual_p, expected_p) != NULL));
+    return ((string_p != NULL)
+            && (substring_p != NULL)
+            && (strstr(string_p, substring_p) != NULL));
 }
 
-void nala_test_failure(const char *file_p,
+void nala_test_failure(const char *condition_p,
+                       const char *file_p,
                        int line,
                        const char *message_p)
 {
@@ -956,8 +959,14 @@ void nala_test_failure(const char *file_p,
     capture_output_destroy(&capture_stderr);
     printf("\n");
     printf("%s failed:\n\n", current_test_p->name_p);
-    printf("  Location: %s:%d\n", file_p, line);
-    printf("  Error:    %s", message_p);
+    printf("\n");
+    printf("  Location:  %s:%d\n", file_p, line);
+
+    if (condition_p != NULL) {
+        printf("  Condition: %s\n", condition_p);
+    }
+
+    printf("  Error:     %s", message_p);
     printf("\n");
     nala_traceback_print("  ");
     printf("\n");

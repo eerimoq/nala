@@ -108,7 +108,7 @@ static {{mock.state_type}} {{mock.state_name}} =
         NALA_INSTANCES_POP({{mock.state_name}}.instances, &instance_p);
 
         if (instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
+            NALA_TEST_FAILURE(NULL, nala_format(
                     "{{mock.func_name}}() called more times than expected.\n"));
         }
 
@@ -321,7 +321,7 @@ static {{mock.state_type}} {{mock.state_name}} =
     {% if mock.is_variadic_func %}
 
     if (vafmt_p == NULL) {
-        NALA_TEST_FAILURE(nala_format("Variadic format cannot be NULL.\n"));
+        NALA_TEST_FAILURE(NULL, nala_format("Variadic format cannot be NULL.\n"));
     }
 
     {{mock.state_name}}.data.params.vafmt_p = vafmt_p;
@@ -375,7 +375,7 @@ static {{mock.state_type}} {{mock.state_name}} =
     {% if mock.is_variadic_func %}
 
     if (vafmt_p == NULL) {
-        NALA_TEST_FAILURE(nala_format("Variadic format cannot be NULL.\n"));
+        NALA_TEST_FAILURE(NULL, nala_format("Variadic format cannot be NULL.\n"));
     }
 
     instance_p->data.params.vafmt_p = vafmt_p;
@@ -634,7 +634,7 @@ void {{mock.func_name}}_mock_set_va_arg_in_pointer_at(unsigned int index, const 
     instance_p = {{mock.state_name}}.instances.tail_p;
 
     if (instance_p == NULL) {
-        NALA_TEST_FAILURE(nala_format(
+        NALA_TEST_FAILURE(NULL, nala_format(
             "{{mock.func_name}}_mock_set_va_arg_in_pointer_at(...) not implemented "
             "for mock state.\n"));
     }
@@ -685,7 +685,7 @@ void {{mock.func_name}}_mock_reset(void)
 void {{mock.func_name}}_mock_assert_completed(void)
 {
     if ({{mock.state_name}}.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        NALA_TEST_FAILURE(NULL, nala_format(
              "{{mock.func_name}}() called fewer times than expected. %d call(s) "
              "missing.\n",
              {{mock.state_name}}.instances.length));
