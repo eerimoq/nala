@@ -491,7 +491,7 @@ static void print_signal_failure(struct nala_test_t *test_p)
     printf("%s failed:\n", test_p->name_p);
     printf("\n");
     printf("  Location: unknown\n");
-    printf("  Condition: signal caugt\n");
+    printf("  Condition: signal caught\n");
     printf("  Error:    " COLOR_BOLD(RED, "Terminated by signal %d.\n"),
            test_p->signal_number);
 }
