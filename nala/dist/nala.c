@@ -958,7 +958,7 @@ void nala_test_failure(const char *condition_p,
     capture_output_destroy(&capture_stdout);
     capture_output_destroy(&capture_stderr);
     printf("\n");
-    printf("%s failed:\n\n", current_test_p->name_p);
+    printf("%s failed:\n", current_test_p->name_p);
     printf("\n");
     printf("  Location:  %s:%d\n", file_p, line);
 
