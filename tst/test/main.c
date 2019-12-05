@@ -106,8 +106,7 @@ static void assert_eq_error_entry()
 
 TEST(assert_eq_error)
 {
-    expect_error_in_subprocess(assert_eq_error_entry,
-                               "1 is not equal to 0.");
+    expect_error_in_subprocess(assert_eq_error_entry, "1 != 0");
 }
 
 static void assert_eq_error_string_entry()
@@ -119,7 +118,7 @@ TEST(assert_eq_error_string)
 {
     expect_error_in_subprocess(
         assert_eq_error_string_entry,
-        "  Error:     "BRED"\"123\" is not equal to \"23\".\n"
+        "  Error:     "BRED"\"123\" != \"23\"\n"
         "             See diff for details.\n"
         RST"  Diff:\n"
         "\n"
@@ -134,8 +133,7 @@ static void assert_ne_error_entry()
 
 TEST(assert_ne_error)
 {
-    expect_error_in_subprocess(assert_ne_error_entry,
-                               "1 is not different from 1.");
+    expect_error_in_subprocess(assert_ne_error_entry, "1 == 1");
 }
 
 static void assert_lt_error_entry()
@@ -145,8 +143,7 @@ static void assert_lt_error_entry()
 
 TEST(assert_lt_error)
 {
-    expect_error_in_subprocess(assert_lt_error_entry,
-                               "1 is not less than 1.");
+    expect_error_in_subprocess(assert_lt_error_entry, "1 >= 1");
 }
 
 static void assert_le_error_entry()
@@ -156,8 +153,7 @@ static void assert_le_error_entry()
 
 TEST(assert_le_error)
 {
-    expect_error_in_subprocess(assert_le_error_entry,
-                               "2 is not less than or equal to 1.");
+    expect_error_in_subprocess(assert_le_error_entry, "2 > 1");
 }
 
 static void assert_gt_error_entry()
@@ -167,8 +163,7 @@ static void assert_gt_error_entry()
 
 TEST(assert_gt_error)
 {
-    expect_error_in_subprocess(assert_gt_error_entry,
-                               "1 is not greater than 1.");
+    expect_error_in_subprocess(assert_gt_error_entry, "1 <= 1");
 }
 
 static void assert_ge_error_entry()
@@ -178,8 +173,7 @@ static void assert_ge_error_entry()
 
 TEST(assert_ge_error)
 {
-    expect_error_in_subprocess(assert_ge_error_entry,
-                               "1 is not greater or equal to 2.");
+    expect_error_in_subprocess(assert_ge_error_entry, "1 < 2");
 }
 
 static void assert_substring_error_entry()
@@ -190,7 +184,7 @@ static void assert_substring_error_entry()
 TEST(assert_substring_error)
 {
     expect_error_in_subprocess(assert_substring_error_entry,
-                               "\"123\" doesn't contain \"4\".");
+                               "\"123\" doesn't contain \"4\"");
 }
 
 static void assert_not_substring_error_entry()
@@ -201,7 +195,7 @@ static void assert_not_substring_error_entry()
 TEST(assert_not_substring_error)
 {
     expect_error_in_subprocess(assert_not_substring_error_entry,
-                               "\"123\" contains \"3\".");
+                               "\"123\" contains \"3\"");
 }
 
 static void assert_memory_error_entry()
@@ -243,7 +237,7 @@ static void assert_error_entry()
 
 TEST(assert_error)
 {
-    expect_error_in_subprocess(assert_error_entry, "Assert.");
+    expect_error_in_subprocess(assert_error_entry, "assert");
 }
 
 static void fail_error_entry()
@@ -253,7 +247,7 @@ static void fail_error_entry()
 
 TEST(fail_error)
 {
-    expect_error_in_subprocess(fail_error_entry, "Fail.");
+    expect_error_in_subprocess(fail_error_entry, "fail");
 }
 
 TEST(capture_output)
