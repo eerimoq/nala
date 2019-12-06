@@ -92,6 +92,42 @@ TEST(add_function_set_callback)
     ASSERT_EQ(add_function_set_callback_callback_y, 13);
 }
 
+TEST(output_message_function)
+{
+    output_message_mock_once("a");
+    output_message("a");
+}
+
+static void output_message_function_error_mock_null_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    output_message_mock_once(NULL);
+    output_message("a");
+}
+
+TEST(output_message_function_error_mock_null)
+{
+    function_error_in_subprocess(
+        output_message_function_error_mock_null_entry,
+        "Mocked output_message(message): \"(null)\" != \"a\"");
+}
+
+static void output_message_function_error_call_null_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    output_message_mock_once("a");
+    output_message(NULL);
+}
+
+TEST(output_message_function_error_call_null)
+{
+    function_error_in_subprocess(
+        output_message_function_error_call_null_entry,
+        "Memory mismatch. See diff for details.");
+}
+
 TEST(time_function)
 {
     time_t start = time(NULL);

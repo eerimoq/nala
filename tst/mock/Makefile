@@ -7,6 +7,7 @@ CFLAGS = \
 	-g \
 	-Og \
 	-no-pie \
+	-fsanitize=address \
 	-Wpedantic \
 	$(ASAN_FLAGS) \
 	-fprofile-arcs \

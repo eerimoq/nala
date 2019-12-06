@@ -1,6 +1,7 @@
 CFLAGS += \
 	-fprofile-arcs \
 	-ftest-coverage \
+	-fsanitize=address \
 	-Wall \
 	-Wextra \
 	-Wpedantic \

@@ -713,6 +713,15 @@ const char *nala_format_string(const char *format_p, ...)
     fprintf(file_p, format_p, left_p, right_p);
     fprintf(file_p, "             See diff for details.\n");
     color_reset(file_p);
+
+    if (right_p == NULL) {
+        right_p = "<null>";
+    }
+
+    if (left_p == NULL) {
+        left_p = "<null>";
+    }
+
     print_string_diff(file_p, right_p, left_p);
     fputc('\0', file_p);
     fclose(file_p);
