@@ -43,7 +43,7 @@ def do_generate_mocks(args):
     else:
         expanded_code = ''
 
-        for infile in infiles:
+        for infile in args.infiles:
             with open(infile, 'r') as fin:
                 expanded_code += fin.read()
 
