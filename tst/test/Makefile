@@ -3,6 +3,7 @@ CFLAGS += \
 	-ftest-coverage \
 	-Wall \
 	-Wextra \
+	-Wpedantic \
 	-Og \
 	-g \
 	-no-pie

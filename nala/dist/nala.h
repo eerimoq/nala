@@ -68,8 +68,8 @@
 
 #define NALA_BINARY_ASSERTION(left, right, check, format, formatter)    \
     do {                                                                \
-        __typeof__(left) _nala_assert_left = (left);                    \
-        __typeof__(right) _nala_assert_right = (right);                 \
+        __typeof__(left) _nala_assert_left = left;                      \
+        __typeof__(right) _nala_assert_right = right;                   \
                                                                         \
         if (!check(_nala_assert_left, _nala_assert_right)) {            \
             nala_reset_all_mocks();                                     \

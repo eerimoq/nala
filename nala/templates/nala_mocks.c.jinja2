@@ -126,7 +126,7 @@ static {{mock.state_type}} {{mock.state_name}} =
         {% for param in mock.set_params %}
         if (instance_p->data.params.{{param.name}}_in.buf_p != NULL) {
             if (instance_p->data.params.{{param.name}}_in_assert == NULL) {
-                ASSERT_MEMORY({{param.name}},
+                ASSERT_MEMORY((const void *)(uintptr_t){{param.name}},
                               instance_p->data.params.{{param.name}}_in.buf_p,
                               instance_p->data.params.{{param.name}}_in.size);
             } else {
@@ -141,7 +141,7 @@ static {{mock.state_type}} {{mock.state_name}} =
 
         if (instance_p->data.params.{{param.name}}_out.buf_p != NULL) {
             if (instance_p->data.params.{{param.name}}_out_copy == NULL) {
-                memcpy((void *){{param.name}},
+                memcpy((void *)(uintptr_t){{param.name}},
                        instance_p->data.params.{{param.name}}_out.buf_p,
                        instance_p->data.params.{{param.name}}_out.size);
             } else {
@@ -216,7 +216,7 @@ static {{mock.state_type}} {{mock.state_name}} =
         {% for param in mock.set_params %}
         if ({{mock.state_name}}.data.params.{{param.name}}_in.buf_p != NULL) {
             if ({{mock.state_name}}.data.params.{{param.name}}_in_assert == NULL) {
-                ASSERT_MEMORY({{param.name}},
+                ASSERT_MEMORY((const void *)(uintptr_t){{param.name}},
                               {{mock.state_name}}.data.params.{{param.name}}_in.buf_p,
                               {{mock.state_name}}.data.params.{{param.name}}_in.size);
             } else {
@@ -229,7 +229,7 @@ static {{mock.state_type}} {{mock.state_name}} =
 
         if ({{mock.state_name}}.data.params.{{param.name}}_out.buf_p != NULL) {
             if ({{mock.state_name}}.data.params.{{param.name}}_out_copy == NULL) {
-                memcpy((void *){{param.name}},
+                memcpy((void *)(uintptr_t){{param.name}},
                        {{mock.state_name}}.data.params.{{param.name}}_out.buf_p,
                        {{mock.state_name}}.data.params.{{param.name}}_out.size);
             } else {

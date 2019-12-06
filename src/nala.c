@@ -516,13 +516,13 @@ const char *nala_format(const char *format_p, ...)
 }
 
 static const char *display_inline_diff(FILE *file_p,
-                                       const NalaDiff *inline_diff,
+                                       const struct NalaDiff *inline_diff,
                                        size_t lines,
                                        const char *string,
                                        size_t *line_number,
                                        bool use_original)
 {
-    NalaDiffChunk *inline_chunk = &inline_diff->chunks[0];
+    struct NalaDiffChunk *inline_chunk = &inline_diff->chunks[0];
     size_t line_index = 0;
     size_t index = 0;
 
@@ -598,12 +598,12 @@ static void print_string_diff(FILE *file_p,
 {
     fprintf(file_p, "  Diff:\n\n");
 
-    NalaDiff diff = nala_diff_lines(original, modified);
+    struct NalaDiff diff = nala_diff_lines(original, modified);
 
     size_t line_number = 1;
 
     for (size_t chunk_index = 0; chunk_index < diff.size; chunk_index++) {
-        NalaDiffChunk *chunk = &diff.chunks[chunk_index];
+        struct NalaDiffChunk *chunk = &diff.chunks[chunk_index];
 
         size_t original_lines = chunk->original_end - chunk->original_start;
         size_t modified_lines = chunk->modified_end - chunk->modified_start;
@@ -632,7 +632,7 @@ static void print_string_diff(FILE *file_p,
             size_t original_length = (size_t)(original_end - original);
             size_t modified_length = (size_t)(modified_end - modified);
 
-            NalaDiff inline_diff =
+            struct NalaDiff inline_diff =
                 nala_diff_strings_lengths(original,
                                           original_length,
                                           modified,

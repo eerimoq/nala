@@ -7,6 +7,7 @@ CFLAGS = \
 	-g \
 	-Og \
 	-no-pie \
+	-Wpedantic \
 	$(ASAN_FLAGS) \
 	-fprofile-arcs \
 	-ftest-coverage
