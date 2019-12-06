@@ -11,8 +11,8 @@
 #define NALA_VERSION "0.43.0"
 
 #define TEST(name)                                      \
-    void name(void);                                    \
-    void name ## _before_fork() {}                      \
+    static void name(void);                             \
+    static void name ## _before_fork() {}               \
     static struct nala_test_t nala_test_ ## name = {    \
         .name_p = #name,                                \
         .file_p = __FILE__,                             \
@@ -22,11 +22,11 @@
         .next_p = NULL                                  \
     };                                                  \
     __attribute__ ((constructor))                       \
-    void nala_constructor_ ## name(void)                \
+    static void nala_constructor_ ## name(void)         \
     {                                                   \
         nala_register_test(&nala_test_ ## name);        \
     }                                                   \
-    void name(void)
+    static void name(void)
 
 #define NALA_TEST_FAILURE(message_p)                    \
     nala_test_failure(__FILE__, __LINE__, message_p)
