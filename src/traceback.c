@@ -29,9 +29,10 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <execinfo.h>
-#include "traceback.h"
 #include <stdlib.h>
 #include <unistd.h>
+#include "traceback.h"
+#include "subprocess.h"
 
 #define DEPTH_MAX 100
 
@@ -40,54 +41,67 @@ static void *fixaddr(void *address_p)
     return ((void *)(((uintptr_t)address_p) - 1));
 }
 
-void nala_traceback_print(const char *prefix_p)
+char *nala_traceback_format(const char *prefix_p, void **buffer_pp, int depth)
 {
-    int depth;
-    void *addresses[DEPTH_MAX];
     char exe[256];
     char command[384];
     ssize_t size;
-    int res;
     int i;
+    FILE *stream_p;
+    size_t stream_size;
+    struct nala_subprocess_result_t *result_p;
+    char *string_p;
 
     if (prefix_p == NULL) {
         prefix_p = "";
     }
 
-    depth = backtrace(&addresses[0], DEPTH_MAX);
-
-    printf("%sTraceback (most recent call last):\n", prefix_p);
-
     size = readlink("/proc/self/exe", &exe[0], sizeof(exe) - 1);
 
     if (size == -1) {
-        printf("%sNo executable found!\n", prefix_p);
-
-        return;
+        return (NULL);
     }
 
     exe[size] = '\0';
 
-    for (i = (depth - 1); i >= 0; i--) {
-        printf("%s  ", prefix_p);
-        fflush(stdout);
+    stream_p = open_memstream(&string_p, &stream_size);
 
+    if (stream_p == NULL) {
+        return (NULL);
+    }
+
+    fprintf(stream_p, "%sTraceback (most recent call last):\n", prefix_p);
+
+    for (i = (depth - 1); i >= 0; i--) {
         snprintf(&command[0],
                  sizeof(command),
                  "addr2line -f -p -e %s %p",
                  &exe[0],
-                 fixaddr(addresses[i]));
+                 fixaddr(buffer_pp[i]));
 
-        res = system(&command[0]);
+        result_p = nala_subprocess_exec_output(&command[0]);
 
-        if (res == -1) {
-            return;
-        } else if (WIFEXITED(res)) {
-            if (WEXITSTATUS(res) != 0) {
-                return;
-            }
-        } else {
-            return;
+        if (result_p->exit_code == 0) {
+            fprintf(stream_p, "%s  ", prefix_p);
+            fwrite(result_p->stdout.buf_p,
+                   1,
+                   result_p->stdout.length,
+                   stream_p);
         }
+
+        nala_subprocess_result_free(result_p);
     }
+
+    fclose(stream_p);
+
+    return (string_p);
+}
+
+void nala_traceback_print(const char *prefix_p)
+{
+    int depth;
+    void *addresses[DEPTH_MAX];
+
+    depth = backtrace(&addresses[0], DEPTH_MAX);
+    printf("%s", nala_traceback_format(prefix_p, addresses, depth));
 }

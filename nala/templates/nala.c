@@ -1,3 +1,5 @@
+#include <execinfo.h>
+
 #define NALA_INSTANCES_APPEND(list, item_p)     \
     do {                                        \
         if ((list).head_p == NULL) {            \
@@ -79,6 +81,11 @@ struct nala_va_arg_list_t {
     struct nala_va_arg_item_t *head_p;
     struct nala_va_arg_item_t *tail_p;
     unsigned int length;
+};
+
+struct nala_traceback_t {
+    void *addresses[32];
+    int depth;
 };
 
 void nala_va_arg_list_init(struct nala_va_arg_list_t *self_p)
@@ -368,3 +375,24 @@ void nala_set_param_string(struct nala_set_param *self_p, const char *string_p)
 {
     nala_set_param_buf(self_p, string_p, strlen(string_p) + 1);
 }
+
+void nala_traceback(struct nala_traceback_t *traceback_p)
+{
+    traceback_p->depth = backtrace(&traceback_p->addresses[0], 32);
+}
+
+#define NALA_MOCK_BINARY_ASSERTION(instance_p, param, check, format, formatter) \
+    if (!(instance_p)->data.params.ignore_ ## param ## _in) {           \
+        NALA_BINARY_ASSERTION((instance_p)->data.params.param,          \
+                              param,                                    \
+                              check,                                    \
+                              format,                                   \
+                              formatter);                               \
+    }
+
+#define MOCK_ASSERT_EQ(instance_p, func, param)                         \
+    NALA_MOCK_BINARY_ASSERTION(instance_p,                              \
+                               param,                                   \
+                               NALA_CHECK_EQ,                           \
+                               "Mocked " #func "(" #param "): %s != %s\n", \
+                               NALA_FORMAT_EQ)

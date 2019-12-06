@@ -15,12 +15,18 @@
 #include "nala_mocks.h"
 #include "dummy_functions.h"
 
-static void function_error_in_subprocess(void (*entry)(void *arg_p))
+static void function_error_in_subprocess(void (*entry)(void *arg_p),
+                                         const char *expected_p)
 {
     struct subprocess_result_t *result_p;
 
     result_p = subprocess_call_output(entry, NULL);
     ASSERT_NE(result_p->exit_code, 0);
+
+    if (expected_p != NULL ) {
+        ASSERT_SUBSTRING(result_p->stdout.buf_p, expected_p);
+    }
+
     subprocess_result_free(result_p);
 }
 
@@ -59,7 +65,8 @@ static void add_function_error_wrong_x_entry(void *arg_p)
 
 TEST(add_function_error_wrong_x)
 {
-    function_error_in_subprocess(add_function_error_wrong_x_entry);
+    function_error_in_subprocess(add_function_error_wrong_x_entry,
+                                 "Mocked add(x): 1 != 3");
 }
 
 static int add_function_set_callback_callback_x;
@@ -204,13 +211,13 @@ static void once_in_error_entry(void *arg_p)
     DummyStruct array[] = { { .number = 1 }, { .number = 2 } };
 
     edit_number_mock_once(5, &array[1]);
-    edit_number_mock_set_dummy_struct_in(&array[1], sizeof(array));
+    edit_number_mock_set_dummy_struct_in(&array[1], sizeof(array[0]));
     edit_number(&array[0], 5);
 }
 
 TEST(once_in_error)
 {
-    function_error_in_subprocess(once_in_error_entry);
+    function_error_in_subprocess(once_in_error_entry, "Memory mismatch.");
 }
 
 static void in_error_entry(void *arg_p)
@@ -220,13 +227,13 @@ static void in_error_entry(void *arg_p)
     DummyStruct array[] = { { .number = 1 }, { .number = 2 } };
 
     edit_number_mock(5, &array[1]);
-    edit_number_mock_set_dummy_struct_in(&array[1], sizeof(array));
+    edit_number_mock_set_dummy_struct_in(&array[1], sizeof(array[0]));
     edit_number(&array[0], 5);
 }
 
 TEST(in_error)
 {
-    function_error_in_subprocess(in_error_entry);
+    function_error_in_subprocess(in_error_entry, "Memory mismatch.");
 }
 
 static void in_pointer_error_entry(void *arg_p)
@@ -242,7 +249,8 @@ static void in_pointer_error_entry(void *arg_p)
 
 TEST(in_pointer_error)
 {
-    function_error_in_subprocess(in_pointer_error_entry);
+    function_error_in_subprocess(in_pointer_error_entry,
+                                 "Mocked edit_number(dummy_struct): ");
 }
 
 static void once_in_pointer_error_entry(void *arg_p)
@@ -258,7 +266,8 @@ static void once_in_pointer_error_entry(void *arg_p)
 
 TEST(once_in_pointer_error)
 {
-    function_error_in_subprocess(once_in_pointer_error_entry);
+    function_error_in_subprocess(once_in_pointer_error_entry,
+                                 "Mocked edit_number(dummy_struct): ");
 }
 
 TEST(set_errno)
@@ -411,7 +420,8 @@ static void variadic_function_error_integer_entry(void *arg_p)
 
 TEST(variadic_function_error_integer)
 {
-    function_error_in_subprocess(variadic_function_error_integer_entry);
+    function_error_in_subprocess(variadic_function_error_integer_entry,
+                                 "5 != 6");
 }
 
 static void variadic_function_error_va_arg_in_entry(void *arg_p)
@@ -430,7 +440,7 @@ static void variadic_function_error_va_arg_in_entry(void *arg_p)
 
 TEST(variadic_function_error_va_arg_in)
 {
-    function_error_in_subprocess(variadic_function_error_va_arg_in_entry);
+    function_error_in_subprocess(variadic_function_error_va_arg_in_entry, NULL);
 }
 
 TEST(compose_twice_function)

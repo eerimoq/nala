@@ -231,7 +231,9 @@
 
 #define ASSERT_MEMORY(left, right, size)                                \
     do {                                                                \
-        if (memcmp((left), (right), (size)) != 0) {                     \
+        if (((left == NULL) && (right != NULL))                         \
+            || ((left != NULL) && (right == NULL))                      \
+            || (memcmp((left), (right), (size)) != 0)) {                \
             nala_reset_all_mocks();                                     \
             NALA_TEST_FAILURE(nala_format_memory((left),                \
                                                  (right),               \

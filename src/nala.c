@@ -457,7 +457,13 @@ static int run_tests(struct nala_test_t *tests_p)
 
 bool nala_check_string_equal(const char *actual_p, const char *expected_p)
 {
-    return (strcmp(actual_p, expected_p) == 0);
+    if (actual_p == expected_p) {
+        return (true);
+    }
+
+    return ((actual_p != NULL)
+            && (expected_p != NULL)
+            && (strcmp(actual_p, expected_p) == 0));
 }
 
 const char *nala_format(const char *format_p, ...)

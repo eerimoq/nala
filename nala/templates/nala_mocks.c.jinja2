@@ -58,6 +58,7 @@ struct _nala_data_type_for_{{mock.func_name}}
     int errno_value;
     {{mock.implementation_decl | render}};
     {{mock.callback_decl | render}};
+    struct nala_traceback_t traceback;
 };
 
 typedef struct _nala_instance_type_for_{{mock.func_name}} _nala_instance_type_for_{{mock.func_name}};
@@ -109,28 +110,19 @@ static {{mock.state_type}} {{mock.state_name}} =
 
         if (instance_p == NULL) {
             NALA_TEST_FAILURE(nala_format(
-                    "{{mock.func_name}}() called more times than expected.\n"));
+                    "Mocked {{mock.func_name}}() called more times than expected.\n"));
         }
 
         {% for param in mock.char_pointer_params %}
-        if (!instance_p->data.params.ignore_{{param.name}}_in) {
-            ASSERT_EQ((const void *){{param.name}},
-                      (const void *)instance_p->data.params.{{param.name}});
-        }
-
+        MOCK_ASSERT_EQ(instance_p, {{mock.func_name}}, {{param.name}});
         {% endfor %}
         {% for param in mock.pointer_params %}
-        if (!instance_p->data.params.ignore_{{param.name}}_in) {
-            ASSERT_EQ({{param.name}}, instance_p->data.params.{{param.name}});
-        }
-
+        MOCK_ASSERT_EQ(instance_p, {{mock.func_name}}, {{param.name}});
         {% endfor %}
         {% for param in mock.non_pointer_params %}
-        if (!instance_p->data.params.ignore_{{param.name}}_in) {
-            ASSERT_EQ({{param.name}}, instance_p->data.params.{{param.name}});
-        }
-
+        MOCK_ASSERT_EQ(instance_p, {{mock.func_name}}, {{param.name}});
         {% endfor %}
+
         {% for param in mock.set_params %}
         if (instance_p->data.params.{{param.name}}_in.buf_p != NULL) {
             if (instance_p->data.params.{{param.name}}_in_assert == NULL) {
@@ -213,23 +205,13 @@ static {{mock.state_type}} {{mock.state_name}} =
 
     case 3:
         {% for param in mock.char_pointer_params %}
-        if (!{{mock.state_name}}.data.params.ignore_{{param.name}}_in) {
-            ASSERT_EQ((const void *){{param.name}},
-                      (const void *){{mock.state_name}}.data.params.{{param.name}});
-        }
-
+        MOCK_ASSERT_EQ(&{{mock.state_name}}, {{mock.func_name}}, {{param.name}});
         {% endfor %}
         {% for param in mock.pointer_params %}
-        if (!{{mock.state_name}}.data.params.ignore_{{param.name}}_in) {
-            ASSERT_EQ({{param.name}}, {{mock.state_name}}.data.params.{{param.name}});
-        }
-
+        MOCK_ASSERT_EQ(&{{mock.state_name}}, {{mock.func_name}}, {{param.name}});
         {% endfor %}
         {% for param in mock.non_pointer_params %}
-        if (!{{mock.state_name}}.data.params.ignore_{{param.name}}_in) {
-            ASSERT_EQ({{param.name}}, {{mock.state_name}}.data.params.{{param.name}});
-        }
-
+        MOCK_ASSERT_EQ(&{{mock.state_name}}, {{mock.func_name}}, {{param.name}});
         {% endfor %}
         {% for param in mock.set_params %}
         if ({{mock.state_name}}.data.params.{{param.name}}_in.buf_p != NULL) {
@@ -366,6 +348,7 @@ static {{mock.state_type}} {{mock.state_name}} =
 
     {{mock.state_name}}.mode = 1;
     instance_p = nala_xmalloc(sizeof(*instance_p));
+    nala_traceback(&instance_p->data.traceback);
     {% for param in mock.set_params %}
     nala_set_param_init(&instance_p->data.params.{{param.name}}_out);
     nala_set_param_init(&instance_p->data.params.{{param.name}}_in);
@@ -443,6 +426,7 @@ void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
 
     {{mock.state_name}}.mode = 1;
     instance_p = nala_xmalloc(sizeof(*instance_p));
+    nala_traceback(&instance_p->data.traceback);
     {% for param in mock.set_params %}
     nala_set_param_init(&instance_p->data.params.{{param.name}}_out);
     nala_set_param_init(&instance_p->data.params.{{param.name}}_in);
@@ -686,7 +670,7 @@ void {{mock.func_name}}_mock_assert_completed(void)
 {
     if ({{mock.state_name}}.instances.length != 0) {
         NALA_TEST_FAILURE(nala_format(
-             "{{mock.func_name}}() called fewer times than expected. %d call(s) "
+             "Mocked {{mock.func_name}}() called fewer times than expected. %d call(s) "
              "missing.\n",
              {{mock.state_name}}.instances.length));
     }
