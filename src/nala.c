@@ -1,3 +1,4 @@
+#include <libgen.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
@@ -283,10 +284,38 @@ static const char *test_result(struct nala_test_t *test_p, bool color)
     return (result_p);
 }
 
+static char *format_suite_prefix(struct nala_test_t *test_p,
+                                 char *buf_p,
+                                 size_t size)
+{
+    size_t length;
+
+    strncpy(buf_p, test_p->file_p, size);
+    buf_p = basename(buf_p);
+    length = strlen(buf_p);
+
+    if (length < 2) {
+        return ("");
+    }
+
+    buf_p[length - 2] = '\0';
+
+    if (strcmp(buf_p, "main") == 0) {
+        return ("");
+    }
+
+    strcat(buf_p, "::");
+
+    return (buf_p);
+}
+
 static void print_test_result(struct nala_test_t *test_p)
 {
-    printf("%s %s (" COLOR_BOLD(YELLOW, "%s") ")",
+    char suite[512];
+
+    printf("%s %s%s (" COLOR_BOLD(YELLOW, "%s") ")",
            test_result(test_p, true),
+           format_suite_prefix(test_p, &suite[0], sizeof(suite)),
            test_p->name_p,
            format_timespan(test_p->elapsed_time_ms));
 
