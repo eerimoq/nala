@@ -128,6 +128,21 @@ TEST(output_message_function_error_call_null)
         "Memory mismatch. See diff for details.");
 }
 
+static void output_message_function_error_mismatch_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    output_message_mock_once("a");
+    output_message("b");
+}
+
+TEST(output_message_function_error_mismatch)
+{
+    function_error_in_subprocess(
+        output_message_function_error_mismatch_entry,
+        "Mocked output_message(message): Memory mismatch. See diff for details.");
+}
+
 TEST(time_function)
 {
     time_t start = time(NULL);

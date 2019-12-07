@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NALA_VERSION "0.49.0"
+#define NALA_VERSION "0.50.0"
 
 #define TEST(name)                                      \
     static void name(void);                             \
@@ -235,7 +235,8 @@
             || ((left != NULL) && (right == NULL))                      \
             || (memcmp((left), (right), (size)) != 0)) {                \
             nala_reset_all_mocks();                                     \
-            NALA_TEST_FAILURE(nala_format_memory((left),                \
+            NALA_TEST_FAILURE(nala_format_memory("",                    \
+                                                 (left),                \
                                                  (right),               \
                                                  (size)));              \
         }                                                               \
@@ -281,7 +282,8 @@ const char *nala_format(const char *format_p, ...);
 
 const char *nala_format_string(const char *format_p, ...);
 
-const char *nala_format_memory(const void *left_p,
+const char *nala_format_memory(const char *prefix_p,
+                               const void *left_p,
                                const void *right_p,
                                size_t size);
 

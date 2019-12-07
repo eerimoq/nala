@@ -1002,7 +1002,8 @@ const char *nala_format_string(const char *format_p, ...)
     return (buf_p);
 }
 
-const char *nala_format_memory(const void *left_p,
+const char *nala_format_memory(const char *prefix_p,
+                               const void *left_p,
                                const void *right_p,
                                size_t size)
 {
@@ -1013,7 +1014,18 @@ const char *nala_format_memory(const void *left_p,
     char *right_hexdump_p;
 
     file_p = open_memstream(&buf_p, &file_size);
-    fprintf(file_p, COLOR_BOLD(RED, "Memory mismatch. See diff for details.\n"));
+    fprintf(file_p,
+            COLOR_BOLD(RED, "%sMemory mismatch. See diff for details.\n"),
+            prefix_p);
+
+    if (left_p == NULL) {
+        left_p = "<null>";
+    }
+
+    if (right_p == NULL) {
+        right_p = "<null>";
+    }
+
     left_hexdump_p = nala_hexdump(left_p, size, 16);
     right_hexdump_p = nala_hexdump(right_p, size, 16);
     print_string_diff(file_p, right_hexdump_p, left_hexdump_p);

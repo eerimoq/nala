@@ -397,19 +397,35 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                                "Mocked " #func "(" #param "): %s != %s\n", \
                                NALA_FORMAT_EQ)
 
-#define MOCK_ASSERT_PARAM_IN(params_p, name)            \
-    if ((params_p)->name ## _in_assert == NULL) {       \
-        ASSERT_MEMORY((const void *)(uintptr_t)name,    \
-                      (params_p)->name ## _in.buf_p,    \
-                      (params_p)->name ## _in.size);    \
-    } else {                                            \
-        (params_p)->name ## _in_assert(                 \
-            name,                                       \
-            (params_p)->name ## _in.buf_p,              \
-            (params_p)->name ## _in.size);              \
+#define MOCK_ASSERT_MEMORY(left, right, size, func, param)              \
+    do {                                                                \
+        if (((left == NULL) && (right != NULL))                         \
+            || ((left != NULL) && (right == NULL))                      \
+            || (memcmp((left), (right), (size)) != 0)) {                \
+            nala_reset_all_mocks();                                     \
+            NALA_TEST_FAILURE(nala_format_memory(                       \
+                                  "Mocked " #func "(" #param "): ",     \
+                                  (left),                               \
+                                  (right),                              \
+                                  (size)));                             \
+        }                                                               \
+    } while (0)
+
+#define MOCK_ASSERT_PARAM_IN(params_p, func, name)              \
+    if ((params_p)->name ## _in_assert == NULL) {               \
+        MOCK_ASSERT_MEMORY((const void *)(uintptr_t)name,       \
+                           (params_p)->name ## _in.buf_p,       \
+                           (params_p)->name ## _in.size,        \
+                           func,                                \
+                           name);                               \
+    } else {                                                    \
+        (params_p)->name ## _in_assert(                         \
+            name,                                               \
+            (params_p)->name ## _in.buf_p,                      \
+            (params_p)->name ## _in.size);                      \
     }
 
-#define MOCK_ASSERT_PARAM_OUT(params_p, name)           \
+#define MOCK_COPY_PARAM_OUT(params_p, name)             \
     if ((params_p)->name ## _out_copy == NULL) {        \
         memcpy((void *)(uintptr_t)name,                 \
                (params_p)->name ## _out.buf_p,          \
