@@ -168,7 +168,6 @@ For all functions
    <func>_mock_implementation(*)     - replace implementation
    <func>_mock_disable()             - call real implementation
    <func>_mock_reset()               - mock reset
-   <func>_mock_assert_completed()    - completion checks
    <func>_mock_set_callback(*)       - additional checks and/or actions
 
 For selected function parameters
