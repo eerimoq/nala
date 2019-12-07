@@ -57,10 +57,6 @@ static struct tests_t tests = {
 static struct capture_output_t capture_stdout;
 static struct capture_output_t capture_stderr;
 
-int setup(void);
-
-int teardown(void);
-
 void nala_assert_all_mocks_completed(void);
 
 __attribute__ ((weak)) void nala_assert_all_mocks_completed(void)
@@ -418,29 +414,16 @@ static void write_report_json(struct nala_test_t *test_p)
 static void test_entry(void *arg_p)
 {
     struct nala_test_t *test_p;
-    int res;
 
     test_p = (struct nala_test_t *)arg_p;
-
     capture_output_init(&capture_stdout, stdout);
     capture_output_init(&capture_stderr, stderr);
-
-    res = setup();
-
-    if (res == 0) {
-        test_p->func();
-        res = teardown();
-
-        if (res == 0) {
-            nala_assert_all_mocks_completed();
-        }
-    }
-
+    test_p->func();
+    nala_assert_all_mocks_completed();
     nala_reset_all_mocks();
     capture_output_destroy(&capture_stdout);
     capture_output_destroy(&capture_stderr);
-
-    exit(res == 0 ? 0 : 1);
+    exit(0);
 }
 
 static int run_tests(struct nala_test_t *tests_p)
@@ -812,16 +795,6 @@ void nala_register_test(struct nala_test_t *test_p)
 int nala_run_tests()
 {
     return (run_tests(tests.head_p));
-}
-
-__attribute__((weak)) int setup(void)
-{
-    return (0);
-}
-
-__attribute__((weak)) int teardown(void)
-{
-    return (0);
 }
 
 __attribute__((weak)) int main(void)
