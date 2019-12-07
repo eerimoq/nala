@@ -251,6 +251,13 @@ class GeneratedMock:
                                            node.IdentifierType(["char"])))))
             self.forward_args += ', __nala_vl'
 
+        # -Wpedantic warns on empty structs.
+        if not self.params_struct:
+            self.params_struct = [
+                decl("dummy",
+                     node.TypeDecl("dummy", [], node.IdentifierType(["int"])))
+            ]
+
         return_type = self.func_decl.type
         self.return_value = (
             None

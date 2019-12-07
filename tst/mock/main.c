@@ -660,3 +660,9 @@ TEST(rename_parameters)
     usleep_mock_ignore_in(0);
     write_mock_ignore_in(0);
 }
+
+TEST(print_hello_function)
+{
+    print_hello_mock_once();
+    print_hello();
+}

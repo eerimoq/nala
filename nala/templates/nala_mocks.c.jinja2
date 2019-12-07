@@ -81,7 +81,7 @@ static struct {{mock.state_type}} {{mock.state_name}} = {
     }
 };
 
-static struct _nala_data_type_for_{{mock.func_name}} *get_data_{{mock.func_name}}()
+struct _nala_data_type_for_{{mock.func_name}} *nala_get_data_{{mock.func_name}}()
 {
     if ({{mock.state_name}}.instances.tail_p != NULL) {
         return (&{{mock.state_name}}.instances.tail_p->data);
@@ -90,9 +90,9 @@ static struct _nala_data_type_for_{{mock.func_name}} *get_data_{{mock.func_name}
     }
 }
 
-static struct _nala_data_params_for_{{mock.func_name}} *get_params_{{mock.func_name}}()
+struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_name}}()
 {
-    return (&get_data_{{mock.func_name}}()->params);
+    return (&nala_get_data_{{mock.func_name}}()->params);
 }
 
 #define MOCK_ASSERT_{{mock.func_name}}(data_p) \
@@ -383,53 +383,53 @@ void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
 
 {{mock.set_errno_func | render}}
 {
-    get_data_{{mock.func_name}}()->errno_value = errno_value;
+    nala_get_data_{{mock.func_name}}()->errno_value = errno_value;
 }
 
 void {{mock.func_name}}_mock_set_callback({{mock.callback_decl | render}})
 {
-    get_data_{{mock.func_name}}()->callback = callback;
+    nala_get_data_{{mock.func_name}}()->callback = callback;
 }
 {% for param in mock.ignore_params %}
 
 void {{mock.func_name}}_mock_ignore_{{param}}_in(void)
 {
-    get_params_{{mock.func_name}}()->ignore_{{param}}_in = true;
+    nala_get_params_{{mock.func_name}}()->ignore_{{param}}_in = true;
 }
 {% endfor %}
 {% for param in mock.set_params %}
 
 void {{mock.func_name}}_mock_set_{{param.name}}_in(const void *buf_p, size_t size)
 {
-    nala_set_param_buf(&get_params_{{mock.func_name}}()->{{param.name}}_in,
+    nala_set_param_buf(&nala_get_params_{{mock.func_name}}()->{{param.name}}_in,
                        buf_p,
                        size);
 }
 
 void {{mock.func_name}}_mock_set_{{param.name}}_in_assert(void (*callback)({{param | render}}, const void *nala_buf_p, size_t nala_size))
 {
-    get_params_{{mock.func_name}}()->{{param.name}}_in_assert = callback;
+    nala_get_params_{{mock.func_name}}()->{{param.name}}_in_assert = callback;
 }
 
 void {{mock.func_name}}_mock_set_{{param.name}}_in_pointer({{param | render}})
 {
     struct _nala_data_params_for_{{mock.func_name}} *_nala_params_p;
 
-    _nala_params_p = get_params_{{mock.func_name}}();
+    _nala_params_p = nala_get_params_{{mock.func_name}}();
     _nala_params_p->ignore_{{param.name}}_in = false;
     _nala_params_p->{{param.name}} = {{param.name}};
 }
 
 void {{mock.func_name}}_mock_set_{{param.name}}_out(const void *buf_p, size_t size)
 {
-    nala_set_param_buf(&get_params_{{mock.func_name}}()->{{param.name}}_out,
+    nala_set_param_buf(&nala_get_params_{{mock.func_name}}()->{{param.name}}_out,
                        buf_p,
                        size);
 }
 
 void {{mock.func_name}}_mock_set_{{param.name}}_out_copy(void (*callback)({{param | render}}, const void *nala_buf_p, size_t nala_size))
 {
-    get_params_{{mock.func_name}}()->{{param.name}}_out_copy = callback;
+    nala_get_params_{{mock.func_name}}()->{{param.name}}_out_copy = callback;
 }
 {% endfor %}
 {% if mock.is_variadic_func %}
@@ -438,7 +438,7 @@ void {{mock.func_name}}_mock_ignore_va_arg_in_at(unsigned int index)
 {
     struct nala_va_arg_list_t *va_arg_list_p;
 
-    va_arg_list_p = &get_params_{{mock.func_name}}()->_nala_va_arg_list;
+    va_arg_list_p = &nala_get_params_{{mock.func_name}}()->_nala_va_arg_list;
     nala_va_arg_list_get(va_arg_list_p, index)->ignore_in = true;
 }
 
@@ -447,7 +447,7 @@ void {{mock.func_name}}_mock_set_va_arg_in_at(unsigned int index, const void *bu
     struct nala_va_arg_list_t *va_arg_list_p;
     struct nala_va_arg_item_t *item_p;
 
-    va_arg_list_p = &get_params_{{mock.func_name}}()->_nala_va_arg_list;
+    va_arg_list_p = &nala_get_params_{{mock.func_name}}()->_nala_va_arg_list;
     item_p = nala_va_arg_list_get(va_arg_list_p, index);
     nala_set_param_buf(&item_p->in, buf_p, size);
 }
@@ -473,7 +473,7 @@ void {{mock.func_name}}_mock_set_va_arg_out_at(unsigned int index, const void *b
     struct nala_va_arg_list_t *va_arg_list_p;
     struct nala_va_arg_item_t *item_p;
 
-    va_arg_list_p = &get_params_{{mock.func_name}}()->_nala_va_arg_list;
+    va_arg_list_p = &nala_get_params_{{mock.func_name}}()->_nala_va_arg_list;
     item_p = nala_va_arg_list_get(va_arg_list_p, index);
     nala_set_param_buf(&item_p->out, buf_p, size);
 }
