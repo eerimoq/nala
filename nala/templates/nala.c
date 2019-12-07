@@ -381,18 +381,42 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
     traceback_p->depth = backtrace(&traceback_p->addresses[0], 32);
 }
 
-#define NALA_MOCK_BINARY_ASSERTION(instance_p, param, check, format, formatter) \
-    if (!(instance_p)->data.params.ignore_ ## param ## _in) {           \
-        NALA_BINARY_ASSERTION((instance_p)->data.params.param,          \
+#define NALA_MOCK_BINARY_ASSERTION(data_p, param, check, format, formatter) \
+    if (!(data_p)->params.ignore_ ## param ## _in) {                    \
+        NALA_BINARY_ASSERTION((data_p)->params.param,                   \
                               param,                                    \
                               check,                                    \
                               format,                                   \
                               formatter);                               \
     }
 
-#define MOCK_ASSERT_EQ(instance_p, func, param)                         \
-    NALA_MOCK_BINARY_ASSERTION(instance_p,                              \
+#define MOCK_ASSERT_EQ(data_p, func, param)                             \
+    NALA_MOCK_BINARY_ASSERTION(data_p,                                  \
                                param,                                   \
                                NALA_CHECK_EQ,                           \
                                "Mocked " #func "(" #param "): %s != %s\n", \
                                NALA_FORMAT_EQ)
+
+#define MOCK_ASSERT_PARAM_IN(params_p, name)            \
+    if ((params_p)->name ## _in_assert == NULL) {       \
+        ASSERT_MEMORY((const void *)(uintptr_t)name,    \
+                      (params_p)->name ## _in.buf_p,    \
+                      (params_p)->name ## _in.size);    \
+    } else {                                            \
+        (params_p)->name ## _in_assert(                 \
+            name,                                       \
+            (params_p)->name ## _in.buf_p,              \
+            (params_p)->name ## _in.size);              \
+    }
+
+#define MOCK_ASSERT_PARAM_OUT(params_p, name)           \
+    if ((params_p)->name ## _out_copy == NULL) {        \
+        memcpy((void *)(uintptr_t)name,                 \
+               (params_p)->name ## _out.buf_p,          \
+               (params_p)->name ## _out.size);          \
+    } else {                                            \
+        (params_p)->name ## _out_copy(                  \
+            name,                                       \
+            (params_p)->name ## _out.buf_p,             \
+            (params_p)->name ## _out.size);             \
+    }
