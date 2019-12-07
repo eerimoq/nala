@@ -385,6 +385,43 @@ static void color_reset(FILE *file_p)
     fprintf(file_p, "%s", ANSI_RESET);
 }
 
+static char *format_suite_prefix(struct nala_test_t *test_p,
+                                 char *buf_p,
+                                 size_t size)
+{
+    size_t length;
+
+    strncpy(buf_p, test_p->file_p, size);
+    buf_p = basename(buf_p);
+    length = strlen(buf_p);
+
+    if (length < 2) {
+        return ("");
+    }
+
+    buf_p[length - 2] = '\0';
+
+    if (strcmp(buf_p, "main") == 0) {
+        return ("");
+    }
+
+    strcat(buf_p, "::");
+
+    return (buf_p);
+}
+
+static char *full_test_name(struct nala_test_t *test_p)
+{
+    static char buf[512];
+    char suite[512];
+    char *suite_p;
+
+    suite_p = format_suite_prefix(test_p, &suite[0], sizeof(suite));
+    snprintf(&buf[0], sizeof(buf), "%s%s", suite_p, test_p->name_p);
+
+    return (&buf[0]);
+}
+
 static void capture_output_init(struct capture_output_t *self_p,
                                 FILE *file_p)
 {
@@ -487,7 +524,7 @@ static float timeval_to_ms(struct timeval *timeval_p)
 static void print_signal_failure(struct nala_test_t *test_p)
 {
     printf("\n");
-    printf("%s failed:\n", test_p->name_p);
+    printf("%s failed:\n", full_test_name(test_p));
     printf("\n");
     printf("  Location: unknown\n");
     printf("  Error:    " COLOR_BOLD(RED, "Terminated by signal %d.\n"),
@@ -565,39 +602,11 @@ static const char *test_result(struct nala_test_t *test_p, bool color)
     return (result_p);
 }
 
-static char *format_suite_prefix(struct nala_test_t *test_p,
-                                 char *buf_p,
-                                 size_t size)
-{
-    size_t length;
-
-    strncpy(buf_p, test_p->file_p, size);
-    buf_p = basename(buf_p);
-    length = strlen(buf_p);
-
-    if (length < 2) {
-        return ("");
-    }
-
-    buf_p[length - 2] = '\0';
-
-    if (strcmp(buf_p, "main") == 0) {
-        return ("");
-    }
-
-    strcat(buf_p, "::");
-
-    return (buf_p);
-}
-
 static void print_test_result(struct nala_test_t *test_p)
 {
-    char suite[512];
-
-    printf("%s %s%s (" COLOR_BOLD(YELLOW, "%s") ")",
+    printf("%s %s (" COLOR_BOLD(YELLOW, "%s") ")",
            test_result(test_p, true),
-           format_suite_prefix(test_p, &suite[0], sizeof(suite)),
-           test_p->name_p,
+           full_test_name(test_p),
            format_timespan(test_p->elapsed_time_ms));
 
     if (test_p->signal_number != -1) {
@@ -674,7 +683,7 @@ static void write_report_json(struct nala_test_t *test_p)
                 "            \"result\": \"%s\",\n"
                 "            \"execution_time\": \"%s\"\n"
                 "        }%s\n",
-                test_p->name_p,
+                full_test_name(test_p),
                 test_result(test_p, false),
                 format_timespan(test_p->elapsed_time_ms),
                 (test_p->next_p != NULL ? "," : ""));
@@ -1048,7 +1057,7 @@ void nala_test_failure(const char *file_p,
     capture_output_destroy(&capture_stdout);
     capture_output_destroy(&capture_stderr);
     printf("\n");
-    printf("%s failed:\n", current_test_p->name_p);
+    printf("%s failed:\n", full_test_name(current_test_p));
     printf("\n");
     printf("  Location:  %s:%d\n", file_p, line);
     printf("  Error:     %s", message_p);
