@@ -3,12 +3,12 @@
 #define NALA_INSTANCES_APPEND(list, item_p)     \
     do {                                        \
         if ((list).head_p == NULL) {            \
-            (list).head_p = instance_p;         \
+            (list).head_p = item_p;             \
         } else {                                \
-            (list).tail_p->next_p = instance_p; \
+            (list).tail_p->next_p = item_p;     \
         }                                       \
                                                 \
-        (list).tail_p = instance_p;             \
+        (list).tail_p = item_p;                 \
         (list).length++;                        \
     } while (0);
 
