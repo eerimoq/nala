@@ -194,21 +194,30 @@ class ForgivingDeclarationParser:
         if rename_parameters_file is not None:
             self.param_names = load_param_names(rename_parameters_file)
 
+        self.func_names = []
+        self.func_signatures = []
+        self.func_source_contexts = []
+        self.file_ast = None
+        self.mocked_functions = []
+        self.parse()
+
     @classmethod
     def tokenize(cls, source_code):
         for match in cls.regex.finditer(source_code):
             if match.lastgroup not in cls.ignored_tokens:
                 yield Token(match.lastgroup, match.group().strip(), match.span())
 
-    def __iter__(self):
+    def parse(self):
         while self.next():
             if self.current.is_keyword("typedef"):
                 self.parse_typedef()
 
-            function = self.parse_function_declaration()
+            parsed = self.parse_function_declaration()
 
-            if function is not None:
-                yield function
+            if parsed is not None:
+                self.func_names.append(parsed[0])
+                self.func_signatures.append(parsed[1])
+                self.func_source_contexts.append(self.source_context[:])
 
             if self.functions is not None and not self.functions:
                 break
@@ -216,6 +225,37 @@ class ForgivingDeclarationParser:
             while (self.current and not (self.current.is_punctuation(";", "}")
                                          and not self.bracket_stack)):
                 self.next()
+
+        code = '\n'.join(self.typedefs + self.func_signatures)
+
+        try:
+            self.file_ast = self.cparser.parse(code)
+        except ParseError:
+            pass
+
+        items = zip(self.func_names, self.func_source_contexts)
+
+        for i, (func_name, source_context) in enumerate(items, len(self.typedefs)):
+            if self.functions is not None:
+                self.functions.remove(func_name)
+
+            param_names = self.param_names.get(func_name)
+
+            if param_names:
+                func_declaration = rename_parameters(self.file_ast.ext[i],
+                                                     param_names)
+            else:
+                func_declaration = self.file_ast.ext[i]
+
+            self.mocked_functions.append(MockedFunction(
+                func_name,
+                func_declaration,
+                IncludeDirective.from_source_context(source_context),
+                self.file_ast))
+
+    def __iter__(self):
+        for mocked_function in self.mocked_functions:
+            yield mocked_function
 
     def next(self):
         self.previous = self.current
@@ -308,30 +348,7 @@ class ForgivingDeclarationParser:
                and self.current.is_punctuation("(")):
             self.next()
 
-        signature = self.source_code[start_index : self.previous.span[1]] + ";"
-        code = "\n".join(self.typedefs) + "\n" + signature
-
-        try:
-            file_ast = self.cparser.parse(code)
-        except ParseError:
-            return None
-        else:
-            if self.functions is not None:
-                self.functions.remove(func_name)
-
-            param_names = self.param_names.get(func_name)
-
-            if param_names:
-                func_declaration = rename_parameters(file_ast.ext[-1],
-                                                     param_names)
-            else:
-                func_declaration = file_ast.ext[-1]
-
-            return MockedFunction(
-                func_name,
-                func_declaration,
-                IncludeDirective.from_source_context(self.source_context),
-                file_ast)
+        return func_name, self.source_code[start_index : self.previous.span[1]] + ";"
 
     def erase_code_section(self, begin, end):
         self.source_code = (

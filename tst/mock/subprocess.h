@@ -26,6 +26,9 @@
  * This file is part of the subprocess project.
  */
 
+#ifndef SUBPROCESS_H
+#define SUBPROCESS_H
+
 #include <string.h>
 #include <stdbool.h>
 
@@ -93,3 +96,5 @@ void subprocess_result_print(struct subprocess_result_t *self_p);
  * Free given result.
  */
 void subprocess_result_free(struct subprocess_result_t *self_p);
+
+#endif
