@@ -57,13 +57,19 @@ static struct tests_t tests = {
 static struct capture_output_t capture_stdout;
 static struct capture_output_t capture_stderr;
 
-void nala_assert_all_mocks_completed(void);
-
 __attribute__ ((weak)) void nala_assert_all_mocks_completed(void)
 {
 }
 
 __attribute__ ((weak)) void nala_reset_all_mocks(void)
+{
+}
+
+__attribute__ ((weak)) void nala_suspend_all_mocks(void)
+{
+}
+
+__attribute__ ((weak)) void nala_resume_all_mocks(void)
 {
 }
 
@@ -494,7 +500,9 @@ const char *nala_format(const char *format_p, ...)
     char *buf_p;
     FILE *file_p;
 
+    /* ToDo: Remove reset when suspend and resume are implemented. */
     nala_reset_all_mocks();
+    nala_suspend_all_mocks();
     file_p = open_memstream(&buf_p, &size);
     color_start(file_p, ANSI_COLOR_RED);
     va_start(vl, format_p);
@@ -503,6 +511,7 @@ const char *nala_format(const char *format_p, ...)
     color_reset(file_p);
     fputc('\0', file_p);
     fclose(file_p);
+    nala_resume_all_mocks();
 
     return (buf_p);
 }
@@ -588,6 +597,7 @@ static void print_string_diff(FILE *file_p,
                               const char *original,
                               const char *modified)
 {
+    nala_suspend_all_mocks();
     fprintf(file_p, "  Diff:\n\n");
 
     struct NalaDiff diff = nala_diff_lines(original, modified);
@@ -684,6 +694,7 @@ static void print_string_diff(FILE *file_p,
 
     free(diff.chunks);
     fprintf(file_p, "\n");
+    nala_resume_all_mocks();
 }
 
 const char *nala_format_string(const char *format_p, ...)
@@ -694,6 +705,8 @@ const char *nala_format_string(const char *format_p, ...)
     va_list vl;
     const char *left_p;
     const char *right_p;
+
+    nala_suspend_all_mocks();
 
     va_start(vl, format_p);
     left_p = va_arg(vl, const char *);
@@ -718,6 +731,8 @@ const char *nala_format_string(const char *format_p, ...)
     fputc('\0', file_p);
     fclose(file_p);
 
+    nala_resume_all_mocks();
+
     return (buf_p);
 }
 
@@ -731,6 +746,8 @@ const char *nala_format_memory(const char *prefix_p,
     FILE *file_p;
     char *left_hexdump_p;
     char *right_hexdump_p;
+
+    nala_suspend_all_mocks();
 
     file_p = open_memstream(&buf_p, &file_size);
     fprintf(file_p,
@@ -753,6 +770,8 @@ const char *nala_format_memory(const char *prefix_p,
     fputc('\0', file_p);
     fclose(file_p);
 
+    nala_resume_all_mocks();
+
     return (buf_p);
 }
 
@@ -763,10 +782,18 @@ bool nala_check_substring(const char *string_p, const char *substring_p)
             && (strstr(string_p, substring_p) != NULL));
 }
 
+bool nala_check_memory(const void *left_p, const void *right_p, size_t size)
+{
+    return !(((left_p == NULL) && (right_p != NULL))
+             || ((left_p != NULL) && (right_p == NULL))
+             || (memcmp(left_p, right_p, size) != 0));
+}
+
 void nala_test_failure(const char *file_p,
                        int line,
                        const char *message_p)
 {
+    nala_suspend_all_mocks();
     nala_capture_output_stop();
     capture_output_destroy(&capture_stdout);
     capture_output_destroy(&capture_stderr);
@@ -783,14 +810,18 @@ void nala_test_failure(const char *file_p,
 
 void nala_capture_output_start(char **output_pp, char **errput_pp)
 {
+    nala_suspend_all_mocks();
     capture_output_start(&capture_stdout, output_pp);
     capture_output_start(&capture_stderr, errput_pp);
+    nala_resume_all_mocks();
 }
 
 void nala_capture_output_stop()
 {
+    nala_suspend_all_mocks();
     capture_output_stop(&capture_stdout);
     capture_output_stop(&capture_stderr);
+    nala_resume_all_mocks();
 }
 
 void nala_register_test(struct nala_test_t *test_p)

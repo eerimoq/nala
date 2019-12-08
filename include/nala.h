@@ -1,12 +1,9 @@
 #ifndef NALA_H
 #define NALA_H
 
-#include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define NALA_VERSION "0.55.0"
 
@@ -230,17 +227,10 @@
                           nala_format)
 
 #define ASSERT_MEMORY(left, right, size)                                \
-    do {                                                                \
-        if (((left == NULL) && (right != NULL))                         \
-            || ((left != NULL) && (right == NULL))                      \
-            || (memcmp((left), (right), (size)) != 0)) {                \
-            nala_reset_all_mocks();                                     \
-            NALA_TEST_FAILURE(nala_format_memory("",                    \
-                                                 (left),                \
-                                                 (right),               \
-                                                 (size)));              \
-        }                                                               \
-    } while (0)
+    if (!nala_check_memory(left, right, size)) {                        \
+        nala_reset_all_mocks();                                         \
+        NALA_TEST_FAILURE(nala_format_memory("", left, right, size));   \
+    }
 
 #define ASSERT(cond)                                    \
     if (!(cond)) {                                      \
@@ -288,6 +278,8 @@ const char *nala_format_memory(const char *prefix_p,
                                size_t size);
 
 bool nala_check_substring(const char *string_p, const char *substring_p);
+
+bool nala_check_memory(const void *left_p, const void *right_p, size_t size);
 
 void nala_capture_output_start(char **stdout_pp, char **stderr_pp);
 

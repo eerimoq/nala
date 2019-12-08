@@ -214,43 +214,8 @@ Limitations
 Ideas
 =====
 
-Remaining mocked calls
-----------------------
-
-.. code-block:: text
-
-   test_close failed:
-
-     Location: nala_mocks.c:760
-     Error:    Mocked close() called fewer times than expected. 2 call(s) missing.
-     Remaining call(s):
-
-       close(fd=1): return (-1)
-       close(fd=4): return (0)
-       ...
-
-Failing mocked calls
---------------------
-
-.. code-block:: text
-
-   test_close failed:
-
-     Location: nala_mocks.c:760
-     Error:    Mocked close(fd): 1 != 2
-
-   test_mount failed:
-
-     Location: nala_mocks.c:760
-     Error: Mocked mount(target): "b" != "c"
-     Diff:
-
-         mount(source="a",
-       -       target="b",
-       +       target="c",
-               filesystemtype="c",
-               mountflags=0,
-               data=00): return (0)
+Do not use any standard functions in Nala where mocking may
+happen. Possibly suspend and resume mocks when needed.
 
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
