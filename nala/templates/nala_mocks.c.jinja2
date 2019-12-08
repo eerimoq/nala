@@ -28,7 +28,7 @@ void nala_assert_all_mocks_completed(void)
 
 {{mock.IMPL_MARKER}} {{mock.func_name}}
 
-{% if mock.real_decl and not mock.is_variadic_func %}
+{% if not mock.is_variadic_func %}
 {{mock.real_decl | render}};
 
 {% endif %}

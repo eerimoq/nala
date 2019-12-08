@@ -26,10 +26,7 @@ NALA_C_CAPTURE_FUNCTIONS = [
 ]
 
 
-def generate_mocks(expanded_code,
-                   output_directory,
-                   rename_parameters_file,
-                   redefine_syms):
+def generate_mocks(expanded_code, output_directory, rename_parameters_file):
     """Identify mocked functions and generate the source and header files.
 
     """
@@ -45,6 +42,6 @@ def generate_mocks(expanded_code,
             print(f"warning: '{function.name}()' cannot be mocked if "
                   f"capturing output.")
 
-        generator.add_mock(function, redefine_syms)
+        generator.add_mock(function)
 
-    generator.write_to_directory(output_directory, redefine_syms)
+    generator.write_to_directory(output_directory)

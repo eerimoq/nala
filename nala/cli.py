@@ -55,10 +55,7 @@ def do_generate_mocks(args):
     else:
         rename_parameters_file = args.rename_parameters_file
 
-    generate_mocks(expanded_code,
-                   args.outdir,
-                   rename_parameters_file,
-                   args.redefine_syms)
+    generate_mocks(expanded_code, args.outdir, rename_parameters_file)
 
 
 def main():
@@ -94,9 +91,6 @@ def main():
     subparser.add_argument('-R', '--no-rename-parameters',
                            action='store_true',
                            help='Do not rename any parameters.')
-    subparser.add_argument('--redefine-syms',
-                           action='store_true',
-                           help='Generate redefine syms mocks instead of wrap.')
     subparser.add_argument(
         'infiles',
         nargs='*',
