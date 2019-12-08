@@ -1,4 +1,3 @@
-#include <time.h>
 #include "nala.h"
 
 TEST(assertions)

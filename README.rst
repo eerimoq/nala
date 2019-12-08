@@ -58,7 +58,6 @@ The assertions tests:
 
 .. code-block:: c
 
-   #include <time.h>
    #include "nala.h"
 
    TEST(assertions)
