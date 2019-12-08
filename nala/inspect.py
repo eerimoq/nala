@@ -14,7 +14,6 @@ from pycparser.plyparser import ParseError
 GETTER_REGEX = re.compile(
     r"(void )?(\w+?)(_mock|_mock_once|_mock_ignore_in|_mock_ignore_in_once|_mock_none)\s*\(")
 
-
 def collect_mocked_functions(expanded_source_code, rename_parameters_file):
     """Yield all the mocked functions used in the expanded source code."""
 
@@ -177,7 +176,7 @@ class ForgivingDeclarationParser:
         "|".join(f"(?P<{token}>{pattern})" for token, pattern in tokens.items()),
         flags=re.MULTILINE)
 
-    def __init__(self, source_code, functions=None, rename_parameters_file=None):
+    def __init__(self, source_code, functions, rename_parameters_file=None):
         self.source_code = source_code
         self.functions = functions
         self.token_stream = self.tokenize(source_code)
@@ -218,8 +217,9 @@ class ForgivingDeclarationParser:
                 self.func_names.append(parsed[0])
                 self.func_signatures.append(parsed[1])
                 self.func_source_contexts.append(self.source_context[:])
+                self.functions.remove(parsed[0])
 
-            if self.functions is not None and not self.functions:
+            if not self.functions:
                 break
 
             while (self.current and not (self.current.is_punctuation(";", "}")
@@ -236,9 +236,6 @@ class ForgivingDeclarationParser:
         items = zip(self.func_names, self.func_source_contexts)
 
         for i, (func_name, source_context) in enumerate(items, len(self.typedefs)):
-            if self.functions is not None:
-                self.functions.remove(func_name)
-
             param_names = self.param_names.get(func_name)
 
             if param_names:
@@ -339,7 +336,7 @@ class ForgivingDeclarationParser:
 
         func_name = return_type.pop()
 
-        if self.functions is not None and func_name not in self.functions:
+        if func_name not in self.functions:
             return None
 
         while (self.current
