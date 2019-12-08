@@ -15,6 +15,7 @@ SRC += $(BUILD)/nala_mocks.c
 SRC += nala.c
 SRC += $(TESTS)
 TESTS_C = $(BUILD)/tests.c
+NALA = nala
 
 test: $(BUILD)/nala_mocks.h
 	$(CC) $(INC:%=-I%) $$(cat $(BUILD)/nala_mocks.ld) -g -O0 -no-pie $(SRC) -o $(EXE)
@@ -25,4 +26,4 @@ $(BUILD)/nala_mocks.h: $(TESTS)
 	mkdir -p $(BUILD)
 	[ -f $(BUILD)/nala_mocks.h ] || touch $(BUILD)/nala_mocks.h
 	cat $(TESTS) > $(TESTS_C)
-	$(CC) $(INC:%=-I%) -E $(TESTS_C) | nala generate_mocks -o $(BUILD)
+	$(CC) $(INC:%=-I%) -E $(TESTS_C) | $(NALA) generate_mocks -o $(BUILD)
