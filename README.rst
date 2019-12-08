@@ -50,17 +50,17 @@ Use ``nala init foo`` to create a test folder called ``foo``.
    $ nala init foo
    Run 'make -C foo' to build and run all tests!
 
-Two test files are created ``foo/test_assertions.c`` and
+Two test files are created, ``foo/test_assertions.c`` and
 ``foo/test_time.c``. The first uses all assertions and captures
 output, and the second mocks the time function.
 
-The assertions test file:
+The assertions tests:
 
 .. code-block:: c
 
    #include <time.h>
    #include "nala.h"
-   
+
    TEST(assertions)
    {
        ASSERT_EQ(NULL, NULL);
@@ -73,28 +73,28 @@ The assertions test file:
        ASSERT_NOT_SUBSTRING("12345", "4567");
        ASSERT_MEMORY("abcd", "abcd", 5);
        ASSERT(1 == 1);
-   
+
        CAPTURE_OUTPUT(output, errput) {
            printf("std!\n");
            fprintf(stderr, "err!\n");
        }
-   
+
        ASSERT_EQ(output, "std!\n");
        ASSERT_EQ(errput, "err!\n");
    }
 
-The time test file:
+The time tests:
 
 .. code-block:: c
 
    #include <time.h>
    #include "nala.h"
    #include "nala_mocks.h"
-   
+
    TEST(mock_time)
    {
        time_mock_once(42);
-   
+
        ASSERT_EQ(time(NULL), 42);
    }
 
