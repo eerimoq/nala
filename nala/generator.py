@@ -217,13 +217,15 @@ class GeneratedMock:
     DECL_MARKER = "// NALA_DECLARATION"
     IMPL_MARKER = "// NALA_IMPLEMENTATION"
 
-    def __init__(self, function):
+    def __init__(self, function, redefine_syms):
         self.function = function
-
         self.func_name = function.name
-
         self.wrapped_func = f"__wrap_{self.func_name}"
-        self.real_func = f"__real_{self.func_name}"
+
+        if redefine_syms:
+            self.real_func = self.func_name
+        else:
+            self.real_func = f"__real_{self.func_name}"
 
         self.state_name = f"nala_state_for_{self.func_name}"
         self.state_type = f"nala_state_type_for_{self.func_name}"
@@ -306,7 +308,12 @@ class GeneratedMock:
                 f'nala_v{self.func_name}',
                 [],
                 return_type))
-        self.real_decl = self.rename_function(self.real_func)
+
+        if redefine_syms:
+            self.real_decl = None
+        else:
+            self.real_decl = self.rename_function(self.real_func)
+
         self.wrapped_decl = self.rename_function(self.wrapped_func)
         self.instance_members = []
         self.set_params = []
@@ -440,6 +447,7 @@ class FileGenerator:
     HEADER_FILE = "nala_mocks.h"
     SOURCE_FILE = "nala_mocks.c"
     LINKER_FILE = "nala_mocks.ld"
+    SYMBOLS_FILE = "nala_mocks.syms"
 
     def __init__(self):
         self.code_generator = CGenerator()
@@ -458,8 +466,8 @@ class FileGenerator:
         self.system_includes = set()
         self.local_includes = set()
 
-    def add_mock(self, mocked_function):
-        self.mocks.append(GeneratedMock(mocked_function))
+    def add_mock(self, mocked_function, redefine_syms):
+        self.mocks.append(GeneratedMock(mocked_function, redefine_syms))
 
         if mocked_function.include:
             if mocked_function.include.system:
@@ -467,12 +475,11 @@ class FileGenerator:
             else:
                 self.local_includes.add(mocked_function.include.path)
 
-    def write_to_directory(self, directory):
+    def write_to_directory(self, directory, redefine_syms):
         os.makedirs(directory, exist_ok=True)
 
         header_filename = os.path.join(directory, self.HEADER_FILE)
         source_filename = os.path.join(directory, self.SOURCE_FILE)
-        linker_filename = os.path.join(directory, self.LINKER_FILE)
 
         mocks = list(sorted(self.mocks, key=lambda m: m.func_name))
 
@@ -498,8 +505,19 @@ class FileGenerator:
             fout.write(source_code.strip())
             fout.write('\n')
 
-        with open(linker_filename, "w") as fout:
-            fout.write(' '.join([
-                f'-Wl,--wrap={mock.function.name}'
-                for mock in mocks
-            ]))
+        if redefine_syms:
+            symbols_filename = os.path.join(directory, self.SYMBOLS_FILE)
+
+            with open(symbols_filename, "w") as fout:
+                fout.write('\n'.join([
+                    f'{mock.function.name} __wrap_{mock.function.name}'
+                    for mock in mocks
+                ]) + '\n')
+        else:
+            linker_filename = os.path.join(directory, self.LINKER_FILE)
+
+            with open(linker_filename, "w") as fout:
+                fout.write(' '.join([
+                    f'-Wl,--wrap={mock.function.name}'
+                    for mock in mocks
+                ]))
