@@ -43,23 +43,24 @@ you should be good to go.
 Example
 =======
 
-Use ``nala init`` to create a test suite called ``foo``.
+Use ``nala init foo`` to create a test folder called ``foo``.
 
 .. code-block:: bash
 
    $ nala init foo
-   Run 'make -C foo' to build and run the test suite!
+   Run 'make -C foo' to build and run all tests!
 
-The test suite is found in ``foo/main.c`` and contains two tests; the
-first uses all assertions and captures output, and the second mocks
-the time function.
+Two test files are created ``foo/test_assertions.c`` and
+``foo/test_time.c``. The first uses all assertions and captures
+output, and the second mocks the time function.
+
+The assertions test file:
 
 .. code-block:: c
 
    #include <time.h>
    #include "nala.h"
-   #include "nala_mocks.h"
-
+   
    TEST(assertions)
    {
        ASSERT_EQ(NULL, NULL);
@@ -72,26 +73,38 @@ the time function.
        ASSERT_NOT_SUBSTRING("12345", "4567");
        ASSERT_MEMORY("abcd", "abcd", 5);
        ASSERT(1 == 1);
-
+   
        CAPTURE_OUTPUT(output, errput) {
            printf("std!\n");
            fprintf(stderr, "err!\n");
        }
-
+   
        ASSERT_EQ(output, "std!\n");
        ASSERT_EQ(errput, "err!\n");
    }
 
+The time test file:
+
+.. code-block:: c
+
+   #include <time.h>
+   #include "nala.h"
+   #include "nala_mocks.h"
+   
    TEST(mock_time)
    {
        time_mock_once(42);
-
+   
        ASSERT_EQ(time(NULL), 42);
    }
 
-Build and run the tests.
+Build and run all tests.
 
 .. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run.png
+
+Build and run time tests.
+
+.. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run-one-test.png
 
 Compiler flags
 ==============
