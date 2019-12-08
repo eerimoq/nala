@@ -14,8 +14,11 @@ TEMPLATES_DIR = os.path.join(SCRIPT_DIR, 'templates')
 RENAME_PARAMETERS_TXT = os.path.join(SCRIPT_DIR, 'rename_parameters.txt')
 
 
-def generate_main_c():
-    shutil.copyfile(os.path.join(TEMPLATES_DIR, 'main.c'), 'main.c')
+def generate_suites():
+    shutil.copyfile(os.path.join(TEMPLATES_DIR, 'test_assertions.c'),
+                    'test_assertions.c')
+    shutil.copyfile(os.path.join(TEMPLATES_DIR, 'test_time.c'),
+                    'test_time.c')
 
 
 def generate_makefile():
@@ -30,7 +33,7 @@ def copy_nala():
 def do_init(args):
     os.mkdir(args.name)
     os.chdir(args.name)
-    generate_main_c()
+    generate_suites()
     generate_makefile()
     copy_nala()
 
