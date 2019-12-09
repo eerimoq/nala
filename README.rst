@@ -211,12 +211,6 @@ Limitations
 
 - ``va_list`` parameters are ignored.
 
-Ideas
-=====
-
-Do not use any standard functions in Nala where mocking may
-happen. Possibly suspend and resume mocks when needed.
-
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
 
