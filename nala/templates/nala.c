@@ -27,6 +27,19 @@
         }                                               \
     } while (0);
 
+#define NALA_STATE_SUSPEND(state)               \
+    if ((state).suspended.count == 0) {         \
+        (state).suspended.mode = (state).mode;  \
+        (state).mode = 0;                       \
+    }                                           \
+    (state).suspended.count++;
+
+#define NALA_STATE_RESUME(state)                 \
+    (state).suspended.count--;                   \
+    if ((state).suspended.count == 0) {          \
+        (state).mode = (state).suspended.mode;   \
+    }
+
 #define NALA_STATE_RESET(state)                 \
     do {                                        \
         (state).mode = 0;                       \
@@ -44,6 +57,7 @@ static void *nala_xmalloc(size_t size)
 {
     void *buf_p;
 
+    nala_suspend_all_mocks();
     buf_p = malloc(size);
 
     if (buf_p == NULL) {
@@ -51,7 +65,16 @@ static void *nala_xmalloc(size_t size)
         exit(1);
     }
 
+    nala_resume_all_mocks();
+
     return (buf_p);
+}
+
+static void nala_free(void *buf_p)
+{
+    nala_suspend_all_mocks();
+    free(buf_p);
+    nala_resume_all_mocks();
 }
 
 enum nala_va_arg_item_type_t {
@@ -104,16 +127,16 @@ void nala_va_arg_list_destroy(struct nala_va_arg_list_t *self_p)
 
     while (item_p != NULL) {
         if (item_p->in.buf_p != NULL) {
-            free(item_p->in.buf_p);
+            nala_free(item_p->in.buf_p);
         }
 
         if (item_p->out.buf_p) {
-            free(item_p->out.buf_p);
+            nala_free(item_p->out.buf_p);
         }
 
         tmp_p = item_p;
         item_p = tmp_p->next_p;
-        free(tmp_p);
+        nala_free(tmp_p);
     }
 }
 
@@ -175,7 +198,7 @@ void nala_parse_va_arg_long(const char **format_pp,
         break;
 
     default:
-        free(item_p);
+        nala_free(item_p);
         NALA_TEST_FAILURE(
             nala_format("Unsupported type specifier %%l%c.\n", **format_pp));
         exit(1);
@@ -210,7 +233,7 @@ void nala_parse_va_arg_non_long(const char **format_pp,
         break;
 
     default:
-        free(item_p);
+        nala_free(item_p);
         NALA_TEST_FAILURE(
             nala_format("Unsupported type specifier %%%c.\n", **format_pp));
         exit(1);
@@ -397,19 +420,15 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                                "Mocked " #func "(" #param "): %s != %s\n", \
                                NALA_FORMAT_EQ)
 
-#define MOCK_ASSERT_MEMORY(left, right, size, func, param)              \
-    do {                                                                \
-        if (((left == NULL) && (right != NULL))                         \
-            || ((left != NULL) && (right == NULL))                      \
-            || (memcmp((left), (right), (size)) != 0)) {                \
-            nala_reset_all_mocks();                                     \
-            NALA_TEST_FAILURE(nala_format_memory(                       \
-                                  "Mocked " #func "(" #param "): ",     \
-                                  (left),                               \
-                                  (right),                              \
-                                  (size)));                             \
-        }                                                               \
-    } while (0)
+#define MOCK_ASSERT_MEMORY(left, right, size, func, param)      \
+    if (!nala_check_memory(left, right, size)) {                \
+        nala_reset_all_mocks();                                 \
+        NALA_TEST_FAILURE(nala_format_memory(                   \
+                              "Mocked " #func "(" #param "): ", \
+                              (left),                           \
+                              (right),                          \
+                              (size)));                         \
+    }
 
 #define MOCK_ASSERT_PARAM_IN(params_p, func, name)              \
     if ((params_p)->name ## _in_assert == NULL) {               \

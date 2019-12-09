@@ -666,3 +666,36 @@ TEST(print_hello_function)
     print_hello_mock_once();
     print_hello();
 }
+
+TEST(capture_output_suspend_resume)
+{
+    fflush_mock_once(0);
+    dup_mock_once(1, 2);
+    dup2_mock_once(3, 4, 5);
+    tmpfile_mock_once(NULL);
+    close_mock_once(1, 9);
+    fileno_mock_once(5);
+    ftell_mock_once(6);
+    fseek_mock_once(3, 1, 5);
+    fread_mock_once(7, 6, 5);
+    fclose_mock_once(8);
+
+    CAPTURE_OUTPUT(output, errput) {
+        printf("Stdout!\n");
+        fprintf(stderr, "Stderr!\n");
+    }
+
+    ASSERT_EQ(output, "Stdout!\n");
+    ASSERT_EQ(errput, "Stderr!\n");
+
+    ASSERT_EQ(fflush(NULL), 0);
+    ASSERT_EQ(dup(1), 2);
+    ASSERT_EQ(dup2(3, 4), 5);
+    ASSERT_EQ(tmpfile(), NULL);
+    ASSERT_EQ(close(1), 9);
+    ASSERT_EQ(fileno(NULL), 5);
+    ASSERT_EQ(ftell(NULL), 6);
+    ASSERT_EQ(fseek(NULL, 3, 1), 5);
+    ASSERT_EQ(fread(NULL, 7, 6, NULL), 5u);
+    ASSERT_EQ(fclose(NULL), 8);
+}

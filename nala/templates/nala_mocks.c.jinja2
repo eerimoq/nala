@@ -11,6 +11,20 @@ Do not edit manually
 #include "nala.h"
 {{includes}}
 {{nala_c}}
+void nala_suspend_all_mocks(void)
+{
+{% for mock in mocks %}
+    {{mock.func_name}}_mock_suspend();
+{% endfor %}
+}
+
+void nala_resume_all_mocks(void)
+{
+{% for mock in mocks %}
+    {{mock.func_name}}_mock_resume();
+{% endfor %}
+}
+
 void nala_reset_all_mocks(void)
 {
 {% for mock in mocks %}
@@ -68,12 +82,20 @@ struct _nala_instances_type_for_{{mock.func_name}} {
 
 struct {{mock.state_type}} {
     int mode;
+    struct {
+        int count;
+        int mode;
+    } suspended;
     struct _nala_data_type_for_{{mock.func_name}} data;
     struct _nala_instances_type_for_{{mock.func_name}} instances;
 };
 
 static struct {{mock.state_type}} {{mock.state_name}} = {
     .mode = 0,
+    .suspended = {
+        .count = 0,
+        .mode = 0
+    },
     .instances = {
         .head_p = NULL,
         .tail_p = NULL,
@@ -109,12 +131,12 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
     {% for param in mock.set_params %}
     if ((data_p)->params.{{param.name}}_in.buf_p != NULL) { \
         MOCK_ASSERT_PARAM_IN(&(data_p)->params, {{mock.func_name}}, {{param.name}}); \
-        free((data_p)->params.{{param.name}}_in.buf_p); \
+        nala_free((data_p)->params.{{param.name}}_in.buf_p); \
     } \
  \
     if ((data_p)->params.{{param.name}}_out.buf_p != NULL) { \
         MOCK_COPY_PARAM_OUT(&(data_p)->params, {{param.name}}); \
-        free((data_p)->params.{{param.name}}_out.buf_p); \
+        nala_free((data_p)->params.{{param.name}}_out.buf_p); \
     } \
  \
     {% endfor %}
@@ -162,7 +184,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
         {% if mock.return_value %}
         return_value = _nala_instance_p->data.return_value;
         {% endif %}
-        free(_nala_instance_p);
+        nala_free(_nala_instance_p);
         break;
 
     case 2:
@@ -493,6 +515,16 @@ void {{mock.func_name}}_mock_implementation({{mock.implementation_decl | render}
 void {{mock.func_name}}_mock_disable(void)
 {
     {{mock.state_name}}.mode = 0;
+}
+
+void {{mock.func_name}}_mock_suspend(void)
+{
+    NALA_STATE_SUSPEND({{mock.state_name}});
+}
+
+void {{mock.func_name}}_mock_resume(void)
+{
+    NALA_STATE_RESUME({{mock.state_name}});
 }
 
 void {{mock.func_name}}_mock_reset(void)
