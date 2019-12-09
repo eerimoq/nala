@@ -211,6 +211,8 @@ Limitations
 
 - ``va_list`` parameters are ignored.
 
+- ``malloc()`` and ``free()`` can't be mocked if using gcov.
+
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
 
