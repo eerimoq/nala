@@ -211,7 +211,9 @@ Limitations
 
 - ``va_list`` parameters are ignored.
 
-- ``malloc()`` and ``free()`` can't be mocked if using gcov.
+- ``malloc()`` and ``free()`` can't be mocked if forking and using
+  gcov. They probably can if wrapping ``__gcov_fork()`` in an
+  suspend/resume-block.
 
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
