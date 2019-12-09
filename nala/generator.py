@@ -3,6 +3,7 @@
 import os
 import re
 from copy import deepcopy
+import pathlib
 
 from jinja2 import Environment
 from jinja2 import PackageLoader
@@ -503,3 +504,8 @@ class FileGenerator:
                 f'-Wl,--wrap={mock.function.name}'
                 for mock in mocks
             ]))
+
+    def touch_files(self, directory):
+        pathlib.Path(os.path.join(directory, HEADER_FILE)).touch()
+        pathlib.Path(os.path.join(directory, SOURCE_FILE)).touch()
+        pathlib.Path(os.path.join(directory, LINKER_FILE)).touch()

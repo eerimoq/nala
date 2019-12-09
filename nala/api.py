@@ -52,19 +52,18 @@ def generate_mocks(expanded_code,
 
     nala_mocks_h = os.path.join(output_directory, HEADER_FILE)
     functions, changed = find_mocked_functions(expanded_code, nala_mocks_h)
-
-    if not changed and cache:
-        return
-
     generator = FileGenerator()
 
-    for function in collect_mocked_functions(expanded_code,
-                                             functions,
-                                             rename_parameters_file):
-        if function.name in NALA_C_FUNCTIONS:
-            raise Exception(
-                f"'{function.name}()' cannot be mocked as it is used by Nala.")
+    if changed or not cache:
+        for function in collect_mocked_functions(expanded_code,
+                                                 functions,
+                                                 rename_parameters_file):
+            if function.name in NALA_C_FUNCTIONS:
+                raise Exception(
+                    f"'{function.name}()' cannot be mocked as it is used by Nala.")
 
-        generator.add_mock(function)
+            generator.add_mock(function)
 
-    generator.write_to_directory(output_directory)
+        generator.write_to_directory(output_directory)
+    else:
+        generator.touch_files(output_directory)
