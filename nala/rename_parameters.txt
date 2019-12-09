@@ -4,8 +4,12 @@
 #
 
 close(fd)
+dup(oldfd)
+dup2(oldfd, newfd)
 endmntent(streamp)
 fclose(stream)
+fflush(stream)
+fileno(stream)
 fopen(path, mode)
 fread(ptr, size, nmemb, stream)
 free(ptr)
