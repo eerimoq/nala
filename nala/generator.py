@@ -14,6 +14,10 @@ from . import __version__
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
+HEADER_FILE = "nala_mocks.h"
+SOURCE_FILE = "nala_mocks.c"
+LINKER_FILE = "nala_mocks.ld"
+
 
 def is_ellipsis(param):
     return isinstance(param, node.EllipsisParam)
@@ -437,10 +441,6 @@ class GeneratedMock:
 
 class FileGenerator:
 
-    HEADER_FILE = "nala_mocks.h"
-    SOURCE_FILE = "nala_mocks.c"
-    LINKER_FILE = "nala_mocks.ld"
-
     def __init__(self):
         self.code_generator = CGenerator()
 
@@ -451,8 +451,8 @@ class FileGenerator:
         )
         self.jinja_env.filters["render"] = self.code_generator.visit
 
-        self.header_template = self.jinja_env.get_template(f"{self.HEADER_FILE}.jinja2")
-        self.source_template = self.jinja_env.get_template(f"{self.SOURCE_FILE}.jinja2")
+        self.header_template = self.jinja_env.get_template(f"{HEADER_FILE}.jinja2")
+        self.source_template = self.jinja_env.get_template(f"{SOURCE_FILE}.jinja2")
 
         self.mocks = []
         self.system_includes = set()
@@ -470,9 +470,9 @@ class FileGenerator:
     def write_to_directory(self, directory):
         os.makedirs(directory, exist_ok=True)
 
-        header_filename = os.path.join(directory, self.HEADER_FILE)
-        source_filename = os.path.join(directory, self.SOURCE_FILE)
-        linker_filename = os.path.join(directory, self.LINKER_FILE)
+        header_filename = os.path.join(directory, HEADER_FILE)
+        source_filename = os.path.join(directory, SOURCE_FILE)
+        linker_filename = os.path.join(directory, LINKER_FILE)
 
         mocks = list(sorted(self.mocks, key=lambda m: m.func_name))
 

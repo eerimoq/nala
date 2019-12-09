@@ -11,20 +11,10 @@ from pycparser.c_parser import CParser
 from pycparser.plyparser import ParseError
 
 
-GETTER_REGEX = re.compile(
-    r"(void )?(\w+?)(_mock|_mock_once|_mock_ignore_in|_mock_ignore_in_once|_mock_none)\s*\(")
-
-def collect_mocked_functions(expanded_source_code, rename_parameters_file):
+def collect_mocked_functions(expanded_source_code,
+                             functions,
+                             rename_parameters_file):
     """Yield all the mocked functions used in the expanded source code."""
-
-    functions = set()
-
-    for match in GETTER_REGEX.finditer(expanded_source_code):
-        void = match.group(1)
-        function_name = match.group(2)
-
-        if void is None:
-            functions.add(function_name)
 
     yield from ForgivingDeclarationParser(expanded_source_code,
                                           functions,
