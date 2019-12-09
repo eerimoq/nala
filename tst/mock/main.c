@@ -1,4 +1,5 @@
 #include <err.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <sys/mount.h>
 #include <sys/timerfd.h>
@@ -698,4 +699,17 @@ TEST(capture_output_suspend_resume)
     ASSERT_EQ(fseek(NULL, 3, 1), 5);
     ASSERT_EQ(fread(NULL, 7, 6, NULL), 5u);
     ASSERT_EQ(fclose(NULL), 8);
+}
+
+TEST(malloc_free)
+{
+    int a;
+    int *a_p;
+
+    malloc_mock_once(1, &a);
+    free_mock_once();
+    free_mock_set_ptr_in_pointer(&a);
+    a_p = malloc(1);
+    ASSERT_EQ(a_p, &a);
+    free(a_p);
 }
