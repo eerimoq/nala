@@ -14,32 +14,50 @@ NALA_C_FUNCTIONS = [
     'strncmp'
 ]
 
-GETTER_REGEX = re.compile(
-    r"(void )?(\w+?)(_mock|_mock_once|_mock_ignore_in|_mock_ignore_in_once|_mock_none)\s*\(")
+MOCKED_FUNC_REGEX = re.compile(
+    r"(_mock|_mock_once|_mock_ignore_in|_mock_ignore_in_once|_mock_none)\s*\(")
 
 
-def find_mocked_functions(expanded_source_code, nala_mocks_h):
+def find_mocked_function_name(expanded_source_code, index):
+    name = ''
+
+    while True:
+        index -= 1
+        char = expanded_source_code[index]
+
+        if char in ' \t\n\r':
+            break
+
+        name += char
+
+    if expanded_source_code[index - 4:index] == 'void':
+        return None
+
+    return name[::-1]
+
+
+def find_mocked_functions(expanded_source_code):
     functions = set()
-    changed = True
 
-    for match in GETTER_REGEX.finditer(expanded_source_code):
-        void = match.group(1)
-        function_name = match.group(2)
+    for match in MOCKED_FUNC_REGEX.finditer(expanded_source_code):
+        function_name = find_mocked_function_name(expanded_source_code,
+                                                  match.start())
 
-        if void is None:
+        if function_name is not None:
             functions.add(function_name)
 
-    if os.path.exists(nala_mocks_h):
-        nala_mocks_functions = set()
+    return functions
 
-        with open(nala_mocks_h, 'r') as fin:
-            for line in fin:
-                if line.startswith('//'):
-                    nala_mocks_functions.add(line.split()[-1])
 
-        changed = (functions != nala_mocks_functions)
+def find_cached_mocked_functions(nala_mocks_h):
+    functions = set()
 
-    return (functions, changed)
+    with open(nala_mocks_h, 'r') as fin:
+        for line in fin:
+            if line.startswith('//'):
+                functions.add(line.split()[-1])
+
+    return functions
 
 
 def generate_mocks(expanded_code,
@@ -50,11 +68,18 @@ def generate_mocks(expanded_code,
 
     """
 
+    functions = find_mocked_functions(expanded_code)
     nala_mocks_h = os.path.join(output_directory, HEADER_FILE)
-    functions, changed = find_mocked_functions(expanded_code, nala_mocks_h)
+
+    if cache and os.path.exists(nala_mocks_h):
+        cached_mocked_functions = find_cached_mocked_functions(nala_mocks_h)
+        generate = (functions != cached_mocked_functions)
+    else:
+        generate = True
+
     generator = FileGenerator()
 
-    if changed or not cache:
+    if generate:
         for function in collect_mocked_functions(expanded_code,
                                                  functions,
                                                  rename_parameters_file):
