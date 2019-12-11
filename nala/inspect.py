@@ -173,6 +173,7 @@ class ForgivingDeclarationParser:
         self.previous = None
         self.current = None
 
+        self.chunks_to_erase = []
         self.bracket_stack = []
         self.source_context = []
         self.typedefs = ["typedef int __builtin_va_list;"]
@@ -272,7 +273,6 @@ class ForgivingDeclarationParser:
 
             self.erase_code_section(*self.current.span)
             self.next()
-
         elif self.current.is_keyword("__attribute__"):
             begin = self.current.span[0]
 
@@ -283,7 +283,6 @@ class ForgivingDeclarationParser:
                 self.next()
 
             self.erase_code_section(begin, self.current.span[1])
-
         elif self.current.is_keyword("__extension__", "__restrict"):
             self.erase_code_section(*self.current.span)
             self.next()
@@ -297,7 +296,7 @@ class ForgivingDeclarationParser:
                and not (self.current.is_punctuation(";") and not self.bracket_stack)):
             self.next()
 
-        code = self.source_code[start_index : self.current.span[1]]
+        code = self.read_source_code(start_index, self.current.span[1])
         # typedef __signed__ char __s8;
         self.typedefs.append(code.replace('__signed__', 'signed'))
 
@@ -335,8 +334,28 @@ class ForgivingDeclarationParser:
                and self.current.is_punctuation("(")):
             self.next()
 
-        return func_name, self.source_code[start_index : self.previous.span[1]] + ";"
+        code = self.read_source_code(start_index, self.previous.span[1]) + ";"
+            
+        return func_name, code
 
     def erase_code_section(self, begin, end):
-        self.source_code = (
-            self.source_code[:begin] + " " * (end - begin) + self.source_code[end:])
+        self.chunks_to_erase.append((begin, end))
+
+    def read_source_code(self, begin, end):
+        self.perform_erase()
+
+        return self.source_code[begin:end]
+        
+    def perform_erase(self):
+        chunks = []
+        offset = 0
+
+        for begin, end in self.chunks_to_erase:
+            chunks.append(self.source_code[offset:begin])
+            chunks.append(' ' * (end - begin))
+            offset = end
+
+        chunks.append(self.source_code[offset:])
+
+        self.source_code = ''.join(chunks)
+        self.chunks_to_erase = []
