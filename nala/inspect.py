@@ -215,8 +215,7 @@ class ForgivingDeclarationParser:
             if not self.functions:
                 break
 
-            while not (self.current.is_punctuation(";", "}")
-                       and not self.bracket_stack):
+            while self.bracket_stack or not self.current.is_punctuation(";", "}"):
                 self.next()
 
         if self.functions:
@@ -288,23 +287,20 @@ class ForgivingDeclarationParser:
         return self.current
 
     def parse_typedef(self):
-        start_index = self.current.span[0]
+        begin = self.current.span[0]
 
-        while not (self.current.is_punctuation(";") and not self.bracket_stack):
+        while self.bracket_stack or not self.current.is_punctuation(";"):
             self.next()
 
-        code = self.read_source_code(start_index, self.current.span[1])
+        code = self.read_source_code(begin, self.current.span[1])
         # typedef __signed__ char __s8;
         self.typedefs.append(code.replace('__signed__', 'signed'))
 
     def parse_function_declaration(self):
-        if self.bracket_stack:
-            return None
-
         while self.current.is_prefix:
             self.next()
 
-        start_index = self.current.span[0]
+        begin = self.current.span[0]
         return_type = []
 
         while (not self.current.is_punctuation("(")
@@ -329,7 +325,7 @@ class ForgivingDeclarationParser:
                and self.current.is_punctuation("(")):
             self.next()
 
-        code = self.read_source_code(start_index, self.previous.span[1]) + ";"
+        code = self.read_source_code(begin, self.previous.span[1]) + ";"
 
         return func_name, code
 
