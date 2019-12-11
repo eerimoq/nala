@@ -24,7 +24,9 @@ def collect_mocked_functions(expanded_source_code,
         for function in functions:
             print(f"error: '{function}' undeclared", file=sys.stderr)
 
-        sys.exit(1)
+        raise Exception(
+            "Unable to find declarations of all mocked functions. Add missing "
+            "includes to the test file.")
 
 
 class IncludeDirective(NamedTuple):
@@ -147,7 +149,7 @@ class ForgivingDeclarationParser:
         ),
         "IDENTIFIER": r"\b[a-zA-Z_](?:[a-zA-Z_0-9])*\b",
         "CHARACTER": r"L?'(?:\\.|[^\\'])+'",
-        "STRING": r'L?"(?:\\.|[^\\"])*"',
+        "STRING": r'L?"(\\"|\\\\|.)*?"',
         "INTEGER": r"(?:0[xX][a-fA-F0-9]+|[0-9]+)[uUlL]*",
         "FLOAT": (
             r"(?:[0-9]+[Ee][+-]?[0-9]+|[0-9]*\.[0-9]+(?:[Ee][+-]?[0-9]+)?|[0-9]+\.[0-9]*(?:[Ee][+-]?[0-9]+)?)[fFlL]?"
@@ -213,17 +215,15 @@ class ForgivingDeclarationParser:
             if not self.functions:
                 break
 
-            while (self.current and not (self.current.is_punctuation(";", "}")
-                                         and not self.bracket_stack)):
+            while not (self.current.is_punctuation(";", "}")
+                       and not self.bracket_stack):
                 self.next()
 
+        if self.functions:
+            return
+
         code = '\n'.join(self.typedefs + self.func_signatures)
-
-        try:
-            self.file_ast = self.cparser.parse(code)
-        except ParseError:
-            pass
-
+        self.file_ast = self.cparser.parse(code)
         items = zip(self.func_names, self.func_source_contexts)
 
         for i, (func_name, source_context) in enumerate(items, len(self.typedefs)):
@@ -257,7 +257,6 @@ class ForgivingDeclarationParser:
                 self.bracket_stack.append(")}]"["({[".index(self.current.value)])
             elif self.bracket_stack and self.current.value == self.bracket_stack[-1]:
                 self.bracket_stack.pop()
-
         elif self.current.type == "LINEMARKER":
             filename, flags = self.linemarker.match(self.current.value).groups()
 
@@ -271,20 +270,19 @@ class ForgivingDeclarationParser:
             except IndexError:
                 self.source_context.append(filename)
 
-            self.erase_code_section(*self.current.span)
+            self.mark_for_erase(*self.current.span)
             self.next()
         elif self.current.is_keyword("__attribute__"):
             begin = self.current.span[0]
-
             stack_depth = len(self.bracket_stack)
             self.next()
 
             while len(self.bracket_stack) > stack_depth:
                 self.next()
 
-            self.erase_code_section(begin, self.current.span[1])
+            self.mark_for_erase(begin, self.current.span[1])
         elif self.current.is_keyword("__extension__", "__restrict"):
-            self.erase_code_section(*self.current.span)
+            self.mark_for_erase(*self.current.span)
             self.next()
 
         return self.current
@@ -292,8 +290,7 @@ class ForgivingDeclarationParser:
     def parse_typedef(self):
         start_index = self.current.span[0]
 
-        while (self.current
-               and not (self.current.is_punctuation(";") and not self.bracket_stack)):
+        while not (self.current.is_punctuation(";") and not self.bracket_stack):
             self.next()
 
         code = self.read_source_code(start_index, self.current.span[1])
@@ -304,14 +301,13 @@ class ForgivingDeclarationParser:
         if self.bracket_stack:
             return None
 
-        while self.current and self.current.is_prefix:
+        while self.current.is_prefix:
             self.next()
 
         start_index = self.current.span[0]
         return_type = []
 
-        while (self.current
-               and not self.current.is_punctuation("(")
+        while (not self.current.is_punctuation("(")
                or self.next()
                and self.current.is_punctuation("*")):
             if not self.bracket_stack and self.current.is_punctuation(";"):
@@ -328,25 +324,22 @@ class ForgivingDeclarationParser:
         if func_name not in self.functions:
             return None
 
-        while (self.current
-               and self.bracket_stack
+        while (self.bracket_stack
                or self.next()
                and self.current.is_punctuation("(")):
             self.next()
 
         code = self.read_source_code(start_index, self.previous.span[1]) + ";"
-            
+
         return func_name, code
 
-    def erase_code_section(self, begin, end):
+    def mark_for_erase(self, begin, end):
         self.chunks_to_erase.append((begin, end))
 
-    def read_source_code(self, begin, end):
-        self.perform_erase()
-
-        return self.source_code[begin:end]
-        
     def perform_erase(self):
+        if not self.chunks_to_erase:
+            return
+
         chunks = []
         offset = 0
 
@@ -359,3 +352,8 @@ class ForgivingDeclarationParser:
 
         self.source_code = ''.join(chunks)
         self.chunks_to_erase = []
+
+    def read_source_code(self, begin, end):
+        self.perform_erase()
+
+        return self.source_code[begin:end]
