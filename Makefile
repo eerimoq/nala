@@ -14,10 +14,8 @@ test: test-python test-c
 
 test-python:
 	python3 setup.py test
-	$(MAKE) -C tst
 
 test-c:
-	python3 setup.py test
 	$(MAKE) -C tst
 
 dist:
