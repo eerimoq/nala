@@ -20,7 +20,7 @@ Do not edit manually
 #include <x86_64-linux-gnu/sys/statvfs.h>
 #include <x86_64-linux-gnu/sys/timerfd.h>
 
-#include "../test_dummy_functions.h"
+#include "../tests/files/test_dummy_functions.h"
 
 void nala_suspend_all_mocks(void);
 void nala_resume_all_mocks(void);

@@ -1,3 +1,4 @@
+import subprocess
 import unittest
 from unittest.mock import patch
 from io import StringIO
@@ -9,7 +10,19 @@ def read_file(filename):
         return fin.read()
 
 
+def pre_process_file(name):
+    subprocess.run([
+        'gcc',
+        '-E',
+        '-I', 'nala/dist',
+        '-o', f'tests/files/test_{name}_tests.pp.c',
+        f'tests/files/test_{name}_tests.c'
+    ])
+
+
 class CommandLineTest(unittest.TestCase):
+
+    maxDiff = None
 
     def assert_files_equal(self, actual, expected):
         # open(expected, 'w').write(read_file(actual))
@@ -23,41 +36,24 @@ class CommandLineTest(unittest.TestCase):
         self.assert_files_equal('output/nala_mocks.ld',
                                 f'tests/files/test_{name}_nala_mocks.ld')
 
-    def test_generate_mocks_empty(self):
-        argv = [
-            'nala',
-            'generate_mocks',
-            '-o', 'output',
-            'tests/files/test_empty_tests.pp.c'
+    def test_generate_mocks(self):
+        names = [
+            'empty',
+            'collect',
+            'dummy_functions'
         ]
 
-        with patch('sys.argv', argv):
-            nala.cli.main()
+        for name in names:
+            argv = [
+                'nala',
+                'generate_mocks',
+                '-o', 'output',
+                f'tests/files/test_{name}_tests.pp.c'
+            ]
 
-        self.assert_generated_files('empty')
+            pre_process_file(name)
 
-    def test_generate_mocks_collect(self):
-        argv = [
-            'nala',
-            'generate_mocks',
-            '-o', 'output',
-            'tests/files/test_collect_tests.pp.c'
-        ]
+            with patch('sys.argv', argv):
+                nala.cli.main()
 
-        with patch('sys.argv', argv):
-            nala.cli.main()
-
-        self.assert_generated_files('collect')
-
-    def test_generate_mocks_dummy_functions(self):
-        argv = [
-            'nala',
-            'generate_mocks',
-            '-o', 'output',
-            'tests/files/test_dummy_functions_tests.pp.c'
-        ]
-
-        with patch('sys.argv', argv):
-            nala.cli.main()
-
-        self.assert_generated_files('dummy_functions')
+            self.assert_generated_files(name)

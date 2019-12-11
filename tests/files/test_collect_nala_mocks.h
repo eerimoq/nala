@@ -10,7 +10,7 @@ Do not edit manually
 
 #include <stdarg.h>
 
-#include "../test_collect.h"
+#include "../tests/files/test_collect.h"
 
 void nala_suspend_all_mocks(void);
 void nala_resume_all_mocks(void);

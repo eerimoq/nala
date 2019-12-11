@@ -115,3 +115,4 @@ nala_mocks.ld
 /a.out
 /my-suite
 report.json
+*.pp.c
