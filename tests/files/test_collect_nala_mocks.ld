@@ -1,0 +1,1 @@
+-Wl,--wrap=bar -Wl,--wrap=fie -Wl,--wrap=foo -Wl,--wrap=fum -Wl,--wrap=gam -Wl,--wrap=hit

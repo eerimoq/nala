@@ -10,7 +10,14 @@ all:
 	PYTHONPATH=. python3 -m nala init my-suite
 	$(MAKE) -C my-suite NALA="PYTHONPATH=.. python3 -m nala"
 
-test:
+test: test-python test-c
+
+test-python:
+	python3 setup.py test
+	$(MAKE) -C tst
+
+test-c:
+	python3 setup.py test
 	$(MAKE) -C tst
 
 dist:

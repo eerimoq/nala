@@ -15,7 +15,8 @@ NALA_C_FUNCTIONS = [
 ]
 
 MOCKED_FUNC_REGEX = re.compile(
-    r"(_mock|_mock_once|_mock_ignore_in|_mock_ignore_in_once|_mock_none)\s*\(")
+    r"(_mock|_mock_once|_mock_ignore_in|_mock_ignore_in_once|_mock_none"
+    r"|_mock_implementation)\s*\(")
 
 
 def find_mocked_function_name(expanded_source_code, index):

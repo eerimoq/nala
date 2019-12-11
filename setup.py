@@ -25,6 +25,7 @@ setup(name='nala',
       keywords=['c', 'test', 'mock'],
       url='https://github.com/eerimoq/nala',
       packages=find_packages(exclude=['tests']),
+      test_suite="tests",
       install_requires=[
           'pycparser',
           'jinja2'

@@ -1,4 +1,5 @@
 |buildstatus|_
+|coverage|_
 |codecov|_
 
 🦁 Nala
@@ -217,6 +218,9 @@ Limitations
 
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
+
+.. |coverage| image:: https://coveralls.io/repos/github/eerimoq/nala/badge.svg?branch=master
+.. _coverage: https://coveralls.io/github/eerimoq/nala
 
 .. |codecov| image:: https://codecov.io/gh/eerimoq/nala/branch/master/graph/badge.svg
 .. _codecov: https://codecov.io/gh/eerimoq/nala
