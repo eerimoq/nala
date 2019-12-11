@@ -1,7 +1,7 @@
 /*
 Mocks source file
 
-Generated with Nala version 0.62.0 (https://github.com/eerimoq/nala)
+Generated with Nala version 0.63.0 (https://github.com/eerimoq/nala)
 Do not edit manually
 */
 #include <stdlib.h>
