@@ -48,3 +48,16 @@ class CommandLineTest(unittest.TestCase):
             nala.cli.main()
 
         self.assert_generated_files('collect')
+
+    def test_generate_mocks_dummy_functions(self):
+        argv = [
+            'nala',
+            'generate_mocks',
+            '-o', 'output',
+            'tests/files/test_dummy_functions_tests.pp.c'
+        ]
+
+        with patch('sys.argv', argv):
+            nala.cli.main()
+
+        self.assert_generated_files('dummy_functions')

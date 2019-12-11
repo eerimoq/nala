@@ -1,2 +1,7 @@
+TESTS += collect
+TESTS += dummy_functions
+
 all:
-	gcc -E -I../../nala/dist test_collect_tests.c > test_collect_tests.pp.c
+	for f in $(TESTS) ; do \
+	    gcc -E -I../../nala/dist test_$${f}_tests.c > test_$${f}_tests.pp.c ; \
+	done
