@@ -336,24 +336,22 @@ class ForgivingDeclarationParser:
     def mark_for_erase(self, begin, end):
         self.chunks_to_erase.append((begin, end))
 
-    def perform_erase(self):
-        if not self.chunks_to_erase:
-            return
-
-        chunks = []
-        offset = 0
-
-        for begin, end in self.chunks_to_erase:
-            chunks.append(self.source_code[offset:begin])
-            chunks.append(' ' * (end - begin))
-            offset = end
-
-        chunks.append(self.source_code[offset:])
-
-        self.source_code = ''.join(chunks)
-        self.chunks_to_erase = []
-
     def read_source_code(self, begin, end):
-        self.perform_erase()
+        if self.chunks_to_erase:
+            chunks = []
+            offset = begin
 
-        return self.source_code[begin:end]
+            for chunk_begin, chunk_end in self.chunks_to_erase:
+                if chunk_end < offset:
+                    continue
+
+                chunks.append(self.source_code[offset:chunk_begin])
+                offset = chunk_end
+
+            chunks.append(self.source_code[offset:end])
+            self.chunks_to_erase = []
+            code = ''.join(chunks)
+        else:
+            code = self.source_code[begin:end]
+
+        return code.strip()
