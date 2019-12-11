@@ -57,3 +57,32 @@ class CommandLineTest(unittest.TestCase):
                 nala.cli.main()
 
             self.assert_generated_files(name)
+
+    def test_generate_mocks_missing_declaration(self):
+        argv = [
+            'nala',
+            '-d',
+            'generate_mocks',
+            '-o', 'output',
+            f'tests/files/test_missing_declaration_tests.pp.c'
+        ]
+
+        pre_process_file('missing_declaration')
+        stderr = StringIO()
+
+        with patch('sys.argv', argv):
+            with patch('sys.stderr', stderr):
+                with self.assertRaises(Exception) as cm:
+                    nala.cli.main()
+
+        self.assertEqual(stderr.getvalue(),
+                         "error: Mocked function 'bar' undeclared. Missing include?\n"
+                         "error: Mocked function 'fie' undeclared. Missing include?\n"
+                         "error: Mocked function 'foo' undeclared. Missing include?\n"
+                         "error: Mocked function 'fum' undeclared. Missing include?\n"
+                         "error: Mocked function 'gam' undeclared. Missing include?\n"
+                         "error: Mocked function 'hit' undeclared. Missing include?\n")
+        self.assertEqual(
+            str(cm.exception),
+            'Unable to find declarations of all mocked functions. Add '
+            'missing includes to the test file.')

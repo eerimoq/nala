@@ -21,8 +21,9 @@ def collect_mocked_functions(expanded_source_code,
                                           rename_parameters_file)
 
     if functions:
-        for function in functions:
-            print(f"error: '{function}' undeclared", file=sys.stderr)
+        for function in sorted(functions):
+            print(f"error: Mocked function '{function}' undeclared. Missing include?",
+                  file=sys.stderr)
 
         raise Exception(
             "Unable to find declarations of all mocked functions. Add missing "
