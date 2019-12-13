@@ -41,12 +41,10 @@
     }
 
 #define NALA_STATE_RESET(state)                 \
-    do {                                        \
-        (state).mode = 0;                       \
-        (state).instances.head_p = NULL;        \
-        (state).instances.tail_p = NULL;        \
-        (state).instances.length = 0;           \
-    } while (0);
+    (state).mode = 0;                           \
+    (state).instances.head_p = NULL;            \
+    (state).instances.tail_p = NULL;            \
+    (state).instances.length = 0;
 
 struct nala_set_param {
     void *buf_p;
@@ -109,6 +107,23 @@ struct nala_va_arg_list_t {
 struct nala_traceback_t {
     void *addresses[32];
     int depth;
+};
+
+struct nala_suspended_t {
+    int count;
+    int mode;
+};
+
+struct nala_instances_t {
+    void *head_p;
+    void *tail_p;
+    int length;
+};
+
+struct nala_state_type_t {
+    int mode;
+    struct nala_suspended_t suspended;
+    struct nala_instances_t instances;
 };
 
 void nala_va_arg_list_init(struct nala_va_arg_list_t *self_p)

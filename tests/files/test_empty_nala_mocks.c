@@ -128,6 +128,23 @@ struct nala_traceback_t {
     int depth;
 };
 
+struct nala_suspended_t {
+    int count;
+    int mode;
+};
+
+struct nala_instances_t {
+    void *head_p;
+    void *tail_p;
+    int length;
+};
+
+struct nala_state_type_t {
+    int mode;
+    struct nala_suspended_t suspended;
+    struct nala_instances_t instances;
+};
+
 void nala_va_arg_list_init(struct nala_va_arg_list_t *self_p)
 {
     self_p->head_p = NULL;

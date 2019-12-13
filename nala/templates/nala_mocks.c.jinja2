@@ -82,10 +82,7 @@ struct _nala_instances_type_for_{{mock.func_name}} {
 
 struct {{mock.state_type}} {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_{{mock.func_name}} data;
     struct _nala_instances_type_for_{{mock.func_name}} instances;
 };

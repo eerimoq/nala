@@ -128,6 +128,23 @@ struct nala_traceback_t {
     int depth;
 };
 
+struct nala_suspended_t {
+    int count;
+    int mode;
+};
+
+struct nala_instances_t {
+    void *head_p;
+    void *tail_p;
+    int length;
+};
+
+struct nala_state_type_t {
+    int mode;
+    struct nala_suspended_t suspended;
+    struct nala_instances_t instances;
+};
+
 void nala_va_arg_list_init(struct nala_va_arg_list_t *self_p)
 {
     self_p->head_p = NULL;
@@ -698,10 +715,7 @@ struct _nala_instances_type_for_add {
 
 struct nala_state_type_for_add {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_add data;
     struct _nala_instances_type_for_add instances;
 };
@@ -943,10 +957,7 @@ struct _nala_instances_type_for_call {
 
 struct nala_state_type_for_call {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_call data;
     struct _nala_instances_type_for_call instances;
 };
@@ -1219,10 +1230,7 @@ struct _nala_instances_type_for_close {
 
 struct nala_state_type_for_close {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_close data;
     struct _nala_instances_type_for_close instances;
 };
@@ -1458,10 +1466,7 @@ struct _nala_instances_type_for_compose_twice {
 
 struct nala_state_type_for_compose_twice {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_compose_twice data;
     struct _nala_instances_type_for_compose_twice instances;
 };
@@ -1797,10 +1802,7 @@ struct _nala_instances_type_for_double_pointer {
 
 struct nala_state_type_for_double_pointer {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_double_pointer data;
     struct _nala_instances_type_for_double_pointer instances;
 };
@@ -2073,10 +2075,7 @@ struct _nala_instances_type_for_dup {
 
 struct nala_state_type_for_dup {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_dup data;
     struct _nala_instances_type_for_dup instances;
 };
@@ -2304,10 +2303,7 @@ struct _nala_instances_type_for_dup2 {
 
 struct nala_state_type_for_dup2 {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_dup2 data;
     struct _nala_instances_type_for_dup2 instances;
 };
@@ -2551,10 +2547,7 @@ struct _nala_instances_type_for_edit_number {
 
 struct nala_state_type_for_edit_number {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_edit_number data;
     struct _nala_instances_type_for_edit_number instances;
 };
@@ -2843,10 +2836,7 @@ struct _nala_instances_type_for_endmntent {
 
 struct nala_state_type_for_endmntent {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_endmntent data;
     struct _nala_instances_type_for_endmntent instances;
 };
@@ -3118,10 +3108,7 @@ struct _nala_instances_type_for_enum_param {
 
 struct nala_state_type_for_enum_param {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_enum_param data;
     struct _nala_instances_type_for_enum_param instances;
 };
@@ -3342,10 +3329,7 @@ struct _nala_instances_type_for_fclose {
 
 struct nala_state_type_for_fclose {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_fclose data;
     struct _nala_instances_type_for_fclose instances;
 };
@@ -3622,10 +3606,7 @@ struct _nala_instances_type_for_fflush {
 
 struct nala_state_type_for_fflush {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_fflush data;
     struct _nala_instances_type_for_fflush instances;
 };
@@ -3902,10 +3883,7 @@ struct _nala_instances_type_for_fileno {
 
 struct nala_state_type_for_fileno {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_fileno data;
     struct _nala_instances_type_for_fileno instances;
 };
@@ -4188,10 +4166,7 @@ struct _nala_instances_type_for_fopen {
 
 struct nala_state_type_for_fopen {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_fopen data;
     struct _nala_instances_type_for_fopen instances;
 };
@@ -4579,10 +4554,7 @@ struct _nala_instances_type_for_fread {
 
 struct nala_state_type_for_fread {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_fread data;
     struct _nala_instances_type_for_fread instances;
 };
@@ -4941,10 +4913,7 @@ struct _nala_instances_type_for_free {
 
 struct nala_state_type_for_free {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_free data;
     struct _nala_instances_type_for_free instances;
 };
@@ -5216,10 +5185,7 @@ struct _nala_instances_type_for_fseek {
 
 struct nala_state_type_for_fseek {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_fseek data;
     struct _nala_instances_type_for_fseek instances;
 };
@@ -5520,10 +5486,7 @@ struct _nala_instances_type_for_ftell {
 
 struct nala_state_type_for_ftell {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_ftell data;
     struct _nala_instances_type_for_ftell instances;
 };
@@ -5810,10 +5773,7 @@ struct _nala_instances_type_for_fwrite {
 
 struct nala_state_type_for_fwrite {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_fwrite data;
     struct _nala_instances_type_for_fwrite instances;
 };
@@ -6173,10 +6133,7 @@ struct _nala_instances_type_for_getmntent {
 
 struct nala_state_type_for_getmntent {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_getmntent data;
     struct _nala_instances_type_for_getmntent instances;
 };
@@ -6452,10 +6409,7 @@ struct _nala_instances_type_for_in_out {
 
 struct nala_state_type_for_in_out {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_in_out data;
     struct _nala_instances_type_for_in_out instances;
 };
@@ -6719,10 +6673,7 @@ struct _nala_instances_type_for_io_control {
 
 struct nala_state_type_for_io_control {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_io_control data;
     struct _nala_instances_type_for_io_control instances;
 };
@@ -7042,10 +6993,7 @@ struct _nala_instances_type_for_io_vcontrol {
 
 struct nala_state_type_for_io_vcontrol {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_io_vcontrol data;
     struct _nala_instances_type_for_io_vcontrol instances;
 };
@@ -7271,10 +7219,7 @@ struct _nala_instances_type_for_malloc {
 
 struct nala_state_type_for_malloc {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_malloc data;
     struct _nala_instances_type_for_malloc instances;
 };
@@ -7524,10 +7469,7 @@ struct _nala_instances_type_for_mount {
 
 struct nala_state_type_for_mount {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_mount data;
     struct _nala_instances_type_for_mount instances;
 };
@@ -8055,10 +7997,7 @@ struct _nala_instances_type_for_output_message {
 
 struct nala_state_type_for_output_message {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_output_message data;
     struct _nala_instances_type_for_output_message instances;
 };
@@ -8347,10 +8286,7 @@ struct _nala_instances_type_for_pipe {
 
 struct nala_state_type_for_pipe {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_pipe data;
     struct _nala_instances_type_for_pipe instances;
 };
@@ -8631,10 +8567,7 @@ struct _nala_instances_type_for_poll {
 
 struct nala_state_type_for_poll {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_poll data;
     struct _nala_instances_type_for_poll instances;
 };
@@ -8929,10 +8862,7 @@ struct _nala_instances_type_for_print_hello {
 
 struct nala_state_type_for_print_hello {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_print_hello data;
     struct _nala_instances_type_for_print_hello instances;
 };
@@ -9145,10 +9075,7 @@ struct _nala_instances_type_for_read {
 
 struct nala_state_type_for_read {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_read data;
     struct _nala_instances_type_for_read instances;
 };
@@ -9463,10 +9390,7 @@ struct _nala_instances_type_for_sendto {
 
 struct nala_state_type_for_sendto {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_sendto data;
     struct _nala_instances_type_for_sendto instances;
 };
@@ -9858,10 +9782,7 @@ struct _nala_instances_type_for_setsockopt {
 
 struct nala_state_type_for_setsockopt {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_setsockopt data;
     struct _nala_instances_type_for_setsockopt instances;
 };
@@ -10182,10 +10103,7 @@ struct _nala_instances_type_for_sleep {
 
 struct nala_state_type_for_sleep {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_sleep data;
     struct _nala_instances_type_for_sleep instances;
 };
@@ -10421,10 +10339,7 @@ struct _nala_instances_type_for_statvfs {
 
 struct nala_state_type_for_statvfs {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_statvfs data;
     struct _nala_instances_type_for_statvfs instances;
 };
@@ -10780,10 +10695,7 @@ struct _nala_instances_type_for_struct_param {
 
 struct nala_state_type_for_struct_param {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_struct_param data;
     struct _nala_instances_type_for_struct_param instances;
 };
@@ -11046,10 +10958,7 @@ struct _nala_instances_type_for_struct_param_and_return_type {
 
 struct nala_state_type_for_struct_param_and_return_type {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_struct_param_and_return_type data;
     struct _nala_instances_type_for_struct_param_and_return_type instances;
 };
@@ -11267,10 +11176,7 @@ struct _nala_instances_type_for_time {
 
 struct nala_state_type_for_time {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_time data;
     struct _nala_instances_type_for_time instances;
 };
@@ -11557,10 +11463,7 @@ struct _nala_instances_type_for_timerfd_settime {
 
 struct nala_state_type_for_timerfd_settime {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_timerfd_settime data;
     struct _nala_instances_type_for_timerfd_settime instances;
 };
@@ -11915,10 +11818,7 @@ struct _nala_instances_type_for_tmpfile {
 
 struct nala_state_type_for_tmpfile {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_tmpfile data;
     struct _nala_instances_type_for_tmpfile instances;
 };
@@ -12131,10 +12031,7 @@ struct _nala_instances_type_for_typedef_struct_param_and_return_type {
 
 struct nala_state_type_for_typedef_struct_param_and_return_type {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_typedef_struct_param_and_return_type data;
     struct _nala_instances_type_for_typedef_struct_param_and_return_type instances;
 };
@@ -12347,10 +12244,7 @@ struct _nala_instances_type_for_typedef_union_param_and_return_type {
 
 struct nala_state_type_for_typedef_union_param_and_return_type {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_typedef_union_param_and_return_type data;
     struct _nala_instances_type_for_typedef_union_param_and_return_type instances;
 };
@@ -12563,10 +12457,7 @@ struct _nala_instances_type_for_union_param_and_return_type {
 
 struct nala_state_type_for_union_param_and_return_type {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_union_param_and_return_type data;
     struct _nala_instances_type_for_union_param_and_return_type instances;
 };
@@ -12780,10 +12671,7 @@ struct _nala_instances_type_for_usleep {
 
 struct nala_state_type_for_usleep {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_usleep data;
     struct _nala_instances_type_for_usleep instances;
 };
@@ -13017,10 +12905,7 @@ struct _nala_instances_type_for_write {
 
 struct nala_state_type_for_write {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_write data;
     struct _nala_instances_type_for_write instances;
 };

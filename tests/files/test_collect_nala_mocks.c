@@ -128,6 +128,23 @@ struct nala_traceback_t {
     int depth;
 };
 
+struct nala_suspended_t {
+    int count;
+    int mode;
+};
+
+struct nala_instances_t {
+    void *head_p;
+    void *tail_p;
+    int length;
+};
+
+struct nala_state_type_t {
+    int mode;
+    struct nala_suspended_t suspended;
+    struct nala_instances_t instances;
+};
+
 void nala_va_arg_list_init(struct nala_va_arg_list_t *self_p)
 {
     self_p->head_p = NULL;
@@ -543,10 +560,7 @@ struct _nala_instances_type_for_bar {
 
 struct nala_state_type_for_bar {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_bar data;
     struct _nala_instances_type_for_bar instances;
 };
@@ -759,10 +773,7 @@ struct _nala_instances_type_for_fie {
 
 struct nala_state_type_for_fie {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_fie data;
     struct _nala_instances_type_for_fie instances;
 };
@@ -975,10 +986,7 @@ struct _nala_instances_type_for_foo {
 
 struct nala_state_type_for_foo {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_foo data;
     struct _nala_instances_type_for_foo instances;
 };
@@ -1191,10 +1199,7 @@ struct _nala_instances_type_for_fum {
 
 struct nala_state_type_for_fum {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_fum data;
     struct _nala_instances_type_for_fum instances;
 };
@@ -1407,10 +1412,7 @@ struct _nala_instances_type_for_gam {
 
 struct nala_state_type_for_gam {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_gam data;
     struct _nala_instances_type_for_gam instances;
 };
@@ -1623,10 +1625,7 @@ struct _nala_instances_type_for_hit {
 
 struct nala_state_type_for_hit {
     int mode;
-    struct {
-        int count;
-        int mode;
-    } suspended;
+    struct nala_suspended_t suspended;
     struct _nala_data_type_for_hit data;
     struct _nala_instances_type_for_hit instances;
 };
