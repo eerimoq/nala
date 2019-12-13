@@ -58,12 +58,10 @@ Do not edit manually
     }
 
 #define NALA_STATE_RESET(state)                 \
-    do {                                        \
-        (state).mode = 0;                       \
-        (state).instances.head_p = NULL;        \
-        (state).instances.tail_p = NULL;        \
-        (state).instances.length = 0;           \
-    } while (0);
+    (state).mode = 0;                           \
+    (state).instances.head_p = NULL;            \
+    (state).instances.tail_p = NULL;            \
+    (state).instances.length = 0;
 
 struct nala_set_param {
     void *buf_p;
