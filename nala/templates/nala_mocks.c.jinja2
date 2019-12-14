@@ -183,9 +183,9 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
         {
             va_list __nala_vl;
             va_start(__nala_vl, {{mock.va_list_start_arg_name}});
-                {% if mock.return_value %}
+            {% if mock.return_value %}
             return_value =
-                {% endif %}
+            {% endif %}
             {{mock.state_name}}.data.implementation({{mock.forward_args}});
             va_end(__nala_vl);
         }
@@ -214,9 +214,9 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
         {
             va_list __nala_vl;
             va_start(__nala_vl, {{mock.va_list_start_arg_name}});
-                {% if mock.return_value %}
+            {% if mock.return_value %}
             return_value =
-                {% endif %}
+            {% endif %}
             {{mock.func_name}}_mock_va_arg_real({{mock.forward_args}});
             va_end(__nala_vl);
         }
