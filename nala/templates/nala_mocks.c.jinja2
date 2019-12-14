@@ -126,17 +126,11 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
     {% endfor %}
  \
     {% for param in mock.set_params %}
-    if ((_nala_data_p)->params.{{param.name}}_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, {{mock.func_name}}, {{param.name}}); \
-        nala_free((_nala_data_p)->params.{{param.name}}_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.{{param.name}}_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, {{param.name}}); \
-        nala_free((_nala_data_p)->params.{{param.name}}_out.buf_p); \
-    } \
- \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               {{mock.func_name}}, \
+                               {{param.name}}); \
     {% endfor %}
+ \
     {% if mock.is_variadic_func %}
     { \
         va_list __nala_vl; \

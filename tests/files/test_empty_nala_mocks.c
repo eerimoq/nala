@@ -488,6 +488,17 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
             (params_p)->name ## _out.size);             \
     }
 
+#define MOCK_ASSERT_COPY_SET_PARAM(params_p, func, name)        \
+    if ((params_p)->name ## _in.buf_p != NULL) {                \
+        MOCK_ASSERT_PARAM_IN(params_p, func, name);             \
+        nala_free((params_p)->name ## _in.buf_p);               \
+    }                                                           \
+                                                                \
+    if ((params_p)->name ## _out.buf_p != NULL) {               \
+        MOCK_COPY_PARAM_OUT(params_p, name);                    \
+        nala_free((params_p)->name ## _out.buf_p);              \
+    }
+
 void nala_suspend_all_mocks(void)
 {
 }

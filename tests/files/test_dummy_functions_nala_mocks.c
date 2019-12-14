@@ -488,6 +488,17 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
             (params_p)->name ## _out.size);             \
     }
 
+#define MOCK_ASSERT_COPY_SET_PARAM(params_p, func, name)        \
+    if ((params_p)->name ## _in.buf_p != NULL) {                \
+        MOCK_ASSERT_PARAM_IN(params_p, func, name);             \
+        nala_free((params_p)->name ## _in.buf_p);               \
+    }                                                           \
+                                                                \
+    if ((params_p)->name ## _out.buf_p != NULL) {               \
+        MOCK_COPY_PARAM_OUT(params_p, name);                    \
+        nala_free((params_p)->name ## _out.buf_p);              \
+    }
+
 void nala_suspend_all_mocks(void)
 {
     add_mock_suspend();
@@ -749,6 +760,7 @@ struct _nala_data_params_for_add *nala_get_params_add()
     MOCK_ASSERT_EQ((_nala_data_p), add, x); \
     MOCK_ASSERT_EQ((_nala_data_p), add, y); \
  \
+ \
     errno = (_nala_data_p)->errno_value; \
  \
     if ((_nala_data_p)->callback != NULL) { \
@@ -990,15 +1002,9 @@ struct _nala_data_params_for_call *nala_get_params_call()
 #define MOCK_ASSERT_call(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), call, callback); \
  \
-    if ((_nala_data_p)->params.callback_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, call, callback); \
-        nala_free((_nala_data_p)->params.callback_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.callback_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, callback); \
-        nala_free((_nala_data_p)->params.callback_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               call, \
+                               callback); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -1263,6 +1269,7 @@ struct _nala_data_params_for_close *nala_get_params_close()
 #define MOCK_ASSERT_close(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), close, fd); \
  \
+ \
     errno = (_nala_data_p)->errno_value; \
  \
     if ((_nala_data_p)->callback != NULL) { \
@@ -1500,25 +1507,12 @@ struct _nala_data_params_for_compose_twice *nala_get_params_compose_twice()
     MOCK_ASSERT_EQ((_nala_data_p), compose_twice, dummy_struct); \
     MOCK_ASSERT_EQ((_nala_data_p), compose_twice, dummy_struct_modifier); \
  \
-    if ((_nala_data_p)->params.dummy_struct_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, compose_twice, dummy_struct); \
-        nala_free((_nala_data_p)->params.dummy_struct_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.dummy_struct_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, dummy_struct); \
-        nala_free((_nala_data_p)->params.dummy_struct_out.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.dummy_struct_modifier_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, compose_twice, dummy_struct_modifier); \
-        nala_free((_nala_data_p)->params.dummy_struct_modifier_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.dummy_struct_modifier_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, dummy_struct_modifier); \
-        nala_free((_nala_data_p)->params.dummy_struct_modifier_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               compose_twice, \
+                               dummy_struct); \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               compose_twice, \
+                               dummy_struct_modifier); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -1835,15 +1829,9 @@ struct _nala_data_params_for_double_pointer *nala_get_params_double_pointer()
 #define MOCK_ASSERT_double_pointer(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), double_pointer, value_pp); \
  \
-    if ((_nala_data_p)->params.value_pp_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, double_pointer, value_pp); \
-        nala_free((_nala_data_p)->params.value_pp_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.value_pp_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, value_pp); \
-        nala_free((_nala_data_p)->params.value_pp_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               double_pointer, \
+                               value_pp); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -2108,6 +2096,7 @@ struct _nala_data_params_for_dup *nala_get_params_dup()
 #define MOCK_ASSERT_dup(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), dup, oldfd); \
  \
+ \
     errno = (_nala_data_p)->errno_value; \
  \
     if ((_nala_data_p)->callback != NULL) { \
@@ -2336,6 +2325,7 @@ struct _nala_data_params_for_dup2 *nala_get_params_dup2()
 #define MOCK_ASSERT_dup2(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), dup2, oldfd); \
     MOCK_ASSERT_EQ((_nala_data_p), dup2, newfd); \
+ \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -2581,15 +2571,9 @@ struct _nala_data_params_for_edit_number *nala_get_params_edit_number()
     MOCK_ASSERT_EQ((_nala_data_p), edit_number, dummy_struct); \
     MOCK_ASSERT_EQ((_nala_data_p), edit_number, number); \
  \
-    if ((_nala_data_p)->params.dummy_struct_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, edit_number, dummy_struct); \
-        nala_free((_nala_data_p)->params.dummy_struct_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.dummy_struct_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, dummy_struct); \
-        nala_free((_nala_data_p)->params.dummy_struct_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               edit_number, \
+                               dummy_struct); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -2869,15 +2853,9 @@ struct _nala_data_params_for_endmntent *nala_get_params_endmntent()
 #define MOCK_ASSERT_endmntent(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), endmntent, streamp); \
  \
-    if ((_nala_data_p)->params.streamp_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, endmntent, streamp); \
-        nala_free((_nala_data_p)->params.streamp_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.streamp_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, streamp); \
-        nala_free((_nala_data_p)->params.streamp_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               endmntent, \
+                               streamp); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -3141,6 +3119,7 @@ struct _nala_data_params_for_enum_param *nala_get_params_enum_param()
 #define MOCK_ASSERT_enum_param(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), enum_param, value); \
  \
+ \
     errno = (_nala_data_p)->errno_value; \
  \
     if ((_nala_data_p)->callback != NULL) { \
@@ -3362,15 +3341,9 @@ struct _nala_data_params_for_fclose *nala_get_params_fclose()
 #define MOCK_ASSERT_fclose(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), fclose, stream); \
  \
-    if ((_nala_data_p)->params.stream_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, fclose, stream); \
-        nala_free((_nala_data_p)->params.stream_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.stream_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, stream); \
-        nala_free((_nala_data_p)->params.stream_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               fclose, \
+                               stream); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -3639,15 +3612,9 @@ struct _nala_data_params_for_fflush *nala_get_params_fflush()
 #define MOCK_ASSERT_fflush(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), fflush, stream); \
  \
-    if ((_nala_data_p)->params.stream_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, fflush, stream); \
-        nala_free((_nala_data_p)->params.stream_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.stream_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, stream); \
-        nala_free((_nala_data_p)->params.stream_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               fflush, \
+                               stream); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -3916,15 +3883,9 @@ struct _nala_data_params_for_fileno *nala_get_params_fileno()
 #define MOCK_ASSERT_fileno(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), fileno, stream); \
  \
-    if ((_nala_data_p)->params.stream_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, fileno, stream); \
-        nala_free((_nala_data_p)->params.stream_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.stream_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, stream); \
-        nala_free((_nala_data_p)->params.stream_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               fileno, \
+                               stream); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -4200,25 +4161,12 @@ struct _nala_data_params_for_fopen *nala_get_params_fopen()
     MOCK_ASSERT_EQ((_nala_data_p), fopen, path); \
     MOCK_ASSERT_EQ((_nala_data_p), fopen, mode); \
  \
-    if ((_nala_data_p)->params.path_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, fopen, path); \
-        nala_free((_nala_data_p)->params.path_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.path_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, path); \
-        nala_free((_nala_data_p)->params.path_out.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.mode_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, fopen, mode); \
-        nala_free((_nala_data_p)->params.mode_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.mode_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, mode); \
-        nala_free((_nala_data_p)->params.mode_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               fopen, \
+                               path); \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               fopen, \
+                               mode); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -4590,25 +4538,12 @@ struct _nala_data_params_for_fread *nala_get_params_fread()
     MOCK_ASSERT_EQ((_nala_data_p), fread, size); \
     MOCK_ASSERT_EQ((_nala_data_p), fread, nmemb); \
  \
-    if ((_nala_data_p)->params.ptr_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, fread, ptr); \
-        nala_free((_nala_data_p)->params.ptr_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.ptr_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, ptr); \
-        nala_free((_nala_data_p)->params.ptr_out.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.stream_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, fread, stream); \
-        nala_free((_nala_data_p)->params.stream_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.stream_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, stream); \
-        nala_free((_nala_data_p)->params.stream_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               fread, \
+                               ptr); \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               fread, \
+                               stream); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -4946,15 +4881,9 @@ struct _nala_data_params_for_free *nala_get_params_free()
 #define MOCK_ASSERT_free(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), free, ptr); \
  \
-    if ((_nala_data_p)->params.ptr_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, free, ptr); \
-        nala_free((_nala_data_p)->params.ptr_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.ptr_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, ptr); \
-        nala_free((_nala_data_p)->params.ptr_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               free, \
+                               ptr); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -5220,15 +5149,9 @@ struct _nala_data_params_for_fseek *nala_get_params_fseek()
     MOCK_ASSERT_EQ((_nala_data_p), fseek, offset); \
     MOCK_ASSERT_EQ((_nala_data_p), fseek, whence); \
  \
-    if ((_nala_data_p)->params.stream_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, fseek, stream); \
-        nala_free((_nala_data_p)->params.stream_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.stream_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, stream); \
-        nala_free((_nala_data_p)->params.stream_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               fseek, \
+                               stream); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -5519,15 +5442,9 @@ struct _nala_data_params_for_ftell *nala_get_params_ftell()
 #define MOCK_ASSERT_ftell(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), ftell, stream); \
  \
-    if ((_nala_data_p)->params.stream_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, ftell, stream); \
-        nala_free((_nala_data_p)->params.stream_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.stream_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, stream); \
-        nala_free((_nala_data_p)->params.stream_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               ftell, \
+                               stream); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -5809,25 +5726,12 @@ struct _nala_data_params_for_fwrite *nala_get_params_fwrite()
     MOCK_ASSERT_EQ((_nala_data_p), fwrite, size); \
     MOCK_ASSERT_EQ((_nala_data_p), fwrite, nmemb); \
  \
-    if ((_nala_data_p)->params.ptr_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, fwrite, ptr); \
-        nala_free((_nala_data_p)->params.ptr_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.ptr_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, ptr); \
-        nala_free((_nala_data_p)->params.ptr_out.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.stream_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, fwrite, stream); \
-        nala_free((_nala_data_p)->params.stream_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.stream_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, stream); \
-        nala_free((_nala_data_p)->params.stream_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               fwrite, \
+                               ptr); \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               fwrite, \
+                               stream); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -6166,15 +6070,9 @@ struct _nala_data_params_for_getmntent *nala_get_params_getmntent()
 #define MOCK_ASSERT_getmntent(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), getmntent, stream); \
  \
-    if ((_nala_data_p)->params.stream_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, getmntent, stream); \
-        nala_free((_nala_data_p)->params.stream_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.stream_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, stream); \
-        nala_free((_nala_data_p)->params.stream_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               getmntent, \
+                               stream); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -6442,15 +6340,9 @@ struct _nala_data_params_for_in_out *nala_get_params_in_out()
 #define MOCK_ASSERT_in_out(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), in_out, buf_p); \
  \
-    if ((_nala_data_p)->params.buf_p_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, in_out, buf_p); \
-        nala_free((_nala_data_p)->params.buf_p_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.buf_p_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, buf_p); \
-        nala_free((_nala_data_p)->params.buf_p_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               in_out, \
+                               buf_p); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -6705,6 +6597,7 @@ struct _nala_data_params_for_io_control *nala_get_params_io_control()
 
 #define MOCK_ASSERT_io_control(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), io_control, kind); \
+ \
  \
     { \
         va_list __nala_vl; \
@@ -7026,6 +6919,7 @@ struct _nala_data_params_for_io_vcontrol *nala_get_params_io_vcontrol()
 #define MOCK_ASSERT_io_vcontrol(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), io_vcontrol, kind); \
  \
+ \
     errno = (_nala_data_p)->errno_value; \
  \
     if ((_nala_data_p)->callback != NULL) { \
@@ -7251,6 +7145,7 @@ struct _nala_data_params_for_malloc *nala_get_params_malloc()
 
 #define MOCK_ASSERT_malloc(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), malloc, size); \
+ \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -7506,45 +7401,18 @@ struct _nala_data_params_for_mount *nala_get_params_mount()
     MOCK_ASSERT_EQ((_nala_data_p), mount, data); \
     MOCK_ASSERT_EQ((_nala_data_p), mount, mountflags); \
  \
-    if ((_nala_data_p)->params.source_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, mount, source); \
-        nala_free((_nala_data_p)->params.source_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.source_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, source); \
-        nala_free((_nala_data_p)->params.source_out.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.target_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, mount, target); \
-        nala_free((_nala_data_p)->params.target_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.target_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, target); \
-        nala_free((_nala_data_p)->params.target_out.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.filesystemtype_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, mount, filesystemtype); \
-        nala_free((_nala_data_p)->params.filesystemtype_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.filesystemtype_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, filesystemtype); \
-        nala_free((_nala_data_p)->params.filesystemtype_out.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.data_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, mount, data); \
-        nala_free((_nala_data_p)->params.data_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.data_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, data); \
-        nala_free((_nala_data_p)->params.data_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               mount, \
+                               source); \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               mount, \
+                               target); \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               mount, \
+                               filesystemtype); \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               mount, \
+                               data); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -8030,15 +7898,9 @@ struct _nala_data_params_for_output_message *nala_get_params_output_message()
 #define MOCK_ASSERT_output_message(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), output_message, message); \
  \
-    if ((_nala_data_p)->params.message_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, output_message, message); \
-        nala_free((_nala_data_p)->params.message_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.message_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, message); \
-        nala_free((_nala_data_p)->params.message_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               output_message, \
+                               message); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -8319,15 +8181,9 @@ struct _nala_data_params_for_pipe *nala_get_params_pipe()
 #define MOCK_ASSERT_pipe(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), pipe, pipefd); \
  \
-    if ((_nala_data_p)->params.pipefd_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, pipe, pipefd); \
-        nala_free((_nala_data_p)->params.pipefd_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.pipefd_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, pipefd); \
-        nala_free((_nala_data_p)->params.pipefd_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               pipe, \
+                               pipefd); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -8602,15 +8458,9 @@ struct _nala_data_params_for_poll *nala_get_params_poll()
     MOCK_ASSERT_EQ((_nala_data_p), poll, nfds); \
     MOCK_ASSERT_EQ((_nala_data_p), poll, timeout); \
  \
-    if ((_nala_data_p)->params.fds_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, poll, fds); \
-        nala_free((_nala_data_p)->params.fds_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.fds_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, fds); \
-        nala_free((_nala_data_p)->params.fds_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               poll, \
+                               fds); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -8894,6 +8744,7 @@ struct _nala_data_params_for_print_hello *nala_get_params_print_hello()
 
 #define MOCK_ASSERT_print_hello(_nala_data_p) \
  \
+ \
     errno = (_nala_data_p)->errno_value; \
  \
     if ((_nala_data_p)->callback != NULL) { \
@@ -9110,15 +8961,9 @@ struct _nala_data_params_for_read *nala_get_params_read()
     MOCK_ASSERT_EQ((_nala_data_p), read, fd); \
     MOCK_ASSERT_EQ((_nala_data_p), read, count); \
  \
-    if ((_nala_data_p)->params.buf_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, read, buf); \
-        nala_free((_nala_data_p)->params.buf_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.buf_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, buf); \
-        nala_free((_nala_data_p)->params.buf_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               read, \
+                               buf); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -9428,25 +9273,12 @@ struct _nala_data_params_for_sendto *nala_get_params_sendto()
     MOCK_ASSERT_EQ((_nala_data_p), sendto, flags); \
     MOCK_ASSERT_EQ((_nala_data_p), sendto, addrlen); \
  \
-    if ((_nala_data_p)->params.buf_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, sendto, buf); \
-        nala_free((_nala_data_p)->params.buf_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.buf_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, buf); \
-        nala_free((_nala_data_p)->params.buf_out.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.dest_addr_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, sendto, dest_addr); \
-        nala_free((_nala_data_p)->params.dest_addr_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.dest_addr_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, dest_addr); \
-        nala_free((_nala_data_p)->params.dest_addr_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               sendto, \
+                               buf); \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               sendto, \
+                               dest_addr); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -9819,15 +9651,9 @@ struct _nala_data_params_for_setsockopt *nala_get_params_setsockopt()
     MOCK_ASSERT_EQ((_nala_data_p), setsockopt, optname); \
     MOCK_ASSERT_EQ((_nala_data_p), setsockopt, optlen); \
  \
-    if ((_nala_data_p)->params.optval_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, setsockopt, optval); \
-        nala_free((_nala_data_p)->params.optval_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.optval_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, optval); \
-        nala_free((_nala_data_p)->params.optval_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               setsockopt, \
+                               optval); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -10136,6 +9962,7 @@ struct _nala_data_params_for_sleep *nala_get_params_sleep()
 #define MOCK_ASSERT_sleep(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), sleep, seconds); \
  \
+ \
     errno = (_nala_data_p)->errno_value; \
  \
     if ((_nala_data_p)->callback != NULL) { \
@@ -10373,25 +10200,12 @@ struct _nala_data_params_for_statvfs *nala_get_params_statvfs()
     MOCK_ASSERT_EQ((_nala_data_p), statvfs, path); \
     MOCK_ASSERT_EQ((_nala_data_p), statvfs, buf); \
  \
-    if ((_nala_data_p)->params.path_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, statvfs, path); \
-        nala_free((_nala_data_p)->params.path_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.path_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, path); \
-        nala_free((_nala_data_p)->params.path_out.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.buf_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, statvfs, buf); \
-        nala_free((_nala_data_p)->params.buf_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.buf_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, buf); \
-        nala_free((_nala_data_p)->params.buf_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               statvfs, \
+                               path); \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               statvfs, \
+                               buf); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -10728,15 +10542,9 @@ struct _nala_data_params_for_struct_param *nala_get_params_struct_param()
 #define MOCK_ASSERT_struct_param(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), struct_param, data); \
  \
-    if ((_nala_data_p)->params.data_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, struct_param, data); \
-        nala_free((_nala_data_p)->params.data_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.data_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, data); \
-        nala_free((_nala_data_p)->params.data_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               struct_param, \
+                               data); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -10990,6 +10798,7 @@ struct _nala_data_params_for_struct_param_and_return_type *nala_get_params_struc
 
 #define MOCK_ASSERT_struct_param_and_return_type(_nala_data_p) \
  \
+ \
     errno = (_nala_data_p)->errno_value; \
  \
     if ((_nala_data_p)->callback != NULL) { \
@@ -11209,15 +11018,9 @@ struct _nala_data_params_for_time *nala_get_params_time()
 #define MOCK_ASSERT_time(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), time, tloc); \
  \
-    if ((_nala_data_p)->params.tloc_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, time, tloc); \
-        nala_free((_nala_data_p)->params.tloc_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.tloc_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, tloc); \
-        nala_free((_nala_data_p)->params.tloc_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               time, \
+                               tloc); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -11499,25 +11302,12 @@ struct _nala_data_params_for_timerfd_settime *nala_get_params_timerfd_settime()
     MOCK_ASSERT_EQ((_nala_data_p), timerfd_settime, fd); \
     MOCK_ASSERT_EQ((_nala_data_p), timerfd_settime, flags); \
  \
-    if ((_nala_data_p)->params.new_value_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, timerfd_settime, new_value); \
-        nala_free((_nala_data_p)->params.new_value_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.new_value_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, new_value); \
-        nala_free((_nala_data_p)->params.new_value_out.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.old_value_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, timerfd_settime, old_value); \
-        nala_free((_nala_data_p)->params.old_value_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.old_value_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, old_value); \
-        nala_free((_nala_data_p)->params.old_value_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               timerfd_settime, \
+                               new_value); \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               timerfd_settime, \
+                               old_value); \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -11850,6 +11640,7 @@ struct _nala_data_params_for_tmpfile *nala_get_params_tmpfile()
 
 #define MOCK_ASSERT_tmpfile(_nala_data_p) \
  \
+ \
     errno = (_nala_data_p)->errno_value; \
  \
     if ((_nala_data_p)->callback != NULL) { \
@@ -12062,6 +11853,7 @@ struct _nala_data_params_for_typedef_struct_param_and_return_type *nala_get_para
 }
 
 #define MOCK_ASSERT_typedef_struct_param_and_return_type(_nala_data_p) \
+ \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -12276,6 +12068,7 @@ struct _nala_data_params_for_typedef_union_param_and_return_type *nala_get_param
 
 #define MOCK_ASSERT_typedef_union_param_and_return_type(_nala_data_p) \
  \
+ \
     errno = (_nala_data_p)->errno_value; \
  \
     if ((_nala_data_p)->callback != NULL) { \
@@ -12488,6 +12281,7 @@ struct _nala_data_params_for_union_param_and_return_type *nala_get_params_union_
 }
 
 #define MOCK_ASSERT_union_param_and_return_type(_nala_data_p) \
+ \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -12703,6 +12497,7 @@ struct _nala_data_params_for_usleep *nala_get_params_usleep()
 
 #define MOCK_ASSERT_usleep(_nala_data_p) \
     MOCK_ASSERT_EQ((_nala_data_p), usleep, usec); \
+ \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -12940,15 +12735,9 @@ struct _nala_data_params_for_write *nala_get_params_write()
     MOCK_ASSERT_EQ((_nala_data_p), write, fd); \
     MOCK_ASSERT_EQ((_nala_data_p), write, count); \
  \
-    if ((_nala_data_p)->params.buf_in.buf_p != NULL) { \
-        MOCK_ASSERT_PARAM_IN(&(_nala_data_p)->params, write, buf); \
-        nala_free((_nala_data_p)->params.buf_in.buf_p); \
-    } \
- \
-    if ((_nala_data_p)->params.buf_out.buf_p != NULL) { \
-        MOCK_COPY_PARAM_OUT(&(_nala_data_p)->params, buf); \
-        nala_free((_nala_data_p)->params.buf_out.buf_p); \
-    } \
+    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               write, \
+                               buf); \
  \
     errno = (_nala_data_p)->errno_value; \
  \

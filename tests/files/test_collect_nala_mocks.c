@@ -488,6 +488,17 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
             (params_p)->name ## _out.size);             \
     }
 
+#define MOCK_ASSERT_COPY_SET_PARAM(params_p, func, name)        \
+    if ((params_p)->name ## _in.buf_p != NULL) {                \
+        MOCK_ASSERT_PARAM_IN(params_p, func, name);             \
+        nala_free((params_p)->name ## _in.buf_p);               \
+    }                                                           \
+                                                                \
+    if ((params_p)->name ## _out.buf_p != NULL) {               \
+        MOCK_COPY_PARAM_OUT(params_p, name);                    \
+        nala_free((params_p)->name ## _out.buf_p);              \
+    }
+
 void nala_suspend_all_mocks(void)
 {
     bar_mock_suspend();
@@ -591,6 +602,7 @@ struct _nala_data_params_for_bar *nala_get_params_bar()
 }
 
 #define MOCK_ASSERT_bar(_nala_data_p) \
+ \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -805,6 +817,7 @@ struct _nala_data_params_for_fie *nala_get_params_fie()
 
 #define MOCK_ASSERT_fie(_nala_data_p) \
  \
+ \
     errno = (_nala_data_p)->errno_value; \
  \
     if ((_nala_data_p)->callback != NULL) { \
@@ -1017,6 +1030,7 @@ struct _nala_data_params_for_foo *nala_get_params_foo()
 }
 
 #define MOCK_ASSERT_foo(_nala_data_p) \
+ \
  \
     errno = (_nala_data_p)->errno_value; \
  \
@@ -1231,6 +1245,7 @@ struct _nala_data_params_for_fum *nala_get_params_fum()
 
 #define MOCK_ASSERT_fum(_nala_data_p) \
  \
+ \
     errno = (_nala_data_p)->errno_value; \
  \
     if ((_nala_data_p)->callback != NULL) { \
@@ -1444,6 +1459,7 @@ struct _nala_data_params_for_gam *nala_get_params_gam()
 
 #define MOCK_ASSERT_gam(_nala_data_p) \
  \
+ \
     errno = (_nala_data_p)->errno_value; \
  \
     if ((_nala_data_p)->callback != NULL) { \
@@ -1656,6 +1672,7 @@ struct _nala_data_params_for_hit *nala_get_params_hit()
 }
 
 #define MOCK_ASSERT_hit(_nala_data_p) \
+ \
  \
     errno = (_nala_data_p)->errno_value; \
  \
