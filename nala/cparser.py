@@ -114,7 +114,7 @@ class Parser(textparser.Parser):
                             Optional(attributes),
                             choice(';', block))
 
-        return ZeroOrMore(choice(line_marker,
+        return ZeroOrMore(choice(Tag('linemarker', line_marker),
                                  typedef,
                                  struct,
                                  union,

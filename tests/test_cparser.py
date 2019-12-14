@@ -30,7 +30,7 @@ class CParserTest(unittest.TestCase):
         self.assertEqual(
             parsed,
             [
-                '# 1 "/usr/include/stdc-predef.h" 1 3 4'
+                ('linemarker', '# 1 "/usr/include/stdc-predef.h" 1 3 4')
             ])
 
     def test_parse_typedef_primitive(self):
@@ -59,10 +59,10 @@ class CParserTest(unittest.TestCase):
         self.assertEqual(
             parsed,
             [
-                ('function', [[], ['void', 'foo'], ['(', [], ')'], [], ';'])
+                ('function', [[], ['void', 'foo'], ['(', ')'], [], ';'])
             ])
 
-    def test_parse_function_declaration(self):
+    def test_parse_function_declaration_function_pointer(self):
         parsed = parse('void foo(int (*a)());')
 
         self.assertEqual(
