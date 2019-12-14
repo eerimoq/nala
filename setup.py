@@ -28,7 +28,8 @@ setup(name='nala',
       test_suite="tests",
       install_requires=[
           'pycparser',
-          'jinja2'
+          'jinja2',
+          'textparser'
       ],
       include_package_data=True,
       entry_points = {

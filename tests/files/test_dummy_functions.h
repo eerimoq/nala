@@ -37,7 +37,6 @@ DummyStruct *add_one(DummyStruct *dummy_struct);
 DummyStruct *compose_twice(DummyStruct *dummy_struct,
                            DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct));
 DummyStruct *add_two(DummyStruct *dummy_struct);
-DummyStruct *(*return_add_one(void))(DummyStruct *dummy_struct);
 int io_control(int kind, ...);
 int io_vcontrol(int kind, va_list ap);
 void struct_param(struct struct_param_type *data);
