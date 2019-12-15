@@ -4,11 +4,11 @@ import os
 import sys
 import re
 from typing import NamedTuple
-from typing import Tuple
 
 from pycparser import c_ast as node
 from pycparser.c_parser import CParser
-from pycparser.plyparser import ParseError
+
+from .cparser import fast_parse
 
 
 def collect_mocked_functions(expanded_source_code,
@@ -70,29 +70,6 @@ class MockedFunction(NamedTuple):
     file_ast: node.FileAST
 
 
-class Token(NamedTuple):
-    type: str
-    value: str
-    span: Tuple[int, int]
-
-    def is_punctuation(self, *symbols):
-        return self.type == "PUNCTUATION" and self.value in symbols
-
-    def is_keyword(self, *keywords):
-        return self.type == "KEYWORD" and self.value in keywords
-
-    @property
-    def is_prefix(self):
-        return self.type == "KEYWORD" and self.value in (
-            "typedef",
-            "extern",
-            "static",
-            "auto",
-            "register",
-            "__extension__"
-        )
-
-
 def load_param_names(filename):
     param_names = {}
 
@@ -139,216 +116,48 @@ def rename_parameters(function_declaration, param_names):
 
 
 class ForgivingDeclarationParser:
-    linemarker = re.compile(r'^# \d+ "((?:\\.|[^\\"])*)"((?: [1234])*)$')
-
-    tokens = {
-        "LINEMARKER": r"^#.*$",
-        "KEYWORD": (
-            "\\b(?:auto|break|case|char|const|continue|default|do|double|else|enum|extern|float"
-            "|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch"
-            "|typedef|union|unsigned|void|volatile|while|__extension__|__attribute__|__restrict)\\b"
-        ),
-        "IDENTIFIER": r"\b[a-zA-Z_](?:[a-zA-Z_0-9])*\b",
-        "CHARACTER": r"L?'(?:\\.|[^\\'])+'",
-        "STRING": r'L?"(\\"|\\\\|.)*?"',
-        "INTEGER": r"(?:0[xX][a-fA-F0-9]+|[0-9]+)[uUlL]*",
-        "FLOAT": (
-            r"(?:[0-9]+[Ee][+-]?[0-9]+|[0-9]*\.[0-9]+(?:[Ee][+-]?[0-9]+)?|[0-9]+\.[0-9]*(?:[Ee][+-]?[0-9]+)?)[fFlL]?"
-        ),
-        "PUNCTUATION": (
-            r"\.\.\.|>>=|<<=|\+=|-=|\*=|/=|%=|&=|\^=|\|=|>>|<<|\+\+|--|->|&&|\|\||<=|>=|"
-            r"==|!=|;|\{|\}|,|:|=|\(|\)|\[|\]|\.|&|!|~|-|\+|\*|/|%|<|>|\^|\||\?"
-        ),
-        "SPACE": r"[ \t\v\n\f]*",
-        "IGNORE": r".+?",
-    }
-
-    ignored_tokens = "SPACE", "IGNORE"
-
-    regex = re.compile(
-        "|".join(f"(?P<{token}>{pattern})" for token, pattern in tokens.items()),
-        flags=re.MULTILINE)
 
     def __init__(self, source_code, functions, rename_parameters_file=None):
         self.source_code = source_code
         self.functions = functions
-        self.token_stream = self.tokenize(source_code)
-        self.previous = None
-        self.current = None
-
-        self.chunks_to_erase = []
-        self.bracket_stack = []
-        self.source_context = []
-        self.typedefs = ["typedef int __builtin_va_list;"]
-
         self.cparser = CParser()
         self.param_names = {}
 
         if rename_parameters_file is not None:
             self.param_names = load_param_names(rename_parameters_file)
 
-        self.func_names = []
-        self.func_signatures = []
-        self.func_source_contexts = []
-        self.file_ast = None
         self.mocked_functions = []
         self.parse()
 
-    @classmethod
-    def tokenize(cls, source_code):
-        for match in cls.regex.finditer(source_code):
-            if match.lastgroup not in cls.ignored_tokens:
-                yield Token(match.lastgroup, match.group().strip(), match.span())
-
     def parse(self):
-        while self.next():
-            if self.current.is_keyword("typedef"):
-                self.parse_typedef()
-
-            parsed = self.parse_function_declaration()
-
-            if parsed is not None:
-                self.func_names.append(parsed[0])
-                self.func_signatures.append(parsed[1])
-                self.func_source_contexts.append(self.source_context[:])
-                self.functions.remove(parsed[0])
-
-            if not self.functions:
-                break
-
-            while self.bracket_stack or not self.current.is_punctuation(";", "}"):
-                self.next()
+        result = fast_parse(self.source_code, self.functions)
 
         if self.functions:
             return
 
-        code = '\n'.join(self.typedefs + self.func_signatures)
-        self.file_ast = self.cparser.parse(code)
-        items = zip(self.func_names, self.func_source_contexts)
+        result.typedefs.insert(0, "typedef int __builtin_va_list;")
+        code = '\n'.join(result.typedefs + result.func_signatures)
+        code = code.replace('__extension__', '')
+        code = code.replace('__restrict', '')
+        code = code.replace('__signed__', 'signed')
+        file_ast = self.cparser.parse(code)
+        items = zip(result.func_names, result.func_source_contexts)
 
-        for i, (func_name, source_context) in enumerate(items, len(self.typedefs)):
+        for i, (func_name, source_context) in enumerate(items, len(result.typedefs)):
             param_names = self.param_names.get(func_name)
 
             if param_names:
-                func_declaration = rename_parameters(self.file_ast.ext[i],
+                func_declaration = rename_parameters(file_ast.ext[i],
                                                      param_names)
             else:
-                func_declaration = self.file_ast.ext[i]
+                func_declaration = file_ast.ext[i]
 
             self.mocked_functions.append(MockedFunction(
                 func_name,
                 func_declaration,
                 IncludeDirective.from_source_context(source_context),
-                self.file_ast))
+                file_ast))
 
     def __iter__(self):
         for mocked_function in self.mocked_functions:
             yield mocked_function
-
-    def next(self):
-        self.previous = self.current
-        self.current = next(self.token_stream, None)
-
-        if not self.current:
-            return None
-
-        if self.current.type == "PUNCTUATION":
-            if self.current.value in "({[":
-                self.bracket_stack.append(")}]"["({[".index(self.current.value)])
-            elif self.bracket_stack and self.current.value == self.bracket_stack[-1]:
-                self.bracket_stack.pop()
-        elif self.current.type == "LINEMARKER":
-            filename, flags = self.linemarker.match(self.current.value).groups()
-
-            if "1" in flags:
-                self.source_context.append(filename)
-            elif "2" in flags:
-                self.source_context.pop()
-
-            try:
-                self.source_context[-1] = filename
-            except IndexError:
-                self.source_context.append(filename)
-
-            self.mark_for_erase(*self.current.span)
-            self.next()
-        elif self.current.is_keyword("__attribute__"):
-            begin = self.current.span[0]
-            stack_depth = len(self.bracket_stack)
-            self.next()
-
-            while len(self.bracket_stack) > stack_depth:
-                self.next()
-
-            self.mark_for_erase(begin, self.current.span[1])
-        elif self.current.is_keyword("__extension__", "__restrict"):
-            self.mark_for_erase(*self.current.span)
-            self.next()
-
-        return self.current
-
-    def parse_typedef(self):
-        begin = self.current.span[0]
-
-        while self.bracket_stack or not self.current.is_punctuation(";"):
-            self.next()
-
-        code = self.read_source_code(begin, self.current.span[1])
-        # typedef __signed__ char __s8;
-        self.typedefs.append(code.replace('__signed__', 'signed'))
-
-    def parse_function_declaration(self):
-        while self.current.is_prefix:
-            self.next()
-
-        begin = self.current.span[0]
-        return_type = []
-
-        while (not self.current.is_punctuation("(")
-               or self.next()
-               and self.current.is_punctuation("*")):
-            if not self.bracket_stack and self.current.is_punctuation(";"):
-                return None
-
-            return_type.append(self.current.value)
-            self.next()
-
-        if not return_type:
-            return None
-
-        func_name = return_type.pop()
-
-        if func_name not in self.functions:
-            return None
-
-        while (self.bracket_stack
-               or self.next()
-               and self.current.is_punctuation("(")):
-            self.next()
-
-        code = self.read_source_code(begin, self.previous.span[1]) + ";"
-
-        return func_name, code
-
-    def mark_for_erase(self, begin, end):
-        self.chunks_to_erase.append((begin, end))
-
-    def read_source_code(self, begin, end):
-        if self.chunks_to_erase:
-            chunks = []
-            offset = begin
-
-            for chunk_begin, chunk_end in self.chunks_to_erase:
-                if chunk_end < offset:
-                    continue
-
-                chunks.append(self.source_code[offset:chunk_begin])
-                offset = chunk_end
-
-            chunks.append(self.source_code[offset:end])
-            self.chunks_to_erase = []
-            code = ''.join(chunks)
-        else:
-            code = self.source_code[begin:end]
-
-        return code.strip()

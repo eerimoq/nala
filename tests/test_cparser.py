@@ -1,78 +1,47 @@
+import re
 import time
 import subprocess
 import unittest
 from nala.cparser import parse
+from nala.cparser import IncludeFinder
+from textparser import Token
 
 
 def pre_process_file(name):
-    filename = f'tests/files/test_{name}_tests.pp.c'
+    source_path = f'tests/files/test_{name}_tests.c'
+    expanded_source_path = f'tests/files/test_{name}_tests.pp.c'
     subprocess.run([
         'gcc',
         '-E',
         '-I', 'nala/dist',
-        '-o', filename,
-        f'tests/files/test_{name}_tests.c'
+        '-o', expanded_source_path,
+        source_path
     ])
 
-    with open(filename, 'r') as fin:
-        return fin.read()
+    with open(source_path, 'r') as fin:
+        source = fin.read()
+
+    with open(expanded_source_path, 'r') as fin:
+        expanded_source = fin.read()
+
+    return source, expanded_source
 
 
 class CParserTest(unittest.TestCase):
 
     def test_parse_empty(self):
-        parsed = parse('')
-        self.assertEqual(parsed, [])
-
-    def test_parse_linemarker(self):
-        parsed = parse('# 1 "/usr/include/stdc-predef.h" 1 3 4')
-
-        self.assertEqual(
-            parsed,
-            [
-                ('linemarker', '# 1 "/usr/include/stdc-predef.h" 1 3 4')
-            ])
-
-    def test_parse_typedef_primitive(self):
-        parsed = parse('typedef long unsigned int size_t;')
-
-        self.assertEqual(
-            parsed,
-            [
-                ['typedef', [['long', 'unsigned', 'int', 'size_t'], [], ';']]
-            ])
-
-    def test_parse_typedef_struct(self):
-        parsed = parse('typedef struct {\n'
-                       '    int a;\n'
-                       '} foo_t;')
-
-        self.assertEqual(
-            parsed,
-            [
-                ['typedef', ['struct', ['{', '}'], 'foo_t', [], ';']]
-            ])
-
-    def test_parse_function_declaration(self):
-        parsed = parse('void foo();')
-
-        self.assertEqual(
-            parsed,
-            [
-                ('function', [[], ['void', 'foo'], ['(', ')'], [], ';'])
-            ])
-
-    def test_parse_function_declaration_function_pointer(self):
-        parsed = parse('void foo(int (*a)());')
-
-        self.assertEqual(
-            parsed,
-            [
-                ('function', [[], ['void', 'foo'], ['(',  ')'], [], ';'])
-            ])
+        parsed = parse('', '', set())
+        self.assertEqual(parsed.functions, {})
 
     def test_parse_dummy_functions(self):
-        string = pre_process_file('dummy_functions')
+        source, expanded_source = pre_process_file('dummy_functions')
         start_time = time.time()
-        parse(string)
+        parsed = parse(source, expanded_source, set(['malloc',
+                                                     'mount',
+                                                     'struct_param']))
         print('Measured time:', round(time.time() - start_time, 2))
+
+        from pprint import pprint
+        pprint(parsed.includes)
+        pprint(list(parsed.functions.keys()))
+        pprint(list(parsed.structs.keys()))
