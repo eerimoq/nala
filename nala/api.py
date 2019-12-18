@@ -1,7 +1,7 @@
 import os
 import re
 
-from .inspect import collect_mocked_functions
+from .inspect import ForgivingDeclarationParser
 from .generator import GeneratedMock
 from .generator import FileGenerator
 from .generator import HEADER_FILE
@@ -81,9 +81,14 @@ def generate_mocks(expanded_code,
     generator = FileGenerator()
 
     if generate:
-        for function in collect_mocked_functions(expanded_code,
-                                                 functions,
-                                                 rename_parameters_file):
+        parser = ForgivingDeclarationParser(expanded_code,
+                                            functions,
+                                            rename_parameters_file)
+
+        for name, members in parser.structs:
+            pass
+        
+        for function in parser.mocked_functions:
             if function.name in NALA_C_FUNCTIONS:
                 raise Exception(
                     f"'{function.name}()' cannot be mocked as it is used by Nala.")

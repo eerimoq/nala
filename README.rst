@@ -230,25 +230,7 @@ Ideas
    dummy_struct.number = 5;
    ASSERT_EQ(add_one(&dummy_struct), NULL);
 
-   Diff:
-
-       struct DummyStruct {
-     -     number = 5
-     +     number = 345
-       }
-
-   char *format_DummyStruct(struct DummyStruct *self_p)
-   {
-       FILE *file_p;
-
-       file_p = memopen(&buf_p);
-       fprintf(file_p, "struct DummyStruct {\n");
-       fprintf(file_p, "    number = ", FORMAT(file_p, self_p->number));
-       fprintf(file_p, "}\n");
-       close(file_p);
-
-       return (buf_p);
-   }
+   Error:     add_one(dummy_struct->number): 345 != 5
 
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala

@@ -183,6 +183,7 @@ class ForgivingDeclarationParser:
         self.bracket_stack = []
         self.source_context = []
         self.typedefs = ["typedef int __builtin_va_list;"]
+        self.structs_code = []
         self.structs = []
 
         self.cparser = CParser()
@@ -197,6 +198,15 @@ class ForgivingDeclarationParser:
         self.file_ast = None
         self.mocked_functions = []
         self.parse()
+
+        if self.functions:
+            for function in sorted(functions):
+                print(f"error: Mocked function '{function}' undeclared. Missing include?",
+                      file=sys.stderr)
+
+            raise Exception(
+                "Unable to find declarations of all mocked functions. Add missing "
+                "includes to the test file.")
 
     @classmethod
     def tokenize(cls, source_code):
@@ -226,10 +236,10 @@ class ForgivingDeclarationParser:
         if self.functions:
             return
 
-        code = '\n'.join(self.typedefs + self.structs + self.func_signatures)
+        code = '\n'.join(self.typedefs + self.structs_code + self.func_signatures)
         self.file_ast = self.cparser.parse(code)
         items = zip(self.func_names, self.func_source_contexts)
-        func_offset = len(self.typedefs + self.structs)
+        func_offset = len(self.typedefs + self.structs_code)
 
         for i, (func_name, source_context) in enumerate(items, func_offset):
             param_names = self.param_names.get(func_name)
@@ -246,9 +256,43 @@ class ForgivingDeclarationParser:
                 IncludeDirective.from_source_context(source_context),
                 self.file_ast))
 
-    def __iter__(self):
-        for mocked_function in self.mocked_functions:
-            yield mocked_function
+        self.load_structs()
+
+    def load_struct_member(self, member):
+        item = None
+
+        if isinstance(member.type, node.TypeDecl):
+            if isinstance(member.type.type, node.IdentifierType):
+                if 'int' in member.type.type.names:
+                    item = ('assert-eq', member.name)
+
+        return item
+
+    def load_struct_members(self, struct):
+        items = []
+
+        for member in struct.decls:
+            item = self.load_struct_member(member)
+
+            if item is None:
+                return None
+
+            items.append(item)
+
+        return items
+
+    def load_structs(self):
+        for item in self.file_ast:
+            if isinstance(item, node.Typedef):
+                if isinstance(item.type, node.TypeDecl):
+                    if isinstance(item.type.type, node.Struct):
+                        pass
+            elif isinstance(item, node.Decl):
+                if isinstance(item.type, node.Struct):
+                    items = self.load_struct_members(item.type)
+
+                    if items is not None:
+                        self.structs.append((item.type.name, items))
 
     def next(self):
         self.previous = self.current
@@ -306,7 +350,7 @@ class ForgivingDeclarationParser:
             self.next()
 
         code = self.read_source_code(begin, self.current.span[1]) + ";"
-        self.structs.append(code)
+        self.structs_code.append(code)
 
     def parse_function_declaration_or_struct(self):
         while self.current.is_prefix:
