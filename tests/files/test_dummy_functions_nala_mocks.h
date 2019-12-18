@@ -969,4 +969,7 @@ void write_mock_resume(void);
 void write_mock_reset(void);
 void write_mock_assert_completed(void);
 
+// Struct assertions
+
+
 #endif

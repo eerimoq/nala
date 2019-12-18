@@ -456,6 +456,7 @@ class FileGenerator:
         self.source_template = self.jinja_env.get_template(f"{SOURCE_FILE}.jinja2")
 
         self.mocks = []
+        self.assertions = []
         self.system_includes = set()
         self.local_includes = set()
 
@@ -476,20 +477,23 @@ class FileGenerator:
         linker_filename = os.path.join(directory, LINKER_FILE)
 
         mocks = list(sorted(self.mocks, key=lambda m: m.func_name))
+        assertions = list(sorted(self.assertions, key=lambda a: a.name))
 
         header_code = self.header_template.render(
             nala_version=__version__,
             guard_name=get_guard_name(header_filename),
             includes=generate_includes(
                 self.system_includes, self.local_includes, directory),
-            mocks=mocks)
+            mocks=mocks,
+            assertions=assertions)
 
         source_code = self.source_template.render(
             nala_version=__version__,
             includes=generate_includes(
                 {"stddef.h", "errno.h"}, {header_filename}, directory),
             nala_c=read_nala_c(),
-            mocks=mocks)
+            mocks=mocks,
+            assertions=assertions)
 
         with open(header_filename, "w") as fout:
             fout.write(header_code.strip())

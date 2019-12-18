@@ -15,4 +15,7 @@ void nala_resume_all_mocks(void);
 void nala_reset_all_mocks(void);
 void nala_assert_all_mocks_completed(void);
 
+// Struct assertions
+
+
 #endif

@@ -113,4 +113,7 @@ void hit_mock_resume(void);
 void hit_mock_reset(void);
 void hit_mock_assert_completed(void);
 
+// Struct assertions
+
+
 #endif
