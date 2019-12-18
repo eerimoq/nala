@@ -144,20 +144,23 @@ class ForgivingDeclarationParser:
     tokens = {
         "LINEMARKER": r"^#.*$",
         "KEYWORD": (
-            "\\b(?:auto|break|case|char|const|continue|default|do|double|else|enum|extern|float"
-            "|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch"
-            "|typedef|union|unsigned|void|volatile|while|__extension__|__attribute__|__restrict)\\b"
+            "\\b(?:auto|break|case|char|const|continue|default|do|double|else|enum|"
+            "extern|float"
+            "|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct"
+            "|switch|typedef|union|unsigned|void|volatile|while|__extension__|"
+            "__attribute__|__restrict|__signed__)\\b"
         ),
         "IDENTIFIER": r"\b[a-zA-Z_](?:[a-zA-Z_0-9])*\b",
         "CHARACTER": r"L?'(?:\\.|[^\\'])+'",
         "STRING": r'L?"(\\"|\\\\|.)*?"',
         "INTEGER": r"(?:0[xX][a-fA-F0-9]+|[0-9]+)[uUlL]*",
         "FLOAT": (
-            r"(?:[0-9]+[Ee][+-]?[0-9]+|[0-9]*\.[0-9]+(?:[Ee][+-]?[0-9]+)?|[0-9]+\.[0-9]*(?:[Ee][+-]?[0-9]+)?)[fFlL]?"
+            r"(?:[0-9]+[Ee][+-]?[0-9]+|[0-9]*\.[0-9]+(?:[Ee][+-]?[0-9]+)?|[0-9]+\."
+            r"[0-9]*(?:[Ee][+-]?[0-9]+)?)[fFlL]?"
         ),
         "PUNCTUATION": (
-            r"\.\.\.|>>=|<<=|\+=|-=|\*=|/=|%=|&=|\^=|\|=|>>|<<|\+\+|--|->|&&|\|\||<=|>=|"
-            r"==|!=|;|\{|\}|,|:|=|\(|\)|\[|\]|\.|&|!|~|-|\+|\*|/|%|<|>|\^|\||\?"
+            r"\.\.\.|>>=|<<=|\+=|-=|\*=|/=|%=|&=|\^=|\|=|>>|<<|\+\+|--|->|&&|\|\|""|<="
+            "|>=|==|!=|;|\{|\}|,|:|=|\(|\)|\[|\]|\.|&|!|~|-|\+|\*|/|%|<|>|\^|\||\?"
         ),
         "SPACE": r"[ \t\v\n\f]*",
         "IGNORE": r".+?",
@@ -283,7 +286,7 @@ class ForgivingDeclarationParser:
                 self.next()
 
             self.mark_for_erase(begin, self.current.span[1])
-        elif self.current.is_keyword("__extension__", "__restrict"):
+        elif self.current.is_keyword("__extension__", "__restrict", "__signed__"):
             self.mark_for_erase(*self.current.span)
             self.next()
 
