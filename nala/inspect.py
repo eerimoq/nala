@@ -294,8 +294,7 @@ class ForgivingDeclarationParser:
             self.next()
 
         code = self.read_source_code(begin, self.current.span[1])
-        # typedef __signed__ char __s8;
-        self.typedefs.append(code.replace('__signed__', 'signed'))
+        self.typedefs.append(code)
 
     def parse_function_declaration(self):
         while self.current.is_prefix:
