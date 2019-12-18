@@ -23,6 +23,16 @@ union union_type
     struct struct_param_type a;
 };
 
+typedef struct {
+    long long __max_align_ll __attribute__ ((__aligned__(__alignof__(long long))));
+    long double __max_align_ld __attribute__((__aligned__(__alignof__(long double))));
+} align_1_t;
+
+struct align_2_t {
+    long long __max_align_ll __attribute__  ((__aligned__(__alignof__(long long))));
+    long double __max_align_ld __attribute__((__aligned__(__alignof__(long double))));
+};
+
 typedef union union_type union_type;
 
 typedef struct struct_param_type struct_param_type;

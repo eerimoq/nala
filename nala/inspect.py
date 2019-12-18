@@ -180,6 +180,7 @@ class ForgivingDeclarationParser:
         self.bracket_stack = []
         self.source_context = []
         self.typedefs = ["typedef int __builtin_va_list;"]
+        self.structs = []
 
         self.cparser = CParser()
         self.param_names = {}
@@ -205,7 +206,7 @@ class ForgivingDeclarationParser:
             if self.current.is_keyword("typedef"):
                 self.parse_typedef()
 
-            parsed = self.parse_function_declaration()
+            parsed = self.parse_function_declaration_or_struct()
 
             if parsed is not None:
                 self.func_names.append(parsed[0])
@@ -222,11 +223,12 @@ class ForgivingDeclarationParser:
         if self.functions:
             return
 
-        code = '\n'.join(self.typedefs + self.func_signatures)
+        code = '\n'.join(self.typedefs + self.structs + self.func_signatures)
         self.file_ast = self.cparser.parse(code)
         items = zip(self.func_names, self.func_source_contexts)
+        func_offset = len(self.typedefs + self.structs)
 
-        for i, (func_name, source_context) in enumerate(items, len(self.typedefs)):
+        for i, (func_name, source_context) in enumerate(items, func_offset):
             param_names = self.param_names.get(func_name)
 
             if param_names:
@@ -296,12 +298,28 @@ class ForgivingDeclarationParser:
         code = self.read_source_code(begin, self.current.span[1])
         self.typedefs.append(code)
 
-    def parse_function_declaration(self):
+    def parse_struct(self, begin, name):
+        while self.bracket_stack:
+            self.next()
+
+        code = self.read_source_code(begin, self.current.span[1]) + ";"
+        self.structs.append(code)
+
+    def parse_function_declaration_or_struct(self):
         while self.current.is_prefix:
             self.next()
 
         begin = self.current.span[0]
         return_type = []
+
+        if self.current.is_keyword("struct"):
+            if self.next() and self.current.type == 'IDENTIFIER':
+                struct_name = self.current.value
+
+                if self.next() and self.current.value == '{':
+                    self.parse_struct(begin, struct_name)
+
+                    return None
 
         while (not self.current.is_punctuation("(")
                or self.next()
