@@ -1,3 +1,4 @@
+import re
 import subprocess
 import unittest
 from unittest.mock import patch
@@ -5,9 +6,13 @@ from io import StringIO
 import nala.cli
 
 
+def remove_date_time(string):
+    return re.sub(r'Generated with Nala.*', '', string)
+
+
 def read_file(filename):
     with open(filename, 'r') as fin:
-        return fin.read()
+        return remove_date_time(fin.read())
 
 
 def pre_process_file(name):
