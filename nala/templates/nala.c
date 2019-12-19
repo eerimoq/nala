@@ -428,8 +428,8 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                               NALA_FORMAT_EQ);                          \
     }
 
-#define MOCK_ASSERT_MEMORY(left, right, size, func, param)      \
-    if (!nala_check_memory(left, right, size)) {                \
+#define MOCK_ASSERT_IN(check, left, right, size, func, param)   \
+    if (!check(left, right, size)) {                            \
         nala_reset_all_mocks();                                 \
         NALA_TEST_FAILURE(nala_format_memory(                   \
                               "Mocked " #func "(" #param "): ", \
@@ -438,13 +438,14 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                               (size)));                         \
     }
 
-#define MOCK_ASSERT_PARAM_IN(params_p, func, name)              \
+#define MOCK_ASSERT_PARAM_IN(params_p, check, func, name)       \
     if ((params_p)->name ## _in_assert == NULL) {               \
-        MOCK_ASSERT_MEMORY((const void *)(uintptr_t)name,       \
-                           (params_p)->name ## _in.buf_p,       \
-                           (params_p)->name ## _in.size,        \
-                           func,                                \
-                           name);                               \
+        MOCK_ASSERT_IN(check,                                   \
+                       (const void *)(uintptr_t)name,           \
+                       (params_p)->name ## _in.buf_p,           \
+                       (params_p)->name ## _in.size,            \
+                       func,                                    \
+                       name);                                   \
     } else {                                                    \
         (params_p)->name ## _in_assert(                         \
             name,                                               \
@@ -464,9 +465,9 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
             (params_p)->name ## _out.size);             \
     }
 
-#define MOCK_ASSERT_COPY_SET_PARAM(params_p, func, name)        \
+#define MOCK_ASSERT_COPY_SET_PARAM(params_p, check, func, name) \
     if ((params_p)->name ## _in.buf_p != NULL) {                \
-        MOCK_ASSERT_PARAM_IN(params_p, func, name);             \
+        MOCK_ASSERT_PARAM_IN(params_p, check, func, name);      \
         nala_free((params_p)->name ## _in.buf_p);               \
     }                                                           \
                                                                 \

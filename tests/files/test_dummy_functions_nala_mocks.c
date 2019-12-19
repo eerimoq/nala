@@ -445,8 +445,8 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                               NALA_FORMAT_EQ);                          \
     }
 
-#define MOCK_ASSERT_MEMORY(left, right, size, func, param)      \
-    if (!nala_check_memory(left, right, size)) {                \
+#define MOCK_ASSERT_IN(check, left, right, size, func, param)   \
+    if (!check(left, right, size)) {                            \
         nala_reset_all_mocks();                                 \
         NALA_TEST_FAILURE(nala_format_memory(                   \
                               "Mocked " #func "(" #param "): ", \
@@ -455,13 +455,14 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                               (size)));                         \
     }
 
-#define MOCK_ASSERT_PARAM_IN(params_p, func, name)              \
+#define MOCK_ASSERT_PARAM_IN(params_p, check, func, name)       \
     if ((params_p)->name ## _in_assert == NULL) {               \
-        MOCK_ASSERT_MEMORY((const void *)(uintptr_t)name,       \
-                           (params_p)->name ## _in.buf_p,       \
-                           (params_p)->name ## _in.size,        \
-                           func,                                \
-                           name);                               \
+        MOCK_ASSERT_IN(check,                                   \
+                       (const void *)(uintptr_t)name,           \
+                       (params_p)->name ## _in.buf_p,           \
+                       (params_p)->name ## _in.size,            \
+                       func,                                    \
+                       name);                                   \
     } else {                                                    \
         (params_p)->name ## _in_assert(                         \
             name,                                               \
@@ -481,9 +482,9 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
             (params_p)->name ## _out.size);             \
     }
 
-#define MOCK_ASSERT_COPY_SET_PARAM(params_p, func, name)        \
+#define MOCK_ASSERT_COPY_SET_PARAM(params_p, check, func, name) \
     if ((params_p)->name ## _in.buf_p != NULL) {                \
-        MOCK_ASSERT_PARAM_IN(params_p, func, name);             \
+        MOCK_ASSERT_PARAM_IN(params_p, check, func, name);      \
         nala_free((params_p)->name ## _in.buf_p);               \
     }                                                           \
                                                                 \
@@ -996,6 +997,7 @@ struct _nala_data_params_for_call *nala_get_params_call()
     MOCK_ASSERT_IN_EQ((_nala_data_p), call, callback); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                call, \
                                callback); \
  \
@@ -1501,9 +1503,11 @@ struct _nala_data_params_for_compose_twice *nala_get_params_compose_twice()
     MOCK_ASSERT_IN_EQ((_nala_data_p), compose_twice, dummy_struct_modifier); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                compose_twice, \
                                dummy_struct); \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                compose_twice, \
                                dummy_struct_modifier); \
  \
@@ -1823,6 +1827,7 @@ struct _nala_data_params_for_double_pointer *nala_get_params_double_pointer()
     MOCK_ASSERT_IN_EQ((_nala_data_p), double_pointer, value_pp); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                double_pointer, \
                                value_pp); \
  \
@@ -2565,6 +2570,7 @@ struct _nala_data_params_for_edit_number *nala_get_params_edit_number()
     MOCK_ASSERT_IN_EQ((_nala_data_p), edit_number, number); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                edit_number, \
                                dummy_struct); \
  \
@@ -2847,6 +2853,7 @@ struct _nala_data_params_for_endmntent *nala_get_params_endmntent()
     MOCK_ASSERT_IN_EQ((_nala_data_p), endmntent, streamp); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                endmntent, \
                                streamp); \
  \
@@ -3335,6 +3342,7 @@ struct _nala_data_params_for_fclose *nala_get_params_fclose()
     MOCK_ASSERT_IN_EQ((_nala_data_p), fclose, stream); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                fclose, \
                                stream); \
  \
@@ -3606,6 +3614,7 @@ struct _nala_data_params_for_fflush *nala_get_params_fflush()
     MOCK_ASSERT_IN_EQ((_nala_data_p), fflush, stream); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                fflush, \
                                stream); \
  \
@@ -3877,6 +3886,7 @@ struct _nala_data_params_for_fileno *nala_get_params_fileno()
     MOCK_ASSERT_IN_EQ((_nala_data_p), fileno, stream); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                fileno, \
                                stream); \
  \
@@ -4155,9 +4165,11 @@ struct _nala_data_params_for_fopen *nala_get_params_fopen()
     MOCK_ASSERT_IN_EQ((_nala_data_p), fopen, mode); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                fopen, \
                                path); \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                fopen, \
                                mode); \
  \
@@ -4532,9 +4544,11 @@ struct _nala_data_params_for_fread *nala_get_params_fread()
     MOCK_ASSERT_IN_EQ((_nala_data_p), fread, nmemb); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                fread, \
                                ptr); \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                fread, \
                                stream); \
  \
@@ -4875,6 +4889,7 @@ struct _nala_data_params_for_free *nala_get_params_free()
     MOCK_ASSERT_IN_EQ((_nala_data_p), free, ptr); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                free, \
                                ptr); \
  \
@@ -5143,6 +5158,7 @@ struct _nala_data_params_for_fseek *nala_get_params_fseek()
     MOCK_ASSERT_IN_EQ((_nala_data_p), fseek, whence); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                fseek, \
                                stream); \
  \
@@ -5436,6 +5452,7 @@ struct _nala_data_params_for_ftell *nala_get_params_ftell()
     MOCK_ASSERT_IN_EQ((_nala_data_p), ftell, stream); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                ftell, \
                                stream); \
  \
@@ -5720,9 +5737,11 @@ struct _nala_data_params_for_fwrite *nala_get_params_fwrite()
     MOCK_ASSERT_IN_EQ((_nala_data_p), fwrite, nmemb); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                fwrite, \
                                ptr); \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                fwrite, \
                                stream); \
  \
@@ -6064,6 +6083,7 @@ struct _nala_data_params_for_getmntent *nala_get_params_getmntent()
     MOCK_ASSERT_IN_EQ((_nala_data_p), getmntent, stream); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                getmntent, \
                                stream); \
  \
@@ -6334,6 +6354,7 @@ struct _nala_data_params_for_in_out *nala_get_params_in_out()
     MOCK_ASSERT_IN_EQ((_nala_data_p), in_out, buf_p); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                in_out, \
                                buf_p); \
  \
@@ -7395,15 +7416,19 @@ struct _nala_data_params_for_mount *nala_get_params_mount()
     MOCK_ASSERT_IN_EQ((_nala_data_p), mount, mountflags); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                mount, \
                                source); \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                mount, \
                                target); \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                mount, \
                                filesystemtype); \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                mount, \
                                data); \
  \
@@ -7892,6 +7917,7 @@ struct _nala_data_params_for_output_message *nala_get_params_output_message()
     MOCK_ASSERT_IN_EQ((_nala_data_p), output_message, message); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                output_message, \
                                message); \
  \
@@ -8175,6 +8201,7 @@ struct _nala_data_params_for_pipe *nala_get_params_pipe()
     MOCK_ASSERT_IN_EQ((_nala_data_p), pipe, pipefd); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                pipe, \
                                pipefd); \
  \
@@ -8452,6 +8479,7 @@ struct _nala_data_params_for_poll *nala_get_params_poll()
     MOCK_ASSERT_IN_EQ((_nala_data_p), poll, timeout); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                poll, \
                                fds); \
  \
@@ -8955,6 +8983,7 @@ struct _nala_data_params_for_read *nala_get_params_read()
     MOCK_ASSERT_IN_EQ((_nala_data_p), read, count); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                read, \
                                buf); \
  \
@@ -9267,9 +9296,11 @@ struct _nala_data_params_for_sendto *nala_get_params_sendto()
     MOCK_ASSERT_IN_EQ((_nala_data_p), sendto, addrlen); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                sendto, \
                                buf); \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                sendto, \
                                dest_addr); \
  \
@@ -9645,6 +9676,7 @@ struct _nala_data_params_for_setsockopt *nala_get_params_setsockopt()
     MOCK_ASSERT_IN_EQ((_nala_data_p), setsockopt, optlen); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                setsockopt, \
                                optval); \
  \
@@ -10194,9 +10226,11 @@ struct _nala_data_params_for_statvfs *nala_get_params_statvfs()
     MOCK_ASSERT_IN_EQ((_nala_data_p), statvfs, buf); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                statvfs, \
                                path); \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                statvfs, \
                                buf); \
  \
@@ -10536,6 +10570,7 @@ struct _nala_data_params_for_struct_param *nala_get_params_struct_param()
     MOCK_ASSERT_IN_EQ((_nala_data_p), struct_param, data); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                struct_param, \
                                data); \
  \
@@ -11012,6 +11047,7 @@ struct _nala_data_params_for_time *nala_get_params_time()
     MOCK_ASSERT_IN_EQ((_nala_data_p), time, tloc); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                time, \
                                tloc); \
  \
@@ -11296,9 +11332,11 @@ struct _nala_data_params_for_timerfd_settime *nala_get_params_timerfd_settime()
     MOCK_ASSERT_IN_EQ((_nala_data_p), timerfd_settime, flags); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                timerfd_settime, \
                                new_value); \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                timerfd_settime, \
                                old_value); \
  \
@@ -12729,6 +12767,7 @@ struct _nala_data_params_for_write *nala_get_params_write()
     MOCK_ASSERT_IN_EQ((_nala_data_p), write, count); \
  \
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
+                               nala_check_memory, \
                                write, \
                                buf); \
  \
