@@ -782,7 +782,7 @@ const char *nala_format(const char *format_p, ...)
     FILE *file_p;
 
     /* ToDo: Remove reset when suspend and resume are implemented. */
-    nala_reset_all_mocks();
+    // nala_reset_all_mocks();
     nala_suspend_all_mocks();
     file_p = open_memstream(&buf_p, &size);
     color_start(file_p, ANSI_COLOR_RED);

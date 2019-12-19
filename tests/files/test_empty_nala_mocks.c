@@ -445,24 +445,20 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                               NALA_FORMAT_EQ);                          \
     }
 
-#define MOCK_ASSERT_IN(check, left, right, size, func, param)   \
-    if (!check(left, right, size)) {                            \
-        nala_reset_all_mocks();                                 \
-        NALA_TEST_FAILURE(nala_format_memory(                   \
-                              "Mocked " #func "(" #param "): ", \
-                              (left),                           \
-                              (right),                          \
-                              (size)));                         \
-    }
+#define MOCK_ASSERT_PARAM_IN_EQ(format_p, left, right)  \
+    NALA_BINARY_ASSERTION(left,                         \
+                          right,                        \
+                          NALA_CHECK_EQ,                \
+                          format_p,                     \
+                          NALA_FORMAT_EQ);
 
-#define MOCK_ASSERT_PARAM_IN(params_p, check, func, name)       \
+#define MOCK_ASSERT_PARAM_IN(params_p, assert_in, func, name)   \
     if ((params_p)->name ## _in_assert == NULL) {               \
-        MOCK_ASSERT_IN(check,                                   \
-                       (const void *)(uintptr_t)name,           \
-                       (params_p)->name ## _in.buf_p,           \
-                       (params_p)->name ## _in.size,            \
-                       func,                                    \
-                       name);                                   \
+        assert_in(#func,                                        \
+                  #name,                                        \
+                  (const void *)(uintptr_t)name,                \
+                  (params_p)->name ## _in.buf_p,                \
+                  (params_p)->name ## _in.size);                \
     } else {                                                    \
         (params_p)->name ## _in_assert(                         \
             name,                                               \
@@ -482,16 +478,39 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
             (params_p)->name ## _out.size);             \
     }
 
-#define MOCK_ASSERT_COPY_SET_PARAM(params_p, check, func, name) \
-    if ((params_p)->name ## _in.buf_p != NULL) {                \
-        MOCK_ASSERT_PARAM_IN(params_p, check, func, name);      \
-        nala_free((params_p)->name ## _in.buf_p);               \
-    }                                                           \
-                                                                \
-    if ((params_p)->name ## _out.buf_p != NULL) {               \
-        MOCK_COPY_PARAM_OUT(params_p, name);                    \
-        nala_free((params_p)->name ## _out.buf_p);              \
+#define MOCK_ASSERT_COPY_SET_PARAM(params_p, assert_in, func, name)     \
+    if ((params_p)->name ## _in.buf_p != NULL) {                        \
+        MOCK_ASSERT_PARAM_IN(params_p, assert_in, func, name);          \
+        nala_free((params_p)->name ## _in.buf_p);                       \
+    }                                                                   \
+                                                                        \
+    if ((params_p)->name ## _out.buf_p != NULL) {                       \
+        MOCK_COPY_PARAM_OUT(params_p, name);                            \
+        nala_free((params_p)->name ## _out.buf_p);                      \
     }
+
+void nala_mock_assert_memory(const char *func_p,
+                             const char *param_p,
+                             const void *left_p,
+                             const void *right_p,
+                             size_t size)
+{
+    char _nala_assert_format[512];
+
+    if (!nala_check_memory(left_p, right_p, size)) {
+        nala_reset_all_mocks();
+        snprintf(&_nala_assert_format[0],
+                 sizeof(_nala_assert_format),
+                 "Mocked %s(%s): ",
+                 func_p,
+                 param_p);
+        NALA_TEST_FAILURE(nala_format_memory(
+                              &_nala_assert_format[0],
+                              left_p,
+                              right_p,
+                              size));
+    }
+}
 
 void nala_suspend_all_mocks(void)
 {

@@ -11,25 +11,6 @@ from pycparser.c_parser import CParser
 from pycparser.plyparser import ParseError
 
 
-def collect_mocked_functions(expanded_source_code,
-                             functions,
-                             rename_parameters_file):
-    """Yield all the mocked functions used in the expanded source code."""
-
-    yield from ForgivingDeclarationParser(expanded_source_code,
-                                          functions,
-                                          rename_parameters_file)
-
-    if functions:
-        for function in sorted(functions):
-            print(f"error: Mocked function '{function}' undeclared. Missing include?",
-                  file=sys.stderr)
-
-        raise Exception(
-            "Unable to find declarations of all mocked functions. Add missing "
-            "includes to the test file.")
-
-
 class IncludeDirective(NamedTuple):
     path: str
     system: bool
@@ -275,7 +256,7 @@ class ForgivingDeclarationParser:
             item = self.load_struct_member(member)
 
             if item is None:
-                return None
+                return []
 
             items.append(item)
 
@@ -290,9 +271,7 @@ class ForgivingDeclarationParser:
             elif isinstance(item, node.Decl):
                 if isinstance(item.type, node.Struct):
                     items = self.load_struct_members(item.type)
-
-                    if items is not None:
-                        self.structs.append((item.type.name, items))
+                    self.structs.append((item.type.name, items))
 
     def next(self):
         self.previous = self.current

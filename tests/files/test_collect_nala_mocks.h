@@ -115,5 +115,7 @@ void hit_mock_assert_completed(void);
 
 // Struct assertions
 
+void nala_mock_assert_in_struct__IO_FILE(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
+void nala_mock_assert_in_struct_nala_test_t(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
 
 #endif

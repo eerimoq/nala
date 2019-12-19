@@ -218,15 +218,15 @@ def read_nala_c():
         return fin.read()
 
 
-class StructAssertEq:
+class StructAssertIn:
 
     def __init__(self, struct):
         self.name = struct[0]
-        self.assert_eq_members = []
+        self.assert_in_members = []
 
         for member in struct[1]:
             if member[0] == 'assert-eq':
-                self.assert_eq_members.append(member[1])
+                self.assert_in_members.append(member[1])
 
 
 class FunctionMock:
@@ -368,10 +368,9 @@ class FunctionMock:
     def find_check_function(self, param):
         if isinstance(param.type.type, node.TypeDecl):
             if isinstance(param.type.type.type, node.Struct):
-                if False:
-                    return f'nala_struct_assert_eq_{param.type.type.type.name}'
+                return f'nala_mock_assert_in_struct_{param.type.type.type.name}'
 
-        return 'nala_check_memory'
+        return 'nala_mock_assert_memory'
 
     def void_function_decl(self, name, parameters):
         return node.FuncDecl(node.ParamList(parameters),
@@ -473,7 +472,7 @@ class FileGenerator:
         self.source_template = self.jinja_env.get_template(f"{SOURCE_FILE}.jinja2")
 
         self.mocks = []
-        self.struct_assert_eqs = []
+        self.struct_assert_ins = []
         self.system_includes = set()
         self.local_includes = set()
 
@@ -487,7 +486,7 @@ class FileGenerator:
                 self.local_includes.add(mocked_function.include.path)
 
     def add_struct(self, struct):
-        self.struct_assert_eqs.append(StructAssertEq(struct))
+        self.struct_assert_ins.append(StructAssertIn(struct))
 
     def write_to_directory(self, directory):
         os.makedirs(directory, exist_ok=True)
@@ -497,7 +496,7 @@ class FileGenerator:
         linker_filename = os.path.join(directory, LINKER_FILE)
 
         mocks = list(sorted(self.mocks, key=lambda m: m.func_name))
-        struct_assert_eqs = list(sorted(self.struct_assert_eqs,
+        struct_assert_ins = list(sorted(self.struct_assert_ins,
                                         key=lambda a: a.name))
 
         header_code = self.header_template.render(
@@ -506,7 +505,7 @@ class FileGenerator:
             includes=generate_includes(
                 self.system_includes, self.local_includes, directory),
             mocks=mocks,
-            struct_assert_eqs=struct_assert_eqs)
+            struct_assert_ins=struct_assert_ins)
 
         source_code = self.source_template.render(
             nala_version=__version__,
@@ -514,7 +513,7 @@ class FileGenerator:
                 {"stddef.h", "errno.h"}, {header_filename}, directory),
             nala_c=read_nala_c(),
             mocks=mocks,
-            struct_assert_eqs=struct_assert_eqs)
+            struct_assert_ins=struct_assert_ins)
 
         with open(header_filename, "w") as fout:
             fout.write(header_code.strip())

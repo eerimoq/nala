@@ -536,12 +536,30 @@ void {{mock.func_name}}_mock_assert_completed(void)
 {% endfor %}
 
 // Struct assertions
-{% for assert_eq in struct_assert_eqs %}
+{% for assert_in in struct_assert_ins %}
 
-void nala_struct_assert_eq_{{assert_eq.name}}(const struct {{assert_eq.name}} *actual_p, const struct {{assert_eq.name}} *expected_p)
+void nala_mock_assert_in_struct_{{assert_in.name}}(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size)
 {
-    {% for member in assert_eq.assert_eq_members %}
-    ASSERT_EQ(actual_p->{{member}}, expected_p->{{member}})
-    {% endfor %}
+    {% if assert_in.assert_in_members %}
+    const struct {{assert_in.name}} *actual_p = left_p;
+    const struct {{assert_in.name}} *expected_p = right_p;
+    char format[512];
+
+    snprintf(&format[0],
+             sizeof(format),
+             "Mocked %s(%s): %%s != %%s\n",
+             func_p,
+             param_p);
+
+    if ((actual_p != NULL) && (expected_p != NULL)) {
+            {% for member in assert_in.assert_in_members %}
+        MOCK_ASSERT_PARAM_IN_EQ(format, actual_p->{{member}}, expected_p->{{member}})
+            {% endfor %}
+    } else {
+        MOCK_ASSERT_PARAM_IN_EQ(format, actual_p, expected_p);
+    }
+    {% else %}
+    nala_mock_assert_memory(func_p, param_p, left_p, right_p, size);
+    {% endif %}
 }
 {% endfor %}
