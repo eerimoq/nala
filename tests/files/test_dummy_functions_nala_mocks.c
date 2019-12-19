@@ -1,7 +1,7 @@
 /*
 Mocks source file
 
-Generated with Nala version 0.66.0 (https://github.com/eerimoq/nala)
+
 Do not edit manually
 */
 #include <stdlib.h>
@@ -12956,4 +12956,32 @@ void write_mock_assert_completed(void)
              "missing.\n",
              nala_state_for_write.instances.length));
     }
+}
+
+// Struct assertions
+
+void nala_struct_assert_eq_linger(const struct linger *actual_p, const struct linger *expected_p)
+{
+    ASSERT_EQ(actual_p->l_onoff, expected_p->l_onoff)
+    ASSERT_EQ(actual_p->l_linger, expected_p->l_linger)
+}
+
+void nala_struct_assert_eq_pollfd(const struct pollfd *actual_p, const struct pollfd *expected_p)
+{
+    ASSERT_EQ(actual_p->fd, expected_p->fd)
+    ASSERT_EQ(actual_p->events, expected_p->events)
+    ASSERT_EQ(actual_p->revents, expected_p->revents)
+}
+
+void nala_struct_assert_eq_struct_param_type(const struct struct_param_type *actual_p, const struct struct_param_type *expected_p)
+{
+    ASSERT_EQ(actual_p->number, expected_p->number)
+}
+
+void nala_struct_assert_eq_winsize(const struct winsize *actual_p, const struct winsize *expected_p)
+{
+    ASSERT_EQ(actual_p->ws_row, expected_p->ws_row)
+    ASSERT_EQ(actual_p->ws_col, expected_p->ws_col)
+    ASSERT_EQ(actual_p->ws_xpixel, expected_p->ws_xpixel)
+    ASSERT_EQ(actual_p->ws_ypixel, expected_p->ws_ypixel)
 }

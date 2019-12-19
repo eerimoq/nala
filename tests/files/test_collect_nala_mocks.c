@@ -1,7 +1,7 @@
 /*
 Mocks source file
 
-Generated with Nala version 0.66.0 (https://github.com/eerimoq/nala)
+
 Do not edit manually
 */
 #include <stdlib.h>
@@ -1822,3 +1822,5 @@ void hit_mock_assert_completed(void)
              nala_state_for_hit.instances.length));
     }
 }
+
+// Struct assertions

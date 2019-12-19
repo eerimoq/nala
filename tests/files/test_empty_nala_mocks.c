@@ -1,7 +1,7 @@
 /*
 Mocks source file
 
-Generated with Nala version 0.66.0 (https://github.com/eerimoq/nala)
+
 Do not edit manually
 */
 #include <stdlib.h>
@@ -514,3 +514,5 @@ void nala_reset_all_mocks(void)
 void nala_assert_all_mocks_completed(void)
 {
 }
+
+// Struct assertions

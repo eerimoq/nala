@@ -2,7 +2,6 @@ import os
 import re
 
 from .inspect import ForgivingDeclarationParser
-from .generator import GeneratedMock
 from .generator import FileGenerator
 from .generator import HEADER_FILE
 
@@ -85,9 +84,9 @@ def generate_mocks(expanded_code,
                                             functions,
                                             rename_parameters_file)
 
-        for name, members in parser.structs:
-            pass
-        
+        for struct in parser.structs:
+            generator.add_struct(struct)
+
         for function in parser.mocked_functions:
             if function.name in NALA_C_FUNCTIONS:
                 raise Exception(

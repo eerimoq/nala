@@ -533,3 +533,14 @@ void {{mock.func_name}}_mock_assert_completed(void)
     }
 }
 {% endfor %}
+
+// Struct assertions
+{% for assert_eq in struct_assert_eqs %}
+
+void nala_struct_assert_eq_{{assert_eq.name}}(const struct {{assert_eq.name}} *actual_p, const struct {{assert_eq.name}} *expected_p)
+{
+    {% for member in assert_eq.assert_eq_members %}
+    ASSERT_EQ(actual_p->{{member}}, expected_p->{{member}})
+    {% endfor %}
+}
+{% endfor %}

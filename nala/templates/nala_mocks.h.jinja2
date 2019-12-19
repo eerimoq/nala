@@ -54,8 +54,8 @@ void {{mock.func_name}}_mock_assert_completed(void);
 
 // Struct assertions
 
-{% for assertion in assertions %}
-void nala_assert_eq_{{assertion.name}}(const {{assertion.type}} *actual_p, const {{assertion.type}} *expected_p);
+{% for assert_eq in struct_assert_eqs %}
+void nala_struct_assert_eq_{{assert_eq.name}}(const struct {{assert_eq.name}} *actual_p, const struct {{assert_eq.name}} *expected_p);
 {% endfor %}
 
 #endif

@@ -1,7 +1,7 @@
 /*
 Mocks header file
 
-Generated with Nala version 0.66.0 (https://github.com/eerimoq/nala)
+
 Do not edit manually
 */
 
@@ -971,5 +971,9 @@ void write_mock_assert_completed(void);
 
 // Struct assertions
 
+void nala_struct_assert_eq_linger(const struct linger *actual_p, const struct linger *expected_p);
+void nala_struct_assert_eq_pollfd(const struct pollfd *actual_p, const struct pollfd *expected_p);
+void nala_struct_assert_eq_struct_param_type(const struct struct_param_type *actual_p, const struct struct_param_type *expected_p);
+void nala_struct_assert_eq_winsize(const struct winsize *actual_p, const struct winsize *expected_p);
 
 #endif

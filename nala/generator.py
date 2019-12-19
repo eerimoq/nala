@@ -218,13 +218,24 @@ def read_nala_c():
         return fin.read()
 
 
-class GeneratedMock:
+class StructAssertEq:
+
+    def __init__(self, struct):
+        self.name = struct[0]
+        self.assert_eq_members = []
+
+        for member in struct[1]:
+            if member[0] == 'assert-eq':
+                self.assert_eq_members.append(member[1])
+
+
+class FunctionMock:
+
     DECL_MARKER = "// NALA_DECLARATION"
     IMPL_MARKER = "// NALA_IMPLEMENTATION"
 
     def __init__(self, function):
         self.function = function
-
         self.func_name = function.name
 
         self.wrapped_func = f"__wrap_{self.func_name}"
@@ -456,18 +467,21 @@ class FileGenerator:
         self.source_template = self.jinja_env.get_template(f"{SOURCE_FILE}.jinja2")
 
         self.mocks = []
-        self.assertions = []
+        self.struct_assert_eqs = []
         self.system_includes = set()
         self.local_includes = set()
 
     def add_mock(self, mocked_function):
-        self.mocks.append(GeneratedMock(mocked_function))
+        self.mocks.append(FunctionMock(mocked_function))
 
         if mocked_function.include:
             if mocked_function.include.system:
                 self.system_includes.add(mocked_function.include.path)
             else:
                 self.local_includes.add(mocked_function.include.path)
+
+    def add_struct(self, struct):
+        self.struct_assert_eqs.append(StructAssertEq(struct))
 
     def write_to_directory(self, directory):
         os.makedirs(directory, exist_ok=True)
@@ -477,7 +491,8 @@ class FileGenerator:
         linker_filename = os.path.join(directory, LINKER_FILE)
 
         mocks = list(sorted(self.mocks, key=lambda m: m.func_name))
-        assertions = list(sorted(self.assertions, key=lambda a: a.name))
+        struct_assert_eqs = list(sorted(self.struct_assert_eqs,
+                                        key=lambda a: a.name))
 
         header_code = self.header_template.render(
             nala_version=__version__,
@@ -485,7 +500,7 @@ class FileGenerator:
             includes=generate_includes(
                 self.system_includes, self.local_includes, directory),
             mocks=mocks,
-            assertions=assertions)
+            struct_assert_eqs=struct_assert_eqs)
 
         source_code = self.source_template.render(
             nala_version=__version__,
@@ -493,7 +508,7 @@ class FileGenerator:
                 {"stddef.h", "errno.h"}, {header_filename}, directory),
             nala_c=read_nala_c(),
             mocks=mocks,
-            assertions=assertions)
+            struct_assert_eqs=struct_assert_eqs)
 
         with open(header_filename, "w") as fout:
             fout.write(header_code.strip())
