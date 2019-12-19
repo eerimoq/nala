@@ -436,21 +436,14 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
     traceback_p->depth = backtrace(&traceback_p->addresses[0], 32);
 }
 
-#define NALA_MOCK_BINARY_ASSERTION(data_p, param, check, format, formatter) \
+#define MOCK_ASSERT_IN_EQ(data_p, func, param)                          \
     if (!(data_p)->params.ignore_ ## param ## _in) {                    \
         NALA_BINARY_ASSERTION((data_p)->params.param,                   \
                               param,                                    \
-                              check,                                    \
-                              format,                                   \
-                              formatter);                               \
+                              NALA_CHECK_EQ,                            \
+                              "Mocked " #func "(" #param "): %s != %s\n", \
+                              NALA_FORMAT_EQ);                          \
     }
-
-#define MOCK_ASSERT_EQ(data_p, func, param)                             \
-    NALA_MOCK_BINARY_ASSERTION(data_p,                                  \
-                               param,                                   \
-                               NALA_CHECK_EQ,                           \
-                               "Mocked " #func "(" #param "): %s != %s\n", \
-                               NALA_FORMAT_EQ)
 
 #define MOCK_ASSERT_MEMORY(left, right, size, func, param)      \
     if (!nala_check_memory(left, right, size)) {                \

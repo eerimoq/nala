@@ -116,13 +116,13 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
 
 #define MOCK_ASSERT_{{mock.func_name}}(_nala_data_p) \
     {% for param in mock.char_pointer_params %}
-    MOCK_ASSERT_EQ((_nala_data_p), {{mock.func_name}}, {{param.name}}); \
+    MOCK_ASSERT_IN_EQ((_nala_data_p), {{mock.func_name}}, {{param.name}}); \
     {% endfor %}
     {% for param in mock.pointer_params %}
-    MOCK_ASSERT_EQ((_nala_data_p), {{mock.func_name}}, {{param.name}}); \
+    MOCK_ASSERT_IN_EQ((_nala_data_p), {{mock.func_name}}, {{param.name}}); \
     {% endfor %}
     {% for param in mock.non_pointer_params %}
-    MOCK_ASSERT_EQ((_nala_data_p), {{mock.func_name}}, {{param.name}}); \
+    MOCK_ASSERT_IN_EQ((_nala_data_p), {{mock.func_name}}, {{param.name}}); \
     {% endfor %}
  \
     {% for param in mock.set_params %}
