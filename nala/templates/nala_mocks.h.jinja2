@@ -30,7 +30,7 @@ void {{mock.func_name}}_mock_set_callback({{mock.callback_decl | render}});
 {% for param in mock.ignore_params %}
 void {{mock.func_name}}_mock_ignore_{{param}}_in(void);
 {% endfor %}
-{% for param in mock.set_params %}
+{% for param, _ in mock.set_params %}
 void {{mock.func_name}}_mock_set_{{param.name}}_in(const void *buf_p, size_t size);
 void {{mock.func_name}}_mock_set_{{param.name}}_in_assert(void (*callback)({{param | render}}, const void *nala_buf_p, size_t nala_size));
 void {{mock.func_name}}_mock_set_{{param.name}}_in_pointer({{param | render}});

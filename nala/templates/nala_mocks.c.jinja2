@@ -125,9 +125,9 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
     MOCK_ASSERT_IN_EQ((_nala_data_p), {{mock.func_name}}, {{param.name}}); \
     {% endfor %}
  \
-    {% for param in mock.set_params %}
+    {% for param, check in mock.set_params %}
     MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_check_memory, \
+                               {{check}}, \
                                {{mock.func_name}}, \
                                {{param.name}}); \
     {% endfor %}
@@ -285,7 +285,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
     {{mock.state_name}}.mode = 1;
     _nala_instance_p = nala_xmalloc(sizeof(*_nala_instance_p));
     nala_traceback(&_nala_instance_p->data.traceback);
-    {% for param in mock.set_params %}
+    {% for param, _ in mock.set_params %}
     nala_set_param_init(&_nala_instance_p->data.params.{{param.name}}_out);
     nala_set_param_init(&_nala_instance_p->data.params.{{param.name}}_in);
     _nala_instance_p->data.params.{{param.name}}_in_assert = NULL;
@@ -363,7 +363,7 @@ void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
     {{mock.state_name}}.mode = 1;
     instance_p = nala_xmalloc(sizeof(*instance_p));
     nala_traceback(&instance_p->data.traceback);
-    {% for param in mock.set_params %}
+    {% for param, _ in mock.set_params %}
     nala_set_param_init(&instance_p->data.params.{{param.name}}_out);
     nala_set_param_init(&instance_p->data.params.{{param.name}}_in);
     instance_p->data.params.{{param.name}}_in_assert = NULL;
@@ -411,7 +411,7 @@ void {{mock.func_name}}_mock_ignore_{{param}}_in(void)
     nala_get_params_{{mock.func_name}}()->ignore_{{param}}_in = true;
 }
 {% endfor %}
-{% for param in mock.set_params %}
+{% for param, _ in mock.set_params %}
 
 void {{mock.func_name}}_mock_set_{{param.name}}_in(const void *buf_p, size_t size)
 {

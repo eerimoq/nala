@@ -363,7 +363,15 @@ class FunctionMock:
             self.instance_members.append(in_assert_member(param))
             self.instance_members.append(set_member(f'{param.name}_out'))
             self.instance_members.append(out_copy_member(param))
-            self.set_params.append(param)
+            self.set_params.append((param, self.find_check_function(param)))
+
+    def find_check_function(self, param):
+        if isinstance(param.type.type, node.TypeDecl):
+            if isinstance(param.type.type.type, node.Struct):
+                if False:
+                    return f'nala_struct_assert_eq_{param.type.type.type.name}'
+
+        return 'nala_check_memory'
 
     def void_function_decl(self, name, parameters):
         return node.FuncDecl(node.ParamList(parameters),
@@ -372,10 +380,8 @@ class FunctionMock:
     def rename_function(self, name):
         return decl(
             name,
-            node.FuncDecl(
-                self.func_decl.args, rename_return_type(self.func_decl.type, name)
-            ),
-        )
+            node.FuncDecl(self.func_decl.args,
+                          rename_return_type(self.func_decl.type, name)))
 
     def is_struct(self, param):
         try:
