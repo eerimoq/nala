@@ -531,6 +531,8 @@ TEST(call_function)
 
 static void buf_p_assert(int *actual_p, const void *buf_p, size_t size)
 {
+    (void)size;
+
     const int *expected_p;
 
     expected_p = buf_p;
@@ -615,6 +617,8 @@ TEST(typedef_union_param_and_return_type_function)
 
 static void double_pointer_out_copy(int **value_pp, const void *buf_p, size_t size)
 {
+    (void)size;
+
     **value_pp = *(const int *)buf_p;
 }
 

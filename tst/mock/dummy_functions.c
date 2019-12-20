@@ -62,6 +62,8 @@ int io_control(int kind, ...)
 
 int io_vcontrol(int kind, va_list ap)
 {
+    (void)ap;
+
     return (kind);
 }
 

@@ -2,6 +2,8 @@ ASAN_FLAGS = -fsanitize=address
 INC += -I../../nala/dist
 CFLAGS = \
 	$(INC) \
+	-Werror \
+	-Wall \
 	-Wextra \
 	-Wconversion \
 	-g \
