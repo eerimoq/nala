@@ -87,6 +87,9 @@ def generate_mocks(expanded_code,
         for struct in parser.structs:
             generator.add_struct(struct)
 
+        for include in parser.includes:
+            generator.add_include(include)
+
         for function in parser.mocked_functions:
             if function.name in NALA_C_FUNCTIONS:
                 raise Exception(

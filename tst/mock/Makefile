@@ -13,11 +13,17 @@ CFLAGS = \
 	-fprofile-arcs \
 	-ftest-coverage
 NALA ?= PYTHONPATH=../.. python3 -m nala
+SRC += main.c
+SRC += ../../nala/dist/nala.c
+SRC += dummy_functions.c
+SRC += nala_mocks.c
+SRC += subprocess.c
 
 test: nala_mocks.h
-	$(CC) $(CFLAGS) $$(cat nala_mocks.ld) *.c ../../nala/dist/nala.c -o main
+	$(CC) $(CFLAGS) $$(cat nala_mocks.ld) $(SRC) -o main
 	./main
 
 nala_mocks.h: main.c
 	[ -f nala_mocks.h ] || (touch nala_mocks.h)
-	$(CC) $(INC) -E main.c | $(NALA) generate_mocks
+	$(CC) $(INC) -E main.c > main.pp.c
+	cat main.pp.c | $(NALA) generate_mocks

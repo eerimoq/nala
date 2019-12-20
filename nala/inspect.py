@@ -47,7 +47,6 @@ class IncludeDirective(NamedTuple):
 class MockedFunction(NamedTuple):
     name: str
     declaration: node.FuncDecl
-    include: IncludeDirective
     file_ast: node.FileAST
 
 
@@ -166,6 +165,8 @@ class ForgivingDeclarationParser:
         self.typedefs = ["typedef int __builtin_va_list;"]
         self.structs_code = []
         self.structs = []
+        self.includes = []
+        self.filename = None
 
         self.cparser = CParser()
         self.param_names = {}
@@ -234,7 +235,6 @@ class ForgivingDeclarationParser:
             self.mocked_functions.append(MockedFunction(
                 func_name,
                 func_declaration,
-                IncludeDirective.from_source_context(source_context),
                 self.file_ast))
 
         self.load_structs()
@@ -288,8 +288,16 @@ class ForgivingDeclarationParser:
         elif self.current.type == "LINEMARKER":
             filename, flags = self.linemarker.match(self.current.value).groups()
 
+            if self.filename is None:
+                self.filename = filename
+
             if "1" in flags:
                 self.source_context.append(filename)
+
+                if len(self.source_context) == 2:
+                    if self.source_context[0] == self.filename:
+                        self.includes.append(
+                            IncludeDirective.from_source_context(self.source_context))
             elif "2" in flags:
                 self.source_context.pop()
 

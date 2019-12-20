@@ -10,9 +10,10 @@ Do not edit manually
 
 #include <stdarg.h>
 
+#include <err.h>
+#include <errno.h>
 #include <mntent.h>
 #include <poll.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <x86_64-linux-gnu/sys/mount.h>
@@ -20,6 +21,7 @@ Do not edit manually
 #include <x86_64-linux-gnu/sys/statvfs.h>
 #include <x86_64-linux-gnu/sys/timerfd.h>
 
+#include "../nala/dist/nala.h"
 #include "../tests/files/test_dummy_functions.h"
 
 void nala_suspend_all_mocks(void);

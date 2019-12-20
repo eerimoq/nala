@@ -479,11 +479,11 @@ class FileGenerator:
     def add_mock(self, mocked_function):
         self.mocks.append(FunctionMock(mocked_function))
 
-        if mocked_function.include:
-            if mocked_function.include.system:
-                self.system_includes.add(mocked_function.include.path)
-            else:
-                self.local_includes.add(mocked_function.include.path)
+    def add_include(self, include):
+        if include.system:
+            self.system_includes.add(include.path)
+        else:
+            self.local_includes.add(include.path)
 
     def add_struct(self, struct):
         self.struct_assert_ins.append(StructAssertIn(struct))
