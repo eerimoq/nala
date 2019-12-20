@@ -10,9 +10,13 @@ def remove_date_time(string):
     return re.sub(r'Generated with Nala.*', '', string)
 
 
+def remove_assert_in(string):
+    return re.sub(r'// Struct assertions.*', '', string, flags=re.DOTALL)
+
+
 def read_file(filename):
     with open(filename, 'r') as fin:
-        return remove_date_time(fin.read())
+        return remove_assert_in(remove_date_time(fin.read()))
 
 
 def pre_process_file(name):
