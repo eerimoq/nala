@@ -11,21 +11,18 @@ Do not edit manually
 #ifndef NALA_GENERATE_MOCKS
 
 #include <stdarg.h>
-
 #include <err.h>
-#include <errno.h>
-#include <mntent.h>
-#include <poll.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <errno.h>
 #include <x86_64-linux-gnu/sys/mount.h>
+#include <x86_64-linux-gnu/sys/timerfd.h>
 #include <x86_64-linux-gnu/sys/socket.h>
 #include <x86_64-linux-gnu/sys/statvfs.h>
-#include <x86_64-linux-gnu/sys/timerfd.h>
-
+#include <unistd.h>
+#include <poll.h>
+#include <mntent.h>
 #include "../nala/dist/nala.h"
 #include "../tests/files/test_dummy_functions.h"
-
 void nala_suspend_all_mocks(void);
 void nala_resume_all_mocks(void);
 void nala_reset_all_mocks(void);

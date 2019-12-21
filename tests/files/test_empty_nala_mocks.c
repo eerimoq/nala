@@ -9,12 +9,9 @@ Do not edit manually
 #include <stdbool.h>
 #include <string.h>
 #include "nala.h"
-
-#include <errno.h>
 #include <stddef.h>
-
+#include <errno.h>
 #include "nala_mocks.h"
-
 #include <execinfo.h>
 
 #define NALA_INSTANCES_APPEND(list, item_p)     \

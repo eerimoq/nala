@@ -195,20 +195,16 @@ def get_guard_name(filename):
     return re.sub(r"_+", "_", slug).upper().strip("_")
 
 
-def generate_includes(system_includes, local_includes, directory):
-    includes = "\n".join(
-        includes
-        for includes in (
-            "".join(f"#include <{path}>\n" for path in sorted(system_includes)),
-            "".join(
-                f'#include "{os.path.relpath(path, directory)}"\n'
-                for path in sorted(local_includes)
-            ),
-        )
-        if includes
-    )
+def generate_includes(includes, directory):
+    include_lines = []
 
-    return includes and f"\n{includes}"
+    for path, system in includes:
+        if system:
+            include_lines.append(f'#include <{path}>')
+        else:
+            include_lines.append(f'#include "{os.path.relpath(path, directory)}"')
+
+    return '\n'.join(include_lines)
 
 
 def read_nala_c():
@@ -473,17 +469,13 @@ class FileGenerator:
 
         self.mocks = []
         self.struct_assert_ins = []
-        self.system_includes = set()
-        self.local_includes = set()
+        self.includes = []
 
     def add_mock(self, mocked_function):
         self.mocks.append(FunctionMock(mocked_function))
 
     def add_include(self, include):
-        if include.system:
-            self.system_includes.add(include.path)
-        else:
-            self.local_includes.add(include.path)
+        self.includes.append((include.path, include.system))
 
     def add_struct(self, struct):
         self.struct_assert_ins.append(StructAssertIn(struct))
@@ -502,15 +494,18 @@ class FileGenerator:
         header_code = self.header_template.render(
             nala_version=__version__,
             guard_name=get_guard_name(header_filename),
-            includes=generate_includes(
-                self.system_includes, self.local_includes, directory),
+            includes=generate_includes(self.includes, directory),
             mocks=mocks,
             struct_assert_ins=struct_assert_ins)
 
+        includes = [
+            ("stddef.h", True),
+            ("errno.h", True),
+            (header_filename, False)
+        ]
         source_code = self.source_template.render(
             nala_version=__version__,
-            includes=generate_includes(
-                {"stddef.h", "errno.h"}, {header_filename}, directory),
+            includes=generate_includes(includes, directory),
             nala_c=read_nala_c(),
             mocks=mocks,
             struct_assert_ins=struct_assert_ins)
