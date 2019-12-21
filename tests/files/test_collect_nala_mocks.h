@@ -13,6 +13,9 @@ Do not edit manually
 #include <stdarg.h>
 #include "../nala/dist/nala.h"
 #include "../tests/files/test_collect.h"
+
+#endif
+
 void nala_suspend_all_mocks(void);
 void nala_resume_all_mocks(void);
 void nala_reset_all_mocks(void);

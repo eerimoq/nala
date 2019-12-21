@@ -12,6 +12,9 @@ Do not edit manually
 
 #include <stdarg.h>
 
+
+#endif
+
 void nala_suspend_all_mocks(void);
 void nala_resume_all_mocks(void);
 void nala_reset_all_mocks(void);

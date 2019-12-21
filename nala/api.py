@@ -54,7 +54,7 @@ def find_cached_mocked_functions(nala_mocks_h):
 
     with open(nala_mocks_h, 'r') as fin:
         for line in fin:
-            if line.startswith('//'):
+            if line.startswith('// NALA_DECLARATION'):
                 functions.add(line.split()[-1])
 
     return functions
