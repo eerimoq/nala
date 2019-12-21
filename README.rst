@@ -157,10 +157,11 @@ parameters. Overrides ``--rename-parameters-file``.
 
 .. code-block:: bash
 
-   $ gcc -E *.c | nala generate_mocks
+   $ gcc -DNALA_GENERATE_MOCKS -E *.c | nala generate_mocks
 
 Nala requires source code to be expanded by the preprocessor. You can
-directly pipe the output of ``gcc -E`` to the command-line utility.
+directly pipe the output of ``gcc -DNALA_GENERATE_MOCKS -E`` to the
+command-line utility.
 
 Mock API
 --------

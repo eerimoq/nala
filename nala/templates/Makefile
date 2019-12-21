@@ -26,4 +26,5 @@ $(BUILD)/nala_mocks.h: $(TESTS)
 	mkdir -p $(BUILD)
 	[ -f $(BUILD)/nala_mocks.h ] || touch $(BUILD)/nala_mocks.h
 	cat $(TESTS) > $(TESTS_C)
-	$(CC) $(INC:%=-I%) -E $(TESTS_C) | $(NALA) generate_mocks -o $(BUILD)
+	$(CC) $(INC:%=-I%) -DNALA_GENERATE_MOCKS -E $(TESTS_C) \
+	    | $(NALA) generate_mocks -o $(BUILD)

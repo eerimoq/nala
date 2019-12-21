@@ -8,6 +8,8 @@ Do not edit manually
 #ifndef OUTPUT_NALA_MOCKS_H
 #define OUTPUT_NALA_MOCKS_H
 
+#ifndef NALA_GENERATE_MOCKS
+
 #include <stdarg.h>
 
 #include <err.h>
@@ -971,33 +973,3 @@ void write_mock_resume(void);
 void write_mock_reset(void);
 void write_mock_assert_completed(void);
 
-// Struct assertions
-
-void nala_mock_assert_in_struct__IO_FILE(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct___locale_struct(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct___pthread_cond_s(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct___pthread_mutex_s(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct___pthread_rwlock_arch_t(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_align_2_t(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_cmsghdr(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_drand48_data(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_iovec(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_itimerspec(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_linger(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_mntent(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_msghdr(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_nala_test_t(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_osockaddr(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_pollfd(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_random_data(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_sockaddr(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_sockaddr_storage(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_statvfs(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_struct_param_type(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_termio(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_timespec(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_timeval(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_tm(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-void nala_mock_assert_in_struct_winsize(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
-
-#endif

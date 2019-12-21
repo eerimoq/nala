@@ -528,4 +528,3 @@ void nala_assert_all_mocks_completed(void)
 {
 }
 
-// Struct assertions

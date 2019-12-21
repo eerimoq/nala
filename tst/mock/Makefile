@@ -27,5 +27,5 @@ test: nala_mocks.h
 
 nala_mocks.h: main.c
 	[ -f nala_mocks.h ] || (touch nala_mocks.h)
-	$(CC) $(INC) -E main.c > main.pp.c
+	$(CC) $(INC) -DNALA_GENERATE_MOCKS -E main.c > main.pp.c
 	cat main.pp.c | $(NALA) generate_mocks

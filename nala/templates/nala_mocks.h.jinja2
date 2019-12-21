@@ -8,6 +8,8 @@ Do not edit manually
 #ifndef {{ guard_name }}
 #define {{ guard_name }}
 
+#ifndef NALA_GENERATE_MOCKS
+
 #include <stdarg.h>
 {{ includes }}
 void nala_suspend_all_mocks(void);
@@ -57,5 +59,7 @@ void {{mock.func_name}}_mock_assert_completed(void);
 {% for assert_in in struct_assert_ins %}
 void nala_mock_assert_in_struct_{{assert_in.name}}(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size);
 {% endfor %}
+
+#endif
 
 #endif
