@@ -51,6 +51,7 @@ char *nala_traceback_format(const char *prefix_p, void **buffer_pp, int depth)
     size_t stream_size;
     struct nala_subprocess_result_t *result_p;
     char *string_p;
+    char *discriminator_p;
 
     if (prefix_p == NULL) {
         prefix_p = "";
@@ -83,9 +84,16 @@ char *nala_traceback_format(const char *prefix_p, void **buffer_pp, int depth)
 
         if (result_p->exit_code == 0) {
             fprintf(stream_p, "%s  ", prefix_p);
+            discriminator_p = strstr(result_p->stdout.buf_p, " (discriminator");
+
+            if (discriminator_p != NULL) {
+                discriminator_p[0] = '\n';
+                discriminator_p[1] = '\0';
+            }
+
             fwrite(result_p->stdout.buf_p,
                    1,
-                   result_p->stdout.length,
+                   strlen(result_p->stdout.buf_p),
                    stream_p);
         }
 
