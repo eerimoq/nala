@@ -100,5 +100,3 @@ def generate_mocks(expanded_code,
         generator.write_to_directory(output_directory)
     elif not functions:
         generator.write_to_directory(output_directory)
-    else:
-        generator.touch_files(output_directory)
