@@ -493,3 +493,8 @@ void nala_state_resume(struct nala_state_t *state_p)
         state_p->mode = state_p->suspended.mode;
     }
 }
+
+void nala_mock_none_fail()
+{
+    FAIL();
+}

@@ -508,6 +508,11 @@ void nala_state_resume(struct nala_state_t *state_p)
     }
 }
 
+void nala_mock_none_fail()
+{
+    FAIL();
+}
+
 void nala_suspend_all_mocks(void)
 {
     add_mock_suspend();
@@ -766,35 +771,45 @@ struct _nala_data_params_for_add *nala_get_params_add()
     return (&nala_get_data_add()->params);
 }
 
-#define MOCK_ASSERT_add(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), add, x); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), add, y); \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(x, y); \
-    }
-
 int __wrap_add(int x, int y)
 {
     struct _nala_instance_type_for_add *_nala_instance_p;
+    struct _nala_data_type_for_add *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_add.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_add.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_add.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_add.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked add() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked add() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_add.data;
         }
 
-        MOCK_ASSERT_add(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, add, x);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, add, y);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(x, y);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -802,13 +817,8 @@ int __wrap_add(int x, int y)
         nala_state_for_add.data.implementation(x, y);
         break;
 
-    case 3:
-        MOCK_ASSERT_add(&nala_state_for_add.data);
-        return_value = nala_state_for_add.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -1010,38 +1020,48 @@ struct _nala_data_params_for_call *nala_get_params_call()
     return (&nala_get_data_call()->params);
 }
 
-#define MOCK_ASSERT_call(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), call, callback); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               call, \
-                               callback); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(callback); \
-    }
-
 int __wrap_call(int (*callback)(int value))
 {
     struct _nala_instance_type_for_call *_nala_instance_p;
+    struct _nala_data_type_for_call *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_call.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_call.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_call.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_call.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked call() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked call() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_call.data;
         }
 
-        MOCK_ASSERT_call(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, call, callback);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   call,
+                                   callback);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(callback);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -1049,13 +1069,8 @@ int __wrap_call(int (*callback)(int value))
         nala_state_for_call.data.implementation(callback);
         break;
 
-    case 3:
-        MOCK_ASSERT_call(&nala_state_for_call.data);
-        return_value = nala_state_for_call.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -1279,34 +1294,44 @@ struct _nala_data_params_for_close *nala_get_params_close()
     return (&nala_get_data_close()->params);
 }
 
-#define MOCK_ASSERT_close(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), close, fd); \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(fd); \
-    }
-
 int __wrap_close(int fd)
 {
     struct _nala_instance_type_for_close *_nala_instance_p;
+    struct _nala_data_type_for_close *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_close.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_close.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_close.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_close.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked close() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked close() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_close.data;
         }
 
-        MOCK_ASSERT_close(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, close, fd);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(fd);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -1314,13 +1339,8 @@ int __wrap_close(int fd)
         nala_state_for_close.data.implementation(fd);
         break;
 
-    case 3:
-        MOCK_ASSERT_close(&nala_state_for_close.data);
-        return_value = nala_state_for_close.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -1517,43 +1537,53 @@ struct _nala_data_params_for_compose_twice *nala_get_params_compose_twice()
     return (&nala_get_data_compose_twice()->params);
 }
 
-#define MOCK_ASSERT_compose_twice(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), compose_twice, dummy_struct); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), compose_twice, dummy_struct_modifier); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               compose_twice, \
-                               dummy_struct); \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               compose_twice, \
-                               dummy_struct_modifier); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(dummy_struct, dummy_struct_modifier); \
-    }
-
 DummyStruct *__wrap_compose_twice(DummyStruct *dummy_struct, DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct))
 {
     struct _nala_instance_type_for_compose_twice *_nala_instance_p;
+    struct _nala_data_type_for_compose_twice *_nala_data_p;
     DummyStruct *return_value;
 
     switch (nala_state_for_compose_twice.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_compose_twice.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_compose_twice.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_compose_twice.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked compose_twice() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked compose_twice() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_compose_twice.data;
         }
 
-        MOCK_ASSERT_compose_twice(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, compose_twice, dummy_struct);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, compose_twice, dummy_struct_modifier);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   compose_twice,
+                                   dummy_struct);
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   compose_twice,
+                                   dummy_struct_modifier);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(dummy_struct, dummy_struct_modifier);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -1561,13 +1591,8 @@ DummyStruct *__wrap_compose_twice(DummyStruct *dummy_struct, DummyStruct *(*dumm
         nala_state_for_compose_twice.data.implementation(dummy_struct, dummy_struct_modifier);
         break;
 
-    case 3:
-        MOCK_ASSERT_compose_twice(&nala_state_for_compose_twice.data);
-        return_value = nala_state_for_compose_twice.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -1843,38 +1868,48 @@ struct _nala_data_params_for_double_pointer *nala_get_params_double_pointer()
     return (&nala_get_data_double_pointer()->params);
 }
 
-#define MOCK_ASSERT_double_pointer(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), double_pointer, value_pp); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               double_pointer, \
-                               value_pp); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(value_pp); \
-    }
-
 int __wrap_double_pointer(int **value_pp)
 {
     struct _nala_instance_type_for_double_pointer *_nala_instance_p;
+    struct _nala_data_type_for_double_pointer *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_double_pointer.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_double_pointer.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_double_pointer.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_double_pointer.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked double_pointer() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked double_pointer() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_double_pointer.data;
         }
 
-        MOCK_ASSERT_double_pointer(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, double_pointer, value_pp);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   double_pointer,
+                                   value_pp);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(value_pp);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -1882,13 +1917,8 @@ int __wrap_double_pointer(int **value_pp)
         nala_state_for_double_pointer.data.implementation(value_pp);
         break;
 
-    case 3:
-        MOCK_ASSERT_double_pointer(&nala_state_for_double_pointer.data);
-        return_value = nala_state_for_double_pointer.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -2112,34 +2142,44 @@ struct _nala_data_params_for_dup *nala_get_params_dup()
     return (&nala_get_data_dup()->params);
 }
 
-#define MOCK_ASSERT_dup(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), dup, oldfd); \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(oldfd); \
-    }
-
 int __wrap_dup(int oldfd)
 {
     struct _nala_instance_type_for_dup *_nala_instance_p;
+    struct _nala_data_type_for_dup *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_dup.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_dup.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_dup.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_dup.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked dup() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked dup() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_dup.data;
         }
 
-        MOCK_ASSERT_dup(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, dup, oldfd);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(oldfd);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -2147,13 +2187,8 @@ int __wrap_dup(int oldfd)
         nala_state_for_dup.data.implementation(oldfd);
         break;
 
-    case 3:
-        MOCK_ASSERT_dup(&nala_state_for_dup.data);
-        return_value = nala_state_for_dup.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -2342,35 +2377,45 @@ struct _nala_data_params_for_dup2 *nala_get_params_dup2()
     return (&nala_get_data_dup2()->params);
 }
 
-#define MOCK_ASSERT_dup2(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), dup2, oldfd); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), dup2, newfd); \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(oldfd, newfd); \
-    }
-
 int __wrap_dup2(int oldfd, int newfd)
 {
     struct _nala_instance_type_for_dup2 *_nala_instance_p;
+    struct _nala_data_type_for_dup2 *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_dup2.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_dup2.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_dup2.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_dup2.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked dup2() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked dup2() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_dup2.data;
         }
 
-        MOCK_ASSERT_dup2(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, dup2, oldfd);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, dup2, newfd);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(oldfd, newfd);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -2378,13 +2423,8 @@ int __wrap_dup2(int oldfd, int newfd)
         nala_state_for_dup2.data.implementation(oldfd, newfd);
         break;
 
-    case 3:
-        MOCK_ASSERT_dup2(&nala_state_for_dup2.data);
-        return_value = nala_state_for_dup2.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -2588,39 +2628,49 @@ struct _nala_data_params_for_edit_number *nala_get_params_edit_number()
     return (&nala_get_data_edit_number()->params);
 }
 
-#define MOCK_ASSERT_edit_number(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), edit_number, dummy_struct); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), edit_number, number); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               edit_number, \
-                               dummy_struct); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(dummy_struct, number); \
-    }
-
 DummyStruct *__wrap_edit_number(DummyStruct *dummy_struct, int number)
 {
     struct _nala_instance_type_for_edit_number *_nala_instance_p;
+    struct _nala_data_type_for_edit_number *_nala_data_p;
     DummyStruct *return_value;
 
     switch (nala_state_for_edit_number.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_edit_number.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_edit_number.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_edit_number.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked edit_number() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked edit_number() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_edit_number.data;
         }
 
-        MOCK_ASSERT_edit_number(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, edit_number, dummy_struct);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, edit_number, number);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   edit_number,
+                                   dummy_struct);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(dummy_struct, number);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -2628,13 +2678,8 @@ DummyStruct *__wrap_edit_number(DummyStruct *dummy_struct, int number)
         nala_state_for_edit_number.data.implementation(dummy_struct, number);
         break;
 
-    case 3:
-        MOCK_ASSERT_edit_number(&nala_state_for_edit_number.data);
-        return_value = nala_state_for_edit_number.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -2873,38 +2918,48 @@ struct _nala_data_params_for_endmntent *nala_get_params_endmntent()
     return (&nala_get_data_endmntent()->params);
 }
 
-#define MOCK_ASSERT_endmntent(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), endmntent, streamp); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               endmntent, \
-                               streamp); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(streamp); \
-    }
-
 int __wrap_endmntent(FILE *streamp)
 {
     struct _nala_instance_type_for_endmntent *_nala_instance_p;
+    struct _nala_data_type_for_endmntent *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_endmntent.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_endmntent.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_endmntent.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_endmntent.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked endmntent() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked endmntent() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_endmntent.data;
         }
 
-        MOCK_ASSERT_endmntent(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, endmntent, streamp);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   endmntent,
+                                   streamp);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(streamp);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -2912,13 +2967,8 @@ int __wrap_endmntent(FILE *streamp)
         nala_state_for_endmntent.data.implementation(streamp);
         break;
 
-    case 3:
-        MOCK_ASSERT_endmntent(&nala_state_for_endmntent.data);
-        return_value = nala_state_for_endmntent.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -3141,44 +3191,50 @@ struct _nala_data_params_for_enum_param *nala_get_params_enum_param()
     return (&nala_get_data_enum_param()->params);
 }
 
-#define MOCK_ASSERT_enum_param(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), enum_param, value); \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(value); \
-    }
-
 void __wrap_enum_param(enum enum_param_type value)
 {
     struct _nala_instance_type_for_enum_param *_nala_instance_p;
+    struct _nala_data_type_for_enum_param *_nala_data_p;
 
     switch (nala_state_for_enum_param.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_enum_param.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_enum_param.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_enum_param.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked enum_param() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked enum_param() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_enum_param.data;
         }
 
-        MOCK_ASSERT_enum_param(&_nala_instance_p->data);
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, enum_param, value);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(value);
+        }
+
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
         nala_state_for_enum_param.data.implementation(value);
         break;
 
-    case 3:
-        MOCK_ASSERT_enum_param(&nala_state_for_enum_param.data);
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -3364,38 +3420,48 @@ struct _nala_data_params_for_fclose *nala_get_params_fclose()
     return (&nala_get_data_fclose()->params);
 }
 
-#define MOCK_ASSERT_fclose(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fclose, stream); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               fclose, \
-                               stream); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(stream); \
-    }
-
 int __wrap_fclose(FILE *stream)
 {
     struct _nala_instance_type_for_fclose *_nala_instance_p;
+    struct _nala_data_type_for_fclose *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_fclose.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_fclose.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_fclose.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_fclose.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked fclose() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked fclose() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_fclose.data;
         }
 
-        MOCK_ASSERT_fclose(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fclose, stream);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   fclose,
+                                   stream);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(stream);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -3403,13 +3469,8 @@ int __wrap_fclose(FILE *stream)
         nala_state_for_fclose.data.implementation(stream);
         break;
 
-    case 3:
-        MOCK_ASSERT_fclose(&nala_state_for_fclose.data);
-        return_value = nala_state_for_fclose.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -3637,38 +3698,48 @@ struct _nala_data_params_for_fflush *nala_get_params_fflush()
     return (&nala_get_data_fflush()->params);
 }
 
-#define MOCK_ASSERT_fflush(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fflush, stream); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               fflush, \
-                               stream); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(stream); \
-    }
-
 int __wrap_fflush(FILE *stream)
 {
     struct _nala_instance_type_for_fflush *_nala_instance_p;
+    struct _nala_data_type_for_fflush *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_fflush.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_fflush.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_fflush.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_fflush.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked fflush() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked fflush() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_fflush.data;
         }
 
-        MOCK_ASSERT_fflush(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fflush, stream);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   fflush,
+                                   stream);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(stream);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -3676,13 +3747,8 @@ int __wrap_fflush(FILE *stream)
         nala_state_for_fflush.data.implementation(stream);
         break;
 
-    case 3:
-        MOCK_ASSERT_fflush(&nala_state_for_fflush.data);
-        return_value = nala_state_for_fflush.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -3910,38 +3976,48 @@ struct _nala_data_params_for_fileno *nala_get_params_fileno()
     return (&nala_get_data_fileno()->params);
 }
 
-#define MOCK_ASSERT_fileno(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fileno, stream); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               fileno, \
-                               stream); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(stream); \
-    }
-
 int __wrap_fileno(FILE *stream)
 {
     struct _nala_instance_type_for_fileno *_nala_instance_p;
+    struct _nala_data_type_for_fileno *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_fileno.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_fileno.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_fileno.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_fileno.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked fileno() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked fileno() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_fileno.data;
         }
 
-        MOCK_ASSERT_fileno(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fileno, stream);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   fileno,
+                                   stream);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(stream);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -3949,13 +4025,8 @@ int __wrap_fileno(FILE *stream)
         nala_state_for_fileno.data.implementation(stream);
         break;
 
-    case 3:
-        MOCK_ASSERT_fileno(&nala_state_for_fileno.data);
-        return_value = nala_state_for_fileno.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -4189,43 +4260,53 @@ struct _nala_data_params_for_fopen *nala_get_params_fopen()
     return (&nala_get_data_fopen()->params);
 }
 
-#define MOCK_ASSERT_fopen(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fopen, path); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fopen, mode); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               fopen, \
-                               path); \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               fopen, \
-                               mode); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(path, mode); \
-    }
-
 FILE *__wrap_fopen(const char *path, const char *mode)
 {
     struct _nala_instance_type_for_fopen *_nala_instance_p;
+    struct _nala_data_type_for_fopen *_nala_data_p;
     FILE *return_value;
 
     switch (nala_state_for_fopen.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_fopen.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_fopen.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_fopen.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked fopen() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked fopen() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_fopen.data;
         }
 
-        MOCK_ASSERT_fopen(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fopen, path);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fopen, mode);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   fopen,
+                                   path);
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   fopen,
+                                   mode);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(path, mode);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -4233,13 +4314,8 @@ FILE *__wrap_fopen(const char *path, const char *mode)
         nala_state_for_fopen.data.implementation(path, mode);
         break;
 
-    case 3:
-        MOCK_ASSERT_fopen(&nala_state_for_fopen.data);
-        return_value = nala_state_for_fopen.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -4567,45 +4643,55 @@ struct _nala_data_params_for_fread *nala_get_params_fread()
     return (&nala_get_data_fread()->params);
 }
 
-#define MOCK_ASSERT_fread(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fread, ptr); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fread, stream); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fread, size); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fread, nmemb); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               fread, \
-                               ptr); \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               fread, \
-                               stream); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(ptr, size, nmemb, stream); \
-    }
-
 size_t __wrap_fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
     struct _nala_instance_type_for_fread *_nala_instance_p;
+    struct _nala_data_type_for_fread *_nala_data_p;
     size_t return_value;
 
     switch (nala_state_for_fread.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_fread.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_fread.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_fread.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked fread() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked fread() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_fread.data;
         }
 
-        MOCK_ASSERT_fread(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fread, ptr);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fread, stream);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fread, size);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fread, nmemb);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   fread,
+                                   ptr);
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   fread,
+                                   stream);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(ptr, size, nmemb, stream);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -4613,13 +4699,8 @@ size_t __wrap_fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
         nala_state_for_fread.data.implementation(ptr, size, nmemb, stream);
         break;
 
-    case 3:
-        MOCK_ASSERT_fread(&nala_state_for_fread.data);
-        return_value = nala_state_for_fread.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -4916,48 +4997,54 @@ struct _nala_data_params_for_free *nala_get_params_free()
     return (&nala_get_data_free()->params);
 }
 
-#define MOCK_ASSERT_free(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), free, ptr); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               free, \
-                               ptr); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(ptr); \
-    }
-
 void __wrap_free(void *ptr)
 {
     struct _nala_instance_type_for_free *_nala_instance_p;
+    struct _nala_data_type_for_free *_nala_data_p;
 
     switch (nala_state_for_free.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_free.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_free.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_free.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked free() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked free() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_free.data;
         }
 
-        MOCK_ASSERT_free(&_nala_instance_p->data);
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, free, ptr);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   free,
+                                   ptr);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(ptr);
+        }
+
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
         nala_state_for_free.data.implementation(ptr);
         break;
 
-    case 3:
-        MOCK_ASSERT_free(&nala_state_for_free.data);
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -5184,40 +5271,50 @@ struct _nala_data_params_for_fseek *nala_get_params_fseek()
     return (&nala_get_data_fseek()->params);
 }
 
-#define MOCK_ASSERT_fseek(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fseek, stream); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fseek, offset); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fseek, whence); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               fseek, \
-                               stream); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(stream, offset, whence); \
-    }
-
 int __wrap_fseek(FILE *stream, long int offset, int whence)
 {
     struct _nala_instance_type_for_fseek *_nala_instance_p;
+    struct _nala_data_type_for_fseek *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_fseek.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_fseek.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_fseek.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_fseek.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked fseek() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked fseek() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_fseek.data;
         }
 
-        MOCK_ASSERT_fseek(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fseek, stream);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fseek, offset);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fseek, whence);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   fseek,
+                                   stream);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(stream, offset, whence);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -5225,13 +5322,8 @@ int __wrap_fseek(FILE *stream, long int offset, int whence)
         nala_state_for_fseek.data.implementation(stream, offset, whence);
         break;
 
-    case 3:
-        MOCK_ASSERT_fseek(&nala_state_for_fseek.data);
-        return_value = nala_state_for_fseek.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -5481,38 +5573,48 @@ struct _nala_data_params_for_ftell *nala_get_params_ftell()
     return (&nala_get_data_ftell()->params);
 }
 
-#define MOCK_ASSERT_ftell(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), ftell, stream); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               ftell, \
-                               stream); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(stream); \
-    }
-
 long int __wrap_ftell(FILE *stream)
 {
     struct _nala_instance_type_for_ftell *_nala_instance_p;
+    struct _nala_data_type_for_ftell *_nala_data_p;
     long int return_value;
 
     switch (nala_state_for_ftell.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_ftell.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_ftell.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_ftell.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked ftell() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked ftell() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_ftell.data;
         }
 
-        MOCK_ASSERT_ftell(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, ftell, stream);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   ftell,
+                                   stream);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(stream);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -5520,13 +5622,8 @@ long int __wrap_ftell(FILE *stream)
         nala_state_for_ftell.data.implementation(stream);
         break;
 
-    case 3:
-        MOCK_ASSERT_ftell(&nala_state_for_ftell.data);
-        return_value = nala_state_for_ftell.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -5764,45 +5861,55 @@ struct _nala_data_params_for_fwrite *nala_get_params_fwrite()
     return (&nala_get_data_fwrite()->params);
 }
 
-#define MOCK_ASSERT_fwrite(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fwrite, ptr); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fwrite, stream); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fwrite, size); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), fwrite, nmemb); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               fwrite, \
-                               ptr); \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               fwrite, \
-                               stream); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(ptr, size, nmemb, stream); \
-    }
-
 size_t __wrap_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
     struct _nala_instance_type_for_fwrite *_nala_instance_p;
+    struct _nala_data_type_for_fwrite *_nala_data_p;
     size_t return_value;
 
     switch (nala_state_for_fwrite.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_fwrite.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_fwrite.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_fwrite.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked fwrite() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked fwrite() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_fwrite.data;
         }
 
-        MOCK_ASSERT_fwrite(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fwrite, ptr);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fwrite, stream);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fwrite, size);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, fwrite, nmemb);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   fwrite,
+                                   ptr);
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   fwrite,
+                                   stream);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(ptr, size, nmemb, stream);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -5810,13 +5917,8 @@ size_t __wrap_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
         nala_state_for_fwrite.data.implementation(ptr, size, nmemb, stream);
         break;
 
-    case 3:
-        MOCK_ASSERT_fwrite(&nala_state_for_fwrite.data);
-        return_value = nala_state_for_fwrite.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -6114,38 +6216,48 @@ struct _nala_data_params_for_getmntent *nala_get_params_getmntent()
     return (&nala_get_data_getmntent()->params);
 }
 
-#define MOCK_ASSERT_getmntent(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), getmntent, stream); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               getmntent, \
-                               stream); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(stream); \
-    }
-
 struct mntent *__wrap_getmntent(FILE *stream)
 {
     struct _nala_instance_type_for_getmntent *_nala_instance_p;
+    struct _nala_data_type_for_getmntent *_nala_data_p;
     struct mntent *return_value;
 
     switch (nala_state_for_getmntent.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_getmntent.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_getmntent.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_getmntent.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked getmntent() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked getmntent() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_getmntent.data;
         }
 
-        MOCK_ASSERT_getmntent(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, getmntent, stream);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   getmntent,
+                                   stream);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(stream);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -6153,13 +6265,8 @@ struct mntent *__wrap_getmntent(FILE *stream)
         nala_state_for_getmntent.data.implementation(stream);
         break;
 
-    case 3:
-        MOCK_ASSERT_getmntent(&nala_state_for_getmntent.data);
-        return_value = nala_state_for_getmntent.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -6386,48 +6493,54 @@ struct _nala_data_params_for_in_out *nala_get_params_in_out()
     return (&nala_get_data_in_out()->params);
 }
 
-#define MOCK_ASSERT_in_out(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), in_out, buf_p); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               in_out, \
-                               buf_p); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(buf_p); \
-    }
-
 void __wrap_in_out(int *buf_p)
 {
     struct _nala_instance_type_for_in_out *_nala_instance_p;
+    struct _nala_data_type_for_in_out *_nala_data_p;
 
     switch (nala_state_for_in_out.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_in_out.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_in_out.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_in_out.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked in_out() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked in_out() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_in_out.data;
         }
 
-        MOCK_ASSERT_in_out(&_nala_instance_p->data);
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, in_out, buf_p);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   in_out,
+                                   buf_p);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(buf_p);
+        }
+
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
         nala_state_for_in_out.data.implementation(buf_p);
         break;
 
-    case 3:
-        MOCK_ASSERT_in_out(&nala_state_for_in_out.data);
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -6646,45 +6759,55 @@ struct _nala_data_params_for_io_control *nala_get_params_io_control()
     return (&nala_get_data_io_control()->params);
 }
 
-#define MOCK_ASSERT_io_control(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), io_control, kind); \
- \
- \
-    { \
-        va_list __nala_vl; \
-        va_start(__nala_vl, kind); \
-        nala_va_arg_list_assert(&(_nala_data_p)->params._nala_va_arg_list, __nala_vl); \
-        va_end(__nala_vl); \
-        nala_va_arg_list_destroy(&(_nala_data_p)->params._nala_va_arg_list); \
-    } \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        va_list __nala_vl; \
-        va_start(__nala_vl, kind); \
-        (_nala_data_p)->callback(kind, __nala_vl); \
-        va_end(__nala_vl); \
-    }
-
 int __wrap_io_control(int kind, ...)
 {
     struct _nala_instance_type_for_io_control *_nala_instance_p;
+    struct _nala_data_type_for_io_control *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_io_control.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_io_control.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_io_control.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_io_control.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked io_control() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked io_control() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_io_control.data;
         }
 
-        MOCK_ASSERT_io_control(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, io_control, kind);
+
+
+        {
+            va_list __nala_vl;
+            va_start(__nala_vl, kind);
+            nala_va_arg_list_assert(&_nala_data_p->params._nala_va_arg_list, __nala_vl);
+            va_end(__nala_vl);
+            nala_va_arg_list_destroy(&_nala_data_p->params._nala_va_arg_list);
+        }
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            va_list __nala_vl;
+            va_start(__nala_vl, kind);
+            _nala_data_p->callback(kind, __nala_vl);
+            va_end(__nala_vl);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -6697,13 +6820,8 @@ int __wrap_io_control(int kind, ...)
         }
         break;
 
-    case 3:
-        MOCK_ASSERT_io_control(&nala_state_for_io_control.data);
-        return_value = nala_state_for_io_control.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -6968,34 +7086,44 @@ struct _nala_data_params_for_io_vcontrol *nala_get_params_io_vcontrol()
     return (&nala_get_data_io_vcontrol()->params);
 }
 
-#define MOCK_ASSERT_io_vcontrol(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), io_vcontrol, kind); \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(kind, ap); \
-    }
-
 int __wrap_io_vcontrol(int kind, va_list ap)
 {
     struct _nala_instance_type_for_io_vcontrol *_nala_instance_p;
+    struct _nala_data_type_for_io_vcontrol *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_io_vcontrol.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_io_vcontrol.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_io_vcontrol.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_io_vcontrol.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked io_vcontrol() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked io_vcontrol() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_io_vcontrol.data;
         }
 
-        MOCK_ASSERT_io_vcontrol(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, io_vcontrol, kind);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(kind, ap);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -7003,13 +7131,8 @@ int __wrap_io_vcontrol(int kind, va_list ap)
         nala_state_for_io_vcontrol.data.implementation(kind, ap);
         break;
 
-    case 3:
-        MOCK_ASSERT_io_vcontrol(&nala_state_for_io_vcontrol.data);
-        return_value = nala_state_for_io_vcontrol.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -7196,34 +7319,44 @@ struct _nala_data_params_for_malloc *nala_get_params_malloc()
     return (&nala_get_data_malloc()->params);
 }
 
-#define MOCK_ASSERT_malloc(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), malloc, size); \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(size); \
-    }
-
 void *__wrap_malloc(size_t size)
 {
     struct _nala_instance_type_for_malloc *_nala_instance_p;
+    struct _nala_data_type_for_malloc *_nala_data_p;
     void *return_value;
 
     switch (nala_state_for_malloc.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_malloc.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_malloc.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_malloc.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked malloc() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked malloc() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_malloc.data;
         }
 
-        MOCK_ASSERT_malloc(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, malloc, size);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(size);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -7231,13 +7364,8 @@ void *__wrap_malloc(size_t size)
         nala_state_for_malloc.data.implementation(size);
         break;
 
-    case 3:
-        MOCK_ASSERT_malloc(&nala_state_for_malloc.data);
-        return_value = nala_state_for_malloc.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -7448,54 +7576,64 @@ struct _nala_data_params_for_mount *nala_get_params_mount()
     return (&nala_get_data_mount()->params);
 }
 
-#define MOCK_ASSERT_mount(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), mount, source); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), mount, target); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), mount, filesystemtype); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), mount, data); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), mount, mountflags); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               mount, \
-                               source); \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               mount, \
-                               target); \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               mount, \
-                               filesystemtype); \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               mount, \
-                               data); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(source, target, filesystemtype, mountflags, data); \
-    }
-
 int __wrap_mount(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, const void *data)
 {
     struct _nala_instance_type_for_mount *_nala_instance_p;
+    struct _nala_data_type_for_mount *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_mount.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_mount.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_mount.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_mount.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked mount() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked mount() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_mount.data;
         }
 
-        MOCK_ASSERT_mount(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, mount, source);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, mount, target);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, mount, filesystemtype);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, mount, data);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, mount, mountflags);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   mount,
+                                   source);
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   mount,
+                                   target);
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   mount,
+                                   filesystemtype);
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   mount,
+                                   data);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(source, target, filesystemtype, mountflags, data);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -7503,13 +7641,8 @@ int __wrap_mount(const char *source, const char *target, const char *filesystemt
         nala_state_for_mount.data.implementation(source, target, filesystemtype, mountflags, data);
         break;
 
-    case 3:
-        MOCK_ASSERT_mount(&nala_state_for_mount.data);
-        return_value = nala_state_for_mount.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -7954,48 +8087,54 @@ struct _nala_data_params_for_output_message *nala_get_params_output_message()
     return (&nala_get_data_output_message()->params);
 }
 
-#define MOCK_ASSERT_output_message(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), output_message, message); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               output_message, \
-                               message); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(message); \
-    }
-
 void __wrap_output_message(const char *message)
 {
     struct _nala_instance_type_for_output_message *_nala_instance_p;
+    struct _nala_data_type_for_output_message *_nala_data_p;
 
     switch (nala_state_for_output_message.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_output_message.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_output_message.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_output_message.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked output_message() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked output_message() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_output_message.data;
         }
 
-        MOCK_ASSERT_output_message(&_nala_instance_p->data);
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, output_message, message);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   output_message,
+                                   message);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(message);
+        }
+
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
         nala_state_for_output_message.data.implementation(message);
         break;
 
-    case 3:
-        MOCK_ASSERT_output_message(&nala_state_for_output_message.data);
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -8239,38 +8378,48 @@ struct _nala_data_params_for_pipe *nala_get_params_pipe()
     return (&nala_get_data_pipe()->params);
 }
 
-#define MOCK_ASSERT_pipe(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), pipe, pipefd); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               pipe, \
-                               pipefd); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(pipefd); \
-    }
-
 int __wrap_pipe(int pipefd[2])
 {
     struct _nala_instance_type_for_pipe *_nala_instance_p;
+    struct _nala_data_type_for_pipe *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_pipe.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_pipe.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_pipe.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_pipe.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked pipe() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked pipe() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_pipe.data;
         }
 
-        MOCK_ASSERT_pipe(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, pipe, pipefd);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   pipe,
+                                   pipefd);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(pipefd);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -8278,13 +8427,8 @@ int __wrap_pipe(int pipefd[2])
         nala_state_for_pipe.data.implementation(pipefd);
         break;
 
-    case 3:
-        MOCK_ASSERT_pipe(&nala_state_for_pipe.data);
-        return_value = nala_state_for_pipe.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -8516,40 +8660,50 @@ struct _nala_data_params_for_poll *nala_get_params_poll()
     return (&nala_get_data_poll()->params);
 }
 
-#define MOCK_ASSERT_poll(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), poll, fds); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), poll, nfds); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), poll, timeout); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_in_struct_pollfd, \
-                               poll, \
-                               fds); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(fds, nfds, timeout); \
-    }
-
 int __wrap_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
     struct _nala_instance_type_for_poll *_nala_instance_p;
+    struct _nala_data_type_for_poll *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_poll.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_poll.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_poll.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_poll.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked poll() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked poll() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_poll.data;
         }
 
-        MOCK_ASSERT_poll(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, poll, fds);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, poll, nfds);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, poll, timeout);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_in_struct_pollfd,
+                                   poll,
+                                   fds);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(fds, nfds, timeout);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -8557,13 +8711,8 @@ int __wrap_poll(struct pollfd *fds, nfds_t nfds, int timeout)
         nala_state_for_poll.data.implementation(fds, nfds, timeout);
         break;
 
-    case 3:
-        MOCK_ASSERT_poll(&nala_state_for_poll.data);
-        return_value = nala_state_for_poll.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -8807,43 +8956,49 @@ struct _nala_data_params_for_print_hello *nala_get_params_print_hello()
     return (&nala_get_data_print_hello()->params);
 }
 
-#define MOCK_ASSERT_print_hello(_nala_data_p) \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(); \
-    }
-
 void __wrap_print_hello()
 {
     struct _nala_instance_type_for_print_hello *_nala_instance_p;
+    struct _nala_data_type_for_print_hello *_nala_data_p;
 
     switch (nala_state_for_print_hello.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_print_hello.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_print_hello.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_print_hello.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked print_hello() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked print_hello() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_print_hello.data;
         }
 
-        MOCK_ASSERT_print_hello(&_nala_instance_p->data);
-        nala_free(_nala_instance_p);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback();
+        }
+
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
         nala_state_for_print_hello.data.implementation();
         break;
 
-    case 3:
-        MOCK_ASSERT_print_hello(&nala_state_for_print_hello.data);
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -9022,40 +9177,50 @@ struct _nala_data_params_for_read *nala_get_params_read()
     return (&nala_get_data_read()->params);
 }
 
-#define MOCK_ASSERT_read(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), read, buf); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), read, fd); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), read, count); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               read, \
-                               buf); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(fd, buf, count); \
-    }
-
 ssize_t __wrap_read(int fd, void *buf, size_t count)
 {
     struct _nala_instance_type_for_read *_nala_instance_p;
+    struct _nala_data_type_for_read *_nala_data_p;
     ssize_t return_value;
 
     switch (nala_state_for_read.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_read.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_read.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_read.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked read() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked read() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_read.data;
         }
 
-        MOCK_ASSERT_read(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, read, buf);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, read, fd);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, read, count);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   read,
+                                   buf);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(fd, buf, count);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -9063,13 +9228,8 @@ ssize_t __wrap_read(int fd, void *buf, size_t count)
         nala_state_for_read.data.implementation(fd, buf, count);
         break;
 
-    case 3:
-        MOCK_ASSERT_read(&nala_state_for_read.data);
-        return_value = nala_state_for_read.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -9333,47 +9493,57 @@ struct _nala_data_params_for_sendto *nala_get_params_sendto()
     return (&nala_get_data_sendto()->params);
 }
 
-#define MOCK_ASSERT_sendto(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), sendto, buf); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), sendto, dest_addr); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), sendto, sockfd); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), sendto, len); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), sendto, flags); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), sendto, addrlen); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               sendto, \
-                               buf); \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_in_struct_sockaddr, \
-                               sendto, \
-                               dest_addr); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(sockfd, buf, len, flags, dest_addr, addrlen); \
-    }
-
 ssize_t __wrap_sendto(int sockfd, const void *buf, size_t len, int flags, const struct sockaddr *dest_addr, socklen_t addrlen)
 {
     struct _nala_instance_type_for_sendto *_nala_instance_p;
+    struct _nala_data_type_for_sendto *_nala_data_p;
     ssize_t return_value;
 
     switch (nala_state_for_sendto.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_sendto.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_sendto.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_sendto.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked sendto() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked sendto() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_sendto.data;
         }
 
-        MOCK_ASSERT_sendto(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, sendto, buf);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, sendto, dest_addr);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, sendto, sockfd);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, sendto, len);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, sendto, flags);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, sendto, addrlen);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   sendto,
+                                   buf);
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_in_struct_sockaddr,
+                                   sendto,
+                                   dest_addr);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(sockfd, buf, len, flags, dest_addr, addrlen);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -9381,13 +9551,8 @@ ssize_t __wrap_sendto(int sockfd, const void *buf, size_t len, int flags, const 
         nala_state_for_sendto.data.implementation(sockfd, buf, len, flags, dest_addr, addrlen);
         break;
 
-    case 3:
-        MOCK_ASSERT_sendto(&nala_state_for_sendto.data);
-        return_value = nala_state_for_sendto.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -9715,42 +9880,52 @@ struct _nala_data_params_for_setsockopt *nala_get_params_setsockopt()
     return (&nala_get_data_setsockopt()->params);
 }
 
-#define MOCK_ASSERT_setsockopt(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), setsockopt, optval); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), setsockopt, sockfd); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), setsockopt, level); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), setsockopt, optname); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), setsockopt, optlen); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               setsockopt, \
-                               optval); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(sockfd, level, optname, optval, optlen); \
-    }
-
 int __wrap_setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen)
 {
     struct _nala_instance_type_for_setsockopt *_nala_instance_p;
+    struct _nala_data_type_for_setsockopt *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_setsockopt.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_setsockopt.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_setsockopt.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_setsockopt.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked setsockopt() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked setsockopt() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_setsockopt.data;
         }
 
-        MOCK_ASSERT_setsockopt(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, setsockopt, optval);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, setsockopt, sockfd);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, setsockopt, level);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, setsockopt, optname);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, setsockopt, optlen);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   setsockopt,
+                                   optval);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(sockfd, level, optname, optval, optlen);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -9758,13 +9933,8 @@ int __wrap_setsockopt(int sockfd, int level, int optname, const void *optval, so
         nala_state_for_setsockopt.data.implementation(sockfd, level, optname, optval, optlen);
         break;
 
-    case 3:
-        MOCK_ASSERT_setsockopt(&nala_state_for_setsockopt.data);
-        return_value = nala_state_for_setsockopt.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -10032,34 +10202,44 @@ struct _nala_data_params_for_sleep *nala_get_params_sleep()
     return (&nala_get_data_sleep()->params);
 }
 
-#define MOCK_ASSERT_sleep(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), sleep, seconds); \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(seconds); \
-    }
-
 unsigned int __wrap_sleep(unsigned int seconds)
 {
     struct _nala_instance_type_for_sleep *_nala_instance_p;
+    struct _nala_data_type_for_sleep *_nala_data_p;
     unsigned int return_value;
 
     switch (nala_state_for_sleep.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_sleep.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_sleep.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_sleep.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked sleep() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked sleep() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_sleep.data;
         }
 
-        MOCK_ASSERT_sleep(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, sleep, seconds);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(seconds);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -10067,13 +10247,8 @@ unsigned int __wrap_sleep(unsigned int seconds)
         nala_state_for_sleep.data.implementation(seconds);
         break;
 
-    case 3:
-        MOCK_ASSERT_sleep(&nala_state_for_sleep.data);
-        return_value = nala_state_for_sleep.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -10270,43 +10445,53 @@ struct _nala_data_params_for_statvfs *nala_get_params_statvfs()
     return (&nala_get_data_statvfs()->params);
 }
 
-#define MOCK_ASSERT_statvfs(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), statvfs, path); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), statvfs, buf); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               statvfs, \
-                               path); \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_in_struct_statvfs, \
-                               statvfs, \
-                               buf); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(path, buf); \
-    }
-
 int __wrap_statvfs(const char *path, struct statvfs *buf)
 {
     struct _nala_instance_type_for_statvfs *_nala_instance_p;
+    struct _nala_data_type_for_statvfs *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_statvfs.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_statvfs.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_statvfs.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_statvfs.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked statvfs() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked statvfs() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_statvfs.data;
         }
 
-        MOCK_ASSERT_statvfs(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, statvfs, path);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, statvfs, buf);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   statvfs,
+                                   path);
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_in_struct_statvfs,
+                                   statvfs,
+                                   buf);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(path, buf);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -10314,13 +10499,8 @@ int __wrap_statvfs(const char *path, struct statvfs *buf)
         nala_state_for_statvfs.data.implementation(path, buf);
         break;
 
-    case 3:
-        MOCK_ASSERT_statvfs(&nala_state_for_statvfs.data);
-        return_value = nala_state_for_statvfs.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -10616,48 +10796,54 @@ struct _nala_data_params_for_struct_param *nala_get_params_struct_param()
     return (&nala_get_data_struct_param()->params);
 }
 
-#define MOCK_ASSERT_struct_param(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), struct_param, data); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_in_struct_struct_param_type, \
-                               struct_param, \
-                               data); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(data); \
-    }
-
 void __wrap_struct_param(struct struct_param_type *data)
 {
     struct _nala_instance_type_for_struct_param *_nala_instance_p;
+    struct _nala_data_type_for_struct_param *_nala_data_p;
 
     switch (nala_state_for_struct_param.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_struct_param.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_struct_param.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_struct_param.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked struct_param() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked struct_param() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_struct_param.data;
         }
 
-        MOCK_ASSERT_struct_param(&_nala_instance_p->data);
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, struct_param, data);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_in_struct_struct_param_type,
+                                   struct_param,
+                                   data);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(data);
+        }
+
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
         nala_state_for_struct_param.data.implementation(data);
         break;
 
-    case 3:
-        MOCK_ASSERT_struct_param(&nala_state_for_struct_param.data);
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -10875,33 +11061,43 @@ struct _nala_data_params_for_struct_param_and_return_type *nala_get_params_struc
     return (&nala_get_data_struct_param_and_return_type()->params);
 }
 
-#define MOCK_ASSERT_struct_param_and_return_type(_nala_data_p) \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(arg); \
-    }
-
 struct struct_param_type __wrap_struct_param_and_return_type(struct struct_param_type arg)
 {
     struct _nala_instance_type_for_struct_param_and_return_type *_nala_instance_p;
+    struct _nala_data_type_for_struct_param_and_return_type *_nala_data_p;
     struct struct_param_type return_value;
 
     switch (nala_state_for_struct_param_and_return_type.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_struct_param_and_return_type.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_struct_param_and_return_type.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_struct_param_and_return_type.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked struct_param_and_return_type() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked struct_param_and_return_type() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_struct_param_and_return_type.data;
         }
 
-        MOCK_ASSERT_struct_param_and_return_type(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(arg);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -10909,13 +11105,8 @@ struct struct_param_type __wrap_struct_param_and_return_type(struct struct_param
         nala_state_for_struct_param_and_return_type.data.implementation(arg);
         break;
 
-    case 3:
-        MOCK_ASSERT_struct_param_and_return_type(&nala_state_for_struct_param_and_return_type.data);
-        return_value = nala_state_for_struct_param_and_return_type.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -11095,38 +11286,48 @@ struct _nala_data_params_for_time *nala_get_params_time()
     return (&nala_get_data_time()->params);
 }
 
-#define MOCK_ASSERT_time(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), time, tloc); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               time, \
-                               tloc); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(tloc); \
-    }
-
 time_t __wrap_time(time_t *tloc)
 {
     struct _nala_instance_type_for_time *_nala_instance_p;
+    struct _nala_data_type_for_time *_nala_data_p;
     time_t return_value;
 
     switch (nala_state_for_time.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_time.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_time.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_time.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked time() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked time() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_time.data;
         }
 
-        MOCK_ASSERT_time(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, time, tloc);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   time,
+                                   tloc);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(tloc);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -11134,13 +11335,8 @@ time_t __wrap_time(time_t *tloc)
         nala_state_for_time.data.implementation(tloc);
         break;
 
-    case 3:
-        MOCK_ASSERT_time(&nala_state_for_time.data);
-        return_value = nala_state_for_time.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -11378,45 +11574,55 @@ struct _nala_data_params_for_timerfd_settime *nala_get_params_timerfd_settime()
     return (&nala_get_data_timerfd_settime()->params);
 }
 
-#define MOCK_ASSERT_timerfd_settime(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), timerfd_settime, new_value); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), timerfd_settime, old_value); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), timerfd_settime, fd); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), timerfd_settime, flags); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_in_struct_itimerspec, \
-                               timerfd_settime, \
-                               new_value); \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_in_struct_itimerspec, \
-                               timerfd_settime, \
-                               old_value); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(fd, flags, new_value, old_value); \
-    }
-
 int __wrap_timerfd_settime(int fd, int flags, const struct itimerspec *new_value, struct itimerspec *old_value)
 {
     struct _nala_instance_type_for_timerfd_settime *_nala_instance_p;
+    struct _nala_data_type_for_timerfd_settime *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_timerfd_settime.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_timerfd_settime.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_timerfd_settime.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_timerfd_settime.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked timerfd_settime() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked timerfd_settime() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_timerfd_settime.data;
         }
 
-        MOCK_ASSERT_timerfd_settime(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, timerfd_settime, new_value);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, timerfd_settime, old_value);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, timerfd_settime, fd);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, timerfd_settime, flags);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_in_struct_itimerspec,
+                                   timerfd_settime,
+                                   new_value);
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_in_struct_itimerspec,
+                                   timerfd_settime,
+                                   old_value);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(fd, flags, new_value, old_value);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -11424,13 +11630,8 @@ int __wrap_timerfd_settime(int fd, int flags, const struct itimerspec *new_value
         nala_state_for_timerfd_settime.data.implementation(fd, flags, new_value, old_value);
         break;
 
-    case 3:
-        MOCK_ASSERT_timerfd_settime(&nala_state_for_timerfd_settime.data);
-        return_value = nala_state_for_timerfd_settime.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -11723,33 +11924,43 @@ struct _nala_data_params_for_tmpfile *nala_get_params_tmpfile()
     return (&nala_get_data_tmpfile()->params);
 }
 
-#define MOCK_ASSERT_tmpfile(_nala_data_p) \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(); \
-    }
-
 FILE *__wrap_tmpfile(void)
 {
     struct _nala_instance_type_for_tmpfile *_nala_instance_p;
+    struct _nala_data_type_for_tmpfile *_nala_data_p;
     FILE *return_value;
 
     switch (nala_state_for_tmpfile.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_tmpfile.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_tmpfile.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_tmpfile.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked tmpfile() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked tmpfile() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_tmpfile.data;
         }
 
-        MOCK_ASSERT_tmpfile(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback();
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -11757,13 +11968,8 @@ FILE *__wrap_tmpfile(void)
         nala_state_for_tmpfile.data.implementation();
         break;
 
-    case 3:
-        MOCK_ASSERT_tmpfile(&nala_state_for_tmpfile.data);
-        return_value = nala_state_for_tmpfile.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -11938,33 +12144,43 @@ struct _nala_data_params_for_typedef_struct_param_and_return_type *nala_get_para
     return (&nala_get_data_typedef_struct_param_and_return_type()->params);
 }
 
-#define MOCK_ASSERT_typedef_struct_param_and_return_type(_nala_data_p) \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(arg); \
-    }
-
 struct_param_type __wrap_typedef_struct_param_and_return_type(struct_param_type arg)
 {
     struct _nala_instance_type_for_typedef_struct_param_and_return_type *_nala_instance_p;
+    struct _nala_data_type_for_typedef_struct_param_and_return_type *_nala_data_p;
     struct_param_type return_value;
 
     switch (nala_state_for_typedef_struct_param_and_return_type.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_typedef_struct_param_and_return_type.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_typedef_struct_param_and_return_type.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_typedef_struct_param_and_return_type.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked typedef_struct_param_and_return_type() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked typedef_struct_param_and_return_type() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_typedef_struct_param_and_return_type.data;
         }
 
-        MOCK_ASSERT_typedef_struct_param_and_return_type(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(arg);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -11972,13 +12188,8 @@ struct_param_type __wrap_typedef_struct_param_and_return_type(struct_param_type 
         nala_state_for_typedef_struct_param_and_return_type.data.implementation(arg);
         break;
 
-    case 3:
-        MOCK_ASSERT_typedef_struct_param_and_return_type(&nala_state_for_typedef_struct_param_and_return_type.data);
-        return_value = nala_state_for_typedef_struct_param_and_return_type.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -12153,33 +12364,43 @@ struct _nala_data_params_for_typedef_union_param_and_return_type *nala_get_param
     return (&nala_get_data_typedef_union_param_and_return_type()->params);
 }
 
-#define MOCK_ASSERT_typedef_union_param_and_return_type(_nala_data_p) \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(arg); \
-    }
-
 union_type __wrap_typedef_union_param_and_return_type(union_type arg)
 {
     struct _nala_instance_type_for_typedef_union_param_and_return_type *_nala_instance_p;
+    struct _nala_data_type_for_typedef_union_param_and_return_type *_nala_data_p;
     union_type return_value;
 
     switch (nala_state_for_typedef_union_param_and_return_type.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_typedef_union_param_and_return_type.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_typedef_union_param_and_return_type.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_typedef_union_param_and_return_type.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked typedef_union_param_and_return_type() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked typedef_union_param_and_return_type() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_typedef_union_param_and_return_type.data;
         }
 
-        MOCK_ASSERT_typedef_union_param_and_return_type(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(arg);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -12187,13 +12408,8 @@ union_type __wrap_typedef_union_param_and_return_type(union_type arg)
         nala_state_for_typedef_union_param_and_return_type.data.implementation(arg);
         break;
 
-    case 3:
-        MOCK_ASSERT_typedef_union_param_and_return_type(&nala_state_for_typedef_union_param_and_return_type.data);
-        return_value = nala_state_for_typedef_union_param_and_return_type.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -12368,33 +12584,43 @@ struct _nala_data_params_for_union_param_and_return_type *nala_get_params_union_
     return (&nala_get_data_union_param_and_return_type()->params);
 }
 
-#define MOCK_ASSERT_union_param_and_return_type(_nala_data_p) \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(arg); \
-    }
-
 union union_type __wrap_union_param_and_return_type(union union_type arg)
 {
     struct _nala_instance_type_for_union_param_and_return_type *_nala_instance_p;
+    struct _nala_data_type_for_union_param_and_return_type *_nala_data_p;
     union union_type return_value;
 
     switch (nala_state_for_union_param_and_return_type.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_union_param_and_return_type.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_union_param_and_return_type.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_union_param_and_return_type.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked union_param_and_return_type() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked union_param_and_return_type() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_union_param_and_return_type.data;
         }
 
-        MOCK_ASSERT_union_param_and_return_type(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(arg);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -12402,13 +12628,8 @@ union union_type __wrap_union_param_and_return_type(union union_type arg)
         nala_state_for_union_param_and_return_type.data.implementation(arg);
         break;
 
-    case 3:
-        MOCK_ASSERT_union_param_and_return_type(&nala_state_for_union_param_and_return_type.data);
-        return_value = nala_state_for_union_param_and_return_type.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -12584,34 +12805,44 @@ struct _nala_data_params_for_usleep *nala_get_params_usleep()
     return (&nala_get_data_usleep()->params);
 }
 
-#define MOCK_ASSERT_usleep(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), usleep, usec); \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(usec); \
-    }
-
 int __wrap_usleep(__useconds_t usec)
 {
     struct _nala_instance_type_for_usleep *_nala_instance_p;
+    struct _nala_data_type_for_usleep *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_usleep.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_usleep.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_usleep.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_usleep.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked usleep() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked usleep() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_usleep.data;
         }
 
-        MOCK_ASSERT_usleep(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, usleep, usec);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(usec);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -12619,13 +12850,8 @@ int __wrap_usleep(__useconds_t usec)
         nala_state_for_usleep.data.implementation(usec);
         break;
 
-    case 3:
-        MOCK_ASSERT_usleep(&nala_state_for_usleep.data);
-        return_value = nala_state_for_usleep.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -12820,40 +13046,50 @@ struct _nala_data_params_for_write *nala_get_params_write()
     return (&nala_get_data_write()->params);
 }
 
-#define MOCK_ASSERT_write(_nala_data_p) \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), write, buf); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), write, fd); \
-    MOCK_ASSERT_IN_EQ((_nala_data_p), write, count); \
- \
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               nala_mock_assert_memory, \
-                               write, \
-                               buf); \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(fd, buf, count); \
-    }
-
 ssize_t __wrap_write(int fd, const void *buf, size_t count)
 {
     struct _nala_instance_type_for_write *_nala_instance_p;
+    struct _nala_data_type_for_write *_nala_data_p;
     ssize_t return_value;
 
     switch (nala_state_for_write.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_write.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_write.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_write.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked write() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked write() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_write.data;
         }
 
-        MOCK_ASSERT_write(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, write, buf);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, write, fd);
+        MOCK_ASSERT_IN_EQ(_nala_data_p, write, count);
+
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   nala_mock_assert_memory,
+                                   write,
+                                   buf);
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback(fd, buf, count);
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -12861,13 +13097,8 @@ ssize_t __wrap_write(int fd, const void *buf, size_t count)
         nala_state_for_write.data.implementation(fd, buf, count);
         break;
 
-    case 3:
-        MOCK_ASSERT_write(&nala_state_for_write.data);
-        return_value = nala_state_for_write.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 

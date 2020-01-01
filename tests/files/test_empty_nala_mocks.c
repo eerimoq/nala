@@ -508,6 +508,11 @@ void nala_state_resume(struct nala_state_t *state_p)
     }
 }
 
+void nala_mock_none_fail()
+{
+    FAIL();
+}
+
 void nala_suspend_all_mocks(void)
 {
 }

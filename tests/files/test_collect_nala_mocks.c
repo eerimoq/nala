@@ -508,6 +508,11 @@ void nala_state_resume(struct nala_state_t *state_p)
     }
 }
 
+void nala_mock_none_fail()
+{
+    FAIL();
+}
+
 void nala_suspend_all_mocks(void)
 {
     bar_mock_suspend();
@@ -611,33 +616,43 @@ struct _nala_data_params_for_bar *nala_get_params_bar()
     return (&nala_get_data_bar()->params);
 }
 
-#define MOCK_ASSERT_bar(_nala_data_p) \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(); \
-    }
-
 int __wrap_bar()
 {
     struct _nala_instance_type_for_bar *_nala_instance_p;
+    struct _nala_data_type_for_bar *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_bar.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_bar.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_bar.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_bar.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked bar() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked bar() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_bar.data;
         }
 
-        MOCK_ASSERT_bar(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback();
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -645,13 +660,8 @@ int __wrap_bar()
         nala_state_for_bar.data.implementation();
         break;
 
-    case 3:
-        MOCK_ASSERT_bar(&nala_state_for_bar.data);
-        return_value = nala_state_for_bar.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -826,33 +836,43 @@ struct _nala_data_params_for_fie *nala_get_params_fie()
     return (&nala_get_data_fie()->params);
 }
 
-#define MOCK_ASSERT_fie(_nala_data_p) \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(); \
-    }
-
 int __wrap_fie()
 {
     struct _nala_instance_type_for_fie *_nala_instance_p;
+    struct _nala_data_type_for_fie *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_fie.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_fie.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_fie.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_fie.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked fie() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked fie() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_fie.data;
         }
 
-        MOCK_ASSERT_fie(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback();
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -860,13 +880,8 @@ int __wrap_fie()
         nala_state_for_fie.data.implementation();
         break;
 
-    case 3:
-        MOCK_ASSERT_fie(&nala_state_for_fie.data);
-        return_value = nala_state_for_fie.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -1041,33 +1056,43 @@ struct _nala_data_params_for_foo *nala_get_params_foo()
     return (&nala_get_data_foo()->params);
 }
 
-#define MOCK_ASSERT_foo(_nala_data_p) \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(); \
-    }
-
 int __wrap_foo()
 {
     struct _nala_instance_type_for_foo *_nala_instance_p;
+    struct _nala_data_type_for_foo *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_foo.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_foo.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_foo.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_foo.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked foo() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked foo() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_foo.data;
         }
 
-        MOCK_ASSERT_foo(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback();
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -1075,13 +1100,8 @@ int __wrap_foo()
         nala_state_for_foo.data.implementation();
         break;
 
-    case 3:
-        MOCK_ASSERT_foo(&nala_state_for_foo.data);
-        return_value = nala_state_for_foo.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -1256,33 +1276,43 @@ struct _nala_data_params_for_fum *nala_get_params_fum()
     return (&nala_get_data_fum()->params);
 }
 
-#define MOCK_ASSERT_fum(_nala_data_p) \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(); \
-    }
-
 int __wrap_fum()
 {
     struct _nala_instance_type_for_fum *_nala_instance_p;
+    struct _nala_data_type_for_fum *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_fum.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_fum.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_fum.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_fum.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked fum() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked fum() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_fum.data;
         }
 
-        MOCK_ASSERT_fum(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback();
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -1290,13 +1320,8 @@ int __wrap_fum()
         nala_state_for_fum.data.implementation();
         break;
 
-    case 3:
-        MOCK_ASSERT_fum(&nala_state_for_fum.data);
-        return_value = nala_state_for_fum.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -1471,33 +1496,43 @@ struct _nala_data_params_for_gam *nala_get_params_gam()
     return (&nala_get_data_gam()->params);
 }
 
-#define MOCK_ASSERT_gam(_nala_data_p) \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(); \
-    }
-
 int __wrap_gam()
 {
     struct _nala_instance_type_for_gam *_nala_instance_p;
+    struct _nala_data_type_for_gam *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_gam.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_gam.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_gam.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_gam.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked gam() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked gam() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_gam.data;
         }
 
-        MOCK_ASSERT_gam(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback();
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -1505,13 +1540,8 @@ int __wrap_gam()
         nala_state_for_gam.data.implementation();
         break;
 
-    case 3:
-        MOCK_ASSERT_gam(&nala_state_for_gam.data);
-        return_value = nala_state_for_gam.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
@@ -1686,33 +1716,43 @@ struct _nala_data_params_for_hit *nala_get_params_hit()
     return (&nala_get_data_hit()->params);
 }
 
-#define MOCK_ASSERT_hit(_nala_data_p) \
- \
- \
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-        (_nala_data_p)->callback(); \
-    }
-
 int __wrap_hit()
 {
     struct _nala_instance_type_for_hit *_nala_instance_p;
+    struct _nala_data_type_for_hit *_nala_data_p;
     int return_value;
 
     switch (nala_state_for_hit.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP(nala_state_for_hit.instances, &_nala_instance_p);
+    case 3:
+        if (nala_state_for_hit.state.mode == 1) {
+            NALA_INSTANCES_POP(nala_state_for_hit.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked hit() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked hit() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_hit.data;
         }
 
-        MOCK_ASSERT_hit(&_nala_instance_p->data);
-        return_value = _nala_instance_p->data.return_value;
-        nala_free(_nala_instance_p);
+
+
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+            _nala_data_p->callback();
+        }
+
+        return_value = _nala_data_p->return_value;
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -1720,13 +1760,8 @@ int __wrap_hit()
         nala_state_for_hit.data.implementation();
         break;
 
-    case 3:
-        MOCK_ASSERT_hit(&nala_state_for_hit.data);
-        return_value = nala_state_for_hit.data.return_value;
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 

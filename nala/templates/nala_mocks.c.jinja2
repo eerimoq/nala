@@ -115,50 +115,10 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
     return (&nala_get_data_{{mock.func_name}}()->params);
 }
 
-#define MOCK_ASSERT_{{mock.func_name}}(_nala_data_p) \
-    {% for param in mock.char_pointer_params %}
-    MOCK_ASSERT_IN_EQ((_nala_data_p), {{mock.func_name}}, {{param.name}}); \
-    {% endfor %}
-    {% for param in mock.pointer_params %}
-    MOCK_ASSERT_IN_EQ((_nala_data_p), {{mock.func_name}}, {{param.name}}); \
-    {% endfor %}
-    {% for param in mock.non_pointer_params %}
-    MOCK_ASSERT_IN_EQ((_nala_data_p), {{mock.func_name}}, {{param.name}}); \
-    {% endfor %}
- \
-    {% for param, check in mock.set_params %}
-    MOCK_ASSERT_COPY_SET_PARAM(&(_nala_data_p)->params, \
-                               {{check}}, \
-                               {{mock.func_name}}, \
-                               {{param.name}}); \
-    {% endfor %}
- \
-    {% if mock.is_variadic_func %}
-    { \
-        va_list __nala_vl; \
-        va_start(__nala_vl, {{mock.va_list_start_arg_name}}); \
-        nala_va_arg_list_assert(&(_nala_data_p)->params._nala_va_arg_list, __nala_vl); \
-        va_end(__nala_vl); \
-        nala_va_arg_list_destroy(&(_nala_data_p)->params._nala_va_arg_list); \
-    } \
- \
-    {% endif %}
-    errno = (_nala_data_p)->errno_value; \
- \
-    if ((_nala_data_p)->callback != NULL) { \
-    {% if mock.is_variadic_func %}
-        va_list __nala_vl; \
-        va_start(__nala_vl, {{mock.va_list_start_arg_name}}); \
-        (_nala_data_p)->callback({{mock.forward_args}}); \
-        va_end(__nala_vl); \
-    {% else %}
-        (_nala_data_p)->callback({{mock.forward_args}}); \
-    {% endif %}
-    }
-
 {{mock.wrapped_decl | render}}
 {
     struct _nala_instance_type_for_{{mock.func_name}} *_nala_instance_p;
+    struct _nala_data_type_for_{{mock.func_name}} *_nala_data_p;
     {% if mock.return_value %}
     {{mock.return_value_decl | render}};
     {% endif %}
@@ -166,18 +126,68 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
     switch ({{mock.state_name}}.state.mode) {
 
     case 1:
-        NALA_INSTANCES_POP({{mock.state_name}}.instances, &_nala_instance_p);
+    case 3:
+        if ({{mock.state_name}}.state.mode == 1) {
+            NALA_INSTANCES_POP({{mock.state_name}}.instances, &_nala_instance_p);
 
-        if (_nala_instance_p == NULL) {
-            NALA_TEST_FAILURE(nala_format(
-                    "Mocked {{mock.func_name}}() called more times than expected.\n"));
+            if (_nala_instance_p == NULL) {
+                NALA_TEST_FAILURE(nala_format(
+                        "Mocked {{mock.func_name}}() called more times than expected.\n"));
+            }
+
+            _nala_data_p = &_nala_instance_p->data;
+        } else {
+            _nala_instance_p = NULL;
+            _nala_data_p = &nala_state_for_{{mock.func_name}}.data;
         }
 
-        MOCK_ASSERT_{{mock.func_name}}(&_nala_instance_p->data);
-        {% if mock.return_value %}
-        return_value = _nala_instance_p->data.return_value;
+        {% for param in mock.char_pointer_params %}
+        MOCK_ASSERT_IN_EQ(_nala_data_p, {{mock.func_name}}, {{param.name}});
+        {% endfor %}
+        {% for param in mock.pointer_params %}
+        MOCK_ASSERT_IN_EQ(_nala_data_p, {{mock.func_name}}, {{param.name}});
+        {% endfor %}
+        {% for param in mock.non_pointer_params %}
+        MOCK_ASSERT_IN_EQ(_nala_data_p, {{mock.func_name}}, {{param.name}});
+        {% endfor %}
+
+        {% for param, check in mock.set_params %}
+        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+                                   {{check}},
+                                   {{mock.func_name}},
+                                   {{param.name}});
+        {% endfor %}
+
+        {% if mock.is_variadic_func %}
+        {
+            va_list __nala_vl;
+            va_start(__nala_vl, {{mock.va_list_start_arg_name}});
+            nala_va_arg_list_assert(&_nala_data_p->params._nala_va_arg_list, __nala_vl);
+            va_end(__nala_vl);
+            nala_va_arg_list_destroy(&_nala_data_p->params._nala_va_arg_list);
+        }
+
         {% endif %}
-        nala_free(_nala_instance_p);
+        errno = _nala_data_p->errno_value;
+
+        if (_nala_data_p->callback != NULL) {
+        {% if mock.is_variadic_func %}
+            va_list __nala_vl;
+            va_start(__nala_vl, {{mock.va_list_start_arg_name}});
+            _nala_data_p->callback({{mock.forward_args}});
+            va_end(__nala_vl);
+        {% else %}
+            _nala_data_p->callback({{mock.forward_args}});
+        {% endif %}
+        }
+
+        {% if mock.return_value %}
+        return_value = _nala_data_p->return_value;
+        {% endif %}
+
+        if (_nala_instance_p != NULL) {
+            nala_free(_nala_instance_p);
+        }
         break;
 
     case 2:
@@ -199,15 +209,8 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
         {% endif %}
         break;
 
-    case 3:
-        MOCK_ASSERT_{{mock.func_name}}(&{{mock.state_name}}.data);
-        {% if mock.return_value %}
-        return_value = {{mock.state_name}}.data.return_value;
-        {% endif %}
-        break;
-
     case 4:
-        FAIL();
+        nala_mock_none_fail();
         exit(1);
         break;
 
