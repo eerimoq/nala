@@ -81,17 +81,18 @@ struct _nala_instances_type_for_{{mock.func_name}} {
 };
 
 struct {{mock.state_type}} {
-    int mode;
-    struct nala_suspended_t suspended;
+    struct nala_state_t state;
     struct _nala_data_type_for_{{mock.func_name}} data;
     struct _nala_instances_type_for_{{mock.func_name}} instances;
 };
 
 static struct {{mock.state_type}} {{mock.state_name}} = {
-    .mode = 0,
-    .suspended = {
-        .count = 0,
-        .mode = 0
+    .state = {
+        .mode = 0,
+        .suspended = {
+            .count = 0,
+            .mode = 0
+        }
     },
     .instances = {
         .head_p = NULL,
@@ -162,7 +163,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
     {{mock.return_value_decl | render}};
     {% endif %}
 
-    switch ({{mock.state_name}}.mode) {
+    switch ({{mock.state_name}}.state.mode) {
 
     case 1:
         NALA_INSTANCES_POP({{mock.state_name}}.instances, &_nala_instance_p);
@@ -235,7 +236,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
 
 {{mock.mock_func | render}}
 {
-    {{mock.state_name}}.mode = 3;
+    {{mock.state_name}}.state.mode = 3;
     {% if mock.is_variadic_func %}
 
     if (vafmt_p == NULL) {
@@ -282,7 +283,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
 {
     struct _nala_instance_type_for_{{mock.func_name}} *_nala_instance_p;
 
-    {{mock.state_name}}.mode = 1;
+    {{mock.state_name}}.state.mode = 1;
     _nala_instance_p = nala_xmalloc(sizeof(*_nala_instance_p));
     nala_traceback(&_nala_instance_p->data.traceback);
     {% for param, _ in mock.set_params %}
@@ -339,7 +340,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
 
 void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
 {
-    {{mock.state_name}}.mode = 3;
+    {{mock.state_name}}.state.mode = 3;
     {% for param in mock.char_pointer_params %}
     {{mock.state_name}}.data.params.ignore_{{param.name}}_in = true;
     {% endfor %}
@@ -360,7 +361,7 @@ void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
 {
     struct _nala_instance_type_for_{{mock.func_name}} *instance_p;
 
-    {{mock.state_name}}.mode = 1;
+    {{mock.state_name}}.state.mode = 1;
     instance_p = nala_xmalloc(sizeof(*instance_p));
     nala_traceback(&instance_p->data.traceback);
     {% for param, _ in mock.set_params %}
@@ -495,28 +496,28 @@ void {{mock.func_name}}_mock_set_va_arg_out_at(unsigned int index, const void *b
 
 void {{mock.func_name}}_mock_none(void)
 {
-    {{mock.state_name}}.mode = 4;
+    {{mock.state_name}}.state.mode = 4;
 }
 
 void {{mock.func_name}}_mock_implementation({{mock.implementation_decl | render}})
 {
-    {{mock.state_name}}.mode = 2;
+    {{mock.state_name}}.state.mode = 2;
     {{mock.state_name}}.data.implementation = implementation;
 }
 
 void {{mock.func_name}}_mock_disable(void)
 {
-    {{mock.state_name}}.mode = 0;
+    {{mock.state_name}}.state.mode = 0;
 }
 
 void {{mock.func_name}}_mock_suspend(void)
 {
-    NALA_STATE_SUSPEND({{mock.state_name}});
+    nala_state_suspend(&{{mock.state_name}}.state);
 }
 
 void {{mock.func_name}}_mock_resume(void)
 {
-    NALA_STATE_RESUME({{mock.state_name}});
+    nala_state_resume(&{{mock.state_name}}.state);
 }
 
 void {{mock.func_name}}_mock_reset(void)

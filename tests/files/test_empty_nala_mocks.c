@@ -41,24 +41,11 @@ Do not edit manually
         }                                               \
     } while (0);
 
-#define NALA_STATE_SUSPEND(state)               \
-    if ((state).suspended.count == 0) {         \
-        (state).suspended.mode = (state).mode;  \
-        (state).mode = 0;                       \
-    }                                           \
-    (state).suspended.count++;
-
-#define NALA_STATE_RESUME(state)                 \
-    (state).suspended.count--;                   \
-    if ((state).suspended.count == 0) {          \
-        (state).mode = (state).suspended.mode;   \
-    }
-
-#define NALA_STATE_RESET(state)                 \
-    (state).mode = 0;                           \
-    (state).instances.head_p = NULL;            \
-    (state).instances.tail_p = NULL;            \
-    (state).instances.length = 0;
+#define NALA_STATE_RESET(_state)                \
+    (_state).state.mode = 0;                    \
+    (_state).instances.head_p = NULL;           \
+    (_state).instances.tail_p = NULL;           \
+    (_state).instances.length = 0;
 
 struct nala_set_param {
     void *buf_p;
@@ -128,16 +115,9 @@ struct nala_suspended_t {
     int mode;
 };
 
-struct nala_instances_t {
-    void *head_p;
-    void *tail_p;
-    int length;
-};
-
-struct nala_state_type_t {
+struct nala_state_t {
     int mode;
     struct nala_suspended_t suspended;
-    struct nala_instances_t instances;
 };
 
 void nala_va_arg_list_init(struct nala_va_arg_list_t *self_p)
@@ -506,6 +486,25 @@ void nala_mock_assert_memory(const char *func_p,
                               left_p,
                               right_p,
                               size));
+    }
+}
+
+void nala_state_suspend(struct nala_state_t *state_p)
+{
+    if (state_p->suspended.count == 0) {
+        state_p->suspended.mode = state_p->mode;
+        state_p->mode = 0;
+    }
+
+    state_p->suspended.count++;
+}
+
+void nala_state_resume(struct nala_state_t *state_p)
+{
+    state_p->suspended.count--;
+
+    if (state_p->suspended.count == 0) {
+        state_p->mode = state_p->suspended.mode;
     }
 }
 
