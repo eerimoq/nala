@@ -789,6 +789,21 @@ bool nala_check_memory(const void *left_p, const void *right_p, size_t size)
              || (memcmp(left_p, right_p, size) != 0));
 }
 
+static bool traceback_skip_filter(void *arg_p, const char *line_p)
+{
+    (void)arg_p;
+
+    if (strstr(line_p, "nala.c:") != NULL) {
+        return (true);
+    }
+
+    if (strstr(line_p, "??") != NULL) {
+        return (true);
+    }
+
+    return (false);
+}
+
 void nala_test_failure(const char *file_p,
                        int line,
                        const char *message_p)
@@ -803,7 +818,7 @@ void nala_test_failure(const char *file_p,
     printf("  Location:  %s:%d\n", file_p, line);
     printf("  Error:     %s", message_p);
     print_location_context(file_p, (size_t)line);
-    nala_traceback_print("  ");
+    nala_traceback_print("  ", traceback_skip_filter, NULL);
     printf("\n");
     exit(1);
 }

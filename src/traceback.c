@@ -41,7 +41,38 @@ static void *fixaddr(void *address_p)
     return ((void *)(((uintptr_t)address_p) - 1));
 }
 
-char *nala_traceback_format(const char *prefix_p, void **buffer_pp, int depth)
+static bool is_nala_traceback_line(const char *line_p)
+{
+    if (strncmp(line_p, "nala_traceback_print at ", 19) == 0) {
+        return (true);
+    }
+
+    if (strncmp(line_p, "nala_traceback_string at ", 20) == 0) {
+        return (true);
+    }
+
+    return (false);
+}
+
+static char *strip_discriminator(char *line_p)
+{
+    char *discriminator_p;
+
+    discriminator_p = strstr(line_p, " (discriminator");
+
+    if (discriminator_p != NULL) {
+        discriminator_p[0] = '\n';
+        discriminator_p[1] = '\0';
+    }
+
+    return (line_p);
+}
+
+char *nala_traceback_format(void **buffer_pp,
+                       int depth,
+                       const char *prefix_p,
+                       nala_traceback_skip_filter_t skip_filter,
+                       void *arg_p)
 {
     char exe[256];
     char command[384];
@@ -51,7 +82,6 @@ char *nala_traceback_format(const char *prefix_p, void **buffer_pp, int depth)
     size_t stream_size;
     struct nala_subprocess_result_t *result_p;
     char *string_p;
-    char *discriminator_p;
 
     if (prefix_p == NULL) {
         prefix_p = "";
@@ -82,21 +112,28 @@ char *nala_traceback_format(const char *prefix_p, void **buffer_pp, int depth)
 
         result_p = nala_subprocess_exec_output(&command[0]);
 
-        if (result_p->exit_code == 0) {
-            fprintf(stream_p, "%s  ", prefix_p);
-            discriminator_p = strstr(result_p->stdout.buf_p, " (discriminator");
-
-            if (discriminator_p != NULL) {
-                discriminator_p[0] = '\n';
-                discriminator_p[1] = '\0';
-            }
-
-            fwrite(result_p->stdout.buf_p,
-                   1,
-                   strlen(result_p->stdout.buf_p),
-                   stream_p);
+        if (result_p->exit_code != 0) {
+            nala_subprocess_result_free(result_p);
+            continue;
         }
 
+        if (is_nala_traceback_line(result_p->stdout.buf_p)) {
+            nala_subprocess_result_free(result_p);
+            continue;
+        }
+
+        if (skip_filter != NULL) {
+            if (skip_filter(arg_p, result_p->stdout.buf_p)) {
+                nala_subprocess_result_free(result_p);
+                continue;
+            }
+        }
+
+        fprintf(stream_p, "%s  ", prefix_p);
+        fwrite(strip_discriminator(result_p->stdout.buf_p),
+               1,
+               strlen(result_p->stdout.buf_p),
+               stream_p);
         nala_subprocess_result_free(result_p);
     }
 
@@ -105,11 +142,29 @@ char *nala_traceback_format(const char *prefix_p, void **buffer_pp, int depth)
     return (string_p);
 }
 
-void nala_traceback_print(const char *prefix_p)
+char *nala_traceback_string(const char *prefix_p,
+                       nala_traceback_skip_filter_t skip_filter,
+                       void *arg_p)
 {
     int depth;
     void *addresses[DEPTH_MAX];
 
     depth = backtrace(&addresses[0], DEPTH_MAX);
-    printf("%s", nala_traceback_format(prefix_p, addresses, depth));
+
+    return (nala_traceback_format(addresses,
+                             depth,
+                             prefix_p,
+                             skip_filter,
+                             arg_p));
+}
+
+void nala_traceback_print(const char *prefix_p,
+                     nala_traceback_skip_filter_t skip_filter,
+                     void *arg_p)
+{
+    char *string_p;
+
+    string_p = nala_traceback_string(prefix_p, skip_filter, arg_p);
+    printf("%s", string_p);
+    free(string_p);
 }
