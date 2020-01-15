@@ -1164,8 +1164,62 @@ int nala_run_tests()
     return (run_tests(tests.head_p));
 }
 
-__attribute__((weak)) int main(void)
+static void print_usage_and_exit()
 {
+    printf("usage: ./main [--help] [--version] [<test-pattern>]\n"
+           "\n"
+           "Run tests.\n"
+           "\n"
+           "positional arguments:\n"
+           "  test-pattern          Only run tests containing given pattern.\n"
+           "\n"
+           "optional arguments:\n"
+           "  --help                Show this help message and exit.\n"
+           "  --version             Print version information.\n");
+    exit(0);
+}
+
+static void print_version_and_exit()
+{
+    printf("%s\n", NALA_VERSION);
+    exit(0);
+}
+
+static void filter_tests(const char *test_pattern_p)
+{
+    struct nala_test_t *test_p;
+
+    test_p = tests.head_p;
+    tests.head_p = NULL;
+    tests.tail_p = NULL;
+
+    while (test_p != NULL) {
+        if (strstr(full_test_name(test_p), test_pattern_p) != NULL) {
+            nala_register_test(test_p);
+        }
+
+        test_p = test_p->next_p;
+    }
+
+    if (tests.tail_p != NULL) {
+        tests.tail_p->next_p = NULL;
+    }
+}
+
+__attribute__((weak)) int main(int argc, const char *argv[])
+{
+    if (argc == 2) {
+        if (strcmp(argv[1], "--help") == 0) {
+            print_usage_and_exit();
+        } else if (strcmp(argv[1], "--version") == 0) {
+            print_version_and_exit();
+        } else {
+            filter_tests(argv[1]);
+        }
+    } else if (argc != 1) {
+        print_usage_and_exit();
+    }
+
     return (nala_run_tests());
 }
 /*

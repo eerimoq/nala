@@ -41,6 +41,9 @@ Drop the two files in your project, make sure ``nala.c`` is compiled
 and linked just like the other source files of your test program and
 you should be good to go.
 
+The test program takes an optional single argument to filter out which
+tests to run.
+
 Example
 =======
 
