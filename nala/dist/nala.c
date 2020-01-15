@@ -540,20 +540,30 @@ static float timeval_to_ms(struct timeval *timeval_p)
     return (res);
 }
 
-static void print_signal_failure(struct nala_test_t *test_p)
+static void print_test_failure_report_begin()
 {
     printf("-------------------------- "
            "TEST FAILURE REPORT BEGIN "
            "--------------------------\n");
     printf("\n");
-    printf("  Test name: " COLOR(GREEN, "%s\n"), full_test_name(current_test_p));
-    printf("  Location:  " COLOR(CYAN, "unknown\n"));
-    printf("  Error:     " COLOR_BOLD(RED, "Terminated by signal %d.\n"),
-           test_p->signal_number);
+}
+
+static void print_test_failure_report_end()
+{
     printf("\n");
     printf("--------------------------- "
            "TEST FAILURE REPORT END "
            "---------------------------\n");
+}
+
+static void print_signal_failure(struct nala_test_t *test_p)
+{
+    print_test_failure_report_begin();
+    printf("  Test name: " COLOR(GREEN, "%s\n"), full_test_name(current_test_p));
+    printf("  Location:  " COLOR(CYAN, "unknown\n"));
+    printf("  Error:     " COLOR_BOLD(RED, "Terminated by signal %d.\n"),
+           test_p->signal_number);
+    print_test_failure_report_end();
 }
 
 static void print_location_context(const char *filename_p, size_t line_number)
@@ -1116,19 +1126,13 @@ void nala_test_failure(const char *file_p,
     nala_capture_output_stop();
     capture_output_destroy(&capture_stdout);
     capture_output_destroy(&capture_stderr);
-    printf("-------------------------- "
-           "TEST FAILURE REPORT BEGIN "
-           "--------------------------\n");
-    printf("\n");
+    print_test_failure_report_begin();
     printf("  Test name: " COLOR(GREEN, "%s\n"), full_test_name(current_test_p));
     printf("  Location:  " COLOR(CYAN, "%s:%d\n"), file_p, line);
     printf("  Error:     %s", message_p);
     print_location_context(file_p, (size_t)line);
     nala_traceback_print("  ", traceback_skip_filter, NULL);
-    printf("\n");
-    printf("--------------------------- "
-           "TEST FAILURE REPORT END "
-           "---------------------------\n");
+    print_test_failure_report_end();
     exit(1);
 }
 
