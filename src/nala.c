@@ -244,12 +244,18 @@ static float timeval_to_ms(struct timeval *timeval_p)
 
 static void print_signal_failure(struct nala_test_t *test_p)
 {
+    printf("-------------------------- "
+           "TEST FAILURE REPORT BEGIN "
+           "--------------------------\n");
     printf("\n");
-    printf("%s failed:\n", full_test_name(test_p));
-    printf("\n");
-    printf("  Location: unknown\n");
-    printf("  Error:    " COLOR_BOLD(RED, "Terminated by signal %d.\n"),
+    printf("  Test name: " COLOR(GREEN, "%s\n"), full_test_name(current_test_p));
+    printf("  Location:  " COLOR(CYAN, "unknown\n"));
+    printf("  Error:     " COLOR_BOLD(RED, "Terminated by signal %d.\n"),
            test_p->signal_number);
+    printf("\n");
+    printf("--------------------------- "
+           "TEST FAILURE REPORT END "
+           "---------------------------\n");
 }
 
 static void print_location_context(const char *filename_p, size_t line_number)
@@ -812,14 +818,19 @@ void nala_test_failure(const char *file_p,
     nala_capture_output_stop();
     capture_output_destroy(&capture_stdout);
     capture_output_destroy(&capture_stderr);
+    printf("-------------------------- "
+           "TEST FAILURE REPORT BEGIN "
+           "--------------------------\n");
     printf("\n");
-    printf("%s failed:\n", full_test_name(current_test_p));
-    printf("\n");
-    printf("  Location:  %s:%d\n", file_p, line);
+    printf("  Test name: " COLOR(GREEN, "%s\n"), full_test_name(current_test_p));
+    printf("  Location:  " COLOR(CYAN, "%s:%d\n"), file_p, line);
     printf("  Error:     %s", message_p);
     print_location_context(file_p, (size_t)line);
     nala_traceback_print("  ", traceback_skip_filter, NULL);
     printf("\n");
+    printf("--------------------------- "
+           "TEST FAILURE REPORT END "
+           "---------------------------\n");
     exit(1);
 }
 

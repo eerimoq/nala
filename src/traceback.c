@@ -36,6 +36,12 @@
 
 #define DEPTH_MAX 100
 
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_CYAN  "\x1b[36m"
+#define ANSI_RESET       "\x1b[0m"
+
+#define COLOR(color, ...) ANSI_RESET ANSI_COLOR_##color __VA_ARGS__ ANSI_RESET
+
 static void *fixaddr(void *address_p)
 {
     return ((void *)(((uintptr_t)address_p) - 1));
@@ -66,6 +72,30 @@ static char *strip_discriminator(char *line_p)
     }
 
     return (line_p);
+}
+
+static void print_line(FILE *stream_p, const char *prefix_p, char *line_p)
+{
+    char *at_p;
+    char *function_p;
+    char *location_p;
+
+    function_p = line_p;
+    at_p = strstr(line_p, " at ");
+
+    if (at_p == NULL) {
+        fprintf(stream_p, "%s  %s", prefix_p, line_p);
+        return;
+    }
+
+    at_p[0] = '\0';
+    location_p = &at_p[4];
+
+    fprintf(stream_p,
+            "%s  " COLOR(GREEN, "%s") " at " COLOR(CYAN, "%s"),
+            prefix_p,
+            function_p,
+            location_p);
 }
 
 char *nala_traceback_format(void **buffer_pp,
@@ -129,11 +159,9 @@ char *nala_traceback_format(void **buffer_pp,
             }
         }
 
-        fprintf(stream_p, "%s  ", prefix_p);
-        fwrite(strip_discriminator(result_p->stdout.buf_p),
-               1,
-               strlen(result_p->stdout.buf_p),
-               stream_p);
+        print_line(stream_p,
+                   prefix_p,
+                   strip_discriminator(result_p->stdout.buf_p));
         nala_subprocess_result_free(result_p);
     }
 
