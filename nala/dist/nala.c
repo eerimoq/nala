@@ -8,6 +8,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <sys/time.h>
+#include <getopt.h>
 // #include "subprocess.h"
 /*
  * The MIT License (MIT)
@@ -1174,7 +1175,7 @@ int nala_run_tests()
 
 static void print_usage_and_exit(const char *program_name_p, int exit_code)
 {
-    printf("usage: %s [--help] [--version] [<test-pattern>]\n"
+    printf("usage: %s [-h] [-v] [-a] [<test-pattern>]\n"
            "\n"
            "Run tests.\n"
            "\n"
@@ -1182,9 +1183,9 @@ static void print_usage_and_exit(const char *program_name_p, int exit_code)
            "  test-pattern          Only run tests containing given pattern.\n"
            "\n"
            "optional arguments:\n"
-           "  --help                Show this help message and exit.\n"
-           "  --version             Print version information.\n"
-           "  --print-all-calls     Print all calls to ease debugging.\n",
+           "  -h, --help                Show this help message and exit.\n"
+           "  -v, --version             Print version information.\n"
+           "  -a, --print-all-calls     Print all calls to ease debugging.\n",
            program_name_p);
     exit(exit_code);
 }
@@ -1216,22 +1217,47 @@ static void filter_tests(const char *test_pattern_p)
     }
 }
 
-__attribute__((weak)) int main(int argc, const char *argv[])
+__attribute__((weak)) int main(int argc, char *argv[])
 {
+    static struct option long_options[] = {
+        { "help",            no_argument, NULL, 'h' },
+        { "version",         no_argument, NULL, 'v' },
+        { "print-all-calls", no_argument, NULL, 'a' },
+        { NULL,              no_argument, NULL, 0 }
+    };
+    int option;
+
+    /* Do not print function calls outside tests. */
     nala_suspend_all_mocks();
 
-    if (argc == 2) {
-        if (strcmp(argv[1], "--help") == 0) {
-            print_usage_and_exit(argv[0], 0);
-        } else if (strcmp(argv[1], "--version") == 0) {
-            print_version_and_exit();
-        } else if (strcmp(argv[1], "--print-all-calls") == 0) {
-            nala_print_call_mask = 0xff;
-        } else {
-            filter_tests(argv[1]);
+    while (1) {
+        option = getopt_long(argc, argv, "hva", &long_options[0], NULL);
+
+        if (option == -1) {
+            break;
         }
-    } else if (argc != 1) {
-        print_usage_and_exit(argv[0], 1);
+
+        switch (option) {
+
+        case 'h':
+            print_usage_and_exit(argv[0], 0);
+            break;
+
+        case 'v':
+            print_version_and_exit();
+            break;
+
+        case 'a':
+            nala_print_call_mask = 0xff;
+            break;
+
+        default:
+            print_usage_and_exit(argv[0], 1);
+        }
+    }
+
+    if (optind < argc) {
+        filter_tests(argv[optind]);
     }
 
     return (nala_run_tests());
