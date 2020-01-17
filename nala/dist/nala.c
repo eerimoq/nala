@@ -371,6 +371,8 @@ __attribute__ ((weak)) void nala_resume_all_mocks(void)
 {
 }
 
+__attribute__ ((weak)) int nala_print_call_mask = 0;
+
 static const char *get_node(void)
 {
     static char buf[128];
@@ -738,9 +740,11 @@ static void test_entry(void *arg_p)
     test_p = (struct nala_test_t *)arg_p;
     capture_output_init(&capture_stdout, stdout);
     capture_output_init(&capture_stderr, stderr);
+    nala_reset_all_mocks();
     test_p->func();
     nala_assert_all_mocks_completed();
     nala_reset_all_mocks();
+    nala_suspend_all_mocks();
     capture_output_destroy(&capture_stdout);
     capture_output_destroy(&capture_stderr);
     exit(0);
@@ -1168,9 +1172,9 @@ int nala_run_tests()
     return (run_tests(tests.head_p));
 }
 
-static void print_usage_and_exit()
+static void print_usage_and_exit(const char *program_name_p, int exit_code)
 {
-    printf("usage: ./main [--help] [--version] [<test-pattern>]\n"
+    printf("usage: %s [--help] [--version] [<test-pattern>]\n"
            "\n"
            "Run tests.\n"
            "\n"
@@ -1179,8 +1183,10 @@ static void print_usage_and_exit()
            "\n"
            "optional arguments:\n"
            "  --help                Show this help message and exit.\n"
-           "  --version             Print version information.\n");
-    exit(0);
+           "  --version             Print version information.\n"
+           "  --print-all-calls     Print all calls to ease debugging.\n",
+           program_name_p);
+    exit(exit_code);
 }
 
 static void print_version_and_exit()
@@ -1212,16 +1218,20 @@ static void filter_tests(const char *test_pattern_p)
 
 __attribute__((weak)) int main(int argc, const char *argv[])
 {
+    nala_suspend_all_mocks();
+
     if (argc == 2) {
         if (strcmp(argv[1], "--help") == 0) {
-            print_usage_and_exit();
+            print_usage_and_exit(argv[0], 0);
         } else if (strcmp(argv[1], "--version") == 0) {
             print_version_and_exit();
+        } else if (strcmp(argv[1], "--print-all-calls") == 0) {
+            nala_print_call_mask = 0xff;
         } else {
             filter_tests(argv[1]);
         }
     } else if (argc != 1) {
-        print_usage_and_exit();
+        print_usage_and_exit(argv[0], 1);
     }
 
     return (nala_run_tests());

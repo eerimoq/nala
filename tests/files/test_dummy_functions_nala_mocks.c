@@ -43,6 +43,7 @@ Do not edit manually
 
 #define NALA_STATE_RESET(_state)                \
     (_state).state.mode = 0;                    \
+    (_state).state.suspended.count = 0;         \
     (_state).instances.head_p = NULL;           \
     (_state).instances.tail_p = NULL;           \
     (_state).instances.length = 0;
@@ -513,6 +514,50 @@ void nala_mock_none_fail()
     FAIL();
 }
 
+int nala_print_call_mask = 0;
+
+void nala_print_call(const char *function_name_p, struct nala_state_t *state_p)
+{
+    const char *mode_p;
+
+    if (state_p->suspended.count != 0) {
+        return;
+    }
+
+    if (((1 << state_p->mode) & nala_print_call_mask) == 0) {
+        return;
+    }
+
+    switch (state_p->mode) {
+
+    case 0:
+        mode_p = "real";
+        break;
+
+    case 1:
+        mode_p = "once";
+        break;
+
+    case 2:
+        mode_p = "impl";
+        break;
+
+    case 3:
+        mode_p = "mock";
+        break;
+
+    case 4:
+        mode_p = "none";
+        break;
+
+    default:
+        mode_p = "unknown";
+        break;
+    }
+
+    printf("%s: %s()\n", mode_p, function_name_p);
+}
+
 void nala_suspend_all_mocks(void)
 {
     add_mock_suspend();
@@ -777,6 +822,8 @@ int __wrap_add(int x, int y)
     struct _nala_data_type_for_add *_nala_data_p;
     int return_value;
 
+    nala_print_call("add", &nala_state_for_add.state);
+
     switch (nala_state_for_add.state.mode) {
 
     case 1:
@@ -1025,6 +1072,8 @@ int __wrap_call(int (*callback)(int value))
     struct _nala_instance_type_for_call *_nala_instance_p;
     struct _nala_data_type_for_call *_nala_data_p;
     int return_value;
+
+    nala_print_call("call", &nala_state_for_call.state);
 
     switch (nala_state_for_call.state.mode) {
 
@@ -1300,6 +1349,8 @@ int __wrap_close(int fd)
     struct _nala_data_type_for_close *_nala_data_p;
     int return_value;
 
+    nala_print_call("close", &nala_state_for_close.state);
+
     switch (nala_state_for_close.state.mode) {
 
     case 1:
@@ -1542,6 +1593,8 @@ DummyStruct *__wrap_compose_twice(DummyStruct *dummy_struct, DummyStruct *(*dumm
     struct _nala_instance_type_for_compose_twice *_nala_instance_p;
     struct _nala_data_type_for_compose_twice *_nala_data_p;
     DummyStruct *return_value;
+
+    nala_print_call("compose_twice", &nala_state_for_compose_twice.state);
 
     switch (nala_state_for_compose_twice.state.mode) {
 
@@ -1874,6 +1927,8 @@ int __wrap_double_pointer(int **value_pp)
     struct _nala_data_type_for_double_pointer *_nala_data_p;
     int return_value;
 
+    nala_print_call("double_pointer", &nala_state_for_double_pointer.state);
+
     switch (nala_state_for_double_pointer.state.mode) {
 
     case 1:
@@ -2148,6 +2203,8 @@ int __wrap_dup(int oldfd)
     struct _nala_data_type_for_dup *_nala_data_p;
     int return_value;
 
+    nala_print_call("dup", &nala_state_for_dup.state);
+
     switch (nala_state_for_dup.state.mode) {
 
     case 1:
@@ -2382,6 +2439,8 @@ int __wrap_dup2(int oldfd, int newfd)
     struct _nala_instance_type_for_dup2 *_nala_instance_p;
     struct _nala_data_type_for_dup2 *_nala_data_p;
     int return_value;
+
+    nala_print_call("dup2", &nala_state_for_dup2.state);
 
     switch (nala_state_for_dup2.state.mode) {
 
@@ -2633,6 +2692,8 @@ DummyStruct *__wrap_edit_number(DummyStruct *dummy_struct, int number)
     struct _nala_instance_type_for_edit_number *_nala_instance_p;
     struct _nala_data_type_for_edit_number *_nala_data_p;
     DummyStruct *return_value;
+
+    nala_print_call("edit_number", &nala_state_for_edit_number.state);
 
     switch (nala_state_for_edit_number.state.mode) {
 
@@ -2924,6 +2985,8 @@ int __wrap_endmntent(FILE *streamp)
     struct _nala_data_type_for_endmntent *_nala_data_p;
     int return_value;
 
+    nala_print_call("endmntent", &nala_state_for_endmntent.state);
+
     switch (nala_state_for_endmntent.state.mode) {
 
     case 1:
@@ -3196,6 +3259,8 @@ void __wrap_enum_param(enum enum_param_type value)
     struct _nala_instance_type_for_enum_param *_nala_instance_p;
     struct _nala_data_type_for_enum_param *_nala_data_p;
 
+    nala_print_call("enum_param", &nala_state_for_enum_param.state);
+
     switch (nala_state_for_enum_param.state.mode) {
 
     case 1:
@@ -3425,6 +3490,8 @@ int __wrap_fclose(FILE *stream)
     struct _nala_instance_type_for_fclose *_nala_instance_p;
     struct _nala_data_type_for_fclose *_nala_data_p;
     int return_value;
+
+    nala_print_call("fclose", &nala_state_for_fclose.state);
 
     switch (nala_state_for_fclose.state.mode) {
 
@@ -3704,6 +3771,8 @@ int __wrap_fflush(FILE *stream)
     struct _nala_data_type_for_fflush *_nala_data_p;
     int return_value;
 
+    nala_print_call("fflush", &nala_state_for_fflush.state);
+
     switch (nala_state_for_fflush.state.mode) {
 
     case 1:
@@ -3981,6 +4050,8 @@ int __wrap_fileno(FILE *stream)
     struct _nala_instance_type_for_fileno *_nala_instance_p;
     struct _nala_data_type_for_fileno *_nala_data_p;
     int return_value;
+
+    nala_print_call("fileno", &nala_state_for_fileno.state);
 
     switch (nala_state_for_fileno.state.mode) {
 
@@ -4265,6 +4336,8 @@ FILE *__wrap_fopen(const char *path, const char *mode)
     struct _nala_instance_type_for_fopen *_nala_instance_p;
     struct _nala_data_type_for_fopen *_nala_data_p;
     FILE *return_value;
+
+    nala_print_call("fopen", &nala_state_for_fopen.state);
 
     switch (nala_state_for_fopen.state.mode) {
 
@@ -4649,6 +4722,8 @@ size_t __wrap_fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
     struct _nala_data_type_for_fread *_nala_data_p;
     size_t return_value;
 
+    nala_print_call("fread", &nala_state_for_fread.state);
+
     switch (nala_state_for_fread.state.mode) {
 
     case 1:
@@ -5002,6 +5077,8 @@ void __wrap_free(void *ptr)
     struct _nala_instance_type_for_free *_nala_instance_p;
     struct _nala_data_type_for_free *_nala_data_p;
 
+    nala_print_call("free", &nala_state_for_free.state);
+
     switch (nala_state_for_free.state.mode) {
 
     case 1:
@@ -5276,6 +5353,8 @@ int __wrap_fseek(FILE *stream, long int offset, int whence)
     struct _nala_instance_type_for_fseek *_nala_instance_p;
     struct _nala_data_type_for_fseek *_nala_data_p;
     int return_value;
+
+    nala_print_call("fseek", &nala_state_for_fseek.state);
 
     switch (nala_state_for_fseek.state.mode) {
 
@@ -5579,6 +5658,8 @@ long int __wrap_ftell(FILE *stream)
     struct _nala_data_type_for_ftell *_nala_data_p;
     long int return_value;
 
+    nala_print_call("ftell", &nala_state_for_ftell.state);
+
     switch (nala_state_for_ftell.state.mode) {
 
     case 1:
@@ -5866,6 +5947,8 @@ size_t __wrap_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
     struct _nala_instance_type_for_fwrite *_nala_instance_p;
     struct _nala_data_type_for_fwrite *_nala_data_p;
     size_t return_value;
+
+    nala_print_call("fwrite", &nala_state_for_fwrite.state);
 
     switch (nala_state_for_fwrite.state.mode) {
 
@@ -6222,6 +6305,8 @@ struct mntent *__wrap_getmntent(FILE *stream)
     struct _nala_data_type_for_getmntent *_nala_data_p;
     struct mntent *return_value;
 
+    nala_print_call("getmntent", &nala_state_for_getmntent.state);
+
     switch (nala_state_for_getmntent.state.mode) {
 
     case 1:
@@ -6498,6 +6583,8 @@ void __wrap_in_out(int *buf_p)
     struct _nala_instance_type_for_in_out *_nala_instance_p;
     struct _nala_data_type_for_in_out *_nala_data_p;
 
+    nala_print_call("in_out", &nala_state_for_in_out.state);
+
     switch (nala_state_for_in_out.state.mode) {
 
     case 1:
@@ -6764,6 +6851,8 @@ int __wrap_io_control(int kind, ...)
     struct _nala_instance_type_for_io_control *_nala_instance_p;
     struct _nala_data_type_for_io_control *_nala_data_p;
     int return_value;
+
+    nala_print_call("io_control", &nala_state_for_io_control.state);
 
     switch (nala_state_for_io_control.state.mode) {
 
@@ -7092,6 +7181,8 @@ int __wrap_io_vcontrol(int kind, va_list ap)
     struct _nala_data_type_for_io_vcontrol *_nala_data_p;
     int return_value;
 
+    nala_print_call("io_vcontrol", &nala_state_for_io_vcontrol.state);
+
     switch (nala_state_for_io_vcontrol.state.mode) {
 
     case 1:
@@ -7324,6 +7415,8 @@ void *__wrap_malloc(size_t size)
     struct _nala_instance_type_for_malloc *_nala_instance_p;
     struct _nala_data_type_for_malloc *_nala_data_p;
     void *return_value;
+
+    nala_print_call("malloc", &nala_state_for_malloc.state);
 
     switch (nala_state_for_malloc.state.mode) {
 
@@ -7581,6 +7674,8 @@ int __wrap_mount(const char *source, const char *target, const char *filesystemt
     struct _nala_instance_type_for_mount *_nala_instance_p;
     struct _nala_data_type_for_mount *_nala_data_p;
     int return_value;
+
+    nala_print_call("mount", &nala_state_for_mount.state);
 
     switch (nala_state_for_mount.state.mode) {
 
@@ -8092,6 +8187,8 @@ void __wrap_output_message(const char *message)
     struct _nala_instance_type_for_output_message *_nala_instance_p;
     struct _nala_data_type_for_output_message *_nala_data_p;
 
+    nala_print_call("output_message", &nala_state_for_output_message.state);
+
     switch (nala_state_for_output_message.state.mode) {
 
     case 1:
@@ -8384,6 +8481,8 @@ int __wrap_pipe(int pipefd[2])
     struct _nala_data_type_for_pipe *_nala_data_p;
     int return_value;
 
+    nala_print_call("pipe", &nala_state_for_pipe.state);
+
     switch (nala_state_for_pipe.state.mode) {
 
     case 1:
@@ -8665,6 +8764,8 @@ int __wrap_poll(struct pollfd *fds, nfds_t nfds, int timeout)
     struct _nala_instance_type_for_poll *_nala_instance_p;
     struct _nala_data_type_for_poll *_nala_data_p;
     int return_value;
+
+    nala_print_call("poll", &nala_state_for_poll.state);
 
     switch (nala_state_for_poll.state.mode) {
 
@@ -8961,6 +9062,8 @@ void __wrap_print_hello()
     struct _nala_instance_type_for_print_hello *_nala_instance_p;
     struct _nala_data_type_for_print_hello *_nala_data_p;
 
+    nala_print_call("print_hello", &nala_state_for_print_hello.state);
+
     switch (nala_state_for_print_hello.state.mode) {
 
     case 1:
@@ -9182,6 +9285,8 @@ ssize_t __wrap_read(int fd, void *buf, size_t count)
     struct _nala_instance_type_for_read *_nala_instance_p;
     struct _nala_data_type_for_read *_nala_data_p;
     ssize_t return_value;
+
+    nala_print_call("read", &nala_state_for_read.state);
 
     switch (nala_state_for_read.state.mode) {
 
@@ -9498,6 +9603,8 @@ ssize_t __wrap_sendto(int sockfd, const void *buf, size_t len, int flags, const 
     struct _nala_instance_type_for_sendto *_nala_instance_p;
     struct _nala_data_type_for_sendto *_nala_data_p;
     ssize_t return_value;
+
+    nala_print_call("sendto", &nala_state_for_sendto.state);
 
     switch (nala_state_for_sendto.state.mode) {
 
@@ -9886,6 +9993,8 @@ int __wrap_setsockopt(int sockfd, int level, int optname, const void *optval, so
     struct _nala_data_type_for_setsockopt *_nala_data_p;
     int return_value;
 
+    nala_print_call("setsockopt", &nala_state_for_setsockopt.state);
+
     switch (nala_state_for_setsockopt.state.mode) {
 
     case 1:
@@ -10208,6 +10317,8 @@ unsigned int __wrap_sleep(unsigned int seconds)
     struct _nala_data_type_for_sleep *_nala_data_p;
     unsigned int return_value;
 
+    nala_print_call("sleep", &nala_state_for_sleep.state);
+
     switch (nala_state_for_sleep.state.mode) {
 
     case 1:
@@ -10450,6 +10561,8 @@ int __wrap_statvfs(const char *path, struct statvfs *buf)
     struct _nala_instance_type_for_statvfs *_nala_instance_p;
     struct _nala_data_type_for_statvfs *_nala_data_p;
     int return_value;
+
+    nala_print_call("statvfs", &nala_state_for_statvfs.state);
 
     switch (nala_state_for_statvfs.state.mode) {
 
@@ -10801,6 +10914,8 @@ void __wrap_struct_param(struct struct_param_type *data)
     struct _nala_instance_type_for_struct_param *_nala_instance_p;
     struct _nala_data_type_for_struct_param *_nala_data_p;
 
+    nala_print_call("struct_param", &nala_state_for_struct_param.state);
+
     switch (nala_state_for_struct_param.state.mode) {
 
     case 1:
@@ -11067,6 +11182,8 @@ struct struct_param_type __wrap_struct_param_and_return_type(struct struct_param
     struct _nala_data_type_for_struct_param_and_return_type *_nala_data_p;
     struct struct_param_type return_value;
 
+    nala_print_call("struct_param_and_return_type", &nala_state_for_struct_param_and_return_type.state);
+
     switch (nala_state_for_struct_param_and_return_type.state.mode) {
 
     case 1:
@@ -11291,6 +11408,8 @@ time_t __wrap_time(time_t *tloc)
     struct _nala_instance_type_for_time *_nala_instance_p;
     struct _nala_data_type_for_time *_nala_data_p;
     time_t return_value;
+
+    nala_print_call("time", &nala_state_for_time.state);
 
     switch (nala_state_for_time.state.mode) {
 
@@ -11579,6 +11698,8 @@ int __wrap_timerfd_settime(int fd, int flags, const struct itimerspec *new_value
     struct _nala_instance_type_for_timerfd_settime *_nala_instance_p;
     struct _nala_data_type_for_timerfd_settime *_nala_data_p;
     int return_value;
+
+    nala_print_call("timerfd_settime", &nala_state_for_timerfd_settime.state);
 
     switch (nala_state_for_timerfd_settime.state.mode) {
 
@@ -11930,6 +12051,8 @@ FILE *__wrap_tmpfile(void)
     struct _nala_data_type_for_tmpfile *_nala_data_p;
     FILE *return_value;
 
+    nala_print_call("tmpfile", &nala_state_for_tmpfile.state);
+
     switch (nala_state_for_tmpfile.state.mode) {
 
     case 1:
@@ -12149,6 +12272,8 @@ struct_param_type __wrap_typedef_struct_param_and_return_type(struct_param_type 
     struct _nala_instance_type_for_typedef_struct_param_and_return_type *_nala_instance_p;
     struct _nala_data_type_for_typedef_struct_param_and_return_type *_nala_data_p;
     struct_param_type return_value;
+
+    nala_print_call("typedef_struct_param_and_return_type", &nala_state_for_typedef_struct_param_and_return_type.state);
 
     switch (nala_state_for_typedef_struct_param_and_return_type.state.mode) {
 
@@ -12370,6 +12495,8 @@ union_type __wrap_typedef_union_param_and_return_type(union_type arg)
     struct _nala_data_type_for_typedef_union_param_and_return_type *_nala_data_p;
     union_type return_value;
 
+    nala_print_call("typedef_union_param_and_return_type", &nala_state_for_typedef_union_param_and_return_type.state);
+
     switch (nala_state_for_typedef_union_param_and_return_type.state.mode) {
 
     case 1:
@@ -12589,6 +12716,8 @@ union union_type __wrap_union_param_and_return_type(union union_type arg)
     struct _nala_instance_type_for_union_param_and_return_type *_nala_instance_p;
     struct _nala_data_type_for_union_param_and_return_type *_nala_data_p;
     union union_type return_value;
+
+    nala_print_call("union_param_and_return_type", &nala_state_for_union_param_and_return_type.state);
 
     switch (nala_state_for_union_param_and_return_type.state.mode) {
 
@@ -12810,6 +12939,8 @@ int __wrap_usleep(__useconds_t usec)
     struct _nala_instance_type_for_usleep *_nala_instance_p;
     struct _nala_data_type_for_usleep *_nala_data_p;
     int return_value;
+
+    nala_print_call("usleep", &nala_state_for_usleep.state);
 
     switch (nala_state_for_usleep.state.mode) {
 
@@ -13051,6 +13182,8 @@ ssize_t __wrap_write(int fd, const void *buf, size_t count)
     struct _nala_instance_type_for_write *_nala_instance_p;
     struct _nala_data_type_for_write *_nala_data_p;
     ssize_t return_value;
+
+    nala_print_call("write", &nala_state_for_write.state);
 
     switch (nala_state_for_write.state.mode) {
 

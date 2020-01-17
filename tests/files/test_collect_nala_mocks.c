@@ -43,6 +43,7 @@ Do not edit manually
 
 #define NALA_STATE_RESET(_state)                \
     (_state).state.mode = 0;                    \
+    (_state).state.suspended.count = 0;         \
     (_state).instances.head_p = NULL;           \
     (_state).instances.tail_p = NULL;           \
     (_state).instances.length = 0;
@@ -513,6 +514,50 @@ void nala_mock_none_fail()
     FAIL();
 }
 
+int nala_print_call_mask = 0;
+
+void nala_print_call(const char *function_name_p, struct nala_state_t *state_p)
+{
+    const char *mode_p;
+
+    if (state_p->suspended.count != 0) {
+        return;
+    }
+
+    if (((1 << state_p->mode) & nala_print_call_mask) == 0) {
+        return;
+    }
+
+    switch (state_p->mode) {
+
+    case 0:
+        mode_p = "real";
+        break;
+
+    case 1:
+        mode_p = "once";
+        break;
+
+    case 2:
+        mode_p = "impl";
+        break;
+
+    case 3:
+        mode_p = "mock";
+        break;
+
+    case 4:
+        mode_p = "none";
+        break;
+
+    default:
+        mode_p = "unknown";
+        break;
+    }
+
+    printf("%s: %s()\n", mode_p, function_name_p);
+}
+
 void nala_suspend_all_mocks(void)
 {
     bar_mock_suspend();
@@ -621,6 +666,8 @@ int __wrap_bar()
     struct _nala_instance_type_for_bar *_nala_instance_p;
     struct _nala_data_type_for_bar *_nala_data_p;
     int return_value;
+
+    nala_print_call("bar", &nala_state_for_bar.state);
 
     switch (nala_state_for_bar.state.mode) {
 
@@ -842,6 +889,8 @@ int __wrap_fie()
     struct _nala_data_type_for_fie *_nala_data_p;
     int return_value;
 
+    nala_print_call("fie", &nala_state_for_fie.state);
+
     switch (nala_state_for_fie.state.mode) {
 
     case 1:
@@ -1061,6 +1110,8 @@ int __wrap_foo()
     struct _nala_instance_type_for_foo *_nala_instance_p;
     struct _nala_data_type_for_foo *_nala_data_p;
     int return_value;
+
+    nala_print_call("foo", &nala_state_for_foo.state);
 
     switch (nala_state_for_foo.state.mode) {
 
@@ -1282,6 +1333,8 @@ int __wrap_fum()
     struct _nala_data_type_for_fum *_nala_data_p;
     int return_value;
 
+    nala_print_call("fum", &nala_state_for_fum.state);
+
     switch (nala_state_for_fum.state.mode) {
 
     case 1:
@@ -1502,6 +1555,8 @@ int __wrap_gam()
     struct _nala_data_type_for_gam *_nala_data_p;
     int return_value;
 
+    nala_print_call("gam", &nala_state_for_gam.state);
+
     switch (nala_state_for_gam.state.mode) {
 
     case 1:
@@ -1721,6 +1776,8 @@ int __wrap_hit()
     struct _nala_instance_type_for_hit *_nala_instance_p;
     struct _nala_data_type_for_hit *_nala_data_p;
     int return_value;
+
+    nala_print_call("hit", &nala_state_for_hit.state);
 
     switch (nala_state_for_hit.state.mode) {
 

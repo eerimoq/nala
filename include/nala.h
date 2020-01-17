@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NALA_VERSION "0.74.0"
+#define NALA_VERSION "0.75.0"
 
 #define TEST(name)                                      \
     static void name(void);                             \

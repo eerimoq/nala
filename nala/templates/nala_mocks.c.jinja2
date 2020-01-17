@@ -123,6 +123,8 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
     {{mock.return_value_decl | render}};
     {% endif %}
 
+    nala_print_call("{{mock.func_name}}", &{{mock.state_name}}.state);
+
     switch ({{mock.state_name}}.state.mode) {
 
     case 1:

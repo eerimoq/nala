@@ -29,6 +29,7 @@
 
 #define NALA_STATE_RESET(_state)                \
     (_state).state.mode = 0;                    \
+    (_state).state.suspended.count = 0;         \
     (_state).instances.head_p = NULL;           \
     (_state).instances.tail_p = NULL;           \
     (_state).instances.length = 0;
@@ -497,4 +498,48 @@ void nala_state_resume(struct nala_state_t *state_p)
 void nala_mock_none_fail()
 {
     FAIL();
+}
+
+int nala_print_call_mask = 0;
+
+void nala_print_call(const char *function_name_p, struct nala_state_t *state_p)
+{
+    const char *mode_p;
+
+    if (state_p->suspended.count != 0) {
+        return;
+    }
+
+    if (((1 << state_p->mode) & nala_print_call_mask) == 0) {
+        return;
+    }
+
+    switch (state_p->mode) {
+
+    case 0:
+        mode_p = "real";
+        break;
+
+    case 1:
+        mode_p = "once";
+        break;
+
+    case 2:
+        mode_p = "impl";
+        break;
+
+    case 3:
+        mode_p = "mock";
+        break;
+
+    case 4:
+        mode_p = "none";
+        break;
+
+    default:
+        mode_p = "unknown";
+        break;
+    }
+
+    printf("%s: %s()\n", mode_p, function_name_p);
 }
