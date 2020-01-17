@@ -1,13 +1,6 @@
-TEST ?= all
-
-ifneq ($(TEST), all)
-TESTS = $(TEST:%=test_%.c)
-else
 TESTS += test_assertions.c
 TESTS += test_time.c
-endif
-
-BUILD = build/$(TEST)
+BUILD = build
 EXE = $(BUILD)/app
 INC += $(BUILD)
 INC += $(CURDIR)
@@ -21,7 +14,7 @@ NALA = nala
 all:
 	$(MAKE) $(BUILD)/nala_mocks.ld
 	$(MAKE) $(EXE)
-	$(EXE)
+	$(EXE) $(ARGS)
 
 clean:
 	rm -rf $(BUILD) $(OBJ)

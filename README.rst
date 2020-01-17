@@ -105,7 +105,7 @@ Build and run all tests.
 
 .. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run.png
 
-Build and run time tests.
+Build all tests but only run those whose name contains ``time``.
 
 .. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run-one-test.png
 
