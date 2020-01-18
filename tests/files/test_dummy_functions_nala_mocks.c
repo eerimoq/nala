@@ -468,18 +468,18 @@ char *format_mock_in_eq(const char *func_p,
                           format_p,                     \
                           NALA_FORMAT_EQ);
 
-#define MOCK_ASSERT_PARAM_IN(params_p, assert_in, func, name)   \
-    if ((params_p)->name ## _in_assert == NULL) {               \
+#define MOCK_ASSERT_PARAM_IN(data_p, assert_in, func, name)     \
+    if ((data_p)->params.name ## _in_assert == NULL) {          \
         assert_in(#func,                                        \
                   #name,                                        \
                   (const void *)(uintptr_t)name,                \
-                  (params_p)->name ## _in.buf_p,                \
-                  (params_p)->name ## _in.size);                \
+                  (data_p)->params.name ## _in.buf_p,           \
+                  (data_p)->params.name ## _in.size);           \
     } else {                                                    \
-        (params_p)->name ## _in_assert(                         \
+        (data_p)->params.name ## _in_assert(                    \
             name,                                               \
-            (params_p)->name ## _in.buf_p,                      \
-            (params_p)->name ## _in.size);                      \
+            (data_p)->params.name ## _in.buf_p,                 \
+            (data_p)->params.name ## _in.size);                 \
     }
 
 #define MOCK_COPY_PARAM_OUT(params_p, name)             \
@@ -494,15 +494,15 @@ char *format_mock_in_eq(const char *func_p,
             (params_p)->name ## _out.size);             \
     }
 
-#define MOCK_ASSERT_COPY_SET_PARAM(params_p, assert_in, func, name)     \
-    if ((params_p)->name ## _in.buf_p != NULL) {                        \
-        MOCK_ASSERT_PARAM_IN(params_p, assert_in, func, name);          \
-        nala_free((params_p)->name ## _in.buf_p);                       \
+#define MOCK_ASSERT_COPY_SET_PARAM(data_p, assert_in, func, name)       \
+    if ((data_p)->params.name ## _in.buf_p != NULL) {                   \
+        MOCK_ASSERT_PARAM_IN(data_p, assert_in, func, name); \
+        nala_free((data_p)->params.name ## _in.buf_p);                  \
     }                                                                   \
                                                                         \
-    if ((params_p)->name ## _out.buf_p != NULL) {                       \
-        MOCK_COPY_PARAM_OUT(params_p, name);                            \
-        nala_free((params_p)->name ## _out.buf_p);                      \
+    if ((data_p)->params.name ## _out.buf_p != NULL) {                  \
+        MOCK_COPY_PARAM_OUT(&(data_p)->params, name);                   \
+        nala_free((data_p)->params.name ## _out.buf_p);                 \
     }
 
 void nala_mock_assert_memory(const char *func_p,
@@ -1133,7 +1133,7 @@ int __wrap_call(int (*callback)(int value))
 
         MOCK_ASSERT_IN_EQ(_nala_data_p, call, callback);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    call,
                                    callback);
@@ -1655,11 +1655,11 @@ DummyStruct *__wrap_compose_twice(DummyStruct *dummy_struct, DummyStruct *(*dumm
         MOCK_ASSERT_IN_EQ(_nala_data_p, compose_twice, dummy_struct);
         MOCK_ASSERT_IN_EQ(_nala_data_p, compose_twice, dummy_struct_modifier);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    compose_twice,
                                    dummy_struct);
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    compose_twice,
                                    dummy_struct_modifier);
@@ -1987,7 +1987,7 @@ int __wrap_double_pointer(int **value_pp)
 
         MOCK_ASSERT_IN_EQ(_nala_data_p, double_pointer, value_pp);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    double_pointer,
                                    value_pp);
@@ -2754,7 +2754,7 @@ DummyStruct *__wrap_edit_number(DummyStruct *dummy_struct, int number)
         MOCK_ASSERT_IN_EQ(_nala_data_p, edit_number, dummy_struct);
         MOCK_ASSERT_IN_EQ(_nala_data_p, edit_number, number);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    edit_number,
                                    dummy_struct);
@@ -3045,7 +3045,7 @@ int __wrap_endmntent(FILE *streamp)
 
         MOCK_ASSERT_IN_EQ(_nala_data_p, endmntent, streamp);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    endmntent,
                                    streamp);
@@ -3551,7 +3551,7 @@ int __wrap_fclose(FILE *stream)
 
         MOCK_ASSERT_IN_EQ(_nala_data_p, fclose, stream);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    fclose,
                                    stream);
@@ -3831,7 +3831,7 @@ int __wrap_fflush(FILE *stream)
 
         MOCK_ASSERT_IN_EQ(_nala_data_p, fflush, stream);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    fflush,
                                    stream);
@@ -4111,7 +4111,7 @@ int __wrap_fileno(FILE *stream)
 
         MOCK_ASSERT_IN_EQ(_nala_data_p, fileno, stream);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    fileno,
                                    stream);
@@ -4398,11 +4398,11 @@ FILE *__wrap_fopen(const char *path, const char *mode)
         MOCK_ASSERT_IN_EQ(_nala_data_p, fopen, path);
         MOCK_ASSERT_IN_EQ(_nala_data_p, fopen, mode);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    fopen,
                                    path);
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    fopen,
                                    mode);
@@ -4785,11 +4785,11 @@ size_t __wrap_fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
         MOCK_ASSERT_IN_EQ(_nala_data_p, fread, size);
         MOCK_ASSERT_IN_EQ(_nala_data_p, fread, nmemb);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    fread,
                                    ptr);
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    fread,
                                    stream);
@@ -5137,7 +5137,7 @@ void __wrap_free(void *ptr)
 
         MOCK_ASSERT_IN_EQ(_nala_data_p, free, ptr);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    free,
                                    ptr);
@@ -5416,7 +5416,7 @@ int __wrap_fseek(FILE *stream, long int offset, int whence)
         MOCK_ASSERT_IN_EQ(_nala_data_p, fseek, offset);
         MOCK_ASSERT_IN_EQ(_nala_data_p, fseek, whence);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    fseek,
                                    stream);
@@ -5718,7 +5718,7 @@ long int __wrap_ftell(FILE *stream)
 
         MOCK_ASSERT_IN_EQ(_nala_data_p, ftell, stream);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    ftell,
                                    stream);
@@ -6011,11 +6011,11 @@ size_t __wrap_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
         MOCK_ASSERT_IN_EQ(_nala_data_p, fwrite, size);
         MOCK_ASSERT_IN_EQ(_nala_data_p, fwrite, nmemb);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    fwrite,
                                    ptr);
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    fwrite,
                                    stream);
@@ -6365,7 +6365,7 @@ struct mntent *__wrap_getmntent(FILE *stream)
 
         MOCK_ASSERT_IN_EQ(_nala_data_p, getmntent, stream);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    getmntent,
                                    stream);
@@ -6643,7 +6643,7 @@ void __wrap_in_out(int *buf_p)
 
         MOCK_ASSERT_IN_EQ(_nala_data_p, in_out, buf_p);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    in_out,
                                    buf_p);
@@ -7739,19 +7739,19 @@ int __wrap_mount(const char *source, const char *target, const char *filesystemt
         MOCK_ASSERT_IN_EQ(_nala_data_p, mount, data);
         MOCK_ASSERT_IN_EQ(_nala_data_p, mount, mountflags);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    mount,
                                    source);
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    mount,
                                    target);
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    mount,
                                    filesystemtype);
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    mount,
                                    data);
@@ -8247,7 +8247,7 @@ void __wrap_output_message(const char *message)
 
         MOCK_ASSERT_IN_EQ(_nala_data_p, output_message, message);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    output_message,
                                    message);
@@ -8541,7 +8541,7 @@ int __wrap_pipe(int pipefd[2])
 
         MOCK_ASSERT_IN_EQ(_nala_data_p, pipe, pipefd);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    pipe,
                                    pipefd);
@@ -8827,7 +8827,7 @@ int __wrap_poll(struct pollfd *fds, nfds_t nfds, int timeout)
         MOCK_ASSERT_IN_EQ(_nala_data_p, poll, nfds);
         MOCK_ASSERT_IN_EQ(_nala_data_p, poll, timeout);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_in_struct_pollfd,
                                    poll,
                                    fds);
@@ -9348,7 +9348,7 @@ ssize_t __wrap_read(int fd, void *buf, size_t count)
         MOCK_ASSERT_IN_EQ(_nala_data_p, read, fd);
         MOCK_ASSERT_IN_EQ(_nala_data_p, read, count);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    read,
                                    buf);
@@ -9669,11 +9669,11 @@ ssize_t __wrap_sendto(int sockfd, const void *buf, size_t len, int flags, const 
         MOCK_ASSERT_IN_EQ(_nala_data_p, sendto, flags);
         MOCK_ASSERT_IN_EQ(_nala_data_p, sendto, addrlen);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    sendto,
                                    buf);
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_in_struct_sockaddr,
                                    sendto,
                                    dest_addr);
@@ -10057,7 +10057,7 @@ int __wrap_setsockopt(int sockfd, int level, int optname, const void *optval, so
         MOCK_ASSERT_IN_EQ(_nala_data_p, setsockopt, optname);
         MOCK_ASSERT_IN_EQ(_nala_data_p, setsockopt, optlen);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    setsockopt,
                                    optval);
@@ -10623,11 +10623,11 @@ int __wrap_statvfs(const char *path, struct statvfs *buf)
         MOCK_ASSERT_IN_EQ(_nala_data_p, statvfs, path);
         MOCK_ASSERT_IN_EQ(_nala_data_p, statvfs, buf);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    statvfs,
                                    path);
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_in_struct_statvfs,
                                    statvfs,
                                    buf);
@@ -10974,7 +10974,7 @@ void __wrap_struct_param(struct struct_param_type *data)
 
         MOCK_ASSERT_IN_EQ(_nala_data_p, struct_param, data);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_in_struct_struct_param_type,
                                    struct_param,
                                    data);
@@ -11469,7 +11469,7 @@ time_t __wrap_time(time_t *tloc)
 
         MOCK_ASSERT_IN_EQ(_nala_data_p, time, tloc);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    time,
                                    tloc);
@@ -11762,11 +11762,11 @@ int __wrap_timerfd_settime(int fd, int flags, const struct itimerspec *new_value
         MOCK_ASSERT_IN_EQ(_nala_data_p, timerfd_settime, fd);
         MOCK_ASSERT_IN_EQ(_nala_data_p, timerfd_settime, flags);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_in_struct_itimerspec,
                                    timerfd_settime,
                                    new_value);
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_in_struct_itimerspec,
                                    timerfd_settime,
                                    old_value);
@@ -13245,7 +13245,7 @@ ssize_t __wrap_write(int fd, const void *buf, size_t count)
         MOCK_ASSERT_IN_EQ(_nala_data_p, write, fd);
         MOCK_ASSERT_IN_EQ(_nala_data_p, write, count);
 
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    nala_mock_assert_memory,
                                    write,
                                    buf);

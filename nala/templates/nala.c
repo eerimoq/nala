@@ -454,18 +454,18 @@ char *format_mock_in_eq(const char *func_p,
                           format_p,                     \
                           NALA_FORMAT_EQ);
 
-#define MOCK_ASSERT_PARAM_IN(params_p, assert_in, func, name)   \
-    if ((params_p)->name ## _in_assert == NULL) {               \
+#define MOCK_ASSERT_PARAM_IN(data_p, assert_in, func, name)     \
+    if ((data_p)->params.name ## _in_assert == NULL) {          \
         assert_in(#func,                                        \
                   #name,                                        \
                   (const void *)(uintptr_t)name,                \
-                  (params_p)->name ## _in.buf_p,                \
-                  (params_p)->name ## _in.size);                \
+                  (data_p)->params.name ## _in.buf_p,           \
+                  (data_p)->params.name ## _in.size);           \
     } else {                                                    \
-        (params_p)->name ## _in_assert(                         \
+        (data_p)->params.name ## _in_assert(                    \
             name,                                               \
-            (params_p)->name ## _in.buf_p,                      \
-            (params_p)->name ## _in.size);                      \
+            (data_p)->params.name ## _in.buf_p,                 \
+            (data_p)->params.name ## _in.size);                 \
     }
 
 #define MOCK_COPY_PARAM_OUT(params_p, name)             \
@@ -480,15 +480,15 @@ char *format_mock_in_eq(const char *func_p,
             (params_p)->name ## _out.size);             \
     }
 
-#define MOCK_ASSERT_COPY_SET_PARAM(params_p, assert_in, func, name)     \
-    if ((params_p)->name ## _in.buf_p != NULL) {                        \
-        MOCK_ASSERT_PARAM_IN(params_p, assert_in, func, name);          \
-        nala_free((params_p)->name ## _in.buf_p);                       \
+#define MOCK_ASSERT_COPY_SET_PARAM(data_p, assert_in, func, name)       \
+    if ((data_p)->params.name ## _in.buf_p != NULL) {                   \
+        MOCK_ASSERT_PARAM_IN(data_p, assert_in, func, name); \
+        nala_free((data_p)->params.name ## _in.buf_p);                  \
     }                                                                   \
                                                                         \
-    if ((params_p)->name ## _out.buf_p != NULL) {                       \
-        MOCK_COPY_PARAM_OUT(params_p, name);                            \
-        nala_free((params_p)->name ## _out.buf_p);                      \
+    if ((data_p)->params.name ## _out.buf_p != NULL) {                  \
+        MOCK_COPY_PARAM_OUT(&(data_p)->params, name);                   \
+        nala_free((data_p)->params.name ## _out.buf_p);                 \
     }
 
 void nala_mock_assert_memory(const char *func_p,

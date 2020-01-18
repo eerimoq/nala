@@ -154,7 +154,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
         {% endfor %}
 
         {% for param, check in mock.set_params %}
-        MOCK_ASSERT_COPY_SET_PARAM(&_nala_data_p->params,
+        MOCK_ASSERT_COPY_SET_PARAM(_nala_data_p,
                                    {{check}},
                                    {{mock.func_name}},
                                    {{param.name}});
