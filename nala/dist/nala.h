@@ -295,4 +295,6 @@ int nala_run_tests(void);
 
 void nala_reset_all_mocks(void);
 
+char *nala_mock_traceback_format(void **buffer_pp, int depth);
+
 #endif

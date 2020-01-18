@@ -915,3 +915,31 @@ __attribute__((weak)) int main(int argc, char *argv[])
 
     return (nala_run_tests());
 }
+
+static bool mock_traceback_skip_filter(void *arg_p, const char *line_p)
+{
+    (void)arg_p;
+
+    if (strstr(line_p, "nala.c:") != NULL) {
+        return (true);
+    }
+
+    if (strstr(line_p, "nala_mocks.c:") != NULL) {
+        return (true);
+    }
+
+    if (strstr(line_p, "??") != NULL) {
+        return (true);
+    }
+
+    return (false);
+}
+
+char *nala_mock_traceback_format(void **buffer_pp, int depth)
+{
+    return (nala_traceback_format(buffer_pp,
+                                  depth,
+                                  "  ",
+                                  mock_traceback_skip_filter,
+                                  NULL));
+}
