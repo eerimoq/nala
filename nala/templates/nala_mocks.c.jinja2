@@ -545,9 +545,16 @@ void {{mock.func_name}}_mock_assert_completed(void)
 // Struct assertions
 {% for assert_in in struct_assert_ins %}
 
-void nala_mock_assert_in_struct_{{assert_in.name}}(const char *func_p, const char *param_p, const void *left_p, const void *right_p, size_t size)
+void nala_mock_assert_in_struct_{{assert_in.name}}(
+    struct nala_traceback_t *traceback_p,
+    const char *func_p,
+    const char *param_p,
+    const void *left_p,
+    const void *right_p,
+    size_t size)
 {
     {% if assert_in.assert_in_members %}
+    (void)traceback_p;
     (void)size;
     const struct {{assert_in.name}} *actual_p = left_p;
     const struct {{assert_in.name}} *expected_p = right_p;
@@ -567,7 +574,7 @@ void nala_mock_assert_in_struct_{{assert_in.name}}(const char *func_p, const cha
         MOCK_ASSERT_PARAM_IN_EQ(format, actual_p, expected_p);
     }
     {% else %}
-    nala_mock_assert_memory(func_p, param_p, left_p, right_p, size);
+    nala_mock_assert_memory(traceback_p, func_p, param_p, left_p, right_p, size);
     {% endif %}
 }
 {% endfor %}

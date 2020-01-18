@@ -16,6 +16,11 @@ Do not edit manually
 
 #endif
 
+struct nala_traceback_t {
+    void *addresses[32];
+    int depth;
+};
+
 void nala_suspend_all_mocks(void);
 void nala_resume_all_mocks(void);
 void nala_reset_all_mocks(void);

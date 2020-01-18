@@ -108,11 +108,6 @@ struct nala_va_arg_list_t {
     unsigned int length;
 };
 
-struct nala_traceback_t {
-    void *addresses[32];
-    int depth;
-};
-
 struct nala_suspended_t {
     int count;
     int mode;
@@ -431,7 +426,6 @@ char *format_mock_traceback(const char *message_p,
     file_p = open_memstream(&buf_p, &file_size);
     fprintf(file_p,
             "%s" ANSI_RESET
-            "\n"
             "%s",
             message_p,
             formatted_traceback_p);
@@ -450,7 +444,7 @@ char *format_mock_traceback(const char *message_p,
             char _nala_assert_format[512];                              \
             snprintf(&_nala_assert_format[0],                           \
                      sizeof(_nala_assert_format),                       \
-                     "Mocked " #func "(" #param "): %s != %s\n",        \
+                     "Mocked " #func "(" #param "): %s != %s\n\n",      \
                      NALA_PRINT_FORMAT((data_p)->params.param),         \
                      NALA_PRINT_FORMAT(param));                         \
             nala_test_failure(                                          \
@@ -471,7 +465,8 @@ char *format_mock_traceback(const char *message_p,
 
 #define MOCK_ASSERT_PARAM_IN(data_p, assert_in, func, name)     \
     if ((data_p)->params.name ## _in_assert == NULL) {          \
-        assert_in(#func,                                        \
+        assert_in(&(data_p)->traceback,                         \
+                  #func,                                        \
                   #name,                                        \
                   (const void *)(uintptr_t)name,                \
                   (data_p)->params.name ## _in.buf_p,           \
@@ -514,7 +509,8 @@ char *format_mock_traceback(const char *message_p,
         }                                                       \
     }
 
-void nala_mock_assert_memory(const char *func_p,
+void nala_mock_assert_memory(struct nala_traceback_t *traceback_p,
+                             const char *func_p,
                              const char *param_p,
                              const void *left_p,
                              const void *right_p,
@@ -529,11 +525,14 @@ void nala_mock_assert_memory(const char *func_p,
                  "Mocked %s(%s): ",
                  func_p,
                  param_p);
-        nala_test_failure(nala_format_memory(
-                              &_nala_assert_format[0],
-                              left_p,
-                              right_p,
-                              size));
+        nala_test_failure(
+            format_mock_traceback(
+                nala_format_memory(
+                    &_nala_assert_format[0],
+                    left_p,
+                    right_p,
+                    size),
+                traceback_p));
     }
 }
 
