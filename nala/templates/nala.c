@@ -1,5 +1,7 @@
 #include <execinfo.h>
 
+#define ANSI_RESET "\x1b[0m"
+
 #define NALA_INSTANCES_APPEND(list, item_p)     \
     do {                                        \
         if ((list).head_p == NULL) {            \
@@ -400,13 +402,49 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
     traceback_p->depth = backtrace(&traceback_p->addresses[0], 32);
 }
 
+char *format_mock_in_eq(const char *func_p,
+                        const char *param_p,
+                        const char *print_format_left_p,
+                        const char *print_format_right_p,
+                        struct nala_traceback_t *traceback_p)
+{
+    FILE *file_p;
+    char *buf_p;
+    size_t file_size;
+
+    file_p = open_memstream(&buf_p, &file_size);
+    fprintf(file_p,
+            "Mocked %s(%s): %s != %s\n"
+            ANSI_RESET
+            "\n"
+            "%s",
+            func_p,
+            param_p,
+            print_format_left_p,
+            print_format_right_p,
+            nala_mock_traceback_format(&traceback_p->addresses[0],
+                                       traceback_p->depth));
+    fputc('\0', file_p);
+    fclose(file_p);
+
+    return (buf_p);
+}
+
 #define MOCK_ASSERT_IN_EQ(data_p, func, param)                          \
     if (!(data_p)->params.ignore_ ## param ## _in) {                    \
-        NALA_BINARY_ASSERTION((data_p)->params.param,                   \
-                              param,                                    \
-                              NALA_CHECK_EQ,                            \
-                              "Mocked " #func "(" #param "): %s != %s\n", \
-                              NALA_FORMAT_EQ);                          \
+        if (!NALA_CHECK_EQ((data_p)->params.param, param)) {            \
+            nala_reset_all_mocks();                                     \
+            NALA_TEST_FAILURE(                                          \
+                NALA_FORMAT_EQ(                                         \
+                    format_mock_in_eq(                                  \
+                        #func,                                          \
+                        #param,                                         \
+                        NALA_PRINT_FORMAT((data_p)->params.param),      \
+                        NALA_PRINT_FORMAT(param),                       \
+                        &(data_p)->traceback),                          \
+                    (data_p)->params.param,                             \
+                    param));                                            \
+        }                                                               \
     }
 
 #define MOCK_ASSERT_PARAM_IN_EQ(format_p, left, right)  \

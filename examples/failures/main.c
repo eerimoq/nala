@@ -30,6 +30,19 @@ TEST(time_wrong_pointer)
     time(NULL);
 }
 
+TEST(time_wrong_in)
+{
+    time_t now;
+
+    time_mock_once(42);
+    now = 5;
+    time_mock_set_tloc_in(&now, sizeof(now));
+
+    now = 4;
+    ASSERT_EQ(time(&now), 42);
+    time(NULL);
+}
+
 TEST(segfault)
 {
     (*((int *)0)) = 1;
