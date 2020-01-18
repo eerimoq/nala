@@ -220,39 +220,6 @@ Limitations
   gcov. They probably can if wrapping ``__gcov_fork()`` in an
   suspend/resume-block.
 
-Ideas
-=====
-
-.. code-block::
-
-   -------------------------- TEST FAILURE REPORT BEGIN --------------------------
-
-     Test:  test_mqtt_client::receive_publish_200_bytes
-     Error: Mocked mqtt_on_publish(buf_p): Memory mismatch. See diff for details.
-     Diff:
-
-        - 1 |  000000  01 23 45 67 89 01 23 45 67 89 01 23 45 67 89 01  .#Eg..#Eg..#Eg..
-        + 1 |  000000  00 23 45 67 89 01 23 45 67 89 01 23 45 67 89 01  .#Eg..#Eg..#Eg..
-          2 |  000010  23 45 67 89 01 23 45 67 89 01 23 45 67 89 01 23  #Eg..#Eg..#Eg..#
-          3 |  000020  45 67 89 01 23 45 67 89 01 23 45 67 89 01 23 45  Eg..#Eg..#Eg..#E
-
-     Mock traceback (most recent call last):
-       receive_publish_200_bytes at /home/erik/workspace/async/tst/test_mqtt_client.c:457
-       input_packet at /home/erik/workspace/async/tst/test_mqtt_client.c:110
-       on_publish at /home/erik/workspace/async/tst/test_mqtt_client.c:41
-       mqtt_on_publish_mock_once at /home/erik/workspace/async/tst/build/nala_mocks.c:4565
-
-     Traceback (most recent call last):
-       receive_publish_200_bytes at /home/erik/workspace/async/tst/test_mqtt_client.c:457
-       input_packet at /home/erik/workspace/async/tst/test_mqtt_client.c:110
-       on_tcp_input at /home/erik/workspace/async/src/modules/async_stcp_client.c:112
-       handle_publish at /home/erik/workspace/async/src/modules/async_mqtt_client.c:720
-       on_publish at /home/erik/workspace/async/tst/test_mqtt_client.c:41
-       __wrap_mqtt_on_publish at /home/erik/workspace/async/tst/build/nala_mocks.c:4565
-       nala_mock_assert_memory at /home/erik/workspace/async/tst/build/nala_mocks.c:485
-
-   --------------------------- TEST FAILURE REPORT END ---------------------------
-
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
 
