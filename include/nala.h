@@ -25,8 +25,8 @@
     }                                                   \
     static void name(void)
 
-#define NALA_TEST_FAILURE(message_p)                    \
-    nala_test_failure(__FILE__, __LINE__, message_p)
+#define NALA_TEST_FAILURE(message_p)            \
+        nala_test_failure(message_p)
 
 #define NALA_PRINT_FORMAT(value)                        \
     _Generic((value),                                   \
@@ -77,7 +77,7 @@
                      format,                                            \
                      NALA_PRINT_FORMAT(_nala_assert_left),              \
                      NALA_PRINT_FORMAT(_nala_assert_right));            \
-            NALA_TEST_FAILURE(formatter(_nala_assert_format,            \
+            nala_test_failure(formatter(_nala_assert_format,            \
                                         _nala_assert_left,              \
                                         _nala_assert_right));           \
         }                                                               \
@@ -229,19 +229,19 @@
 #define ASSERT_MEMORY(left, right, size)                                \
     if (!nala_check_memory(left, right, size)) {                        \
         nala_reset_all_mocks();                                         \
-        NALA_TEST_FAILURE(nala_format_memory("", left, right, size));   \
+        nala_test_failure(nala_format_memory("", left, right, size));   \
     }
 
 #define ASSERT(cond)                                            \
     if (!(cond)) {                                              \
         nala_reset_all_mocks();                                 \
-        NALA_TEST_FAILURE(nala_format("false != true\n"));      \
+        nala_test_failure(nala_format("false != true\n"));      \
     }
 
 #define FAIL()                                          \
     do {                                                \
         nala_reset_all_mocks();                         \
-        NALA_TEST_FAILURE(nala_format("fail\n"));       \
+        nala_test_failure(nala_format("fail\n"));       \
     } while (0);
 
 #define CAPTURE_OUTPUT(stdout_name, stderr_name)                        \
@@ -285,9 +285,10 @@ void nala_capture_output_start(char **stdout_pp, char **stderr_pp);
 
 void nala_capture_output_stop(void);
 
-__attribute__ ((noreturn)) void nala_test_failure(const char *file_p,
-                                                  int line,
-                                                  const char *message_p);
+/**
+ * message_p is freed by this function.
+ */
+__attribute__ ((noreturn)) void nala_test_failure(const char *message_p);
 
 void nala_register_test(struct nala_test_t *test_p);
 

@@ -161,9 +161,10 @@ struct nala_va_arg_item_t *nala_va_arg_list_get(
     struct nala_va_arg_item_t *item_p;
 
     if (index >= self_p->length) {
-        NALA_TEST_FAILURE(
+        nala_test_failure(
             nala_format(
-                "Trying to access variable argument at index %u when only %u exists.\n",
+                "Trying to access variable argument at index %u when only %u "
+                "exists.\n",
                 index,
                 self_p->length));
     }
@@ -197,7 +198,7 @@ void nala_parse_va_arg_long(const char **format_pp,
 
     default:
         nala_free(item_p);
-        NALA_TEST_FAILURE(
+        nala_test_failure(
             nala_format("Unsupported type specifier %%l%c.\n", **format_pp));
         exit(1);
         break;
@@ -232,7 +233,7 @@ void nala_parse_va_arg_non_long(const char **format_pp,
 
     default:
         nala_free(item_p);
-        NALA_TEST_FAILURE(
+        nala_test_failure(
             nala_format("Unsupported type specifier %%%c.\n", **format_pp));
         exit(1);
         break;
@@ -370,7 +371,7 @@ void nala_va_arg_list_assert(struct nala_va_arg_list_t *self_p,
             break;
 
         default:
-            NALA_TEST_FAILURE(nala_format("Nala internal failure.\n"));
+            nala_test_failure(nala_format("Nala internal failure.\n"));
             exit(1);
             break;
         }
@@ -402,30 +403,28 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
     traceback_p->depth = backtrace(&traceback_p->addresses[0], 32);
 }
 
-char *format_mock_in_eq(const char *func_p,
-                        const char *param_p,
-                        const char *print_format_left_p,
-                        const char *print_format_right_p,
-                        struct nala_traceback_t *traceback_p)
+char *format_mock_traceback(const char *message_p,
+                            struct nala_traceback_t *traceback_p)
 {
     FILE *file_p;
     char *buf_p;
     size_t file_size;
+    char *formatted_traceback_p;
 
+    formatted_traceback_p = nala_mock_traceback_format(
+        &traceback_p->addresses[0],
+        traceback_p->depth);
     file_p = open_memstream(&buf_p, &file_size);
     fprintf(file_p,
-            "Mocked %s(%s): %s != %s\n"
-            ANSI_RESET
+            "%s" ANSI_RESET
             "\n"
             "%s",
-            func_p,
-            param_p,
-            print_format_left_p,
-            print_format_right_p,
-            nala_mock_traceback_format(&traceback_p->addresses[0],
-                                       traceback_p->depth));
+            message_p,
+            formatted_traceback_p);
     fputc('\0', file_p);
     fclose(file_p);
+    free((void *)message_p);
+    free(formatted_traceback_p);
 
     return (buf_p);
 }
@@ -434,16 +433,18 @@ char *format_mock_in_eq(const char *func_p,
     if (!(data_p)->params.ignore_ ## param ## _in) {                    \
         if (!NALA_CHECK_EQ((data_p)->params.param, param)) {            \
             nala_reset_all_mocks();                                     \
-            NALA_TEST_FAILURE(                                          \
-                NALA_FORMAT_EQ(                                         \
-                    format_mock_in_eq(                                  \
-                        #func,                                          \
-                        #param,                                         \
-                        NALA_PRINT_FORMAT((data_p)->params.param),      \
-                        NALA_PRINT_FORMAT(param),                       \
-                        &(data_p)->traceback),                          \
-                    (data_p)->params.param,                             \
-                    param));                                            \
+            char _nala_assert_format[512];                              \
+            snprintf(&_nala_assert_format[0],                           \
+                     sizeof(_nala_assert_format),                       \
+                     "Mocked " #func "(" #param "): %s != %s\n",        \
+                     NALA_PRINT_FORMAT((data_p)->params.param),         \
+                     NALA_PRINT_FORMAT(param));                         \
+            nala_test_failure(                                          \
+                format_mock_traceback(                                  \
+                    NALA_FORMAT_EQ(&_nala_assert_format[0],             \
+                                   (data_p)->params.param,              \
+                                   param),                              \
+                    &(data_p)->traceback));                             \
         }                                                               \
     }
 
@@ -514,7 +515,7 @@ void nala_mock_assert_memory(const char *func_p,
                  "Mocked %s(%s): ",
                  func_p,
                  param_p);
-        NALA_TEST_FAILURE(nala_format_memory(
+        nala_test_failure(nala_format_memory(
                               &_nala_assert_format[0],
                               left_p,
                               right_p,

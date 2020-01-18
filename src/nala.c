@@ -470,8 +470,6 @@ const char *nala_format(const char *format_p, ...)
     char *buf_p;
     FILE *file_p;
 
-    /* ToDo: Remove reset when suspend and resume are implemented. */
-    // nala_reset_all_mocks();
     nala_suspend_all_mocks();
     file_p = open_memstream(&buf_p, &size);
     color_start(file_p, ANSI_COLOR_RED);
@@ -774,13 +772,8 @@ static bool traceback_skip_filter(void *arg_p, const char *line_p)
     return (false);
 }
 
-void nala_test_failure(const char *file_p,
-                       int line,
-                       const char *message_p)
+void nala_test_failure(const char *message_p)
 {
-    (void)file_p;
-    (void)line;
-
     nala_suspend_all_mocks();
     nala_capture_output_stop();
     capture_output_destroy(&capture_stdout);
@@ -791,6 +784,7 @@ void nala_test_failure(const char *file_p,
     printf("\n");
     nala_traceback_print("  ", traceback_skip_filter, NULL);
     print_test_failure_report_end();
+    free((void *)message_p);
     exit(1);
 }
 
