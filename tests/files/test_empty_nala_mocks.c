@@ -14,8 +14,6 @@ Do not edit manually
 #include "nala_mocks.h"
 #include <execinfo.h>
 
-#define ANSI_RESET "\x1b[0m"
-
 #define NALA_INSTANCES_APPEND(list, item_p)     \
     do {                                        \
         if ((list).head_p == NULL) {            \
@@ -424,11 +422,7 @@ char *format_mock_traceback(const char *message_p,
         &traceback_p->addresses[0],
         traceback_p->depth);
     file_p = open_memstream(&buf_p, &file_size);
-    fprintf(file_p,
-            "%s" ANSI_RESET
-            "%s",
-            message_p,
-            formatted_traceback_p);
+    fprintf(file_p, "%s%s", message_p, formatted_traceback_p);
     fputc('\0', file_p);
     fclose(file_p);
     free((void *)message_p);
