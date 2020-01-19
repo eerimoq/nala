@@ -14,6 +14,12 @@ Do not edit manually
 #include "nala_mocks.h"
 #include <execinfo.h>
 
+#define MODE_REAL            0
+#define MODE_MOCK_ONCE       1
+#define MODE_IMPLEMENTATION  2
+#define MODE_MOCK            3
+#define MODE_NONE            4
+
 #define NALA_INSTANCES_APPEND(list, item_p)     \
     do {                                        \
         if ((list).head_p == NULL) {            \
@@ -42,7 +48,7 @@ Do not edit manually
     } while (0);
 
 #define NALA_STATE_RESET(_state)                \
-    (_state).state.mode = 0;                    \
+    (_state).state.mode = MODE_REAL;            \
     (_state).state.suspended.count = 0;         \
     (_state).instances.head_p = NULL;           \
     (_state).instances.tail_p = NULL;           \
@@ -534,7 +540,7 @@ void nala_state_suspend(struct nala_state_t *state_p)
 {
     if (state_p->suspended.count == 0) {
         state_p->suspended.mode = state_p->mode;
-        state_p->mode = 0;
+        state_p->mode = MODE_REAL;
     }
 
     state_p->suspended.count++;
@@ -570,23 +576,23 @@ void nala_print_call(const char *function_name_p, struct nala_state_t *state_p)
 
     switch (state_p->mode) {
 
-    case 0:
+    case MODE_REAL:
         mode_p = "real";
         break;
 
-    case 1:
+    case MODE_MOCK_ONCE:
         mode_p = "once";
         break;
 
-    case 2:
+    case MODE_IMPLEMENTATION:
         mode_p = "impl";
         break;
 
-    case 3:
+    case MODE_MOCK:
         mode_p = "mock";
         break;
 
-    case 4:
+    case MODE_NONE:
         mode_p = "none";
         break;
 
@@ -674,10 +680,10 @@ struct nala_state_type_for_bar {
 
 static struct nala_state_type_for_bar nala_state_for_bar = {
     .state = {
-        .mode = 0,
+        .mode = MODE_REAL,
         .suspended = {
             .count = 0,
-            .mode = 0
+            .mode = MODE_REAL
         }
     },
     .instances = {
@@ -711,9 +717,9 @@ int __wrap_bar()
 
     switch (nala_state_for_bar.state.mode) {
 
-    case 1:
-    case 3:
-        if (nala_state_for_bar.state.mode == 1) {
+    case MODE_MOCK_ONCE:
+    case MODE_MOCK:
+        if (nala_state_for_bar.state.mode == MODE_MOCK_ONCE) {
             NALA_INSTANCES_POP(nala_state_for_bar.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
@@ -742,12 +748,12 @@ int __wrap_bar()
         }
         break;
 
-    case 2:
+    case MODE_IMPLEMENTATION:
         return_value =
         nala_state_for_bar.data.implementation();
         break;
 
-    case 4:
+    case MODE_NONE:
         nala_mock_none_fail();
         exit(1);
         break;
@@ -763,7 +769,7 @@ int __wrap_bar()
 
 void bar_mock(int return_value)
 {
-    nala_state_for_bar.state.mode = 3;
+    nala_state_for_bar.state.mode = MODE_MOCK;
     nala_state_for_bar.data.return_value = return_value;
     nala_state_for_bar.data.errno_value = 0;
     nala_state_for_bar.data.callback = NULL;
@@ -773,7 +779,7 @@ void bar_mock_once(int return_value)
 {
     struct _nala_instance_type_for_bar *_nala_instance_p;
 
-    nala_state_for_bar.state.mode = 1;
+    nala_state_for_bar.state.mode = MODE_MOCK_ONCE;
     _nala_instance_p = nala_xmalloc(sizeof(*_nala_instance_p));
     nala_traceback(&_nala_instance_p->data.traceback);
     _nala_instance_p->data.return_value = return_value;
@@ -787,7 +793,7 @@ void bar_mock_once(int return_value)
 
 void bar_mock_ignore_in(int return_value)
 {
-    nala_state_for_bar.state.mode = 3;
+    nala_state_for_bar.state.mode = MODE_MOCK;
     nala_state_for_bar.data.return_value = return_value;
     nala_state_for_bar.data.errno_value = 0;
     nala_state_for_bar.data.callback = NULL;
@@ -797,7 +803,7 @@ void bar_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_bar *instance_p;
 
-    nala_state_for_bar.state.mode = 1;
+    nala_state_for_bar.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
     nala_traceback(&instance_p->data.traceback);
     instance_p->data.return_value = return_value;
@@ -821,18 +827,18 @@ void bar_mock_set_callback(void (*callback)())
 
 void bar_mock_none(void)
 {
-    nala_state_for_bar.state.mode = 4;
+    nala_state_for_bar.state.mode = MODE_NONE;
 }
 
 void bar_mock_implementation(int (*implementation)())
 {
-    nala_state_for_bar.state.mode = 2;
+    nala_state_for_bar.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_bar.data.implementation = implementation;
 }
 
 void bar_mock_disable(void)
 {
-    nala_state_for_bar.state.mode = 0;
+    nala_state_for_bar.state.mode = MODE_REAL;
 }
 
 void bar_mock_suspend(void)
@@ -896,10 +902,10 @@ struct nala_state_type_for_fie {
 
 static struct nala_state_type_for_fie nala_state_for_fie = {
     .state = {
-        .mode = 0,
+        .mode = MODE_REAL,
         .suspended = {
             .count = 0,
-            .mode = 0
+            .mode = MODE_REAL
         }
     },
     .instances = {
@@ -933,9 +939,9 @@ int __wrap_fie()
 
     switch (nala_state_for_fie.state.mode) {
 
-    case 1:
-    case 3:
-        if (nala_state_for_fie.state.mode == 1) {
+    case MODE_MOCK_ONCE:
+    case MODE_MOCK:
+        if (nala_state_for_fie.state.mode == MODE_MOCK_ONCE) {
             NALA_INSTANCES_POP(nala_state_for_fie.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
@@ -964,12 +970,12 @@ int __wrap_fie()
         }
         break;
 
-    case 2:
+    case MODE_IMPLEMENTATION:
         return_value =
         nala_state_for_fie.data.implementation();
         break;
 
-    case 4:
+    case MODE_NONE:
         nala_mock_none_fail();
         exit(1);
         break;
@@ -985,7 +991,7 @@ int __wrap_fie()
 
 void fie_mock(int return_value)
 {
-    nala_state_for_fie.state.mode = 3;
+    nala_state_for_fie.state.mode = MODE_MOCK;
     nala_state_for_fie.data.return_value = return_value;
     nala_state_for_fie.data.errno_value = 0;
     nala_state_for_fie.data.callback = NULL;
@@ -995,7 +1001,7 @@ void fie_mock_once(int return_value)
 {
     struct _nala_instance_type_for_fie *_nala_instance_p;
 
-    nala_state_for_fie.state.mode = 1;
+    nala_state_for_fie.state.mode = MODE_MOCK_ONCE;
     _nala_instance_p = nala_xmalloc(sizeof(*_nala_instance_p));
     nala_traceback(&_nala_instance_p->data.traceback);
     _nala_instance_p->data.return_value = return_value;
@@ -1009,7 +1015,7 @@ void fie_mock_once(int return_value)
 
 void fie_mock_ignore_in(int return_value)
 {
-    nala_state_for_fie.state.mode = 3;
+    nala_state_for_fie.state.mode = MODE_MOCK;
     nala_state_for_fie.data.return_value = return_value;
     nala_state_for_fie.data.errno_value = 0;
     nala_state_for_fie.data.callback = NULL;
@@ -1019,7 +1025,7 @@ void fie_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_fie *instance_p;
 
-    nala_state_for_fie.state.mode = 1;
+    nala_state_for_fie.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
     nala_traceback(&instance_p->data.traceback);
     instance_p->data.return_value = return_value;
@@ -1043,18 +1049,18 @@ void fie_mock_set_callback(void (*callback)())
 
 void fie_mock_none(void)
 {
-    nala_state_for_fie.state.mode = 4;
+    nala_state_for_fie.state.mode = MODE_NONE;
 }
 
 void fie_mock_implementation(int (*implementation)())
 {
-    nala_state_for_fie.state.mode = 2;
+    nala_state_for_fie.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_fie.data.implementation = implementation;
 }
 
 void fie_mock_disable(void)
 {
-    nala_state_for_fie.state.mode = 0;
+    nala_state_for_fie.state.mode = MODE_REAL;
 }
 
 void fie_mock_suspend(void)
@@ -1118,10 +1124,10 @@ struct nala_state_type_for_foo {
 
 static struct nala_state_type_for_foo nala_state_for_foo = {
     .state = {
-        .mode = 0,
+        .mode = MODE_REAL,
         .suspended = {
             .count = 0,
-            .mode = 0
+            .mode = MODE_REAL
         }
     },
     .instances = {
@@ -1155,9 +1161,9 @@ int __wrap_foo()
 
     switch (nala_state_for_foo.state.mode) {
 
-    case 1:
-    case 3:
-        if (nala_state_for_foo.state.mode == 1) {
+    case MODE_MOCK_ONCE:
+    case MODE_MOCK:
+        if (nala_state_for_foo.state.mode == MODE_MOCK_ONCE) {
             NALA_INSTANCES_POP(nala_state_for_foo.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
@@ -1186,12 +1192,12 @@ int __wrap_foo()
         }
         break;
 
-    case 2:
+    case MODE_IMPLEMENTATION:
         return_value =
         nala_state_for_foo.data.implementation();
         break;
 
-    case 4:
+    case MODE_NONE:
         nala_mock_none_fail();
         exit(1);
         break;
@@ -1207,7 +1213,7 @@ int __wrap_foo()
 
 void foo_mock(int return_value)
 {
-    nala_state_for_foo.state.mode = 3;
+    nala_state_for_foo.state.mode = MODE_MOCK;
     nala_state_for_foo.data.return_value = return_value;
     nala_state_for_foo.data.errno_value = 0;
     nala_state_for_foo.data.callback = NULL;
@@ -1217,7 +1223,7 @@ void foo_mock_once(int return_value)
 {
     struct _nala_instance_type_for_foo *_nala_instance_p;
 
-    nala_state_for_foo.state.mode = 1;
+    nala_state_for_foo.state.mode = MODE_MOCK_ONCE;
     _nala_instance_p = nala_xmalloc(sizeof(*_nala_instance_p));
     nala_traceback(&_nala_instance_p->data.traceback);
     _nala_instance_p->data.return_value = return_value;
@@ -1231,7 +1237,7 @@ void foo_mock_once(int return_value)
 
 void foo_mock_ignore_in(int return_value)
 {
-    nala_state_for_foo.state.mode = 3;
+    nala_state_for_foo.state.mode = MODE_MOCK;
     nala_state_for_foo.data.return_value = return_value;
     nala_state_for_foo.data.errno_value = 0;
     nala_state_for_foo.data.callback = NULL;
@@ -1241,7 +1247,7 @@ void foo_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_foo *instance_p;
 
-    nala_state_for_foo.state.mode = 1;
+    nala_state_for_foo.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
     nala_traceback(&instance_p->data.traceback);
     instance_p->data.return_value = return_value;
@@ -1265,18 +1271,18 @@ void foo_mock_set_callback(void (*callback)())
 
 void foo_mock_none(void)
 {
-    nala_state_for_foo.state.mode = 4;
+    nala_state_for_foo.state.mode = MODE_NONE;
 }
 
 void foo_mock_implementation(int (*implementation)())
 {
-    nala_state_for_foo.state.mode = 2;
+    nala_state_for_foo.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_foo.data.implementation = implementation;
 }
 
 void foo_mock_disable(void)
 {
-    nala_state_for_foo.state.mode = 0;
+    nala_state_for_foo.state.mode = MODE_REAL;
 }
 
 void foo_mock_suspend(void)
@@ -1340,10 +1346,10 @@ struct nala_state_type_for_fum {
 
 static struct nala_state_type_for_fum nala_state_for_fum = {
     .state = {
-        .mode = 0,
+        .mode = MODE_REAL,
         .suspended = {
             .count = 0,
-            .mode = 0
+            .mode = MODE_REAL
         }
     },
     .instances = {
@@ -1377,9 +1383,9 @@ int __wrap_fum()
 
     switch (nala_state_for_fum.state.mode) {
 
-    case 1:
-    case 3:
-        if (nala_state_for_fum.state.mode == 1) {
+    case MODE_MOCK_ONCE:
+    case MODE_MOCK:
+        if (nala_state_for_fum.state.mode == MODE_MOCK_ONCE) {
             NALA_INSTANCES_POP(nala_state_for_fum.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
@@ -1408,12 +1414,12 @@ int __wrap_fum()
         }
         break;
 
-    case 2:
+    case MODE_IMPLEMENTATION:
         return_value =
         nala_state_for_fum.data.implementation();
         break;
 
-    case 4:
+    case MODE_NONE:
         nala_mock_none_fail();
         exit(1);
         break;
@@ -1429,7 +1435,7 @@ int __wrap_fum()
 
 void fum_mock(int return_value)
 {
-    nala_state_for_fum.state.mode = 3;
+    nala_state_for_fum.state.mode = MODE_MOCK;
     nala_state_for_fum.data.return_value = return_value;
     nala_state_for_fum.data.errno_value = 0;
     nala_state_for_fum.data.callback = NULL;
@@ -1439,7 +1445,7 @@ void fum_mock_once(int return_value)
 {
     struct _nala_instance_type_for_fum *_nala_instance_p;
 
-    nala_state_for_fum.state.mode = 1;
+    nala_state_for_fum.state.mode = MODE_MOCK_ONCE;
     _nala_instance_p = nala_xmalloc(sizeof(*_nala_instance_p));
     nala_traceback(&_nala_instance_p->data.traceback);
     _nala_instance_p->data.return_value = return_value;
@@ -1453,7 +1459,7 @@ void fum_mock_once(int return_value)
 
 void fum_mock_ignore_in(int return_value)
 {
-    nala_state_for_fum.state.mode = 3;
+    nala_state_for_fum.state.mode = MODE_MOCK;
     nala_state_for_fum.data.return_value = return_value;
     nala_state_for_fum.data.errno_value = 0;
     nala_state_for_fum.data.callback = NULL;
@@ -1463,7 +1469,7 @@ void fum_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_fum *instance_p;
 
-    nala_state_for_fum.state.mode = 1;
+    nala_state_for_fum.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
     nala_traceback(&instance_p->data.traceback);
     instance_p->data.return_value = return_value;
@@ -1487,18 +1493,18 @@ void fum_mock_set_callback(void (*callback)())
 
 void fum_mock_none(void)
 {
-    nala_state_for_fum.state.mode = 4;
+    nala_state_for_fum.state.mode = MODE_NONE;
 }
 
 void fum_mock_implementation(int (*implementation)())
 {
-    nala_state_for_fum.state.mode = 2;
+    nala_state_for_fum.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_fum.data.implementation = implementation;
 }
 
 void fum_mock_disable(void)
 {
-    nala_state_for_fum.state.mode = 0;
+    nala_state_for_fum.state.mode = MODE_REAL;
 }
 
 void fum_mock_suspend(void)
@@ -1562,10 +1568,10 @@ struct nala_state_type_for_gam {
 
 static struct nala_state_type_for_gam nala_state_for_gam = {
     .state = {
-        .mode = 0,
+        .mode = MODE_REAL,
         .suspended = {
             .count = 0,
-            .mode = 0
+            .mode = MODE_REAL
         }
     },
     .instances = {
@@ -1599,9 +1605,9 @@ int __wrap_gam()
 
     switch (nala_state_for_gam.state.mode) {
 
-    case 1:
-    case 3:
-        if (nala_state_for_gam.state.mode == 1) {
+    case MODE_MOCK_ONCE:
+    case MODE_MOCK:
+        if (nala_state_for_gam.state.mode == MODE_MOCK_ONCE) {
             NALA_INSTANCES_POP(nala_state_for_gam.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
@@ -1630,12 +1636,12 @@ int __wrap_gam()
         }
         break;
 
-    case 2:
+    case MODE_IMPLEMENTATION:
         return_value =
         nala_state_for_gam.data.implementation();
         break;
 
-    case 4:
+    case MODE_NONE:
         nala_mock_none_fail();
         exit(1);
         break;
@@ -1651,7 +1657,7 @@ int __wrap_gam()
 
 void gam_mock(int return_value)
 {
-    nala_state_for_gam.state.mode = 3;
+    nala_state_for_gam.state.mode = MODE_MOCK;
     nala_state_for_gam.data.return_value = return_value;
     nala_state_for_gam.data.errno_value = 0;
     nala_state_for_gam.data.callback = NULL;
@@ -1661,7 +1667,7 @@ void gam_mock_once(int return_value)
 {
     struct _nala_instance_type_for_gam *_nala_instance_p;
 
-    nala_state_for_gam.state.mode = 1;
+    nala_state_for_gam.state.mode = MODE_MOCK_ONCE;
     _nala_instance_p = nala_xmalloc(sizeof(*_nala_instance_p));
     nala_traceback(&_nala_instance_p->data.traceback);
     _nala_instance_p->data.return_value = return_value;
@@ -1675,7 +1681,7 @@ void gam_mock_once(int return_value)
 
 void gam_mock_ignore_in(int return_value)
 {
-    nala_state_for_gam.state.mode = 3;
+    nala_state_for_gam.state.mode = MODE_MOCK;
     nala_state_for_gam.data.return_value = return_value;
     nala_state_for_gam.data.errno_value = 0;
     nala_state_for_gam.data.callback = NULL;
@@ -1685,7 +1691,7 @@ void gam_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_gam *instance_p;
 
-    nala_state_for_gam.state.mode = 1;
+    nala_state_for_gam.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
     nala_traceback(&instance_p->data.traceback);
     instance_p->data.return_value = return_value;
@@ -1709,18 +1715,18 @@ void gam_mock_set_callback(void (*callback)())
 
 void gam_mock_none(void)
 {
-    nala_state_for_gam.state.mode = 4;
+    nala_state_for_gam.state.mode = MODE_NONE;
 }
 
 void gam_mock_implementation(int (*implementation)())
 {
-    nala_state_for_gam.state.mode = 2;
+    nala_state_for_gam.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_gam.data.implementation = implementation;
 }
 
 void gam_mock_disable(void)
 {
-    nala_state_for_gam.state.mode = 0;
+    nala_state_for_gam.state.mode = MODE_REAL;
 }
 
 void gam_mock_suspend(void)
@@ -1784,10 +1790,10 @@ struct nala_state_type_for_hit {
 
 static struct nala_state_type_for_hit nala_state_for_hit = {
     .state = {
-        .mode = 0,
+        .mode = MODE_REAL,
         .suspended = {
             .count = 0,
-            .mode = 0
+            .mode = MODE_REAL
         }
     },
     .instances = {
@@ -1821,9 +1827,9 @@ int __wrap_hit()
 
     switch (nala_state_for_hit.state.mode) {
 
-    case 1:
-    case 3:
-        if (nala_state_for_hit.state.mode == 1) {
+    case MODE_MOCK_ONCE:
+    case MODE_MOCK:
+        if (nala_state_for_hit.state.mode == MODE_MOCK_ONCE) {
             NALA_INSTANCES_POP(nala_state_for_hit.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
@@ -1852,12 +1858,12 @@ int __wrap_hit()
         }
         break;
 
-    case 2:
+    case MODE_IMPLEMENTATION:
         return_value =
         nala_state_for_hit.data.implementation();
         break;
 
-    case 4:
+    case MODE_NONE:
         nala_mock_none_fail();
         exit(1);
         break;
@@ -1873,7 +1879,7 @@ int __wrap_hit()
 
 void hit_mock(int return_value)
 {
-    nala_state_for_hit.state.mode = 3;
+    nala_state_for_hit.state.mode = MODE_MOCK;
     nala_state_for_hit.data.return_value = return_value;
     nala_state_for_hit.data.errno_value = 0;
     nala_state_for_hit.data.callback = NULL;
@@ -1883,7 +1889,7 @@ void hit_mock_once(int return_value)
 {
     struct _nala_instance_type_for_hit *_nala_instance_p;
 
-    nala_state_for_hit.state.mode = 1;
+    nala_state_for_hit.state.mode = MODE_MOCK_ONCE;
     _nala_instance_p = nala_xmalloc(sizeof(*_nala_instance_p));
     nala_traceback(&_nala_instance_p->data.traceback);
     _nala_instance_p->data.return_value = return_value;
@@ -1897,7 +1903,7 @@ void hit_mock_once(int return_value)
 
 void hit_mock_ignore_in(int return_value)
 {
-    nala_state_for_hit.state.mode = 3;
+    nala_state_for_hit.state.mode = MODE_MOCK;
     nala_state_for_hit.data.return_value = return_value;
     nala_state_for_hit.data.errno_value = 0;
     nala_state_for_hit.data.callback = NULL;
@@ -1907,7 +1913,7 @@ void hit_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_hit *instance_p;
 
-    nala_state_for_hit.state.mode = 1;
+    nala_state_for_hit.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
     nala_traceback(&instance_p->data.traceback);
     instance_p->data.return_value = return_value;
@@ -1931,18 +1937,18 @@ void hit_mock_set_callback(void (*callback)())
 
 void hit_mock_none(void)
 {
-    nala_state_for_hit.state.mode = 4;
+    nala_state_for_hit.state.mode = MODE_NONE;
 }
 
 void hit_mock_implementation(int (*implementation)())
 {
-    nala_state_for_hit.state.mode = 2;
+    nala_state_for_hit.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_hit.data.implementation = implementation;
 }
 
 void hit_mock_disable(void)
 {
-    nala_state_for_hit.state.mode = 0;
+    nala_state_for_hit.state.mode = MODE_REAL;
 }
 
 void hit_mock_suspend(void)

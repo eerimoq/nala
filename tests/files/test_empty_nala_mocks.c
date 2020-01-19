@@ -14,6 +14,12 @@ Do not edit manually
 #include "nala_mocks.h"
 #include <execinfo.h>
 
+#define MODE_REAL            0
+#define MODE_MOCK_ONCE       1
+#define MODE_IMPLEMENTATION  2
+#define MODE_MOCK            3
+#define MODE_NONE            4
+
 #define NALA_INSTANCES_APPEND(list, item_p)     \
     do {                                        \
         if ((list).head_p == NULL) {            \
@@ -42,7 +48,7 @@ Do not edit manually
     } while (0);
 
 #define NALA_STATE_RESET(_state)                \
-    (_state).state.mode = 0;                    \
+    (_state).state.mode = MODE_REAL;            \
     (_state).state.suspended.count = 0;         \
     (_state).instances.head_p = NULL;           \
     (_state).instances.tail_p = NULL;           \
@@ -534,7 +540,7 @@ void nala_state_suspend(struct nala_state_t *state_p)
 {
     if (state_p->suspended.count == 0) {
         state_p->suspended.mode = state_p->mode;
-        state_p->mode = 0;
+        state_p->mode = MODE_REAL;
     }
 
     state_p->suspended.count++;
@@ -570,23 +576,23 @@ void nala_print_call(const char *function_name_p, struct nala_state_t *state_p)
 
     switch (state_p->mode) {
 
-    case 0:
+    case MODE_REAL:
         mode_p = "real";
         break;
 
-    case 1:
+    case MODE_MOCK_ONCE:
         mode_p = "once";
         break;
 
-    case 2:
+    case MODE_IMPLEMENTATION:
         mode_p = "impl";
         break;
 
-    case 3:
+    case MODE_MOCK:
         mode_p = "mock";
         break;
 
-    case 4:
+    case MODE_NONE:
         mode_p = "none";
         break;
 

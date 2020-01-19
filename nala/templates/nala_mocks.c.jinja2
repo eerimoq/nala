@@ -88,10 +88,10 @@ struct {{mock.state_type}} {
 
 static struct {{mock.state_type}} {{mock.state_name}} = {
     .state = {
-        .mode = 0,
+        .mode = MODE_REAL,
         .suspended = {
             .count = 0,
-            .mode = 0
+            .mode = MODE_REAL
         }
     },
     .instances = {
@@ -127,9 +127,9 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
 
     switch ({{mock.state_name}}.state.mode) {
 
-    case 1:
-    case 3:
-        if ({{mock.state_name}}.state.mode == 1) {
+    case MODE_MOCK_ONCE:
+    case MODE_MOCK:
+        if ({{mock.state_name}}.state.mode == MODE_MOCK_ONCE) {
             NALA_INSTANCES_POP({{mock.state_name}}.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
@@ -193,7 +193,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
         }
         break;
 
-    case 2:
+    case MODE_IMPLEMENTATION:
         {% if mock.is_variadic_func %}
         {
             va_list __nala_vl;
@@ -212,7 +212,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
         {% endif %}
         break;
 
-    case 4:
+    case MODE_NONE:
         nala_mock_none_fail();
         exit(1);
         break;
@@ -242,7 +242,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
 
 {{mock.mock_func | render}}
 {
-    {{mock.state_name}}.state.mode = 3;
+    {{mock.state_name}}.state.mode = MODE_MOCK;
     {% if mock.is_variadic_func %}
 
     if (vafmt_p == NULL) {
@@ -289,7 +289,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
 {
     struct _nala_instance_type_for_{{mock.func_name}} *_nala_instance_p;
 
-    {{mock.state_name}}.state.mode = 1;
+    {{mock.state_name}}.state.mode = MODE_MOCK_ONCE;
     _nala_instance_p = nala_xmalloc(sizeof(*_nala_instance_p));
     nala_traceback(&_nala_instance_p->data.traceback);
     {% for param, _ in mock.set_params %}
@@ -346,7 +346,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
 
 void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
 {
-    {{mock.state_name}}.state.mode = 3;
+    {{mock.state_name}}.state.mode = MODE_MOCK;
     {% for param in mock.char_pointer_params %}
     {{mock.state_name}}.data.params.ignore_{{param.name}}_in = true;
     {% endfor %}
@@ -367,7 +367,7 @@ void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
 {
     struct _nala_instance_type_for_{{mock.func_name}} *instance_p;
 
-    {{mock.state_name}}.state.mode = 1;
+    {{mock.state_name}}.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
     nala_traceback(&instance_p->data.traceback);
     {% for param, _ in mock.set_params %}
@@ -502,18 +502,18 @@ void {{mock.func_name}}_mock_set_va_arg_out_at(unsigned int index, const void *b
 
 void {{mock.func_name}}_mock_none(void)
 {
-    {{mock.state_name}}.state.mode = 4;
+    {{mock.state_name}}.state.mode = MODE_NONE;
 }
 
 void {{mock.func_name}}_mock_implementation({{mock.implementation_decl | render}})
 {
-    {{mock.state_name}}.state.mode = 2;
+    {{mock.state_name}}.state.mode = MODE_IMPLEMENTATION;
     {{mock.state_name}}.data.implementation = implementation;
 }
 
 void {{mock.func_name}}_mock_disable(void)
 {
-    {{mock.state_name}}.state.mode = 0;
+    {{mock.state_name}}.state.mode = MODE_REAL;
 }
 
 void {{mock.func_name}}_mock_suspend(void)
