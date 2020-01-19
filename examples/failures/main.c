@@ -1,6 +1,7 @@
 #include <time.h>
 #include "nala.h"
 #include "nala_mocks.h"
+#include "foo.h"
 
 TEST(time_called_more_times_than_expected)
 {
@@ -41,6 +42,20 @@ TEST(time_wrong_in)
     now = 4;
     ASSERT_EQ(time(&now), 42);
     time(NULL);
+}
+
+TEST(foo_wrong_in)
+{
+    struct foo_t value;
+
+    value.a = 1;
+    value.b = -1;
+    foo_mock_once(0);
+    foo_mock_set_foo_p_in(&value, sizeof(value));
+
+    value.a = 1;
+    value.b = -2;
+    ASSERT_EQ(foo(&value), 0);
 }
 
 TEST(segfault)

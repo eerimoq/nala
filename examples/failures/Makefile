@@ -1,5 +1,6 @@
 ASAN_FLAGS = -fsanitize=address
 INC += -I../../nala/dist
+SRC += foo.c
 CFLAGS += $(INC)
 CFLAGS += -Wextra
 CFLAGS += -g
@@ -14,4 +15,4 @@ test: nala_mocks.h
 
 nala_mocks.h: main.c
 	[ -f nala_mocks.h ] || touch nala_mocks.h
-	$(CC) $(INC) -E main.c | $(NALA) generate_mocks
+	$(CC) $(INC) -DNALA_GENERATE_MOCKS -E main.c | $(NALA) generate_mocks

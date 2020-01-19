@@ -554,7 +554,6 @@ void nala_mock_assert_in_struct_{{assert_in.name}}(
     size_t size)
 {
     {% if assert_in.assert_in_members %}
-    (void)traceback_p;
     (void)size;
     const struct {{assert_in.name}} *actual_p = left_p;
     const struct {{assert_in.name}} *expected_p = right_p;
@@ -562,16 +561,16 @@ void nala_mock_assert_in_struct_{{assert_in.name}}(
 
     snprintf(&format[0],
              sizeof(format),
-             "Mocked %s(%s): %%s != %%s\n",
+             "Mocked %s(%s%%s): %%s != %%s\n\n",
              func_p,
              param_p);
 
     if ((actual_p != NULL) && (expected_p != NULL)) {
             {% for member in assert_in.assert_in_members %}
-        MOCK_ASSERT_PARAM_IN_EQ(format, actual_p->{{member}}, expected_p->{{member}})
+        MOCK_ASSERT_PARAM_IN_EQ(traceback_p, format, "->{{member}}", actual_p->{{member}}, expected_p->{{member}})
             {% endfor %}
     } else {
-        MOCK_ASSERT_PARAM_IN_EQ(format, actual_p, expected_p);
+        MOCK_ASSERT_PARAM_IN_EQ(traceback_p, format, "", actual_p, expected_p);
     }
     {% else %}
     nala_mock_assert_memory(traceback_p, func_p, param_p, left_p, right_p, size);

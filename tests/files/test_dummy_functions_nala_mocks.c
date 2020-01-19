@@ -456,12 +456,27 @@ char *format_mock_traceback(const char *message_p,
         }                                                               \
     }
 
-#define MOCK_ASSERT_PARAM_IN_EQ(format_p, left, right)  \
-    NALA_BINARY_ASSERTION(left,                         \
-                          right,                        \
-                          NALA_CHECK_EQ,                \
-                          format_p,                     \
-                          NALA_FORMAT_EQ);
+#define MOCK_ASSERT_PARAM_IN_EQ(traceback_p,            \
+                                format_p,               \
+                                member_p,               \
+                                left,                   \
+                                right)                  \
+    if (!NALA_CHECK_EQ(left, right)) {                  \
+        nala_reset_all_mocks();                         \
+        char _nala_assert_format[512];                  \
+        snprintf(&_nala_assert_format[0],               \
+                 sizeof(_nala_assert_format),           \
+                 format_p,                              \
+                 member_p,                              \
+                 NALA_PRINT_FORMAT(left),               \
+                 NALA_PRINT_FORMAT(right));             \
+        nala_test_failure(                              \
+            format_mock_traceback(                      \
+                NALA_FORMAT_EQ(&_nala_assert_format[0], \
+                               left,                    \
+                               right),                  \
+                traceback_p));                          \
+    }
 
 #define MOCK_ASSERT_PARAM_IN(data_p, assert_in, func, name)     \
     if ((data_p)->params.name ## _in_assert == NULL) {          \
