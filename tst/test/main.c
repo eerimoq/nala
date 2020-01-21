@@ -13,9 +13,16 @@
 
 TEST(assert_eq)
 {
+    char string[] = "foo";
+    const char const_string[] = "bar";
+
     ASSERT_EQ(1, 1);
     ASSERT_EQ("", "");
     ASSERT_EQ("12", "12");
+    ASSERT_EQ(string, "foo");
+    ASSERT_EQ(const_string, "bar");
+    ASSERT_EQ("foo", string);
+    ASSERT_EQ("bar", const_string);
 }
 
 TEST(assert_ne)

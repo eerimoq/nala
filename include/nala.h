@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NALA_VERSION "0.79.0"
+#define NALA_VERSION "0.80.0"
 
 #define TEST(name)                                      \
     static void name(void);                             \
@@ -63,10 +63,16 @@
              bool: "%d",                                \
     default: "%p")
 
+#define NALA_TYPEOF(value)                              \
+    typeof(_Generic((value),                            \
+                    char *: nala_char_p,                \
+                    const char *: nala_const_char_p,    \
+                    default: (value)))
+
 #define NALA_BINARY_ASSERTION(left, right, check, format, formatter)    \
     do {                                                                \
-        __typeof__(left) _nala_assert_left = left;                      \
-        __typeof__(right) _nala_assert_right = right;                   \
+        NALA_TYPEOF(left) _nala_assert_left = left;                     \
+        NALA_TYPEOF(right) _nala_assert_right = right;                  \
                                                                         \
         if (!check(_nala_assert_left, _nala_assert_right)) {            \
             nala_reset_all_mocks();                                     \
@@ -265,6 +271,9 @@ struct nala_test_t {
     float elapsed_time_ms;
     struct nala_test_t *next_p;
 };
+
+char *nala_char_p;
+const char *nala_const_char_p;
 
 bool nala_check_string_equal(const char *actual_p, const char *expected_p);
 
