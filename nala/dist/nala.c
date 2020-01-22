@@ -1358,30 +1358,21 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
              bool: "%d",                                \
              default: "%p")
 
-#define TYPEOF(value)                                   \
-    typeof(_Generic((value),                            \
-                    char *: nala_char_p,                \
-                    const char *: nala_const_char_p,    \
-                    default: (value)))
-
-#define ASSERTION(actual, expected, check, format, formatter)           \
-    do {                                                                \
-        TYPEOF(actual) _nala_assert_actual = actual;                    \
-        TYPEOF(expected) _nala_assert_expected = expected;              \
-                                                                        \
-        if (!check(_nala_assert_actual, _nala_assert_expected)) {       \
-            nala_reset_all_mocks();                                     \
-            char _nala_assert_format[512];                              \
-                                                                        \
-            snprintf(&_nala_assert_format[0],                           \
-                     sizeof(_nala_assert_format),                       \
-                     format,                                            \
-                     PRINT_FORMAT(_nala_assert_actual),                 \
-                     PRINT_FORMAT(_nala_assert_expected));              \
-            nala_test_failure(formatter(_nala_assert_format,            \
-                                        _nala_assert_actual,            \
-                                        _nala_assert_expected));        \
-        }                                                               \
+#define ASSERTION(actual, expected, check, format, formatter)   \
+    do {                                                        \
+        if (!check(actual, expected)) {                         \
+            nala_reset_all_mocks();                             \
+            char _nala_assert_format[512];                      \
+                                                                \
+            snprintf(&_nala_assert_format[0],                   \
+                     sizeof(_nala_assert_format),               \
+                     format,                                    \
+                     PRINT_FORMAT(actual),                      \
+                     PRINT_FORMAT(expected));                   \
+            nala_test_failure(formatter(_nala_assert_format,    \
+                                        actual,                 \
+                                        expected));             \
+        }                                                       \
     } while (0);
 
 #define BINARY_ASSERTION(actual, expected, op)                          \
