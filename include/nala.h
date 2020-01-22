@@ -7,6 +7,47 @@
 
 #define NALA_VERSION "0.81.0"
 
+#define ASSERT_EQ(actual, expected)                                     \
+    NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_EQ)
+
+#define ASSERT_NE(actual, expected)                                     \
+    NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_NE)
+
+#define ASSERT_LT(actual, expected)                                     \
+    NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_LT)
+
+#define ASSERT_LE(actual, expected)                                     \
+    NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_LE)
+
+#define ASSERT_GT(actual, expected)                                     \
+    NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_GT)
+
+#define ASSERT_GE(actual, expected)                                     \
+    NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_GE)
+
+#define ASSERT_SUBSTRING(haystack, needle)      \
+    nala_assert_substring(haystack, needle)
+
+#define ASSERT_NOT_SUBSTRING(haystack, needle)  \
+    nala_assert_not_substring(haystack, needle)
+
+#define ASSERT_MEMORY(actual, expected, size)   \
+    nala_assert_memory(actual, expected, size)
+
+#define ASSERT(cond) nala_assert(cond)
+
+#define FAIL() nala_fail()
+
+#define CAPTURE_OUTPUT(stdout_name, stderr_name)                        \
+    int stdout_name ## i;                                               \
+    static char *stdout_name = NULL;                                    \
+    static char *stderr_name = NULL;                                    \
+                                                                        \
+    for (stdout_name ## i = 0, nala_capture_output_start(&stdout_name,  \
+                                                         &stderr_name); \
+         stdout_name ## i < 1;                                          \
+         stdout_name ## i++, nala_capture_output_stop())
+
 #define TEST(name)                                      \
     static void name(void);                             \
     static void name ## _before_fork() {}               \
@@ -56,47 +97,6 @@
              bool: nala_assert_bool,                    \
              default: nala_assert_ptr)
 
-#define ASSERT_EQ(actual, expected)                                     \
-    NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_EQ)
-
-#define ASSERT_NE(actual, expected)                                     \
-    NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_NE)
-
-#define ASSERT_LT(actual, expected)                                     \
-    NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_LT)
-
-#define ASSERT_LE(actual, expected)                                     \
-    NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_LE)
-
-#define ASSERT_GT(actual, expected)                                     \
-    NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_GT)
-
-#define ASSERT_GE(actual, expected)                                     \
-    NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_GE)
-
-#define ASSERT_SUBSTRING(haystack, needle)      \
-    nala_assert_substring(haystack, needle)
-
-#define ASSERT_NOT_SUBSTRING(haystack, needle)  \
-    nala_assert_not_substring(haystack, needle)
-
-#define ASSERT_MEMORY(actual, expected, size)   \
-    nala_assert_memory(actual, expected, size)
-
-#define ASSERT(cond) nala_assert(cond)
-
-#define FAIL() nala_fail()
-
-#define CAPTURE_OUTPUT(stdout_name, stderr_name)                        \
-    int stdout_name ## i;                                               \
-    static char *stdout_name = NULL;                                    \
-    static char *stderr_name = NULL;                                    \
-                                                                        \
-    for (stdout_name ## i = 0, nala_capture_output_start(&stdout_name,  \
-                                                         &stderr_name); \
-         stdout_name ## i < 1;                                          \
-         stdout_name ## i++, nala_capture_output_stop())
-
 struct nala_test_t {
     const char *name_p;
     const char *file_p;
@@ -108,9 +108,6 @@ struct nala_test_t {
     float elapsed_time_ms;
     struct nala_test_t *next_p;
 };
-
-char *nala_char_p;
-const char *nala_const_char_p;
 
 bool nala_check_string_equal(const char *actual_p, const char *expected_p);
 

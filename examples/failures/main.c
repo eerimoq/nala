@@ -62,3 +62,8 @@ TEST(segfault)
 {
     (*((int *)0)) = 1;
 }
+
+TEST(eq)
+{
+    ASSERT_EQ(1, 2);
+}
