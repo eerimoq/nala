@@ -1235,6 +1235,313 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
                                   mock_traceback_skip_filter,
                                   NULL));
 }
+
+#define CHECK_EQ(actual, expected)                      \
+    _Generic(                                           \
+        (actual),                                       \
+        char *: _Generic(                               \
+            (expected),                                 \
+            char *: nala_check_string_equal(            \
+                (char *)(uintptr_t)(actual),            \
+                (char *)(uintptr_t)(expected)),         \
+            const char *: nala_check_string_equal(      \
+                (char *)(uintptr_t)(actual),            \
+                (char *)(uintptr_t)(expected)),         \
+            default: false),                            \
+        const char *: _Generic(                         \
+            (expected),                                 \
+            char *: nala_check_string_equal(            \
+                (char *)(uintptr_t)(actual),            \
+                (char *)(uintptr_t)(expected)),         \
+            const char *: nala_check_string_equal(      \
+                (char *)(uintptr_t)(actual),            \
+                (char *)(uintptr_t)(expected)),         \
+            default: false),                            \
+        default: (actual) == (expected))
+
+#define CHECK_NE(actual, expected)                              \
+    _Generic(                                                   \
+        (actual),                                               \
+        char *: _Generic(                                       \
+            (expected),                                         \
+            char *: (!nala_check_string_equal(                  \
+                         (char *)(uintptr_t)(actual),           \
+                         (char *)(uintptr_t)(expected))),       \
+            const char *: (!nala_check_string_equal(            \
+                               (char *)(uintptr_t)(actual),     \
+                               (char *)(uintptr_t)(expected))), \
+            default: true),                                     \
+        const char *: _Generic(                                 \
+            (expected),                                         \
+            char *: (!nala_check_string_equal(                  \
+                         (char *)(uintptr_t)(actual),           \
+                         (char *)(uintptr_t)(expected))),       \
+            const char *: (!nala_check_string_equal(            \
+                               (char *)(uintptr_t)(actual),     \
+                               (char *)(uintptr_t)(expected))), \
+            default: true),                                     \
+        default: (actual) != (expected))
+
+#define CHECK_LT(actual, expected) ((actual) < (expected))
+
+#define CHECK_LE(actual, expected) ((actual) <= (expected))
+
+#define CHECK_GT(actual, expected) ((actual) > (expected))
+
+#define CHECK_GE(actual, expected) ((actual) >= (expected))
+
+#define CHECK_SUBSTRING(actual, expected)       \
+    nala_check_substring(actual, expected)
+
+#define CHECK_NOT_SUBSTRING(actual, expected)   \
+    (!nala_check_substring(actual, expected))
+
+#define FORMAT_EQ(format, actual, expected)                             \
+    _Generic(                                                           \
+        (actual),                                                       \
+        char *: _Generic(                                               \
+            (expected),                                                 \
+            char *: nala_format_string(                                 \
+                format,                                                 \
+                (char *)(uintptr_t)(actual),                            \
+                (char *)(uintptr_t)(expected)),                         \
+            const char *: nala_format_string(                           \
+                format,                                                 \
+                (char *)(uintptr_t)(actual),                            \
+                (char *)(uintptr_t)(expected)),                         \
+            default: nala_format(format, (actual), (expected))),        \
+        const char *: _Generic(                                         \
+            (expected),                                                 \
+            char *: nala_format_string(                                 \
+                format,                                                 \
+                (char *)(uintptr_t)(actual),                            \
+                (char *)(uintptr_t)(expected)),                         \
+            const char *: nala_format_string(                           \
+                format,                                                 \
+                (char *)(uintptr_t)(actual),                            \
+                (char *)(uintptr_t)(expected)),                         \
+            default: nala_format(format, (actual), (expected))),        \
+        default: nala_format(format, (actual), (expected)))
+
+#define PRINT_FORMAT(value)                             \
+    _Generic((value),                                   \
+             char: "%c",                                \
+             const char: "%c",                          \
+             signed char: "%hhd",                       \
+             const signed char: "%hhd",                 \
+             unsigned char: "%hhu",                     \
+             const unsigned char: "%hhu",               \
+             signed short: "%hd",                       \
+             const signed short: "%hd",                 \
+             unsigned short: "%hu",                     \
+             const unsigned short: "%hu",               \
+             signed int: "%d",                          \
+             const signed int: "%d",                    \
+             unsigned int: "%u",                        \
+             const unsigned int: "%u",                  \
+             long int: "%ld",                           \
+             const long int: "%ld",                     \
+             unsigned long int: "%lu",                  \
+             const unsigned long int: "%lu",            \
+             long long int: "%lld",                     \
+             const long long int: "%lld",               \
+             unsigned long long int: "%llu",            \
+             const unsigned long long int: "%llu",      \
+             float: "%f",                               \
+             const float: "%f",                         \
+             double: "%f",                              \
+             const double: "%f",                        \
+             long double: "%Lf",                        \
+             const long double: "%Lf",                  \
+             char *: "\"%s\"",                          \
+             const char *: "\"%s\"",                    \
+             bool: "%d",                                \
+             default: "%p")
+
+#define TYPEOF(value)                                   \
+    typeof(_Generic((value),                            \
+                    char *: nala_char_p,                \
+                    const char *: nala_const_char_p,    \
+                    default: (value)))
+
+#define ASSERTION(actual, expected, check, format, formatter)           \
+    do {                                                                \
+        TYPEOF(actual) _nala_assert_actual = actual;                    \
+        TYPEOF(expected) _nala_assert_expected = expected;              \
+                                                                        \
+        if (!check(_nala_assert_actual, _nala_assert_expected)) {       \
+            nala_reset_all_mocks();                                     \
+            char _nala_assert_format[512];                              \
+                                                                        \
+            snprintf(&_nala_assert_format[0],                           \
+                     sizeof(_nala_assert_format),                       \
+                     format,                                            \
+                     PRINT_FORMAT(_nala_assert_actual),                 \
+                     PRINT_FORMAT(_nala_assert_expected));              \
+            nala_test_failure(formatter(_nala_assert_format,            \
+                                        _nala_assert_actual,            \
+                                        _nala_assert_expected));        \
+        }                                                               \
+    } while (0);
+
+#define BINARY_ASSERTION(actual, expected, op)                          \
+    switch (op) {                                                       \
+                                                                        \
+    case NALA_CHECK_EQ:                                                 \
+        ASSERTION(actual, expected, CHECK_EQ, "%s != %s\n", FORMAT_EQ); \
+        break;                                                          \
+                                                                        \
+    case NALA_CHECK_NE:                                                 \
+        ASSERTION(actual, expected, CHECK_NE, "%s == %s\n", nala_format); \
+        break;                                                          \
+                                                                        \
+    case NALA_CHECK_LT:                                                 \
+        ASSERTION(actual, expected, CHECK_LT, "%s >= %s\n", nala_format); \
+        break;                                                          \
+                                                                        \
+    case NALA_CHECK_LE:                                                 \
+        ASSERTION(actual, expected, CHECK_LE, "%s > %s\n", nala_format); \
+        break;                                                          \
+                                                                        \
+    case NALA_CHECK_GT:                                                 \
+        ASSERTION(actual, expected, CHECK_GT, "%s <= %s\n", nala_format); \
+        break;                                                          \
+                                                                        \
+    case NALA_CHECK_GE:                                                 \
+        ASSERTION(actual, expected, CHECK_GE, "%s < %s\n", nala_format); \
+        break;                                                          \
+                                                                        \
+    default:                                                            \
+        FAIL();                                                         \
+        break;                                                          \
+    }
+
+void nala_assert_char(char actual, char expected, int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_schar(signed char actual, signed char expected, int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_uchar(unsigned char actual, unsigned char expected, int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_short(short actual, short expected, int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_ushort(unsigned short actual, unsigned short expected, int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_int(int actual, int expected, int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_uint(unsigned int actual, unsigned int expected, int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_long(long actual, long expected, int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_ulong(unsigned long actual, unsigned long expected, int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_llong(long long actual, long long expected, int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_ullong(unsigned long long actual,
+                        unsigned long long expected,
+                        int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_float(float actual, float expected, int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_double(double actual, double expected, int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_ldouble(long double actual, long double expected, int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_bool(bool actual, bool expected, int op)
+{
+    BINARY_ASSERTION(actual, expected, op);
+}
+
+void nala_assert_ptr(const void *actual_p, const void *expected_p, int op)
+{
+    BINARY_ASSERTION(actual_p, expected_p, op);
+}
+
+void nala_assert_string(const char *actual_p, const char *expected_p, int op)
+{
+    BINARY_ASSERTION(actual_p, expected_p, op);
+}
+
+void nala_assert_substring(const char *haystack_p, const char *needle_p)
+{
+    ASSERTION(haystack_p,
+              needle_p,
+              CHECK_SUBSTRING,
+              "%s doesn't contain %s\n",
+              nala_format);
+}
+
+void nala_assert_not_substring(const char *haystack_p, const char *needle_p)
+{
+    ASSERTION(haystack_p,
+              needle_p,
+              CHECK_NOT_SUBSTRING,
+              "%s contains %s\n",
+              nala_format);
+}
+
+void nala_assert_memory(const void *actual_p, const void *expected_p, size_t size)
+{
+    if (!nala_check_memory(actual_p, expected_p, size)) {
+        nala_reset_all_mocks();
+        nala_test_failure(nala_format_memory("", actual_p, expected_p, size));
+    }
+}
+
+void nala_assert(bool cond)
+{
+    if (!cond) {
+        nala_reset_all_mocks();
+        nala_test_failure(nala_format("false != true\n"));
+    }
+}
+
+void nala_fail(void)
+{
+    nala_reset_all_mocks();
+    nala_test_failure(nala_format("fail\n"));
+}
 /*
  * The MIT License (MIT)
  *

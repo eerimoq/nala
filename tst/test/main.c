@@ -16,7 +16,22 @@ TEST(assert_eq)
     char string[] = "foo";
     const char const_string[] = "bar";
 
-    ASSERT_EQ(1, 1);
+    ASSERT_EQ((char)'1', (char)'1');
+    ASSERT_EQ((signed char)'1', (signed char)'1');
+    ASSERT_EQ((unsigned char)'1', (unsigned char)'1');
+    ASSERT_EQ((short)1, (short)1);
+    ASSERT_EQ((unsigned short)1, (unsigned short)1);
+    ASSERT_EQ((int)1, (int)1);
+    ASSERT_EQ((unsigned int)1, (unsigned int)1);
+    ASSERT_EQ((long)1, (long)1);
+    ASSERT_EQ((unsigned long)1, (unsigned long)1);
+    ASSERT_EQ((long long)1, (long long)1);
+    ASSERT_EQ((unsigned long long)1, (unsigned long long)1);
+    ASSERT_EQ((float)1, (float)1);
+    ASSERT_EQ((double)1, (double)1);
+    ASSERT_EQ((long double)1, (long double)1);
+    ASSERT_EQ((bool)true, (bool)true);
+    ASSERT_EQ((void *)NULL, (void *)NULL);
     ASSERT_EQ("", "");
     ASSERT_EQ("12", "12");
     ASSERT_EQ(string, "foo");

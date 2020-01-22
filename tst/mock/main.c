@@ -556,7 +556,7 @@ TEST(in_out_function)
     values[0] = 2;
     values[1] = -1; /* Different from 0. values[1] not asserted. */
     in_out(&values[0]);
-    ASSERT_EQ(values[1], 1)
+    ASSERT_EQ(values[1], 1);
 }
 
 TEST(struct_param_and_return_type_function)
