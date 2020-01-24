@@ -687,5 +687,5 @@ void nala_print_call(const char *function_name_p, struct nala_state_t *state_p)
         break;
     }
 
-    printf("%s: %s()\n", mode_p, function_name_p);
+    fprintf(nala_get_stdout(), "%s: %s()\n", mode_p, function_name_p);
 }

@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NALA_VERSION "0.81.0"
+#define NALA_VERSION "0.82.0"
 
 /**
  * Assert that given characters, numbers, pointers or strings are
@@ -170,6 +170,8 @@ bool nala_check_memory(const void *left_p, const void *right_p, size_t size);
 void nala_capture_output_start(char **stdout_pp, char **stderr_pp);
 
 void nala_capture_output_stop(void);
+
+FILE *nala_get_stdout(void);
 
 /**
  * message_p is freed by this function.

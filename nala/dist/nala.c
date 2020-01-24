@@ -344,6 +344,7 @@ struct capture_output_t {
     int original_fd;
     FILE *temporary_file_p;
     FILE *original_file_p;
+    FILE *stdout_p;
 };
 
 static struct nala_test_t *current_test_p = NULL;
@@ -450,6 +451,7 @@ static void capture_output_init(struct capture_output_t *self_p,
     self_p->output_pp = NULL;
     self_p->length = 0;
     self_p->original_file_p = file_p;
+    self_p->stdout_p = fdopen(dup(fileno(file_p)), "w");
 }
 
 static void capture_output_destroy(struct capture_output_t *self_p)
@@ -461,6 +463,9 @@ static void capture_output_destroy(struct capture_output_t *self_p)
 
         self_p->output_pp = NULL;
     }
+
+    fflush(self_p->stdout_p);
+    fclose(self_p->stdout_p);
 }
 
 static void capture_output_redirect(struct capture_output_t *self_p)
@@ -530,6 +535,15 @@ static void capture_output_stop(struct capture_output_t *self_p)
     fclose(self_p->temporary_file_p);
 
     printf("%s", *self_p->output_pp);
+}
+
+FILE *nala_get_stdout(void)
+{
+    if (capture_stdout.running) {
+        return (capture_stdout.stdout_p);
+    } else {
+        return (stdout);
+    }
 }
 
 static float timeval_to_ms(struct timeval *timeval_p)
