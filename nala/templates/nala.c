@@ -453,33 +453,19 @@ char *format_mock_traceback(const char *message_p,
 #define PRINT_FORMAT(value)                             \
     _Generic((value),                                   \
              char: "%c",                                \
-             const char: "%c",                          \
              signed char: "%hhd",                       \
-             const signed char: "%hhd",                 \
              unsigned char: "%hhu",                     \
-             const unsigned char: "%hhu",               \
              signed short: "%hd",                       \
-             const signed short: "%hd",                 \
              unsigned short: "%hu",                     \
-             const unsigned short: "%hu",               \
              signed int: "%d",                          \
-             const signed int: "%d",                    \
              unsigned int: "%u",                        \
-             const unsigned int: "%u",                  \
              long int: "%ld",                           \
-             const long int: "%ld",                     \
              unsigned long int: "%lu",                  \
-             const unsigned long int: "%lu",            \
              long long int: "%lld",                     \
-             const long long int: "%lld",               \
              unsigned long long int: "%llu",            \
-             const unsigned long long int: "%llu",      \
              float: "%f",                               \
-             const float: "%f",                         \
              double: "%f",                              \
-             const double: "%f",                        \
              long double: "%Lf",                        \
-             const long double: "%Lf",                  \
              char *: "\"%s\"",                          \
              const char *: "\"%s\"",                    \
              bool: "%d",                                \
