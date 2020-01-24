@@ -7,37 +7,76 @@
 
 #define NALA_VERSION "0.81.0"
 
+/**
+ * Assert that given characters, numbers, pointers or strings are
+ * equal.
+ */
 #define ASSERT_EQ(actual, expected)                                     \
     NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_EQ)
 
+/**
+ * Assert that given characters, numbers, pointers or strings are not
+ * equal.
+ */
 #define ASSERT_NE(actual, expected)                                     \
     NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_NE)
 
+/**
+ * Assert that actual is less than expected.
+ */
 #define ASSERT_LT(actual, expected)                                     \
     NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_LT)
 
+/**
+ * Assert that actual is less than or equal to expected.
+ */
 #define ASSERT_LE(actual, expected)                                     \
     NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_LE)
 
+/**
+ * Assert that actual is greater than expected.
+ */
 #define ASSERT_GT(actual, expected)                                     \
     NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_GT)
 
+/**
+ * Assert that actual is greater than or equal to expected.
+ */
 #define ASSERT_GE(actual, expected)                                     \
     NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_GE)
 
+/**
+ * Assert that given haystack string contains given needle string.
+ */
 #define ASSERT_SUBSTRING(haystack, needle)      \
     nala_assert_substring(haystack, needle)
 
+/**
+ * Assert that given haystack string does not contain given needle
+ * string.
+ */
 #define ASSERT_NOT_SUBSTRING(haystack, needle)  \
     nala_assert_not_substring(haystack, needle)
 
+/**
+ * Assert that given memory regions are equal.
+ */
 #define ASSERT_MEMORY(actual, expected, size)   \
     nala_assert_memory(actual, expected, size)
 
+/**
+ * Assert that given condition is true.
+ */
 #define ASSERT(cond) nala_assert(cond)
 
+/**
+ * Fail current test.
+ */
 #define FAIL() nala_fail()
 
+/**
+ * A capture output block.
+ */
 #define CAPTURE_OUTPUT(stdout_name, stderr_name)                        \
     int stdout_name ## i;                                               \
     static char *stdout_name = NULL;                                    \
@@ -48,6 +87,9 @@
          stdout_name ## i < 1;                                          \
          stdout_name ## i++, nala_capture_output_stop())
 
+/**
+ * A test case.
+ */
 #define TEST(name)                                      \
     static void name(void);                             \
     static void name ## _before_fork() {}               \
@@ -66,8 +108,9 @@
     }                                                   \
     static void name(void)
 
-#define NALA_TEST_FAILURE(message_p)            \
-    nala_test_failure(message_p)
+/*
+ * Everything below is for Nala-internal use only!
+ */
 
 #define NALA_CHECK_EQ  0
 #define NALA_CHECK_NE  1

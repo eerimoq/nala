@@ -978,7 +978,7 @@ int __wrap_add(int x, int y)
             NALA_INSTANCES_POP(nala_state_for_add.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked add() called more times than expected.\n"));
             }
 
@@ -1138,7 +1138,7 @@ void add_mock_reset(void)
 void add_mock_assert_completed(void)
 {
     if (nala_state_for_add.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked add() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_add.instances.length));
@@ -1229,7 +1229,7 @@ int __wrap_call(int (*callback)(int value))
             NALA_INSTANCES_POP(nala_state_for_call.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked call() called more times than expected.\n"));
             }
 
@@ -1419,7 +1419,7 @@ void call_mock_reset(void)
 void call_mock_assert_completed(void)
 {
     if (nala_state_for_call.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked call() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_call.instances.length));
@@ -1506,7 +1506,7 @@ int __wrap_close(int fd)
             NALA_INSTANCES_POP(nala_state_for_close.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked close() called more times than expected.\n"));
             }
 
@@ -1654,7 +1654,7 @@ void close_mock_reset(void)
 void close_mock_assert_completed(void)
 {
     if (nala_state_for_close.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked close() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_close.instances.length));
@@ -1751,7 +1751,7 @@ DummyStruct *__wrap_compose_twice(DummyStruct *dummy_struct, DummyStruct *(*dumm
             NALA_INSTANCES_POP(nala_state_for_compose_twice.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked compose_twice() called more times than expected.\n"));
             }
 
@@ -1995,7 +1995,7 @@ void compose_twice_mock_reset(void)
 void compose_twice_mock_assert_completed(void)
 {
     if (nala_state_for_compose_twice.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked compose_twice() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_compose_twice.instances.length));
@@ -2086,7 +2086,7 @@ int __wrap_double_pointer(int **value_pp)
             NALA_INSTANCES_POP(nala_state_for_double_pointer.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked double_pointer() called more times than expected.\n"));
             }
 
@@ -2276,7 +2276,7 @@ void double_pointer_mock_reset(void)
 void double_pointer_mock_assert_completed(void)
 {
     if (nala_state_for_double_pointer.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked double_pointer() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_double_pointer.instances.length));
@@ -2363,7 +2363,7 @@ int __wrap_dup(int oldfd)
             NALA_INSTANCES_POP(nala_state_for_dup.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked dup() called more times than expected.\n"));
             }
 
@@ -2511,7 +2511,7 @@ void dup_mock_reset(void)
 void dup_mock_assert_completed(void)
 {
     if (nala_state_for_dup.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked dup() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_dup.instances.length));
@@ -2600,7 +2600,7 @@ int __wrap_dup2(int oldfd, int newfd)
             NALA_INSTANCES_POP(nala_state_for_dup2.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked dup2() called more times than expected.\n"));
             }
 
@@ -2760,7 +2760,7 @@ void dup2_mock_reset(void)
 void dup2_mock_assert_completed(void)
 {
     if (nala_state_for_dup2.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked dup2() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_dup2.instances.length));
@@ -2853,7 +2853,7 @@ DummyStruct *__wrap_edit_number(DummyStruct *dummy_struct, int number)
             NALA_INSTANCES_POP(nala_state_for_edit_number.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked edit_number() called more times than expected.\n"));
             }
 
@@ -3055,7 +3055,7 @@ void edit_number_mock_reset(void)
 void edit_number_mock_assert_completed(void)
 {
     if (nala_state_for_edit_number.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked edit_number() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_edit_number.instances.length));
@@ -3146,7 +3146,7 @@ int __wrap_endmntent(FILE *streamp)
             NALA_INSTANCES_POP(nala_state_for_endmntent.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked endmntent() called more times than expected.\n"));
             }
 
@@ -3336,7 +3336,7 @@ void endmntent_mock_reset(void)
 void endmntent_mock_assert_completed(void)
 {
     if (nala_state_for_endmntent.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked endmntent() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_endmntent.instances.length));
@@ -3421,7 +3421,7 @@ void __wrap_enum_param(enum enum_param_type value)
             NALA_INSTANCES_POP(nala_state_for_enum_param.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked enum_param() called more times than expected.\n"));
             }
 
@@ -3562,7 +3562,7 @@ void enum_param_mock_reset(void)
 void enum_param_mock_assert_completed(void)
 {
     if (nala_state_for_enum_param.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked enum_param() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_enum_param.instances.length));
@@ -3653,7 +3653,7 @@ int __wrap_fclose(FILE *stream)
             NALA_INSTANCES_POP(nala_state_for_fclose.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked fclose() called more times than expected.\n"));
             }
 
@@ -3843,7 +3843,7 @@ void fclose_mock_reset(void)
 void fclose_mock_assert_completed(void)
 {
     if (nala_state_for_fclose.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked fclose() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_fclose.instances.length));
@@ -3934,7 +3934,7 @@ int __wrap_fflush(FILE *stream)
             NALA_INSTANCES_POP(nala_state_for_fflush.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked fflush() called more times than expected.\n"));
             }
 
@@ -4124,7 +4124,7 @@ void fflush_mock_reset(void)
 void fflush_mock_assert_completed(void)
 {
     if (nala_state_for_fflush.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked fflush() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_fflush.instances.length));
@@ -4215,7 +4215,7 @@ int __wrap_fileno(FILE *stream)
             NALA_INSTANCES_POP(nala_state_for_fileno.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked fileno() called more times than expected.\n"));
             }
 
@@ -4405,7 +4405,7 @@ void fileno_mock_reset(void)
 void fileno_mock_assert_completed(void)
 {
     if (nala_state_for_fileno.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked fileno() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_fileno.instances.length));
@@ -4502,7 +4502,7 @@ FILE *__wrap_fopen(const char *path, const char *mode)
             NALA_INSTANCES_POP(nala_state_for_fopen.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked fopen() called more times than expected.\n"));
             }
 
@@ -4788,7 +4788,7 @@ void fopen_mock_reset(void)
 void fopen_mock_assert_completed(void)
 {
     if (nala_state_for_fopen.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked fopen() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_fopen.instances.length));
@@ -4889,7 +4889,7 @@ size_t __wrap_fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
             NALA_INSTANCES_POP(nala_state_for_fread.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked fread() called more times than expected.\n"));
             }
 
@@ -5157,7 +5157,7 @@ void fread_mock_reset(void)
 void fread_mock_assert_completed(void)
 {
     if (nala_state_for_fread.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked fread() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_fread.instances.length));
@@ -5246,7 +5246,7 @@ void __wrap_free(void *ptr)
             NALA_INSTANCES_POP(nala_state_for_free.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked free() called more times than expected.\n"));
             }
 
@@ -5429,7 +5429,7 @@ void free_mock_reset(void)
 void free_mock_assert_completed(void)
 {
     if (nala_state_for_free.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked free() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_free.instances.length));
@@ -5524,7 +5524,7 @@ int __wrap_fseek(FILE *stream, long int offset, int whence)
             NALA_INSTANCES_POP(nala_state_for_fseek.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked fseek() called more times than expected.\n"));
             }
 
@@ -5738,7 +5738,7 @@ void fseek_mock_reset(void)
 void fseek_mock_assert_completed(void)
 {
     if (nala_state_for_fseek.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked fseek() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_fseek.instances.length));
@@ -5829,7 +5829,7 @@ long int __wrap_ftell(FILE *stream)
             NALA_INSTANCES_POP(nala_state_for_ftell.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked ftell() called more times than expected.\n"));
             }
 
@@ -6019,7 +6019,7 @@ void ftell_mock_reset(void)
 void ftell_mock_assert_completed(void)
 {
     if (nala_state_for_ftell.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked ftell() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_ftell.instances.length));
@@ -6120,7 +6120,7 @@ size_t __wrap_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
             NALA_INSTANCES_POP(nala_state_for_fwrite.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked fwrite() called more times than expected.\n"));
             }
 
@@ -6388,7 +6388,7 @@ void fwrite_mock_reset(void)
 void fwrite_mock_assert_completed(void)
 {
     if (nala_state_for_fwrite.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked fwrite() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_fwrite.instances.length));
@@ -6479,7 +6479,7 @@ struct mntent *__wrap_getmntent(FILE *stream)
             NALA_INSTANCES_POP(nala_state_for_getmntent.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked getmntent() called more times than expected.\n"));
             }
 
@@ -6669,7 +6669,7 @@ void getmntent_mock_reset(void)
 void getmntent_mock_assert_completed(void)
 {
     if (nala_state_for_getmntent.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked getmntent() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_getmntent.instances.length));
@@ -6758,7 +6758,7 @@ void __wrap_in_out(int *buf_p)
             NALA_INSTANCES_POP(nala_state_for_in_out.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked in_out() called more times than expected.\n"));
             }
 
@@ -6941,7 +6941,7 @@ void in_out_mock_reset(void)
 void in_out_mock_assert_completed(void)
 {
     if (nala_state_for_in_out.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked in_out() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_in_out.instances.length));
@@ -7028,7 +7028,7 @@ int __wrap_io_control(int kind, ...)
             NALA_INSTANCES_POP(nala_state_for_io_control.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked io_control() called more times than expected.\n"));
             }
 
@@ -7099,7 +7099,7 @@ void io_control_mock(int kind, int return_value, const char *vafmt_p, ...)
     nala_state_for_io_control.state.mode = MODE_MOCK;
 
     if (vafmt_p == NULL) {
-        NALA_TEST_FAILURE(nala_format("Variadic format cannot be NULL.\n"));
+        nala_test_failure(nala_format("Variadic format cannot be NULL.\n"));
     }
 
     nala_state_for_io_control.data.params.vafmt_p = vafmt_p;
@@ -7126,7 +7126,7 @@ void io_control_mock_once(int kind, int return_value, const char *vafmt_p, ...)
     nala_traceback(&_nala_instance_p->data.traceback);
 
     if (vafmt_p == NULL) {
-        NALA_TEST_FAILURE(nala_format("Variadic format cannot be NULL.\n"));
+        nala_test_failure(nala_format("Variadic format cannot be NULL.\n"));
     }
 
     _nala_instance_p->data.params.vafmt_p = vafmt_p;
@@ -7219,7 +7219,7 @@ void io_control_mock_set_va_arg_in_pointer_at(unsigned int index, const void *bu
     instance_p = nala_state_for_io_control.instances.tail_p;
 
     if (instance_p == NULL) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
             "io_control_mock_set_va_arg_in_pointer_at(...) not implemented "
             "for mock state.\n"));
     }
@@ -7269,7 +7269,7 @@ void io_control_mock_reset(void)
 void io_control_mock_assert_completed(void)
 {
     if (nala_state_for_io_control.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked io_control() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_io_control.instances.length));
@@ -7357,7 +7357,7 @@ int __wrap_io_vcontrol(int kind, va_list ap)
             NALA_INSTANCES_POP(nala_state_for_io_vcontrol.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked io_vcontrol() called more times than expected.\n"));
             }
 
@@ -7505,7 +7505,7 @@ void io_vcontrol_mock_reset(void)
 void io_vcontrol_mock_assert_completed(void)
 {
     if (nala_state_for_io_vcontrol.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked io_vcontrol() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_io_vcontrol.instances.length));
@@ -7592,7 +7592,7 @@ void *__wrap_malloc(size_t size)
             NALA_INSTANCES_POP(nala_state_for_malloc.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked malloc() called more times than expected.\n"));
             }
 
@@ -7740,7 +7740,7 @@ void malloc_mock_reset(void)
 void malloc_mock_assert_completed(void)
 {
     if (nala_state_for_malloc.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked malloc() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_malloc.instances.length));
@@ -7851,7 +7851,7 @@ int __wrap_mount(const char *source, const char *target, const char *filesystemt
             NALA_INSTANCES_POP(nala_state_for_mount.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked mount() called more times than expected.\n"));
             }
 
@@ -8278,7 +8278,7 @@ void mount_mock_reset(void)
 void mount_mock_assert_completed(void)
 {
     if (nala_state_for_mount.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked mount() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_mount.instances.length));
@@ -8367,7 +8367,7 @@ void __wrap_output_message(const char *message)
             NALA_INSTANCES_POP(nala_state_for_output_message.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked output_message() called more times than expected.\n"));
             }
 
@@ -8571,7 +8571,7 @@ void output_message_mock_reset(void)
 void output_message_mock_assert_completed(void)
 {
     if (nala_state_for_output_message.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked output_message() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_output_message.instances.length));
@@ -8662,7 +8662,7 @@ int __wrap_pipe(int pipefd[2])
             NALA_INSTANCES_POP(nala_state_for_pipe.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked pipe() called more times than expected.\n"));
             }
 
@@ -8852,7 +8852,7 @@ void pipe_mock_reset(void)
 void pipe_mock_assert_completed(void)
 {
     if (nala_state_for_pipe.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked pipe() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_pipe.instances.length));
@@ -8947,7 +8947,7 @@ int __wrap_poll(struct pollfd *fds, nfds_t nfds, int timeout)
             NALA_INSTANCES_POP(nala_state_for_poll.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked poll() called more times than expected.\n"));
             }
 
@@ -9161,7 +9161,7 @@ void poll_mock_reset(void)
 void poll_mock_assert_completed(void)
 {
     if (nala_state_for_poll.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked poll() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_poll.instances.length));
@@ -9245,7 +9245,7 @@ void __wrap_print_hello()
             NALA_INSTANCES_POP(nala_state_for_print_hello.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked print_hello() called more times than expected.\n"));
             }
 
@@ -9374,7 +9374,7 @@ void print_hello_mock_reset(void)
 void print_hello_mock_assert_completed(void)
 {
     if (nala_state_for_print_hello.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked print_hello() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_print_hello.instances.length));
@@ -9469,7 +9469,7 @@ ssize_t __wrap_read(int fd, void *buf, size_t count)
             NALA_INSTANCES_POP(nala_state_for_read.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked read() called more times than expected.\n"));
             }
 
@@ -9683,7 +9683,7 @@ void read_mock_reset(void)
 void read_mock_assert_completed(void)
 {
     if (nala_state_for_read.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked read() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_read.instances.length));
@@ -9788,7 +9788,7 @@ ssize_t __wrap_sendto(int sockfd, const void *buf, size_t len, int flags, const 
             NALA_INSTANCES_POP(nala_state_for_sendto.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked sendto() called more times than expected.\n"));
             }
 
@@ -10080,7 +10080,7 @@ void sendto_mock_reset(void)
 void sendto_mock_assert_completed(void)
 {
     if (nala_state_for_sendto.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked sendto() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_sendto.instances.length));
@@ -10179,7 +10179,7 @@ int __wrap_setsockopt(int sockfd, int level, int optname, const void *optval, so
             NALA_INSTANCES_POP(nala_state_for_setsockopt.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked setsockopt() called more times than expected.\n"));
             }
 
@@ -10417,7 +10417,7 @@ void setsockopt_mock_reset(void)
 void setsockopt_mock_assert_completed(void)
 {
     if (nala_state_for_setsockopt.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked setsockopt() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_setsockopt.instances.length));
@@ -10504,7 +10504,7 @@ unsigned int __wrap_sleep(unsigned int seconds)
             NALA_INSTANCES_POP(nala_state_for_sleep.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked sleep() called more times than expected.\n"));
             }
 
@@ -10652,7 +10652,7 @@ void sleep_mock_reset(void)
 void sleep_mock_assert_completed(void)
 {
     if (nala_state_for_sleep.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked sleep() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_sleep.instances.length));
@@ -10749,7 +10749,7 @@ int __wrap_statvfs(const char *path, struct statvfs *buf)
             NALA_INSTANCES_POP(nala_state_for_statvfs.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked statvfs() called more times than expected.\n"));
             }
 
@@ -11014,7 +11014,7 @@ void statvfs_mock_reset(void)
 void statvfs_mock_assert_completed(void)
 {
     if (nala_state_for_statvfs.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked statvfs() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_statvfs.instances.length));
@@ -11103,7 +11103,7 @@ void __wrap_struct_param(struct struct_param_type *data)
             NALA_INSTANCES_POP(nala_state_for_struct_param.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked struct_param() called more times than expected.\n"));
             }
 
@@ -11286,7 +11286,7 @@ void struct_param_mock_reset(void)
 void struct_param_mock_assert_completed(void)
 {
     if (nala_state_for_struct_param.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked struct_param() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_struct_param.instances.length));
@@ -11372,7 +11372,7 @@ struct struct_param_type __wrap_struct_param_and_return_type(struct struct_param
             NALA_INSTANCES_POP(nala_state_for_struct_param_and_return_type.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked struct_param_and_return_type() called more times than expected.\n"));
             }
 
@@ -11508,7 +11508,7 @@ void struct_param_and_return_type_mock_reset(void)
 void struct_param_and_return_type_mock_assert_completed(void)
 {
     if (nala_state_for_struct_param_and_return_type.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked struct_param_and_return_type() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_struct_param_and_return_type.instances.length));
@@ -11599,7 +11599,7 @@ time_t __wrap_time(time_t *tloc)
             NALA_INSTANCES_POP(nala_state_for_time.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked time() called more times than expected.\n"));
             }
 
@@ -11789,7 +11789,7 @@ void time_mock_reset(void)
 void time_mock_assert_completed(void)
 {
     if (nala_state_for_time.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked time() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_time.instances.length));
@@ -11890,7 +11890,7 @@ int __wrap_timerfd_settime(int fd, int flags, const struct itimerspec *new_value
             NALA_INSTANCES_POP(nala_state_for_timerfd_settime.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked timerfd_settime() called more times than expected.\n"));
             }
 
@@ -12158,7 +12158,7 @@ void timerfd_settime_mock_reset(void)
 void timerfd_settime_mock_assert_completed(void)
 {
     if (nala_state_for_timerfd_settime.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked timerfd_settime() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_timerfd_settime.instances.length));
@@ -12244,7 +12244,7 @@ FILE *__wrap_tmpfile(void)
             NALA_INSTANCES_POP(nala_state_for_tmpfile.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked tmpfile() called more times than expected.\n"));
             }
 
@@ -12380,7 +12380,7 @@ void tmpfile_mock_reset(void)
 void tmpfile_mock_assert_completed(void)
 {
     if (nala_state_for_tmpfile.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked tmpfile() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_tmpfile.instances.length));
@@ -12466,7 +12466,7 @@ struct_param_type __wrap_typedef_struct_param_and_return_type(struct_param_type 
             NALA_INSTANCES_POP(nala_state_for_typedef_struct_param_and_return_type.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked typedef_struct_param_and_return_type() called more times than expected.\n"));
             }
 
@@ -12602,7 +12602,7 @@ void typedef_struct_param_and_return_type_mock_reset(void)
 void typedef_struct_param_and_return_type_mock_assert_completed(void)
 {
     if (nala_state_for_typedef_struct_param_and_return_type.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked typedef_struct_param_and_return_type() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_typedef_struct_param_and_return_type.instances.length));
@@ -12688,7 +12688,7 @@ union_type __wrap_typedef_union_param_and_return_type(union_type arg)
             NALA_INSTANCES_POP(nala_state_for_typedef_union_param_and_return_type.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked typedef_union_param_and_return_type() called more times than expected.\n"));
             }
 
@@ -12824,7 +12824,7 @@ void typedef_union_param_and_return_type_mock_reset(void)
 void typedef_union_param_and_return_type_mock_assert_completed(void)
 {
     if (nala_state_for_typedef_union_param_and_return_type.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked typedef_union_param_and_return_type() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_typedef_union_param_and_return_type.instances.length));
@@ -12910,7 +12910,7 @@ union union_type __wrap_union_param_and_return_type(union union_type arg)
             NALA_INSTANCES_POP(nala_state_for_union_param_and_return_type.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked union_param_and_return_type() called more times than expected.\n"));
             }
 
@@ -13046,7 +13046,7 @@ void union_param_and_return_type_mock_reset(void)
 void union_param_and_return_type_mock_assert_completed(void)
 {
     if (nala_state_for_union_param_and_return_type.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked union_param_and_return_type() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_union_param_and_return_type.instances.length));
@@ -13133,7 +13133,7 @@ int __wrap_usleep(__useconds_t usec)
             NALA_INSTANCES_POP(nala_state_for_usleep.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked usleep() called more times than expected.\n"));
             }
 
@@ -13281,7 +13281,7 @@ void usleep_mock_reset(void)
 void usleep_mock_assert_completed(void)
 {
     if (nala_state_for_usleep.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked usleep() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_usleep.instances.length));
@@ -13376,7 +13376,7 @@ ssize_t __wrap_write(int fd, const void *buf, size_t count)
             NALA_INSTANCES_POP(nala_state_for_write.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked write() called more times than expected.\n"));
             }
 
@@ -13590,7 +13590,7 @@ void write_mock_reset(void)
 void write_mock_assert_completed(void)
 {
     if (nala_state_for_write.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked write() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_write.instances.length));

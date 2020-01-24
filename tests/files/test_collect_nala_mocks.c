@@ -823,7 +823,7 @@ int __wrap_bar()
             NALA_INSTANCES_POP(nala_state_for_bar.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked bar() called more times than expected.\n"));
             }
 
@@ -959,7 +959,7 @@ void bar_mock_reset(void)
 void bar_mock_assert_completed(void)
 {
     if (nala_state_for_bar.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked bar() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_bar.instances.length));
@@ -1045,7 +1045,7 @@ int __wrap_fie()
             NALA_INSTANCES_POP(nala_state_for_fie.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked fie() called more times than expected.\n"));
             }
 
@@ -1181,7 +1181,7 @@ void fie_mock_reset(void)
 void fie_mock_assert_completed(void)
 {
     if (nala_state_for_fie.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked fie() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_fie.instances.length));
@@ -1267,7 +1267,7 @@ int __wrap_foo()
             NALA_INSTANCES_POP(nala_state_for_foo.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked foo() called more times than expected.\n"));
             }
 
@@ -1403,7 +1403,7 @@ void foo_mock_reset(void)
 void foo_mock_assert_completed(void)
 {
     if (nala_state_for_foo.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked foo() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_foo.instances.length));
@@ -1489,7 +1489,7 @@ int __wrap_fum()
             NALA_INSTANCES_POP(nala_state_for_fum.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked fum() called more times than expected.\n"));
             }
 
@@ -1625,7 +1625,7 @@ void fum_mock_reset(void)
 void fum_mock_assert_completed(void)
 {
     if (nala_state_for_fum.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked fum() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_fum.instances.length));
@@ -1711,7 +1711,7 @@ int __wrap_gam()
             NALA_INSTANCES_POP(nala_state_for_gam.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked gam() called more times than expected.\n"));
             }
 
@@ -1847,7 +1847,7 @@ void gam_mock_reset(void)
 void gam_mock_assert_completed(void)
 {
     if (nala_state_for_gam.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked gam() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_gam.instances.length));
@@ -1933,7 +1933,7 @@ int __wrap_hit()
             NALA_INSTANCES_POP(nala_state_for_hit.instances, &_nala_instance_p);
 
             if (_nala_instance_p == NULL) {
-                NALA_TEST_FAILURE(nala_format(
+                nala_test_failure(nala_format(
                         "Mocked hit() called more times than expected.\n"));
             }
 
@@ -2069,7 +2069,7 @@ void hit_mock_reset(void)
 void hit_mock_assert_completed(void)
 {
     if (nala_state_for_hit.instances.length != 0) {
-        NALA_TEST_FAILURE(nala_format(
+        nala_test_failure(nala_format(
              "Mocked hit() called fewer times than expected. %d call(s) "
              "missing.\n",
              nala_state_for_hit.instances.length));

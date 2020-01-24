@@ -109,6 +109,25 @@ Build all tests but only run those whose name contains ``time``.
 
 .. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run-one-test.png
 
+Now, make the time test fail to see what an error report looks like.
+
+.. code-block:: c
+
+   #include <time.h>
+   #include "nala.h"
+   #include "nala_mocks.h"
+
+   TEST(mock_time)
+   {
+       time_mock_once(-1);
+
+       ASSERT_EQ(time(NULL), 42);
+   }
+
+Build and run all tests.
+
+.. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run-assert-eq-fail.png
+
 Compiler flags
 ==============
 
