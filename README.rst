@@ -203,6 +203,7 @@ For all functions
    <func>_mock_set_errno(int)        - errno on return
    <func>_mock_implementation(*)     - replace implementation
    <func>_mock_disable()             - call real implementation
+   <func>_mock_disable_once()        - call real implementation once (per call)
    <func>_mock_reset()               - mock reset
    <func>_mock_set_callback(*)       - additional checks and/or actions
 

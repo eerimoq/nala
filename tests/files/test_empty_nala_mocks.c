@@ -20,6 +20,9 @@ Do not edit manually
 #define MODE_MOCK            3
 #define MODE_NONE            4
 
+#define INSTANCE_MODE_NORMAL  0
+#define INSTANCE_MODE_DISABLE 1
+
 #define NALA_INSTANCES_APPEND(list, item_p)     \
     do {                                        \
         if ((list).head_p == NULL) {            \
