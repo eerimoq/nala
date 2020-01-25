@@ -533,18 +533,18 @@ void {{mock.func_name}}_mock_implementation({{mock.implementation_decl | render}
     {{mock.state_name}}.data.implementation = implementation;
 }
 
-void {{mock.func_name}}_mock_disable(void)
+void {{mock.func_name}}_mock_real(void)
 {
     {{mock.state_name}}.state.mode = MODE_REAL;
 }
 
-void {{mock.func_name}}_mock_disable_once(void)
+void {{mock.func_name}}_mock_real_once(void)
 {
     struct _nala_instance_type_for_{{mock.func_name}} *instance_p;
 
     {{mock.state_name}}.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 

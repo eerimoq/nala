@@ -21,7 +21,7 @@ Do not edit manually
 #define MODE_NONE            4
 
 #define INSTANCE_MODE_NORMAL  0
-#define INSTANCE_MODE_DISABLE 1
+#define INSTANCE_MODE_REAL    1
 
 #define NALA_INSTANCES_APPEND(list, item_p)     \
     do {                                        \
@@ -1112,18 +1112,18 @@ void add_mock_implementation(int (*implementation)(int x, int y))
     nala_state_for_add.data.implementation = implementation;
 }
 
-void add_mock_disable(void)
+void add_mock_real(void)
 {
     nala_state_for_add.state.mode = MODE_REAL;
 }
 
-void add_mock_disable_once(void)
+void add_mock_real_once(void)
 {
     struct _nala_instance_type_for_add *instance_p;
 
     nala_state_for_add.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -1415,18 +1415,18 @@ void call_mock_implementation(int (*implementation)(int (*callback)(int value)))
     nala_state_for_call.data.implementation = implementation;
 }
 
-void call_mock_disable(void)
+void call_mock_real(void)
 {
     nala_state_for_call.state.mode = MODE_REAL;
 }
 
-void call_mock_disable_once(void)
+void call_mock_real_once(void)
 {
     struct _nala_instance_type_for_call *instance_p;
 
     nala_state_for_call.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -1672,18 +1672,18 @@ void close_mock_implementation(int (*implementation)(int fd))
     nala_state_for_close.data.implementation = implementation;
 }
 
-void close_mock_disable(void)
+void close_mock_real(void)
 {
     nala_state_for_close.state.mode = MODE_REAL;
 }
 
-void close_mock_disable_once(void)
+void close_mock_real_once(void)
 {
     struct _nala_instance_type_for_close *instance_p;
 
     nala_state_for_close.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -2035,18 +2035,18 @@ void compose_twice_mock_implementation(DummyStruct *(*implementation)(DummyStruc
     nala_state_for_compose_twice.data.implementation = implementation;
 }
 
-void compose_twice_mock_disable(void)
+void compose_twice_mock_real(void)
 {
     nala_state_for_compose_twice.state.mode = MODE_REAL;
 }
 
-void compose_twice_mock_disable_once(void)
+void compose_twice_mock_real_once(void)
 {
     struct _nala_instance_type_for_compose_twice *instance_p;
 
     nala_state_for_compose_twice.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -2338,18 +2338,18 @@ void double_pointer_mock_implementation(int (*implementation)(int **value_pp))
     nala_state_for_double_pointer.data.implementation = implementation;
 }
 
-void double_pointer_mock_disable(void)
+void double_pointer_mock_real(void)
 {
     nala_state_for_double_pointer.state.mode = MODE_REAL;
 }
 
-void double_pointer_mock_disable_once(void)
+void double_pointer_mock_real_once(void)
 {
     struct _nala_instance_type_for_double_pointer *instance_p;
 
     nala_state_for_double_pointer.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -2595,18 +2595,18 @@ void dup_mock_implementation(int (*implementation)(int oldfd))
     nala_state_for_dup.data.implementation = implementation;
 }
 
-void dup_mock_disable(void)
+void dup_mock_real(void)
 {
     nala_state_for_dup.state.mode = MODE_REAL;
 }
 
-void dup_mock_disable_once(void)
+void dup_mock_real_once(void)
 {
     struct _nala_instance_type_for_dup *instance_p;
 
     nala_state_for_dup.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -2866,18 +2866,18 @@ void dup2_mock_implementation(int (*implementation)(int oldfd, int newfd))
     nala_state_for_dup2.data.implementation = implementation;
 }
 
-void dup2_mock_disable(void)
+void dup2_mock_real(void)
 {
     nala_state_for_dup2.state.mode = MODE_REAL;
 }
 
-void dup2_mock_disable_once(void)
+void dup2_mock_real_once(void)
 {
     struct _nala_instance_type_for_dup2 *instance_p;
 
     nala_state_for_dup2.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -3183,18 +3183,18 @@ void edit_number_mock_implementation(DummyStruct *(*implementation)(DummyStruct 
     nala_state_for_edit_number.data.implementation = implementation;
 }
 
-void edit_number_mock_disable(void)
+void edit_number_mock_real(void)
 {
     nala_state_for_edit_number.state.mode = MODE_REAL;
 }
 
-void edit_number_mock_disable_once(void)
+void edit_number_mock_real_once(void)
 {
     struct _nala_instance_type_for_edit_number *instance_p;
 
     nala_state_for_edit_number.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -3486,18 +3486,18 @@ void endmntent_mock_implementation(int (*implementation)(FILE *streamp))
     nala_state_for_endmntent.data.implementation = implementation;
 }
 
-void endmntent_mock_disable(void)
+void endmntent_mock_real(void)
 {
     nala_state_for_endmntent.state.mode = MODE_REAL;
 }
 
-void endmntent_mock_disable_once(void)
+void endmntent_mock_real_once(void)
 {
     struct _nala_instance_type_for_endmntent *instance_p;
 
     nala_state_for_endmntent.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -3733,18 +3733,18 @@ void enum_param_mock_implementation(void (*implementation)(enum enum_param_type 
     nala_state_for_enum_param.data.implementation = implementation;
 }
 
-void enum_param_mock_disable(void)
+void enum_param_mock_real(void)
 {
     nala_state_for_enum_param.state.mode = MODE_REAL;
 }
 
-void enum_param_mock_disable_once(void)
+void enum_param_mock_real_once(void)
 {
     struct _nala_instance_type_for_enum_param *instance_p;
 
     nala_state_for_enum_param.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -4036,18 +4036,18 @@ void fclose_mock_implementation(int (*implementation)(FILE *stream))
     nala_state_for_fclose.data.implementation = implementation;
 }
 
-void fclose_mock_disable(void)
+void fclose_mock_real(void)
 {
     nala_state_for_fclose.state.mode = MODE_REAL;
 }
 
-void fclose_mock_disable_once(void)
+void fclose_mock_real_once(void)
 {
     struct _nala_instance_type_for_fclose *instance_p;
 
     nala_state_for_fclose.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -4339,18 +4339,18 @@ void fflush_mock_implementation(int (*implementation)(FILE *stream))
     nala_state_for_fflush.data.implementation = implementation;
 }
 
-void fflush_mock_disable(void)
+void fflush_mock_real(void)
 {
     nala_state_for_fflush.state.mode = MODE_REAL;
 }
 
-void fflush_mock_disable_once(void)
+void fflush_mock_real_once(void)
 {
     struct _nala_instance_type_for_fflush *instance_p;
 
     nala_state_for_fflush.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -4642,18 +4642,18 @@ void fileno_mock_implementation(int (*implementation)(FILE *stream))
     nala_state_for_fileno.data.implementation = implementation;
 }
 
-void fileno_mock_disable(void)
+void fileno_mock_real(void)
 {
     nala_state_for_fileno.state.mode = MODE_REAL;
 }
 
-void fileno_mock_disable_once(void)
+void fileno_mock_real_once(void)
 {
     struct _nala_instance_type_for_fileno *instance_p;
 
     nala_state_for_fileno.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -5047,18 +5047,18 @@ void fopen_mock_implementation(FILE *(*implementation)(const char *path, const c
     nala_state_for_fopen.data.implementation = implementation;
 }
 
-void fopen_mock_disable(void)
+void fopen_mock_real(void)
 {
     nala_state_for_fopen.state.mode = MODE_REAL;
 }
 
-void fopen_mock_disable_once(void)
+void fopen_mock_real_once(void)
 {
     struct _nala_instance_type_for_fopen *instance_p;
 
     nala_state_for_fopen.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -5438,18 +5438,18 @@ void fread_mock_implementation(size_t (*implementation)(void *ptr, size_t size, 
     nala_state_for_fread.data.implementation = implementation;
 }
 
-void fread_mock_disable(void)
+void fread_mock_real(void)
 {
     nala_state_for_fread.state.mode = MODE_REAL;
 }
 
-void fread_mock_disable_once(void)
+void fread_mock_real_once(void)
 {
     struct _nala_instance_type_for_fread *instance_p;
 
     nala_state_for_fread.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -5731,18 +5731,18 @@ void free_mock_implementation(void (*implementation)(void *ptr))
     nala_state_for_free.data.implementation = implementation;
 }
 
-void free_mock_disable(void)
+void free_mock_real(void)
 {
     nala_state_for_free.state.mode = MODE_REAL;
 }
 
-void free_mock_disable_once(void)
+void free_mock_real_once(void)
 {
     struct _nala_instance_type_for_free *instance_p;
 
     nala_state_for_free.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -6062,18 +6062,18 @@ void fseek_mock_implementation(int (*implementation)(FILE *stream, long int offs
     nala_state_for_fseek.data.implementation = implementation;
 }
 
-void fseek_mock_disable(void)
+void fseek_mock_real(void)
 {
     nala_state_for_fseek.state.mode = MODE_REAL;
 }
 
-void fseek_mock_disable_once(void)
+void fseek_mock_real_once(void)
 {
     struct _nala_instance_type_for_fseek *instance_p;
 
     nala_state_for_fseek.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -6365,18 +6365,18 @@ void ftell_mock_implementation(long int (*implementation)(FILE *stream))
     nala_state_for_ftell.data.implementation = implementation;
 }
 
-void ftell_mock_disable(void)
+void ftell_mock_real(void)
 {
     nala_state_for_ftell.state.mode = MODE_REAL;
 }
 
-void ftell_mock_disable_once(void)
+void ftell_mock_real_once(void)
 {
     struct _nala_instance_type_for_ftell *instance_p;
 
     nala_state_for_ftell.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -6756,18 +6756,18 @@ void fwrite_mock_implementation(size_t (*implementation)(const void *ptr, size_t
     nala_state_for_fwrite.data.implementation = implementation;
 }
 
-void fwrite_mock_disable(void)
+void fwrite_mock_real(void)
 {
     nala_state_for_fwrite.state.mode = MODE_REAL;
 }
 
-void fwrite_mock_disable_once(void)
+void fwrite_mock_real_once(void)
 {
     struct _nala_instance_type_for_fwrite *instance_p;
 
     nala_state_for_fwrite.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -7059,18 +7059,18 @@ void getmntent_mock_implementation(struct mntent *(*implementation)(FILE *stream
     nala_state_for_getmntent.data.implementation = implementation;
 }
 
-void getmntent_mock_disable(void)
+void getmntent_mock_real(void)
 {
     nala_state_for_getmntent.state.mode = MODE_REAL;
 }
 
-void getmntent_mock_disable_once(void)
+void getmntent_mock_real_once(void)
 {
     struct _nala_instance_type_for_getmntent *instance_p;
 
     nala_state_for_getmntent.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -7352,18 +7352,18 @@ void in_out_mock_implementation(void (*implementation)(int *buf_p))
     nala_state_for_in_out.data.implementation = implementation;
 }
 
-void in_out_mock_disable(void)
+void in_out_mock_real(void)
 {
     nala_state_for_in_out.state.mode = MODE_REAL;
 }
 
-void in_out_mock_disable_once(void)
+void in_out_mock_real_once(void)
 {
     struct _nala_instance_type_for_in_out *instance_p;
 
     nala_state_for_in_out.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -7707,18 +7707,18 @@ void io_control_mock_implementation(int (*implementation)(int kind, va_list __na
     nala_state_for_io_control.data.implementation = implementation;
 }
 
-void io_control_mock_disable(void)
+void io_control_mock_real(void)
 {
     nala_state_for_io_control.state.mode = MODE_REAL;
 }
 
-void io_control_mock_disable_once(void)
+void io_control_mock_real_once(void)
 {
     struct _nala_instance_type_for_io_control *instance_p;
 
     nala_state_for_io_control.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -7965,18 +7965,18 @@ void io_vcontrol_mock_implementation(int (*implementation)(int kind, va_list ap)
     nala_state_for_io_vcontrol.data.implementation = implementation;
 }
 
-void io_vcontrol_mock_disable(void)
+void io_vcontrol_mock_real(void)
 {
     nala_state_for_io_vcontrol.state.mode = MODE_REAL;
 }
 
-void io_vcontrol_mock_disable_once(void)
+void io_vcontrol_mock_real_once(void)
 {
     struct _nala_instance_type_for_io_vcontrol *instance_p;
 
     nala_state_for_io_vcontrol.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -8222,18 +8222,18 @@ void malloc_mock_implementation(void *(*implementation)(size_t size))
     nala_state_for_malloc.data.implementation = implementation;
 }
 
-void malloc_mock_disable(void)
+void malloc_mock_real(void)
 {
     nala_state_for_malloc.state.mode = MODE_REAL;
 }
 
-void malloc_mock_disable_once(void)
+void malloc_mock_real_once(void)
 {
     struct _nala_instance_type_for_malloc *instance_p;
 
     nala_state_for_malloc.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -8782,18 +8782,18 @@ void mount_mock_implementation(int (*implementation)(const char *source, const c
     nala_state_for_mount.data.implementation = implementation;
 }
 
-void mount_mock_disable(void)
+void mount_mock_real(void)
 {
     nala_state_for_mount.state.mode = MODE_REAL;
 }
 
-void mount_mock_disable_once(void)
+void mount_mock_real_once(void)
 {
     struct _nala_instance_type_for_mount *instance_p;
 
     nala_state_for_mount.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -9096,18 +9096,18 @@ void output_message_mock_implementation(void (*implementation)(const char *messa
     nala_state_for_output_message.data.implementation = implementation;
 }
 
-void output_message_mock_disable(void)
+void output_message_mock_real(void)
 {
     nala_state_for_output_message.state.mode = MODE_REAL;
 }
 
-void output_message_mock_disable_once(void)
+void output_message_mock_real_once(void)
 {
     struct _nala_instance_type_for_output_message *instance_p;
 
     nala_state_for_output_message.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -9399,18 +9399,18 @@ void pipe_mock_implementation(int (*implementation)(int pipefd[2]))
     nala_state_for_pipe.data.implementation = implementation;
 }
 
-void pipe_mock_disable(void)
+void pipe_mock_real(void)
 {
     nala_state_for_pipe.state.mode = MODE_REAL;
 }
 
-void pipe_mock_disable_once(void)
+void pipe_mock_real_once(void)
 {
     struct _nala_instance_type_for_pipe *instance_p;
 
     nala_state_for_pipe.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -9730,18 +9730,18 @@ void poll_mock_implementation(int (*implementation)(struct pollfd *fds, nfds_t n
     nala_state_for_poll.data.implementation = implementation;
 }
 
-void poll_mock_disable(void)
+void poll_mock_real(void)
 {
     nala_state_for_poll.state.mode = MODE_REAL;
 }
 
-void poll_mock_disable_once(void)
+void poll_mock_real_once(void)
 {
     struct _nala_instance_type_for_poll *instance_p;
 
     nala_state_for_poll.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -9964,18 +9964,18 @@ void print_hello_mock_implementation(void (*implementation)())
     nala_state_for_print_hello.data.implementation = implementation;
 }
 
-void print_hello_mock_disable(void)
+void print_hello_mock_real(void)
 {
     nala_state_for_print_hello.state.mode = MODE_REAL;
 }
 
-void print_hello_mock_disable_once(void)
+void print_hello_mock_real_once(void)
 {
     struct _nala_instance_type_for_print_hello *instance_p;
 
     nala_state_for_print_hello.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -10295,18 +10295,18 @@ void read_mock_implementation(ssize_t (*implementation)(int fd, void *buf, size_
     nala_state_for_read.data.implementation = implementation;
 }
 
-void read_mock_disable(void)
+void read_mock_real(void)
 {
     nala_state_for_read.state.mode = MODE_REAL;
 }
 
-void read_mock_disable_once(void)
+void read_mock_real_once(void)
 {
     struct _nala_instance_type_for_read *instance_p;
 
     nala_state_for_read.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -10714,18 +10714,18 @@ void sendto_mock_implementation(ssize_t (*implementation)(int sockfd, const void
     nala_state_for_sendto.data.implementation = implementation;
 }
 
-void sendto_mock_disable(void)
+void sendto_mock_real(void)
 {
     nala_state_for_sendto.state.mode = MODE_REAL;
 }
 
-void sendto_mock_disable_once(void)
+void sendto_mock_real_once(void)
 {
     struct _nala_instance_type_for_sendto *instance_p;
 
     nala_state_for_sendto.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -11073,18 +11073,18 @@ void setsockopt_mock_implementation(int (*implementation)(int sockfd, int level,
     nala_state_for_setsockopt.data.implementation = implementation;
 }
 
-void setsockopt_mock_disable(void)
+void setsockopt_mock_real(void)
 {
     nala_state_for_setsockopt.state.mode = MODE_REAL;
 }
 
-void setsockopt_mock_disable_once(void)
+void setsockopt_mock_real_once(void)
 {
     struct _nala_instance_type_for_setsockopt *instance_p;
 
     nala_state_for_setsockopt.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -11330,18 +11330,18 @@ void sleep_mock_implementation(unsigned int (*implementation)(unsigned int secon
     nala_state_for_sleep.data.implementation = implementation;
 }
 
-void sleep_mock_disable(void)
+void sleep_mock_real(void)
 {
     nala_state_for_sleep.state.mode = MODE_REAL;
 }
 
-void sleep_mock_disable_once(void)
+void sleep_mock_real_once(void)
 {
     struct _nala_instance_type_for_sleep *instance_p;
 
     nala_state_for_sleep.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -11714,18 +11714,18 @@ void statvfs_mock_implementation(int (*implementation)(const char *path, struct 
     nala_state_for_statvfs.data.implementation = implementation;
 }
 
-void statvfs_mock_disable(void)
+void statvfs_mock_real(void)
 {
     nala_state_for_statvfs.state.mode = MODE_REAL;
 }
 
-void statvfs_mock_disable_once(void)
+void statvfs_mock_real_once(void)
 {
     struct _nala_instance_type_for_statvfs *instance_p;
 
     nala_state_for_statvfs.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -12007,18 +12007,18 @@ void struct_param_mock_implementation(void (*implementation)(struct struct_param
     nala_state_for_struct_param.data.implementation = implementation;
 }
 
-void struct_param_mock_disable(void)
+void struct_param_mock_real(void)
 {
     nala_state_for_struct_param.state.mode = MODE_REAL;
 }
 
-void struct_param_mock_disable_once(void)
+void struct_param_mock_real_once(void)
 {
     struct _nala_instance_type_for_struct_param *instance_p;
 
     nala_state_for_struct_param.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -12251,18 +12251,18 @@ void struct_param_and_return_type_mock_implementation(struct struct_param_type (
     nala_state_for_struct_param_and_return_type.data.implementation = implementation;
 }
 
-void struct_param_and_return_type_mock_disable(void)
+void struct_param_and_return_type_mock_real(void)
 {
     nala_state_for_struct_param_and_return_type.state.mode = MODE_REAL;
 }
 
-void struct_param_and_return_type_mock_disable_once(void)
+void struct_param_and_return_type_mock_real_once(void)
 {
     struct _nala_instance_type_for_struct_param_and_return_type *instance_p;
 
     nala_state_for_struct_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -12554,18 +12554,18 @@ void time_mock_implementation(time_t (*implementation)(time_t *tloc))
     nala_state_for_time.data.implementation = implementation;
 }
 
-void time_mock_disable(void)
+void time_mock_real(void)
 {
     nala_state_for_time.state.mode = MODE_REAL;
 }
 
-void time_mock_disable_once(void)
+void time_mock_real_once(void)
 {
     struct _nala_instance_type_for_time *instance_p;
 
     nala_state_for_time.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -12945,18 +12945,18 @@ void timerfd_settime_mock_implementation(int (*implementation)(int fd, int flags
     nala_state_for_timerfd_settime.data.implementation = implementation;
 }
 
-void timerfd_settime_mock_disable(void)
+void timerfd_settime_mock_real(void)
 {
     nala_state_for_timerfd_settime.state.mode = MODE_REAL;
 }
 
-void timerfd_settime_mock_disable_once(void)
+void timerfd_settime_mock_real_once(void)
 {
     struct _nala_instance_type_for_timerfd_settime *instance_p;
 
     nala_state_for_timerfd_settime.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -13189,18 +13189,18 @@ void tmpfile_mock_implementation(FILE *(*implementation)(void))
     nala_state_for_tmpfile.data.implementation = implementation;
 }
 
-void tmpfile_mock_disable(void)
+void tmpfile_mock_real(void)
 {
     nala_state_for_tmpfile.state.mode = MODE_REAL;
 }
 
-void tmpfile_mock_disable_once(void)
+void tmpfile_mock_real_once(void)
 {
     struct _nala_instance_type_for_tmpfile *instance_p;
 
     nala_state_for_tmpfile.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -13433,18 +13433,18 @@ void typedef_struct_param_and_return_type_mock_implementation(struct_param_type 
     nala_state_for_typedef_struct_param_and_return_type.data.implementation = implementation;
 }
 
-void typedef_struct_param_and_return_type_mock_disable(void)
+void typedef_struct_param_and_return_type_mock_real(void)
 {
     nala_state_for_typedef_struct_param_and_return_type.state.mode = MODE_REAL;
 }
 
-void typedef_struct_param_and_return_type_mock_disable_once(void)
+void typedef_struct_param_and_return_type_mock_real_once(void)
 {
     struct _nala_instance_type_for_typedef_struct_param_and_return_type *instance_p;
 
     nala_state_for_typedef_struct_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -13677,18 +13677,18 @@ void typedef_union_param_and_return_type_mock_implementation(union_type (*implem
     nala_state_for_typedef_union_param_and_return_type.data.implementation = implementation;
 }
 
-void typedef_union_param_and_return_type_mock_disable(void)
+void typedef_union_param_and_return_type_mock_real(void)
 {
     nala_state_for_typedef_union_param_and_return_type.state.mode = MODE_REAL;
 }
 
-void typedef_union_param_and_return_type_mock_disable_once(void)
+void typedef_union_param_and_return_type_mock_real_once(void)
 {
     struct _nala_instance_type_for_typedef_union_param_and_return_type *instance_p;
 
     nala_state_for_typedef_union_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -13921,18 +13921,18 @@ void union_param_and_return_type_mock_implementation(union union_type (*implemen
     nala_state_for_union_param_and_return_type.data.implementation = implementation;
 }
 
-void union_param_and_return_type_mock_disable(void)
+void union_param_and_return_type_mock_real(void)
 {
     nala_state_for_union_param_and_return_type.state.mode = MODE_REAL;
 }
 
-void union_param_and_return_type_mock_disable_once(void)
+void union_param_and_return_type_mock_real_once(void)
 {
     struct _nala_instance_type_for_union_param_and_return_type *instance_p;
 
     nala_state_for_union_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -14178,18 +14178,18 @@ void usleep_mock_implementation(int (*implementation)(__useconds_t usec))
     nala_state_for_usleep.data.implementation = implementation;
 }
 
-void usleep_mock_disable(void)
+void usleep_mock_real(void)
 {
     nala_state_for_usleep.state.mode = MODE_REAL;
 }
 
-void usleep_mock_disable_once(void)
+void usleep_mock_real_once(void)
 {
     struct _nala_instance_type_for_usleep *instance_p;
 
     nala_state_for_usleep.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -14509,18 +14509,18 @@ void write_mock_implementation(ssize_t (*implementation)(int fd, const void *buf
     nala_state_for_write.data.implementation = implementation;
 }
 
-void write_mock_disable(void)
+void write_mock_real(void)
 {
     nala_state_for_write.state.mode = MODE_REAL;
 }
 
-void write_mock_disable_once(void)
+void write_mock_real_once(void)
 {
     struct _nala_instance_type_for_write *instance_p;
 
     nala_state_for_write.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 

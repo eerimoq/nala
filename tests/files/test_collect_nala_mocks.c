@@ -21,7 +21,7 @@ Do not edit manually
 #define MODE_NONE            4
 
 #define INSTANCE_MODE_NORMAL  0
-#define INSTANCE_MODE_DISABLE 1
+#define INSTANCE_MODE_REAL    1
 
 #define NALA_INSTANCES_APPEND(list, item_p)     \
     do {                                        \
@@ -933,18 +933,18 @@ void bar_mock_implementation(int (*implementation)())
     nala_state_for_bar.data.implementation = implementation;
 }
 
-void bar_mock_disable(void)
+void bar_mock_real(void)
 {
     nala_state_for_bar.state.mode = MODE_REAL;
 }
 
-void bar_mock_disable_once(void)
+void bar_mock_real_once(void)
 {
     struct _nala_instance_type_for_bar *instance_p;
 
     nala_state_for_bar.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -1177,18 +1177,18 @@ void fie_mock_implementation(int (*implementation)())
     nala_state_for_fie.data.implementation = implementation;
 }
 
-void fie_mock_disable(void)
+void fie_mock_real(void)
 {
     nala_state_for_fie.state.mode = MODE_REAL;
 }
 
-void fie_mock_disable_once(void)
+void fie_mock_real_once(void)
 {
     struct _nala_instance_type_for_fie *instance_p;
 
     nala_state_for_fie.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -1421,18 +1421,18 @@ void foo_mock_implementation(int (*implementation)())
     nala_state_for_foo.data.implementation = implementation;
 }
 
-void foo_mock_disable(void)
+void foo_mock_real(void)
 {
     nala_state_for_foo.state.mode = MODE_REAL;
 }
 
-void foo_mock_disable_once(void)
+void foo_mock_real_once(void)
 {
     struct _nala_instance_type_for_foo *instance_p;
 
     nala_state_for_foo.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -1665,18 +1665,18 @@ void fum_mock_implementation(int (*implementation)())
     nala_state_for_fum.data.implementation = implementation;
 }
 
-void fum_mock_disable(void)
+void fum_mock_real(void)
 {
     nala_state_for_fum.state.mode = MODE_REAL;
 }
 
-void fum_mock_disable_once(void)
+void fum_mock_real_once(void)
 {
     struct _nala_instance_type_for_fum *instance_p;
 
     nala_state_for_fum.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -1909,18 +1909,18 @@ void gam_mock_implementation(int (*implementation)())
     nala_state_for_gam.data.implementation = implementation;
 }
 
-void gam_mock_disable(void)
+void gam_mock_real(void)
 {
     nala_state_for_gam.state.mode = MODE_REAL;
 }
 
-void gam_mock_disable_once(void)
+void gam_mock_real_once(void)
 {
     struct _nala_instance_type_for_gam *instance_p;
 
     nala_state_for_gam.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 
@@ -2153,18 +2153,18 @@ void hit_mock_implementation(int (*implementation)())
     nala_state_for_hit.data.implementation = implementation;
 }
 
-void hit_mock_disable(void)
+void hit_mock_real(void)
 {
     nala_state_for_hit.state.mode = MODE_REAL;
 }
 
-void hit_mock_disable_once(void)
+void hit_mock_real_once(void)
 {
     struct _nala_instance_type_for_hit *instance_p;
 
     nala_state_for_hit.state.mode = MODE_MOCK_ONCE;
     instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_DISABLE;
+    instance_p->mode = INSTANCE_MODE_REAL;
     nala_traceback(&instance_p->data.traceback);
     instance_p->next_p = NULL;
 

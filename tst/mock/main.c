@@ -44,7 +44,7 @@ TEST(add_function)
     add_mock_once(1, 2, 42);
     ASSERT_EQ(add(1, 2), 42);
 
-    add_mock_disable();
+    add_mock_real();
     ASSERT_EQ(add(1, 2), 3);
 
     add_mock_implementation(fake_add);
@@ -158,7 +158,7 @@ TEST(time_function)
     time_mock_set_tloc_in_pointer(NULL);
     ASSERT_EQ(time(NULL), 0);
 
-    time_mock_disable();
+    time_mock_real();
     ASSERT_GE(time(NULL), start);
 }
 
@@ -335,7 +335,7 @@ TEST(set_errno)
     ASSERT_EQ(f, NULL);
     ASSERT_EQ(errno, ENOENT);
 
-    fopen_mock_disable();
+    fopen_mock_real();
 
     errno = 0;
 
@@ -719,4 +719,40 @@ TEST(malloc_free)
     a_p = malloc(1);
     ASSERT_EQ(a_p, &a);
     free(a_p);
+}
+
+TEST(poll_real_once)
+{
+    struct pollfd fds[1];
+
+    fds[0].revents = POLLHUP;
+
+    poll_mock_once(1, -1, 1);
+    poll_mock_set_fds_out(&fds[0], sizeof(fds));
+
+    poll_mock_real_once();
+
+    poll_mock_once(1, -1, 1);
+    poll_mock_set_fds_out(&fds[0], sizeof(fds));
+
+    /* Mocked call. */
+    fds[0].fd = 100;
+    fds[0].events = 0;
+    fds[0].revents = 0;
+    ASSERT_EQ(poll(&fds[0], 1, -1), 1);
+    ASSERT_EQ(fds[0].revents, POLLHUP);
+
+    /* Real call. */
+    fds[0].fd = 100;
+    fds[0].events = 0;
+    fds[0].revents = 0;
+    ASSERT_EQ(poll(&fds[0], 1, -1), 1);
+    ASSERT_EQ(fds[0].revents, POLLNVAL);
+
+    /* Mocked call. */
+    fds[0].fd = 100;
+    fds[0].events = 0;
+    fds[0].revents = 0;
+    ASSERT_EQ(poll(&fds[0], 1, -1), 1);
+    ASSERT_EQ(fds[0].revents, POLLHUP);
 }
