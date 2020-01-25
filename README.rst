@@ -188,24 +188,38 @@ command-line utility.
 Mock API
 --------
 
-The created mocks provides the following functions.
+A function mock will call the real implementation by default. Use the
+functions below to control mock behaviour.
 
 For all functions
 ^^^^^^^^^^^^^^^^^
 
+Same behaviour for every call.
+
 .. code-block::
 
    <func>_mock(<params>, <res>)      - check parameters and return
-   <func>_mock_once(<params>, <res>) - check parameters and return once (per call)
    <func>_mock_ignore_in(<res>)      - ignore parameters and return
-   <func>_mock_ignore_in_once(<res>) - ignore parameters and return once (per call)
    <func>_mock_none()                - no calls allowed
-   <func>_mock_set_errno(int)        - errno on return
    <func>_mock_implementation(*)     - replace implementation
    <func>_mock_real()                - call real implementation
-   <func>_mock_real_once()           - call real implementation once (per call)
-   <func>_mock_set_callback(*)       - additional checks and/or actions
    <func>_mock_reset()               - mock reset
+
+Per call control.
+
+.. code-block::
+
+   <func>_mock_once(<params>, <res>) - check parameters and return once (per call)
+   <func>_mock_ignore_in_once(<res>) - ignore parameters and return once (per call)
+   <func>_mock_real_once()           - call real implementation once (per call)
+
+Change behaviour of currect mock. Works for both per call and every
+call functions above.
+
+.. code-block::
+
+   <func>_mock_set_errno(int)        - errno on return
+   <func>_mock_set_callback(*)       - additional checks and/or actions
 
 For selected function parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
