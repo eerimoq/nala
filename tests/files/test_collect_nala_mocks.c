@@ -970,10 +970,13 @@ void bar_mock_reset(void)
 void bar_mock_assert_completed(void)
 {
     if (nala_state_for_bar.instances.length != 0) {
-        nala_test_failure(nala_format(
-             "Mocked bar() called fewer times than expected. %d call(s) "
-             "missing.\n",
-             nala_state_for_bar.instances.length));
+        nala_test_failure(
+            format_mock_traceback(
+                nala_format(
+                    "Mocked bar() called fewer times than "
+                    "expected. %d call(s) missing.\n\n",
+                    nala_state_for_bar.instances.length),
+                &nala_state_for_bar.instances.head_p->data.traceback));
     }
 }
 
@@ -1214,10 +1217,13 @@ void fie_mock_reset(void)
 void fie_mock_assert_completed(void)
 {
     if (nala_state_for_fie.instances.length != 0) {
-        nala_test_failure(nala_format(
-             "Mocked fie() called fewer times than expected. %d call(s) "
-             "missing.\n",
-             nala_state_for_fie.instances.length));
+        nala_test_failure(
+            format_mock_traceback(
+                nala_format(
+                    "Mocked fie() called fewer times than "
+                    "expected. %d call(s) missing.\n\n",
+                    nala_state_for_fie.instances.length),
+                &nala_state_for_fie.instances.head_p->data.traceback));
     }
 }
 
@@ -1458,10 +1464,13 @@ void foo_mock_reset(void)
 void foo_mock_assert_completed(void)
 {
     if (nala_state_for_foo.instances.length != 0) {
-        nala_test_failure(nala_format(
-             "Mocked foo() called fewer times than expected. %d call(s) "
-             "missing.\n",
-             nala_state_for_foo.instances.length));
+        nala_test_failure(
+            format_mock_traceback(
+                nala_format(
+                    "Mocked foo() called fewer times than "
+                    "expected. %d call(s) missing.\n\n",
+                    nala_state_for_foo.instances.length),
+                &nala_state_for_foo.instances.head_p->data.traceback));
     }
 }
 
@@ -1702,10 +1711,13 @@ void fum_mock_reset(void)
 void fum_mock_assert_completed(void)
 {
     if (nala_state_for_fum.instances.length != 0) {
-        nala_test_failure(nala_format(
-             "Mocked fum() called fewer times than expected. %d call(s) "
-             "missing.\n",
-             nala_state_for_fum.instances.length));
+        nala_test_failure(
+            format_mock_traceback(
+                nala_format(
+                    "Mocked fum() called fewer times than "
+                    "expected. %d call(s) missing.\n\n",
+                    nala_state_for_fum.instances.length),
+                &nala_state_for_fum.instances.head_p->data.traceback));
     }
 }
 
@@ -1946,10 +1958,13 @@ void gam_mock_reset(void)
 void gam_mock_assert_completed(void)
 {
     if (nala_state_for_gam.instances.length != 0) {
-        nala_test_failure(nala_format(
-             "Mocked gam() called fewer times than expected. %d call(s) "
-             "missing.\n",
-             nala_state_for_gam.instances.length));
+        nala_test_failure(
+            format_mock_traceback(
+                nala_format(
+                    "Mocked gam() called fewer times than "
+                    "expected. %d call(s) missing.\n\n",
+                    nala_state_for_gam.instances.length),
+                &nala_state_for_gam.instances.head_p->data.traceback));
     }
 }
 
@@ -2190,10 +2205,13 @@ void hit_mock_reset(void)
 void hit_mock_assert_completed(void)
 {
     if (nala_state_for_hit.instances.length != 0) {
-        nala_test_failure(nala_format(
-             "Mocked hit() called fewer times than expected. %d call(s) "
-             "missing.\n",
-             nala_state_for_hit.instances.length));
+        nala_test_failure(
+            format_mock_traceback(
+                nala_format(
+                    "Mocked hit() called fewer times than "
+                    "expected. %d call(s) missing.\n\n",
+                    nala_state_for_hit.instances.length),
+                &nala_state_for_hit.instances.head_p->data.traceback));
     }
 }
 
