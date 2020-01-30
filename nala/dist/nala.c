@@ -38,10 +38,13 @@
  * This file is part of the subprocess project.
  */
 
+#ifndef NALA_SUBPROCESS_H
+#define NALA_SUBPROCESS_H
+
 #include <string.h>
 #include <stdbool.h>
 
-#define NALA_SUBPROCESS_VERSION "0.3.0"
+#define NALA_SUBPROCESS_VERSION "0.5.0"
 
 typedef void (*nala_subprocess_entry_t)(void *arg_p);
 
@@ -105,6 +108,8 @@ void nala_subprocess_result_print(struct nala_subprocess_result_t *self_p);
  * Free given result.
  */
 void nala_subprocess_result_free(struct nala_subprocess_result_t *self_p);
+
+#endif
 
 // #include "traceback.h"
 /*
@@ -1566,6 +1571,8 @@ void nala_fail(void)
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <poll.h>
+#include <fcntl.h>
 // #include "subprocess.h"
 
 
@@ -1611,10 +1618,11 @@ static void output_append(struct nala_subprocess_output_t *self_p, int fd)
                 self_p->size += 4096;
                 self_p->buf_p = realloc(self_p->buf_p, self_p->size);
             }
-        } else {
-            if (errno != EINTR) {
-                fatal_error("read");
-            }
+        } else if (errno == EAGAIN) {
+            break;
+        } else if (errno != EINTR) {
+            /* ToDo: Fix. */
+            fatal_error("read");
         }
     }
 }
@@ -1681,12 +1689,10 @@ static void call_child(nala_subprocess_entry_t entry,
     entry(arg_p);
 }
 
-static struct nala_subprocess_result_t *call_parent(pid_t child_pid)
+static struct nala_subprocess_result_t *wait_for_pid(pid_t child_pid,
+                                                     struct nala_subprocess_result_t *result_p)
 {
-    struct nala_subprocess_result_t *result_p;
     int status;
-
-    result_p = result_new();
 
     waitpid(child_pid, &status, 0);
 
@@ -1703,6 +1709,11 @@ static struct nala_subprocess_result_t *call_parent(pid_t child_pid)
     return (result_p);
 }
 
+static struct nala_subprocess_result_t *call_parent(pid_t child_pid)
+{
+    return (wait_for_pid(child_pid, result_new()));
+}
+
 static void call_output_child(nala_subprocess_entry_t entry,
                               void *arg_p,
                               int *stdoutfds_p,
@@ -1711,6 +1722,60 @@ static void call_output_child(nala_subprocess_entry_t entry,
     redirect_output(stdoutfds_p, STDOUT_FILENO);
     redirect_output(stderrfds_p, STDERR_FILENO);
     call_child(entry, arg_p);
+}
+
+static int prepare_for_poll(struct pollfd *fd_p, int fd)
+{
+    int res;
+
+    res = fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
+    fd_p->fd = fd;
+    fd_p->events = (POLLIN | POLLHUP);
+
+    return (res);
+}
+
+static struct nala_subprocess_result_t *read_output(int stdout_fd, int stderr_fd)
+{
+    struct nala_subprocess_result_t *result_p;
+    struct pollfd fds[2];
+    int res;
+
+    result_p = result_new();
+
+    if (result_p == NULL) {
+        return (NULL);
+    }
+
+    prepare_for_poll(&fds[0], stdout_fd);
+    prepare_for_poll(&fds[1], stderr_fd);
+
+    while (1) {
+        res = poll(&fds[0], 2, -1);
+
+        if (res >= 0) {
+            if (fds[0].revents & POLLIN) {
+                output_append(&result_p->stdout, stdout_fd);
+            }
+
+            if (fds[1].revents & POLLIN) {
+                output_append(&result_p->stderr, stderr_fd);
+            }
+
+            if (fds[0].revents & POLLHUP) {
+                break;
+            }
+
+            if (fds[1].revents & POLLHUP) {
+                break;
+            }
+        } else if (errno != EINTR) {
+            /* ToDo: Fix. */
+            fatal_error("poll");
+        }
+    }
+
+    return (result_p);
 }
 
 static struct nala_subprocess_result_t *call_output_parent(pid_t child_pid,
@@ -1723,13 +1788,9 @@ static struct nala_subprocess_result_t *call_output_parent(pid_t child_pid,
     close(stdoutfds_p[1]);
     close(stderrfds_p[1]);
 
-    result_p = call_parent(child_pid);
-
-    /* Poll stdout and stderr pipes. */
-    if (result_p != NULL) {
-        output_append(&result_p->stdout, stdoutfds_p[0]);
-        output_append(&result_p->stderr, stderrfds_p[0]);
-    }
+    /* Read data from stdout and stderr pipes. */
+    result_p = read_output(stdoutfds_p[0], stderrfds_p[0]);
+    wait_for_pid(child_pid, result_p);
 
     close(stdoutfds_p[0]);
     close(stderrfds_p[0]);

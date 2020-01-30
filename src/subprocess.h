@@ -26,10 +26,13 @@
  * This file is part of the subprocess project.
  */
 
+#ifndef NALA_SUBPROCESS_H
+#define NALA_SUBPROCESS_H
+
 #include <string.h>
 #include <stdbool.h>
 
-#define NALA_SUBPROCESS_VERSION "0.3.0"
+#define NALA_SUBPROCESS_VERSION "0.5.0"
 
 typedef void (*nala_subprocess_entry_t)(void *arg_p);
 
@@ -93,3 +96,5 @@ void nala_subprocess_result_print(struct nala_subprocess_result_t *self_p);
  * Free given result.
  */
 void nala_subprocess_result_free(struct nala_subprocess_result_t *self_p);
+
+#endif
