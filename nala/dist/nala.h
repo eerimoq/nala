@@ -65,6 +65,22 @@
     nala_assert_memory(actual, expected, size)
 
 /**
+ * Assert that given function pointes are equal.
+ */
+#define ASSERT_FUNCTION_POINTERS_EQ(actual, expected)   \
+    if (actual != expected) {                           \
+        FAIL();                                         \
+    }
+
+/**
+ * Assert that given function pointes are not equal.
+ */
+#define ASSERT_FUNCTION_POINTERS_NE(actual, expected)   \
+    if (actual == expected) {                           \
+        FAIL();                                         \
+    }
+
+/**
  * Assert that given condition is true.
  */
 #define ASSERT(cond) nala_assert(cond)

@@ -83,6 +83,20 @@ TEST(assert_memory)
     ASSERT_MEMORY("1", "1", 2);
 }
 
+static void foo()
+{
+}
+
+static void bar()
+{
+}
+
+TEST(assert_function_pointers)
+{
+    ASSERT_FUNCTION_POINTERS_EQ(foo, foo);
+    ASSERT_FUNCTION_POINTERS_NE(foo, bar);
+}
+
 TEST(assert)
 {
     ASSERT(1 == 1);
@@ -252,6 +266,30 @@ TEST(assert_memory_error)
         RST MA"       8"RST" |  000070  33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38  3456789012345678\n"
         RST MA"       9"RST" |  000080  39 30 31 32 33 34 35 36 37 38 39 30 31 32 33 34  9012345678901234\n"
         RST MA"      10"RST" |  000090  35 36 37 38 39 30 -- -- -- -- -- -- -- -- -- --  567890          \n");
+}
+
+static void assert_function_pointers_eq_entry()
+{
+    ASSERT_FUNCTION_POINTERS_EQ(foo, bar);
+}
+
+TEST(assert_function_pointers_eq_error)
+{
+    expect_error_in_subprocess(
+        assert_function_pointers_eq_entry,
+        "fail");
+}
+
+static void assert_function_pointers_ne_entry()
+{
+    ASSERT_FUNCTION_POINTERS_NE(foo, foo);
+}
+
+TEST(assert_function_pointers_ne_error)
+{
+    expect_error_in_subprocess(
+        assert_function_pointers_ne_entry,
+        "fail");
 }
 
 static void assert_error_entry()
