@@ -432,32 +432,8 @@ char *format_mock_traceback(const char *message_p,
     return (buf_p);
 }
 
-#define FORMAT_EQ(format, actual, expected)                             \
-    _Generic(                                                           \
-        (actual),                                                       \
-        char *: _Generic(                                               \
-            (expected),                                                 \
-            char *: nala_format_string(                                 \
-                format,                                                 \
-                (char *)(uintptr_t)(actual),                            \
-                (char *)(uintptr_t)(expected)),                         \
-            const char *: nala_format_string(                           \
-                format,                                                 \
-                (char *)(uintptr_t)(actual),                            \
-                (char *)(uintptr_t)(expected)),                         \
-            default: nala_format(format, (actual), (expected))),        \
-        const char *: _Generic(                                         \
-            (expected),                                                 \
-            char *: nala_format_string(                                 \
-                format,                                                 \
-                (char *)(uintptr_t)(actual),                            \
-                (char *)(uintptr_t)(expected)),                         \
-            const char *: nala_format_string(                           \
-                format,                                                 \
-                (char *)(uintptr_t)(actual),                            \
-                (char *)(uintptr_t)(expected)),                         \
-            default: nala_format(format, (actual), (expected))),        \
-        default: nala_format(format, (actual), (expected)))
+#define FORMAT_EQ(format, actual, expected)     \
+    nala_format(format, (actual), (expected))
 
 #define PRINT_FORMAT(value)                             \
     _Generic((value),                                   \
@@ -475,37 +451,12 @@ char *format_mock_traceback(const char *message_p,
              float: "%f",                               \
              double: "%f",                              \
              long double: "%Lf",                        \
-             char *: "\"%s\"",                          \
-             const char *: "\"%s\"",                    \
              bool: "%d",                                \
              default: "%p")
 
-#define CHECK_EQ(actual, expected)                      \
-    _Generic(                                           \
-        (actual),                                       \
-        char *: _Generic(                               \
-            (expected),                                 \
-            char *: nala_check_string_equal(            \
-                (char *)(uintptr_t)(actual),            \
-                (char *)(uintptr_t)(expected)),         \
-            const char *: nala_check_string_equal(      \
-                (char *)(uintptr_t)(actual),            \
-                (char *)(uintptr_t)(expected)),         \
-            default: false),                            \
-        const char *: _Generic(                         \
-            (expected),                                 \
-            char *: nala_check_string_equal(            \
-                (char *)(uintptr_t)(actual),            \
-                (char *)(uintptr_t)(expected)),         \
-            const char *: nala_check_string_equal(      \
-                (char *)(uintptr_t)(actual),            \
-                (char *)(uintptr_t)(expected)),         \
-            default: false),                            \
-        default: (actual) == (expected))
-
 #define MOCK_ASSERT_IN_EQ(data_p, func, param)                          \
     if (!(data_p)->params.ignore_ ## param ## _in) {                    \
-        if (!CHECK_EQ((data_p)->params.param, param)) {                 \
+        if ((data_p)->params.param != param) {                          \
             nala_reset_all_mocks();                                     \
             char _nala_assert_format[512];                              \
             snprintf(&_nala_assert_format[0],                           \
@@ -515,9 +466,9 @@ char *format_mock_traceback(const char *message_p,
                      PRINT_FORMAT(param));                              \
             nala_test_failure(                                          \
                 format_mock_traceback(                                  \
-                    FORMAT_EQ(&_nala_assert_format[0],                  \
-                              (data_p)->params.param,                   \
-                              param),                                   \
+                    nala_format(&_nala_assert_format[0],                \
+                                (data_p)->params.param,                 \
+                                param),                                 \
                     &(data_p)->traceback));                             \
         }                                                               \
     }
@@ -527,7 +478,7 @@ char *format_mock_traceback(const char *message_p,
                                 member_p,               \
                                 left,                   \
                                 right)                  \
-    if (!CHECK_EQ(left, right)) {                       \
+    if ((left) != (right)) {                            \
         nala_reset_all_mocks();                         \
         char _nala_assert_format[512];                  \
         snprintf(&_nala_assert_format[0],               \
@@ -538,9 +489,9 @@ char *format_mock_traceback(const char *message_p,
                  PRINT_FORMAT(right));                  \
         nala_test_failure(                              \
             format_mock_traceback(                      \
-                FORMAT_EQ(&_nala_assert_format[0],      \
-                          left,                         \
-                          right),                       \
+                nala_format(&_nala_assert_format[0],    \
+                            left,                       \
+                            right),                     \
                 traceback_p));                          \
     }
 

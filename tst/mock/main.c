@@ -114,7 +114,7 @@ TEST(output_message_function_error_mock_null)
 {
     function_error_in_subprocess(
         output_message_function_error_mock_null_entry,
-        "Mocked output_message(message): \"(null)\" != \"a\"");
+        "Mocked output_message(message): (nil) != 0x");
 }
 
 TEST(output_message_function_ignore_in_set_out)
@@ -127,6 +127,37 @@ TEST(output_message_function_ignore_in_set_out)
     buf[0] = '\0';
     output_message(&buf[0]);
     ASSERT_EQ(&buf[0], "hello");
+}
+
+TEST(output_message_function_check_pointers)
+{
+    char buf[16];
+
+    output_message_mock_ignore_in_once();
+    output_message_mock_set_message_in_pointer(&buf[0]);
+    output_message(&buf[0]);
+
+    output_message_mock_ignore_in_once();
+    output_message_mock_set_message_in_pointer(NULL);
+    output_message(NULL);
+}
+
+static void output_message_function_error_check_pointers_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    char buf[16];
+
+    output_message_mock_ignore_in_once();
+    output_message_mock_set_message_in_pointer(&buf[0] + 1);
+    output_message(&buf[0]);
+}
+
+TEST(output_message_function_error_check_pointers)
+{
+    function_error_in_subprocess(
+        output_message_function_error_check_pointers_entry,
+        "Mocked output_message(message): 0x");
 }
 
 static void output_message_function_error_call_null_entry(void *arg_p)
