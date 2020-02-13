@@ -117,6 +117,18 @@ TEST(output_message_function_error_mock_null)
         "Mocked output_message(message): \"(null)\" != \"a\"");
 }
 
+TEST(output_message_function_ignore_in_set_out)
+{
+    char buf[16];
+
+    output_message_mock_once(NULL);
+    output_message_mock_ignore_message_in();
+    output_message_mock_set_message_out("hello", 6);
+    buf[0] = '\0';
+    output_message(&buf[0]);
+    ASSERT_EQ(&buf[0], "hello");
+}
+
 static void output_message_function_error_call_null_entry(void *arg_p)
 {
     (void)arg_p;
@@ -496,6 +508,19 @@ static void variadic_function_error_va_arg_in_entry(void *arg_p)
 TEST(variadic_function_error_va_arg_in)
 {
     function_error_in_subprocess(variadic_function_error_va_arg_in_entry, NULL);
+}
+
+static void variadic_function_error_bad_formt_string_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    io_control_mock_once(3, 0, "foo");
+}
+
+TEST(variadic_function_error_bad_format_string)
+{
+    function_error_in_subprocess(variadic_function_error_bad_formt_string_entry,
+                                 "Bad format string 'foo'.");
 }
 
 TEST(compose_twice_function)

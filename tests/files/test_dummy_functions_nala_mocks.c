@@ -277,34 +277,26 @@ struct nala_va_arg_item_t *nala_parse_va_arg(const char **format_pp,
     return (item_p);
 }
 
-int nala_parse_va_list(struct nala_va_arg_list_t *list_p,
-                       const char *format_p,
-                       va_list vl)
+void nala_parse_va_list(struct nala_va_arg_list_t *list_p,
+                        const char *format_p,
+                        va_list vl)
 {
-    int res;
     struct nala_va_arg_item_t *item_p;
 
-    res = 1;
     nala_va_arg_list_init(list_p);
 
-    while (res == 1) {
+    while (true) {
         if (*format_p == '\0') {
-            res = 0;
+            break;
         } else if (*format_p == '%') {
             format_p++;
             item_p = nala_parse_va_arg(&format_p, vl);
-
-            if (item_p == NULL) {
-                res = -1;
-            } else {
-                nala_va_arg_list_append(list_p, item_p);
-            }
+            nala_va_arg_list_append(list_p, item_p);
         } else {
-            res = -1;
+            nala_test_failure(
+                nala_format("Bad format string '%s'.\n", format_p));
         }
     }
-
-    return (res);
 }
 
 void nala_va_arg_list_assert_d(struct nala_va_arg_item_t *item_p,
