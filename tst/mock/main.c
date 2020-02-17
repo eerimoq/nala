@@ -73,6 +73,20 @@ TEST(add_function_error_wrong_x)
                                  "Mocked add(x): 1 != 3");
 }
 
+static void add_function_error_none_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    add_mock_none();
+    add(3, 2);
+}
+
+TEST(add_function_none)
+{
+    function_error_in_subprocess(add_function_error_none_entry,
+                                 "Mocked add() called unexpectedly.");
+}
+
 static int add_function_set_callback_callback_x;
 static int add_function_set_callback_callback_y;
 

@@ -587,9 +587,10 @@ void nala_state_resume(struct nala_state_t *state_p)
     }
 }
 
-void nala_mock_none_fail()
+void nala_mock_none_fail(const char *func_p)
 {
-    FAIL();
+    nala_test_failure(nala_format("Mocked %s() called unexpectedly.\n",
+                                  func_p));
 }
 
 int nala_print_call_mask = 0;
@@ -949,7 +950,7 @@ int __wrap_add(int x, int y)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("add");
         exit(1);
         break;
 
@@ -1229,7 +1230,7 @@ int __wrap_call(int (*callback)(int value))
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("call");
         exit(1);
         break;
 
@@ -1526,7 +1527,7 @@ int __wrap_close(int fd)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("close");
         exit(1);
         break;
 
@@ -1807,7 +1808,7 @@ DummyStruct *__wrap_compose_twice(DummyStruct *dummy_struct, DummyStruct *(*dumm
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("compose_twice");
         exit(1);
         break;
 
@@ -2161,7 +2162,7 @@ int __wrap_double_pointer(int **value_pp)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("double_pointer");
         exit(1);
         break;
 
@@ -2458,7 +2459,7 @@ int __wrap_dup(int oldfd)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("dup");
         exit(1);
         break;
 
@@ -2721,7 +2722,7 @@ int __wrap_dup2(int oldfd, int newfd)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("dup2");
         exit(1);
         break;
 
@@ -3004,7 +3005,7 @@ DummyStruct *__wrap_edit_number(DummyStruct *dummy_struct, int number)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("edit_number");
         exit(1);
         break;
 
@@ -3321,7 +3322,7 @@ int __wrap_endmntent(FILE *streamp)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("endmntent");
         exit(1);
         break;
 
@@ -3613,7 +3614,7 @@ void __wrap_enum_param(enum enum_param_type value)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("enum_param");
         exit(1);
         break;
 
@@ -3877,7 +3878,7 @@ int __wrap_fclose(FILE *stream)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("fclose");
         exit(1);
         break;
 
@@ -4183,7 +4184,7 @@ int __wrap_fflush(FILE *stream)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("fflush");
         exit(1);
         break;
 
@@ -4489,7 +4490,7 @@ int __wrap_fileno(FILE *stream)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("fileno");
         exit(1);
         break;
 
@@ -4807,7 +4808,7 @@ FILE *__wrap_fopen(const char *path, const char *mode)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("fopen");
         exit(1);
         break;
 
@@ -5221,7 +5222,7 @@ size_t __wrap_fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("fread");
         exit(1);
         break;
 
@@ -5592,7 +5593,7 @@ void __wrap_free(void *ptr)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("free");
         exit(1);
         break;
 
@@ -5899,7 +5900,7 @@ int __wrap_fseek(FILE *stream, long int offset, int whence)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("fseek");
         exit(1);
         break;
 
@@ -6227,7 +6228,7 @@ long int __wrap_ftell(FILE *stream)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("ftell");
         exit(1);
         break;
 
@@ -6551,7 +6552,7 @@ size_t __wrap_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("fwrite");
         exit(1);
         break;
 
@@ -6927,7 +6928,7 @@ struct mntent *__wrap_getmntent(FILE *stream)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("getmntent");
         exit(1);
         break;
 
@@ -7228,7 +7229,7 @@ void __wrap_in_out(int *buf_p)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("in_out");
         exit(1);
         break;
 
@@ -7541,7 +7542,7 @@ int __wrap_io_control(int kind, ...)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("io_control");
         exit(1);
         break;
 
@@ -7879,7 +7880,7 @@ int __wrap_io_vcontrol(int kind, va_list ap)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("io_vcontrol");
         exit(1);
         break;
 
@@ -8139,7 +8140,7 @@ void *__wrap_malloc(size_t size)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("malloc");
         exit(1);
         break;
 
@@ -8447,7 +8448,7 @@ int __wrap_mount(const char *source, const char *target, const char *filesystemt
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("mount");
         exit(1);
         break;
 
@@ -8966,7 +8967,7 @@ void __wrap_output_message(const char *message)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("output_message");
         exit(1);
         break;
 
@@ -9288,7 +9289,7 @@ int __wrap_pipe(int pipefd[2])
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("pipe");
         exit(1);
         break;
 
@@ -9600,7 +9601,7 @@ int __wrap_poll(struct pollfd *fds, nfds_t nfds, int timeout)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("poll");
         exit(1);
         break;
 
@@ -9912,7 +9913,7 @@ void __wrap_print_hello()
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("print_hello");
         exit(1);
         break;
 
@@ -10171,7 +10172,7 @@ ssize_t __wrap_read(int fd, void *buf, size_t count)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("read");
         exit(1);
         break;
 
@@ -10523,7 +10524,7 @@ ssize_t __wrap_sendto(int sockfd, const void *buf, size_t len, int flags, const 
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("sendto");
         exit(1);
         break;
 
@@ -10933,7 +10934,7 @@ int __wrap_setsockopt(int sockfd, int level, int optname, const void *optval, so
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("setsockopt");
         exit(1);
         break;
 
@@ -11274,7 +11275,7 @@ unsigned int __wrap_sleep(unsigned int seconds)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("sleep");
         exit(1);
         break;
 
@@ -11555,7 +11556,7 @@ int __wrap_statvfs(const char *path, struct statvfs *buf)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("statvfs");
         exit(1);
         break;
 
@@ -11925,7 +11926,7 @@ void __wrap_struct_param(struct struct_param_type *data)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("struct_param");
         exit(1);
         break;
 
@@ -12215,7 +12216,7 @@ struct struct_param_type __wrap_struct_param_and_return_type(struct struct_param
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("struct_param_and_return_type");
         exit(1);
         break;
 
@@ -12473,7 +12474,7 @@ time_t __wrap_time(time_t *tloc)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("time");
         exit(1);
         break;
 
@@ -12797,7 +12798,7 @@ int __wrap_timerfd_settime(int fd, int flags, const struct itimerspec *new_value
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("timerfd_settime");
         exit(1);
         break;
 
@@ -13162,7 +13163,7 @@ FILE *__wrap_tmpfile(void)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("tmpfile");
         exit(1);
         break;
 
@@ -13409,7 +13410,7 @@ struct_param_type __wrap_typedef_struct_param_and_return_type(struct_param_type 
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("typedef_struct_param_and_return_type");
         exit(1);
         break;
 
@@ -13656,7 +13657,7 @@ union_type __wrap_typedef_union_param_and_return_type(union_type arg)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("typedef_union_param_and_return_type");
         exit(1);
         break;
 
@@ -13903,7 +13904,7 @@ union union_type __wrap_union_param_and_return_type(union union_type arg)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("union_param_and_return_type");
         exit(1);
         break;
 
@@ -14152,7 +14153,7 @@ int __wrap_usleep(__useconds_t usec)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("usleep");
         exit(1);
         break;
 
@@ -14427,7 +14428,7 @@ ssize_t __wrap_write(int fd, const void *buf, size_t count)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("write");
         exit(1);
         break;
 

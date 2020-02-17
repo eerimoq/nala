@@ -233,7 +233,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("{{mock.func_name}}");
         exit(1);
         break;
 

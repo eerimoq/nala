@@ -587,9 +587,10 @@ void nala_state_resume(struct nala_state_t *state_p)
     }
 }
 
-void nala_mock_none_fail()
+void nala_mock_none_fail(const char *func_p)
 {
-    FAIL();
+    nala_test_failure(nala_format("Mocked %s() called unexpectedly.\n",
+                                  func_p));
 }
 
 int nala_print_call_mask = 0;
@@ -792,7 +793,7 @@ int __wrap_bar()
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("bar");
         exit(1);
         break;
 
@@ -1039,7 +1040,7 @@ int __wrap_fie()
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("fie");
         exit(1);
         break;
 
@@ -1286,7 +1287,7 @@ int __wrap_foo()
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("foo");
         exit(1);
         break;
 
@@ -1533,7 +1534,7 @@ int __wrap_fum()
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("fum");
         exit(1);
         break;
 
@@ -1780,7 +1781,7 @@ int __wrap_gam()
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("gam");
         exit(1);
         break;
 
@@ -2027,7 +2028,7 @@ int __wrap_hit()
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail();
+        nala_mock_none_fail("hit");
         exit(1);
         break;
 
