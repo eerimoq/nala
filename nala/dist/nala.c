@@ -1172,7 +1172,7 @@ int nala_run_tests()
 
 static void print_usage_and_exit(const char *program_name_p, int exit_code)
 {
-    printf("usage: %s [-h] [-v] [-e] [-a] [<test-pattern>]\n"
+    printf("usage: %s [-h] [-v] [-c] [-a] [<test-pattern>]\n"
            "\n"
            "Run tests.\n"
            "\n"
@@ -1230,7 +1230,7 @@ __attribute__((weak)) int main(int argc, char *argv[])
     nala_suspend_all_mocks();
 
     while (1) {
-        option = getopt_long(argc, argv, "hva", &long_options[0], NULL);
+        option = getopt_long(argc, argv, "hvca", &long_options[0], NULL);
 
         if (option == -1) {
             break;
