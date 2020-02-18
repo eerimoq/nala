@@ -573,10 +573,14 @@ void nala_state_resume(struct nala_state_t *state_p)
     }
 }
 
-void nala_mock_none_fail(const char *func_p)
+void nala_mock_none_fail(struct nala_traceback_t *traceback_p,
+                         const char *func_p)
 {
-    nala_test_failure(nala_format("Mocked %s() called unexpectedly.\n",
-                                  func_p));
+    nala_test_failure(
+        format_mock_traceback(
+            nala_format("Mocked %s() called unexpectedly.\n\n",
+                        func_p),
+            traceback_p));
 }
 
 int nala_print_call_mask = 0;

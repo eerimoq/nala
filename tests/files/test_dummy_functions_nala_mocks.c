@@ -587,10 +587,14 @@ void nala_state_resume(struct nala_state_t *state_p)
     }
 }
 
-void nala_mock_none_fail(const char *func_p)
+void nala_mock_none_fail(struct nala_traceback_t *traceback_p,
+                         const char *func_p)
 {
-    nala_test_failure(nala_format("Mocked %s() called unexpectedly.\n",
-                                  func_p));
+    nala_test_failure(
+        format_mock_traceback(
+            nala_format("Mocked %s() called unexpectedly.\n\n",
+                        func_p),
+            traceback_p));
 }
 
 int nala_print_call_mask = 0;
@@ -950,7 +954,8 @@ int __wrap_add(int x, int y)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("add");
+        nala_mock_none_fail(&nala_state_for_add.data.traceback,
+                            "add");
         exit(1);
         break;
 
@@ -973,6 +978,7 @@ void add_mock(int x, int y, int return_value)
     nala_state_for_add.data.return_value = return_value;
     nala_state_for_add.data.errno_value = 0;
     nala_state_for_add.data.callback = NULL;
+    nala_traceback(&nala_state_for_add.data.traceback);
 }
 
 void add_mock_once(int x, int y, int return_value)
@@ -1048,17 +1054,20 @@ void add_mock_ignore_y_in(void)
 void add_mock_none(void)
 {
     nala_state_for_add.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_add.data.traceback);
 }
 
 void add_mock_implementation(int (*implementation)(int x, int y))
 {
     nala_state_for_add.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_add.data.implementation = implementation;
+    nala_traceback(&nala_state_for_add.data.traceback);
 }
 
 void add_mock_real(void)
 {
     nala_state_for_add.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_add.data.traceback);
 }
 
 void add_mock_real_once(void)
@@ -1230,7 +1239,8 @@ int __wrap_call(int (*callback)(int value))
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("call");
+        nala_mock_none_fail(&nala_state_for_call.data.traceback,
+                            "call");
         exit(1);
         break;
 
@@ -1251,6 +1261,7 @@ void call_mock(int return_value)
     nala_state_for_call.data.return_value = return_value;
     nala_state_for_call.data.errno_value = 0;
     nala_state_for_call.data.callback = NULL;
+    nala_traceback(&nala_state_for_call.data.traceback);
 }
 
 void call_mock_once(int return_value)
@@ -1354,17 +1365,20 @@ void call_mock_set_callback_out_copy(void (*callback)(int (*callback)(int value)
 void call_mock_none(void)
 {
     nala_state_for_call.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_call.data.traceback);
 }
 
 void call_mock_implementation(int (*implementation)(int (*callback)(int value)))
 {
     nala_state_for_call.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_call.data.implementation = implementation;
+    nala_traceback(&nala_state_for_call.data.traceback);
 }
 
 void call_mock_real(void)
 {
     nala_state_for_call.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_call.data.traceback);
 }
 
 void call_mock_real_once(void)
@@ -1527,7 +1541,8 @@ int __wrap_close(int fd)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("close");
+        nala_mock_none_fail(&nala_state_for_close.data.traceback,
+                            "close");
         exit(1);
         break;
 
@@ -1548,6 +1563,7 @@ void close_mock(int fd, int return_value)
     nala_state_for_close.data.return_value = return_value;
     nala_state_for_close.data.errno_value = 0;
     nala_state_for_close.data.callback = NULL;
+    nala_traceback(&nala_state_for_close.data.traceback);
 }
 
 void close_mock_once(int fd, int return_value)
@@ -1614,17 +1630,20 @@ void close_mock_ignore_fd_in(void)
 void close_mock_none(void)
 {
     nala_state_for_close.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_close.data.traceback);
 }
 
 void close_mock_implementation(int (*implementation)(int fd))
 {
     nala_state_for_close.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_close.data.implementation = implementation;
+    nala_traceback(&nala_state_for_close.data.traceback);
 }
 
 void close_mock_real(void)
 {
     nala_state_for_close.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_close.data.traceback);
 }
 
 void close_mock_real_once(void)
@@ -1808,7 +1827,8 @@ DummyStruct *__wrap_compose_twice(DummyStruct *dummy_struct, DummyStruct *(*dumm
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("compose_twice");
+        nala_mock_none_fail(&nala_state_for_compose_twice.data.traceback,
+                            "compose_twice");
         exit(1);
         break;
 
@@ -1831,6 +1851,7 @@ void compose_twice_mock(DummyStruct *return_value)
     nala_state_for_compose_twice.data.return_value = return_value;
     nala_state_for_compose_twice.data.errno_value = 0;
     nala_state_for_compose_twice.data.callback = NULL;
+    nala_traceback(&nala_state_for_compose_twice.data.traceback);
 }
 
 void compose_twice_mock_once(DummyStruct *return_value)
@@ -1980,17 +2001,20 @@ void compose_twice_mock_set_dummy_struct_modifier_out_copy(void (*callback)(Dumm
 void compose_twice_mock_none(void)
 {
     nala_state_for_compose_twice.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_compose_twice.data.traceback);
 }
 
 void compose_twice_mock_implementation(DummyStruct *(*implementation)(DummyStruct *dummy_struct, DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct)))
 {
     nala_state_for_compose_twice.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_compose_twice.data.implementation = implementation;
+    nala_traceback(&nala_state_for_compose_twice.data.traceback);
 }
 
 void compose_twice_mock_real(void)
 {
     nala_state_for_compose_twice.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_compose_twice.data.traceback);
 }
 
 void compose_twice_mock_real_once(void)
@@ -2162,7 +2186,8 @@ int __wrap_double_pointer(int **value_pp)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("double_pointer");
+        nala_mock_none_fail(&nala_state_for_double_pointer.data.traceback,
+                            "double_pointer");
         exit(1);
         break;
 
@@ -2183,6 +2208,7 @@ void double_pointer_mock(int return_value)
     nala_state_for_double_pointer.data.return_value = return_value;
     nala_state_for_double_pointer.data.errno_value = 0;
     nala_state_for_double_pointer.data.callback = NULL;
+    nala_traceback(&nala_state_for_double_pointer.data.traceback);
 }
 
 void double_pointer_mock_once(int return_value)
@@ -2286,17 +2312,20 @@ void double_pointer_mock_set_value_pp_out_copy(void (*callback)(int **value_pp, 
 void double_pointer_mock_none(void)
 {
     nala_state_for_double_pointer.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_double_pointer.data.traceback);
 }
 
 void double_pointer_mock_implementation(int (*implementation)(int **value_pp))
 {
     nala_state_for_double_pointer.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_double_pointer.data.implementation = implementation;
+    nala_traceback(&nala_state_for_double_pointer.data.traceback);
 }
 
 void double_pointer_mock_real(void)
 {
     nala_state_for_double_pointer.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_double_pointer.data.traceback);
 }
 
 void double_pointer_mock_real_once(void)
@@ -2459,7 +2488,8 @@ int __wrap_dup(int oldfd)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("dup");
+        nala_mock_none_fail(&nala_state_for_dup.data.traceback,
+                            "dup");
         exit(1);
         break;
 
@@ -2480,6 +2510,7 @@ void dup_mock(int oldfd, int return_value)
     nala_state_for_dup.data.return_value = return_value;
     nala_state_for_dup.data.errno_value = 0;
     nala_state_for_dup.data.callback = NULL;
+    nala_traceback(&nala_state_for_dup.data.traceback);
 }
 
 void dup_mock_once(int oldfd, int return_value)
@@ -2546,17 +2577,20 @@ void dup_mock_ignore_oldfd_in(void)
 void dup_mock_none(void)
 {
     nala_state_for_dup.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_dup.data.traceback);
 }
 
 void dup_mock_implementation(int (*implementation)(int oldfd))
 {
     nala_state_for_dup.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_dup.data.implementation = implementation;
+    nala_traceback(&nala_state_for_dup.data.traceback);
 }
 
 void dup_mock_real(void)
 {
     nala_state_for_dup.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_dup.data.traceback);
 }
 
 void dup_mock_real_once(void)
@@ -2722,7 +2756,8 @@ int __wrap_dup2(int oldfd, int newfd)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("dup2");
+        nala_mock_none_fail(&nala_state_for_dup2.data.traceback,
+                            "dup2");
         exit(1);
         break;
 
@@ -2745,6 +2780,7 @@ void dup2_mock(int oldfd, int newfd, int return_value)
     nala_state_for_dup2.data.return_value = return_value;
     nala_state_for_dup2.data.errno_value = 0;
     nala_state_for_dup2.data.callback = NULL;
+    nala_traceback(&nala_state_for_dup2.data.traceback);
 }
 
 void dup2_mock_once(int oldfd, int newfd, int return_value)
@@ -2820,17 +2856,20 @@ void dup2_mock_ignore_newfd_in(void)
 void dup2_mock_none(void)
 {
     nala_state_for_dup2.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_dup2.data.traceback);
 }
 
 void dup2_mock_implementation(int (*implementation)(int oldfd, int newfd))
 {
     nala_state_for_dup2.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_dup2.data.implementation = implementation;
+    nala_traceback(&nala_state_for_dup2.data.traceback);
 }
 
 void dup2_mock_real(void)
 {
     nala_state_for_dup2.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_dup2.data.traceback);
 }
 
 void dup2_mock_real_once(void)
@@ -3005,7 +3044,8 @@ DummyStruct *__wrap_edit_number(DummyStruct *dummy_struct, int number)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("edit_number");
+        nala_mock_none_fail(&nala_state_for_edit_number.data.traceback,
+                            "edit_number");
         exit(1);
         break;
 
@@ -3028,6 +3068,7 @@ void edit_number_mock(int number, DummyStruct *return_value)
     nala_state_for_edit_number.data.return_value = return_value;
     nala_state_for_edit_number.data.errno_value = 0;
     nala_state_for_edit_number.data.callback = NULL;
+    nala_traceback(&nala_state_for_edit_number.data.traceback);
 }
 
 void edit_number_mock_once(int number, DummyStruct *return_value)
@@ -3140,17 +3181,20 @@ void edit_number_mock_set_dummy_struct_out_copy(void (*callback)(DummyStruct *du
 void edit_number_mock_none(void)
 {
     nala_state_for_edit_number.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_edit_number.data.traceback);
 }
 
 void edit_number_mock_implementation(DummyStruct *(*implementation)(DummyStruct *dummy_struct, int number))
 {
     nala_state_for_edit_number.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_edit_number.data.implementation = implementation;
+    nala_traceback(&nala_state_for_edit_number.data.traceback);
 }
 
 void edit_number_mock_real(void)
 {
     nala_state_for_edit_number.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_edit_number.data.traceback);
 }
 
 void edit_number_mock_real_once(void)
@@ -3322,7 +3366,8 @@ int __wrap_endmntent(FILE *streamp)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("endmntent");
+        nala_mock_none_fail(&nala_state_for_endmntent.data.traceback,
+                            "endmntent");
         exit(1);
         break;
 
@@ -3343,6 +3388,7 @@ void endmntent_mock(int return_value)
     nala_state_for_endmntent.data.return_value = return_value;
     nala_state_for_endmntent.data.errno_value = 0;
     nala_state_for_endmntent.data.callback = NULL;
+    nala_traceback(&nala_state_for_endmntent.data.traceback);
 }
 
 void endmntent_mock_once(int return_value)
@@ -3446,17 +3492,20 @@ void endmntent_mock_set_streamp_out_copy(void (*callback)(FILE *streamp, const v
 void endmntent_mock_none(void)
 {
     nala_state_for_endmntent.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_endmntent.data.traceback);
 }
 
 void endmntent_mock_implementation(int (*implementation)(FILE *streamp))
 {
     nala_state_for_endmntent.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_endmntent.data.implementation = implementation;
+    nala_traceback(&nala_state_for_endmntent.data.traceback);
 }
 
 void endmntent_mock_real(void)
 {
     nala_state_for_endmntent.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_endmntent.data.traceback);
 }
 
 void endmntent_mock_real_once(void)
@@ -3614,7 +3663,8 @@ void __wrap_enum_param(enum enum_param_type value)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("enum_param");
+        nala_mock_none_fail(&nala_state_for_enum_param.data.traceback,
+                            "enum_param");
         exit(1);
         break;
 
@@ -3633,6 +3683,7 @@ void enum_param_mock(enum enum_param_type value)
     nala_state_for_enum_param.data.params.ignore_value_in = false;
     nala_state_for_enum_param.data.errno_value = 0;
     nala_state_for_enum_param.data.callback = NULL;
+    nala_traceback(&nala_state_for_enum_param.data.traceback);
 }
 
 void enum_param_mock_once(enum enum_param_type value)
@@ -3696,17 +3747,20 @@ void enum_param_mock_ignore_value_in(void)
 void enum_param_mock_none(void)
 {
     nala_state_for_enum_param.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_enum_param.data.traceback);
 }
 
 void enum_param_mock_implementation(void (*implementation)(enum enum_param_type value))
 {
     nala_state_for_enum_param.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_enum_param.data.implementation = implementation;
+    nala_traceback(&nala_state_for_enum_param.data.traceback);
 }
 
 void enum_param_mock_real(void)
 {
     nala_state_for_enum_param.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_enum_param.data.traceback);
 }
 
 void enum_param_mock_real_once(void)
@@ -3878,7 +3932,8 @@ int __wrap_fclose(FILE *stream)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("fclose");
+        nala_mock_none_fail(&nala_state_for_fclose.data.traceback,
+                            "fclose");
         exit(1);
         break;
 
@@ -3899,6 +3954,7 @@ void fclose_mock(int return_value)
     nala_state_for_fclose.data.return_value = return_value;
     nala_state_for_fclose.data.errno_value = 0;
     nala_state_for_fclose.data.callback = NULL;
+    nala_traceback(&nala_state_for_fclose.data.traceback);
 }
 
 void fclose_mock_once(int return_value)
@@ -4002,17 +4058,20 @@ void fclose_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *
 void fclose_mock_none(void)
 {
     nala_state_for_fclose.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_fclose.data.traceback);
 }
 
 void fclose_mock_implementation(int (*implementation)(FILE *stream))
 {
     nala_state_for_fclose.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_fclose.data.implementation = implementation;
+    nala_traceback(&nala_state_for_fclose.data.traceback);
 }
 
 void fclose_mock_real(void)
 {
     nala_state_for_fclose.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_fclose.data.traceback);
 }
 
 void fclose_mock_real_once(void)
@@ -4184,7 +4243,8 @@ int __wrap_fflush(FILE *stream)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("fflush");
+        nala_mock_none_fail(&nala_state_for_fflush.data.traceback,
+                            "fflush");
         exit(1);
         break;
 
@@ -4205,6 +4265,7 @@ void fflush_mock(int return_value)
     nala_state_for_fflush.data.return_value = return_value;
     nala_state_for_fflush.data.errno_value = 0;
     nala_state_for_fflush.data.callback = NULL;
+    nala_traceback(&nala_state_for_fflush.data.traceback);
 }
 
 void fflush_mock_once(int return_value)
@@ -4308,17 +4369,20 @@ void fflush_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *
 void fflush_mock_none(void)
 {
     nala_state_for_fflush.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_fflush.data.traceback);
 }
 
 void fflush_mock_implementation(int (*implementation)(FILE *stream))
 {
     nala_state_for_fflush.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_fflush.data.implementation = implementation;
+    nala_traceback(&nala_state_for_fflush.data.traceback);
 }
 
 void fflush_mock_real(void)
 {
     nala_state_for_fflush.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_fflush.data.traceback);
 }
 
 void fflush_mock_real_once(void)
@@ -4490,7 +4554,8 @@ int __wrap_fileno(FILE *stream)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("fileno");
+        nala_mock_none_fail(&nala_state_for_fileno.data.traceback,
+                            "fileno");
         exit(1);
         break;
 
@@ -4511,6 +4576,7 @@ void fileno_mock(int return_value)
     nala_state_for_fileno.data.return_value = return_value;
     nala_state_for_fileno.data.errno_value = 0;
     nala_state_for_fileno.data.callback = NULL;
+    nala_traceback(&nala_state_for_fileno.data.traceback);
 }
 
 void fileno_mock_once(int return_value)
@@ -4614,17 +4680,20 @@ void fileno_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *
 void fileno_mock_none(void)
 {
     nala_state_for_fileno.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_fileno.data.traceback);
 }
 
 void fileno_mock_implementation(int (*implementation)(FILE *stream))
 {
     nala_state_for_fileno.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_fileno.data.implementation = implementation;
+    nala_traceback(&nala_state_for_fileno.data.traceback);
 }
 
 void fileno_mock_real(void)
 {
     nala_state_for_fileno.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_fileno.data.traceback);
 }
 
 void fileno_mock_real_once(void)
@@ -4808,7 +4877,8 @@ FILE *__wrap_fopen(const char *path, const char *mode)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("fopen");
+        nala_mock_none_fail(&nala_state_for_fopen.data.traceback,
+                            "fopen");
         exit(1);
         break;
 
@@ -4847,6 +4917,7 @@ void fopen_mock(const char *path, const char *mode, FILE *return_value)
     nala_state_for_fopen.data.return_value = return_value;
     nala_state_for_fopen.data.errno_value = 0;
     nala_state_for_fopen.data.callback = NULL;
+    nala_traceback(&nala_state_for_fopen.data.traceback);
 }
 
 void fopen_mock_once(const char *path, const char *mode, FILE *return_value)
@@ -5022,17 +5093,20 @@ void fopen_mock_set_mode_out_copy(void (*callback)(const char *mode, const void 
 void fopen_mock_none(void)
 {
     nala_state_for_fopen.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_fopen.data.traceback);
 }
 
 void fopen_mock_implementation(FILE *(*implementation)(const char *path, const char *mode))
 {
     nala_state_for_fopen.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_fopen.data.implementation = implementation;
+    nala_traceback(&nala_state_for_fopen.data.traceback);
 }
 
 void fopen_mock_real(void)
 {
     nala_state_for_fopen.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_fopen.data.traceback);
 }
 
 void fopen_mock_real_once(void)
@@ -5222,7 +5296,8 @@ size_t __wrap_fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("fread");
+        nala_mock_none_fail(&nala_state_for_fread.data.traceback,
+                            "fread");
         exit(1);
         break;
 
@@ -5249,6 +5324,7 @@ void fread_mock(size_t size, size_t nmemb, size_t return_value)
     nala_state_for_fread.data.return_value = return_value;
     nala_state_for_fread.data.errno_value = 0;
     nala_state_for_fread.data.callback = NULL;
+    nala_traceback(&nala_state_for_fread.data.traceback);
 }
 
 void fread_mock_once(size_t size, size_t nmemb, size_t return_value)
@@ -5416,17 +5492,20 @@ void fread_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *n
 void fread_mock_none(void)
 {
     nala_state_for_fread.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_fread.data.traceback);
 }
 
 void fread_mock_implementation(size_t (*implementation)(void *ptr, size_t size, size_t nmemb, FILE *stream))
 {
     nala_state_for_fread.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_fread.data.implementation = implementation;
+    nala_traceback(&nala_state_for_fread.data.traceback);
 }
 
 void fread_mock_real(void)
 {
     nala_state_for_fread.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_fread.data.traceback);
 }
 
 void fread_mock_real_once(void)
@@ -5593,7 +5672,8 @@ void __wrap_free(void *ptr)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("free");
+        nala_mock_none_fail(&nala_state_for_free.data.traceback,
+                            "free");
         exit(1);
         break;
 
@@ -5612,6 +5692,7 @@ void free_mock()
     nala_state_for_free.data.params.ignore_ptr_in = true;
     nala_state_for_free.data.errno_value = 0;
     nala_state_for_free.data.callback = NULL;
+    nala_traceback(&nala_state_for_free.data.traceback);
 }
 
 void free_mock_once()
@@ -5712,17 +5793,20 @@ void free_mock_set_ptr_out_copy(void (*callback)(void *ptr, const void *nala_buf
 void free_mock_none(void)
 {
     nala_state_for_free.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_free.data.traceback);
 }
 
 void free_mock_implementation(void (*implementation)(void *ptr))
 {
     nala_state_for_free.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_free.data.implementation = implementation;
+    nala_traceback(&nala_state_for_free.data.traceback);
 }
 
 void free_mock_real(void)
 {
     nala_state_for_free.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_free.data.traceback);
 }
 
 void free_mock_real_once(void)
@@ -5900,7 +5984,8 @@ int __wrap_fseek(FILE *stream, long int offset, int whence)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("fseek");
+        nala_mock_none_fail(&nala_state_for_fseek.data.traceback,
+                            "fseek");
         exit(1);
         break;
 
@@ -5925,6 +6010,7 @@ void fseek_mock(long int offset, int whence, int return_value)
     nala_state_for_fseek.data.return_value = return_value;
     nala_state_for_fseek.data.errno_value = 0;
     nala_state_for_fseek.data.callback = NULL;
+    nala_traceback(&nala_state_for_fseek.data.traceback);
 }
 
 void fseek_mock_once(long int offset, int whence, int return_value)
@@ -6046,17 +6132,20 @@ void fseek_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *n
 void fseek_mock_none(void)
 {
     nala_state_for_fseek.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_fseek.data.traceback);
 }
 
 void fseek_mock_implementation(int (*implementation)(FILE *stream, long int offset, int whence))
 {
     nala_state_for_fseek.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_fseek.data.implementation = implementation;
+    nala_traceback(&nala_state_for_fseek.data.traceback);
 }
 
 void fseek_mock_real(void)
 {
     nala_state_for_fseek.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_fseek.data.traceback);
 }
 
 void fseek_mock_real_once(void)
@@ -6228,7 +6317,8 @@ long int __wrap_ftell(FILE *stream)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("ftell");
+        nala_mock_none_fail(&nala_state_for_ftell.data.traceback,
+                            "ftell");
         exit(1);
         break;
 
@@ -6249,6 +6339,7 @@ void ftell_mock(long int return_value)
     nala_state_for_ftell.data.return_value = return_value;
     nala_state_for_ftell.data.errno_value = 0;
     nala_state_for_ftell.data.callback = NULL;
+    nala_traceback(&nala_state_for_ftell.data.traceback);
 }
 
 void ftell_mock_once(long int return_value)
@@ -6352,17 +6443,20 @@ void ftell_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *n
 void ftell_mock_none(void)
 {
     nala_state_for_ftell.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_ftell.data.traceback);
 }
 
 void ftell_mock_implementation(long int (*implementation)(FILE *stream))
 {
     nala_state_for_ftell.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_ftell.data.implementation = implementation;
+    nala_traceback(&nala_state_for_ftell.data.traceback);
 }
 
 void ftell_mock_real(void)
 {
     nala_state_for_ftell.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_ftell.data.traceback);
 }
 
 void ftell_mock_real_once(void)
@@ -6552,7 +6646,8 @@ size_t __wrap_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("fwrite");
+        nala_mock_none_fail(&nala_state_for_fwrite.data.traceback,
+                            "fwrite");
         exit(1);
         break;
 
@@ -6579,6 +6674,7 @@ void fwrite_mock(size_t size, size_t nmemb, size_t return_value)
     nala_state_for_fwrite.data.return_value = return_value;
     nala_state_for_fwrite.data.errno_value = 0;
     nala_state_for_fwrite.data.callback = NULL;
+    nala_traceback(&nala_state_for_fwrite.data.traceback);
 }
 
 void fwrite_mock_once(size_t size, size_t nmemb, size_t return_value)
@@ -6746,17 +6842,20 @@ void fwrite_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *
 void fwrite_mock_none(void)
 {
     nala_state_for_fwrite.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_fwrite.data.traceback);
 }
 
 void fwrite_mock_implementation(size_t (*implementation)(const void *ptr, size_t size, size_t nmemb, FILE *stream))
 {
     nala_state_for_fwrite.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_fwrite.data.implementation = implementation;
+    nala_traceback(&nala_state_for_fwrite.data.traceback);
 }
 
 void fwrite_mock_real(void)
 {
     nala_state_for_fwrite.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_fwrite.data.traceback);
 }
 
 void fwrite_mock_real_once(void)
@@ -6928,7 +7027,8 @@ struct mntent *__wrap_getmntent(FILE *stream)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("getmntent");
+        nala_mock_none_fail(&nala_state_for_getmntent.data.traceback,
+                            "getmntent");
         exit(1);
         break;
 
@@ -6949,6 +7049,7 @@ void getmntent_mock(struct mntent *return_value)
     nala_state_for_getmntent.data.return_value = return_value;
     nala_state_for_getmntent.data.errno_value = 0;
     nala_state_for_getmntent.data.callback = NULL;
+    nala_traceback(&nala_state_for_getmntent.data.traceback);
 }
 
 void getmntent_mock_once(struct mntent *return_value)
@@ -7052,17 +7153,20 @@ void getmntent_mock_set_stream_out_copy(void (*callback)(FILE *stream, const voi
 void getmntent_mock_none(void)
 {
     nala_state_for_getmntent.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_getmntent.data.traceback);
 }
 
 void getmntent_mock_implementation(struct mntent *(*implementation)(FILE *stream))
 {
     nala_state_for_getmntent.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_getmntent.data.implementation = implementation;
+    nala_traceback(&nala_state_for_getmntent.data.traceback);
 }
 
 void getmntent_mock_real(void)
 {
     nala_state_for_getmntent.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_getmntent.data.traceback);
 }
 
 void getmntent_mock_real_once(void)
@@ -7229,7 +7333,8 @@ void __wrap_in_out(int *buf_p)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("in_out");
+        nala_mock_none_fail(&nala_state_for_in_out.data.traceback,
+                            "in_out");
         exit(1);
         break;
 
@@ -7248,6 +7353,7 @@ void in_out_mock()
     nala_state_for_in_out.data.params.ignore_buf_p_in = true;
     nala_state_for_in_out.data.errno_value = 0;
     nala_state_for_in_out.data.callback = NULL;
+    nala_traceback(&nala_state_for_in_out.data.traceback);
 }
 
 void in_out_mock_once()
@@ -7348,17 +7454,20 @@ void in_out_mock_set_buf_p_out_copy(void (*callback)(int *buf_p, const void *nal
 void in_out_mock_none(void)
 {
     nala_state_for_in_out.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_in_out.data.traceback);
 }
 
 void in_out_mock_implementation(void (*implementation)(int *buf_p))
 {
     nala_state_for_in_out.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_in_out.data.implementation = implementation;
+    nala_traceback(&nala_state_for_in_out.data.traceback);
 }
 
 void in_out_mock_real(void)
 {
     nala_state_for_in_out.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_in_out.data.traceback);
 }
 
 void in_out_mock_real_once(void)
@@ -7542,7 +7651,8 @@ int __wrap_io_control(int kind, ...)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("io_control");
+        nala_mock_none_fail(&nala_state_for_io_control.data.traceback,
+                            "io_control");
         exit(1);
         break;
 
@@ -7581,6 +7691,7 @@ void io_control_mock(int kind, int return_value, const char *vafmt_p, ...)
     nala_state_for_io_control.data.return_value = return_value;
     nala_state_for_io_control.data.errno_value = 0;
     nala_state_for_io_control.data.callback = NULL;
+    nala_traceback(&nala_state_for_io_control.data.traceback);
 }
 
 void io_control_mock_once(int kind, int return_value, const char *vafmt_p, ...)
@@ -7706,17 +7817,20 @@ void io_control_mock_set_va_arg_out_at(unsigned int index, const void *buf_p, si
 void io_control_mock_none(void)
 {
     nala_state_for_io_control.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_io_control.data.traceback);
 }
 
 void io_control_mock_implementation(int (*implementation)(int kind, va_list __nala_va_list))
 {
     nala_state_for_io_control.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_io_control.data.implementation = implementation;
+    nala_traceback(&nala_state_for_io_control.data.traceback);
 }
 
 void io_control_mock_real(void)
 {
     nala_state_for_io_control.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_io_control.data.traceback);
 }
 
 void io_control_mock_real_once(void)
@@ -7880,7 +7994,8 @@ int __wrap_io_vcontrol(int kind, va_list ap)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("io_vcontrol");
+        nala_mock_none_fail(&nala_state_for_io_vcontrol.data.traceback,
+                            "io_vcontrol");
         exit(1);
         break;
 
@@ -7901,6 +8016,7 @@ void io_vcontrol_mock(int kind, int return_value)
     nala_state_for_io_vcontrol.data.return_value = return_value;
     nala_state_for_io_vcontrol.data.errno_value = 0;
     nala_state_for_io_vcontrol.data.callback = NULL;
+    nala_traceback(&nala_state_for_io_vcontrol.data.traceback);
 }
 
 void io_vcontrol_mock_once(int kind, int return_value)
@@ -7967,17 +8083,20 @@ void io_vcontrol_mock_ignore_kind_in(void)
 void io_vcontrol_mock_none(void)
 {
     nala_state_for_io_vcontrol.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_io_vcontrol.data.traceback);
 }
 
 void io_vcontrol_mock_implementation(int (*implementation)(int kind, va_list ap))
 {
     nala_state_for_io_vcontrol.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_io_vcontrol.data.implementation = implementation;
+    nala_traceback(&nala_state_for_io_vcontrol.data.traceback);
 }
 
 void io_vcontrol_mock_real(void)
 {
     nala_state_for_io_vcontrol.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_io_vcontrol.data.traceback);
 }
 
 void io_vcontrol_mock_real_once(void)
@@ -8140,7 +8259,8 @@ void *__wrap_malloc(size_t size)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("malloc");
+        nala_mock_none_fail(&nala_state_for_malloc.data.traceback,
+                            "malloc");
         exit(1);
         break;
 
@@ -8161,6 +8281,7 @@ void malloc_mock(size_t size, void *return_value)
     nala_state_for_malloc.data.return_value = return_value;
     nala_state_for_malloc.data.errno_value = 0;
     nala_state_for_malloc.data.callback = NULL;
+    nala_traceback(&nala_state_for_malloc.data.traceback);
 }
 
 void malloc_mock_once(size_t size, void *return_value)
@@ -8227,17 +8348,20 @@ void malloc_mock_ignore_size_in(void)
 void malloc_mock_none(void)
 {
     nala_state_for_malloc.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_malloc.data.traceback);
 }
 
 void malloc_mock_implementation(void *(*implementation)(size_t size))
 {
     nala_state_for_malloc.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_malloc.data.implementation = implementation;
+    nala_traceback(&nala_state_for_malloc.data.traceback);
 }
 
 void malloc_mock_real(void)
 {
     nala_state_for_malloc.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_malloc.data.traceback);
 }
 
 void malloc_mock_real_once(void)
@@ -8448,7 +8572,8 @@ int __wrap_mount(const char *source, const char *target, const char *filesystemt
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("mount");
+        nala_mock_none_fail(&nala_state_for_mount.data.traceback,
+                            "mount");
         exit(1);
         break;
 
@@ -8501,6 +8626,7 @@ void mount_mock(const char *source, const char *target, const char *filesystemty
     nala_state_for_mount.data.return_value = return_value;
     nala_state_for_mount.data.errno_value = 0;
     nala_state_for_mount.data.callback = NULL;
+    nala_traceback(&nala_state_for_mount.data.traceback);
 }
 
 void mount_mock_once(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, int return_value)
@@ -8790,17 +8916,20 @@ void mount_mock_set_data_out_copy(void (*callback)(const void *data, const void 
 void mount_mock_none(void)
 {
     nala_state_for_mount.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_mount.data.traceback);
 }
 
 void mount_mock_implementation(int (*implementation)(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, const void *data))
 {
     nala_state_for_mount.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_mount.data.implementation = implementation;
+    nala_traceback(&nala_state_for_mount.data.traceback);
 }
 
 void mount_mock_real(void)
 {
     nala_state_for_mount.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_mount.data.traceback);
 }
 
 void mount_mock_real_once(void)
@@ -8967,7 +9096,8 @@ void __wrap_output_message(const char *message)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("output_message");
+        nala_mock_none_fail(&nala_state_for_output_message.data.traceback,
+                            "output_message");
         exit(1);
         break;
 
@@ -8994,6 +9124,7 @@ void output_message_mock(const char *message)
 
     nala_state_for_output_message.data.errno_value = 0;
     nala_state_for_output_message.data.callback = NULL;
+    nala_traceback(&nala_state_for_output_message.data.traceback);
 }
 
 void output_message_mock_once(const char *message)
@@ -9107,17 +9238,20 @@ void output_message_mock_set_message_out_copy(void (*callback)(const char *messa
 void output_message_mock_none(void)
 {
     nala_state_for_output_message.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_output_message.data.traceback);
 }
 
 void output_message_mock_implementation(void (*implementation)(const char *message))
 {
     nala_state_for_output_message.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_output_message.data.implementation = implementation;
+    nala_traceback(&nala_state_for_output_message.data.traceback);
 }
 
 void output_message_mock_real(void)
 {
     nala_state_for_output_message.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_output_message.data.traceback);
 }
 
 void output_message_mock_real_once(void)
@@ -9289,7 +9423,8 @@ int __wrap_pipe(int pipefd[2])
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("pipe");
+        nala_mock_none_fail(&nala_state_for_pipe.data.traceback,
+                            "pipe");
         exit(1);
         break;
 
@@ -9310,6 +9445,7 @@ void pipe_mock(int return_value)
     nala_state_for_pipe.data.return_value = return_value;
     nala_state_for_pipe.data.errno_value = 0;
     nala_state_for_pipe.data.callback = NULL;
+    nala_traceback(&nala_state_for_pipe.data.traceback);
 }
 
 void pipe_mock_once(int return_value)
@@ -9413,17 +9549,20 @@ void pipe_mock_set_pipefd_out_copy(void (*callback)(int pipefd[2], const void *n
 void pipe_mock_none(void)
 {
     nala_state_for_pipe.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_pipe.data.traceback);
 }
 
 void pipe_mock_implementation(int (*implementation)(int pipefd[2]))
 {
     nala_state_for_pipe.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_pipe.data.implementation = implementation;
+    nala_traceback(&nala_state_for_pipe.data.traceback);
 }
 
 void pipe_mock_real(void)
 {
     nala_state_for_pipe.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_pipe.data.traceback);
 }
 
 void pipe_mock_real_once(void)
@@ -9601,7 +9740,8 @@ int __wrap_poll(struct pollfd *fds, nfds_t nfds, int timeout)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("poll");
+        nala_mock_none_fail(&nala_state_for_poll.data.traceback,
+                            "poll");
         exit(1);
         break;
 
@@ -9626,6 +9766,7 @@ void poll_mock(nfds_t nfds, int timeout, int return_value)
     nala_state_for_poll.data.return_value = return_value;
     nala_state_for_poll.data.errno_value = 0;
     nala_state_for_poll.data.callback = NULL;
+    nala_traceback(&nala_state_for_poll.data.traceback);
 }
 
 void poll_mock_once(nfds_t nfds, int timeout, int return_value)
@@ -9747,17 +9888,20 @@ void poll_mock_set_fds_out_copy(void (*callback)(struct pollfd *fds, const void 
 void poll_mock_none(void)
 {
     nala_state_for_poll.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_poll.data.traceback);
 }
 
 void poll_mock_implementation(int (*implementation)(struct pollfd *fds, nfds_t nfds, int timeout))
 {
     nala_state_for_poll.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_poll.data.implementation = implementation;
+    nala_traceback(&nala_state_for_poll.data.traceback);
 }
 
 void poll_mock_real(void)
 {
     nala_state_for_poll.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_poll.data.traceback);
 }
 
 void poll_mock_real_once(void)
@@ -9913,7 +10057,8 @@ void __wrap_print_hello()
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("print_hello");
+        nala_mock_none_fail(&nala_state_for_print_hello.data.traceback,
+                            "print_hello");
         exit(1);
         break;
 
@@ -9930,6 +10075,7 @@ void print_hello_mock()
     nala_state_for_print_hello.state.mode = MODE_MOCK;
     nala_state_for_print_hello.data.errno_value = 0;
     nala_state_for_print_hello.data.callback = NULL;
+    nala_traceback(&nala_state_for_print_hello.data.traceback);
 }
 
 void print_hello_mock_once()
@@ -9984,17 +10130,20 @@ void print_hello_mock_set_callback(void (*callback)())
 void print_hello_mock_none(void)
 {
     nala_state_for_print_hello.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_print_hello.data.traceback);
 }
 
 void print_hello_mock_implementation(void (*implementation)())
 {
     nala_state_for_print_hello.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_print_hello.data.implementation = implementation;
+    nala_traceback(&nala_state_for_print_hello.data.traceback);
 }
 
 void print_hello_mock_real(void)
 {
     nala_state_for_print_hello.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_print_hello.data.traceback);
 }
 
 void print_hello_mock_real_once(void)
@@ -10172,7 +10321,8 @@ ssize_t __wrap_read(int fd, void *buf, size_t count)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("read");
+        nala_mock_none_fail(&nala_state_for_read.data.traceback,
+                            "read");
         exit(1);
         break;
 
@@ -10197,6 +10347,7 @@ void read_mock(int fd, size_t count, ssize_t return_value)
     nala_state_for_read.data.return_value = return_value;
     nala_state_for_read.data.errno_value = 0;
     nala_state_for_read.data.callback = NULL;
+    nala_traceback(&nala_state_for_read.data.traceback);
 }
 
 void read_mock_once(int fd, size_t count, ssize_t return_value)
@@ -10318,17 +10469,20 @@ void read_mock_set_buf_out_copy(void (*callback)(void *buf, const void *nala_buf
 void read_mock_none(void)
 {
     nala_state_for_read.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_read.data.traceback);
 }
 
 void read_mock_implementation(ssize_t (*implementation)(int fd, void *buf, size_t count))
 {
     nala_state_for_read.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_read.data.implementation = implementation;
+    nala_traceback(&nala_state_for_read.data.traceback);
 }
 
 void read_mock_real(void)
 {
     nala_state_for_read.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_read.data.traceback);
 }
 
 void read_mock_real_once(void)
@@ -10524,7 +10678,8 @@ ssize_t __wrap_sendto(int sockfd, const void *buf, size_t len, int flags, const 
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("sendto");
+        nala_mock_none_fail(&nala_state_for_sendto.data.traceback,
+                            "sendto");
         exit(1);
         break;
 
@@ -10555,6 +10710,7 @@ void sendto_mock(int sockfd, size_t len, int flags, socklen_t addrlen, ssize_t r
     nala_state_for_sendto.data.return_value = return_value;
     nala_state_for_sendto.data.errno_value = 0;
     nala_state_for_sendto.data.callback = NULL;
+    nala_traceback(&nala_state_for_sendto.data.traceback);
 }
 
 void sendto_mock_once(int sockfd, size_t len, int flags, socklen_t addrlen, ssize_t return_value)
@@ -10740,17 +10896,20 @@ void sendto_mock_set_dest_addr_out_copy(void (*callback)(const struct sockaddr *
 void sendto_mock_none(void)
 {
     nala_state_for_sendto.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_sendto.data.traceback);
 }
 
 void sendto_mock_implementation(ssize_t (*implementation)(int sockfd, const void *buf, size_t len, int flags, const struct sockaddr *dest_addr, socklen_t addrlen))
 {
     nala_state_for_sendto.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_sendto.data.implementation = implementation;
+    nala_traceback(&nala_state_for_sendto.data.traceback);
 }
 
 void sendto_mock_real(void)
 {
     nala_state_for_sendto.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_sendto.data.traceback);
 }
 
 void sendto_mock_real_once(void)
@@ -10934,7 +11093,8 @@ int __wrap_setsockopt(int sockfd, int level, int optname, const void *optval, so
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("setsockopt");
+        nala_mock_none_fail(&nala_state_for_setsockopt.data.traceback,
+                            "setsockopt");
         exit(1);
         break;
 
@@ -10963,6 +11123,7 @@ void setsockopt_mock(int sockfd, int level, int optname, socklen_t optlen, int r
     nala_state_for_setsockopt.data.return_value = return_value;
     nala_state_for_setsockopt.data.errno_value = 0;
     nala_state_for_setsockopt.data.callback = NULL;
+    nala_traceback(&nala_state_for_setsockopt.data.traceback);
 }
 
 void setsockopt_mock_once(int sockfd, int level, int optname, socklen_t optlen, int return_value)
@@ -11102,17 +11263,20 @@ void setsockopt_mock_set_optval_out_copy(void (*callback)(const void *optval, co
 void setsockopt_mock_none(void)
 {
     nala_state_for_setsockopt.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_setsockopt.data.traceback);
 }
 
 void setsockopt_mock_implementation(int (*implementation)(int sockfd, int level, int optname, const void *optval, socklen_t optlen))
 {
     nala_state_for_setsockopt.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_setsockopt.data.implementation = implementation;
+    nala_traceback(&nala_state_for_setsockopt.data.traceback);
 }
 
 void setsockopt_mock_real(void)
 {
     nala_state_for_setsockopt.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_setsockopt.data.traceback);
 }
 
 void setsockopt_mock_real_once(void)
@@ -11275,7 +11439,8 @@ unsigned int __wrap_sleep(unsigned int seconds)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("sleep");
+        nala_mock_none_fail(&nala_state_for_sleep.data.traceback,
+                            "sleep");
         exit(1);
         break;
 
@@ -11296,6 +11461,7 @@ void sleep_mock(unsigned int seconds, unsigned int return_value)
     nala_state_for_sleep.data.return_value = return_value;
     nala_state_for_sleep.data.errno_value = 0;
     nala_state_for_sleep.data.callback = NULL;
+    nala_traceback(&nala_state_for_sleep.data.traceback);
 }
 
 void sleep_mock_once(unsigned int seconds, unsigned int return_value)
@@ -11362,17 +11528,20 @@ void sleep_mock_ignore_seconds_in(void)
 void sleep_mock_none(void)
 {
     nala_state_for_sleep.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_sleep.data.traceback);
 }
 
 void sleep_mock_implementation(unsigned int (*implementation)(unsigned int seconds))
 {
     nala_state_for_sleep.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_sleep.data.implementation = implementation;
+    nala_traceback(&nala_state_for_sleep.data.traceback);
 }
 
 void sleep_mock_real(void)
 {
     nala_state_for_sleep.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_sleep.data.traceback);
 }
 
 void sleep_mock_real_once(void)
@@ -11556,7 +11725,8 @@ int __wrap_statvfs(const char *path, struct statvfs *buf)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("statvfs");
+        nala_mock_none_fail(&nala_state_for_statvfs.data.traceback,
+                            "statvfs");
         exit(1);
         break;
 
@@ -11587,6 +11757,7 @@ void statvfs_mock(const char *path, int return_value)
     nala_state_for_statvfs.data.return_value = return_value;
     nala_state_for_statvfs.data.errno_value = 0;
     nala_state_for_statvfs.data.callback = NULL;
+    nala_traceback(&nala_state_for_statvfs.data.traceback);
 }
 
 void statvfs_mock_once(const char *path, int return_value)
@@ -11749,17 +11920,20 @@ void statvfs_mock_set_buf_out_copy(void (*callback)(struct statvfs *buf, const v
 void statvfs_mock_none(void)
 {
     nala_state_for_statvfs.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_statvfs.data.traceback);
 }
 
 void statvfs_mock_implementation(int (*implementation)(const char *path, struct statvfs *buf))
 {
     nala_state_for_statvfs.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_statvfs.data.implementation = implementation;
+    nala_traceback(&nala_state_for_statvfs.data.traceback);
 }
 
 void statvfs_mock_real(void)
 {
     nala_state_for_statvfs.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_statvfs.data.traceback);
 }
 
 void statvfs_mock_real_once(void)
@@ -11926,7 +12100,8 @@ void __wrap_struct_param(struct struct_param_type *data)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("struct_param");
+        nala_mock_none_fail(&nala_state_for_struct_param.data.traceback,
+                            "struct_param");
         exit(1);
         break;
 
@@ -11945,6 +12120,7 @@ void struct_param_mock()
     nala_state_for_struct_param.data.params.ignore_data_in = true;
     nala_state_for_struct_param.data.errno_value = 0;
     nala_state_for_struct_param.data.callback = NULL;
+    nala_traceback(&nala_state_for_struct_param.data.traceback);
 }
 
 void struct_param_mock_once()
@@ -12045,17 +12221,20 @@ void struct_param_mock_set_data_out_copy(void (*callback)(struct struct_param_ty
 void struct_param_mock_none(void)
 {
     nala_state_for_struct_param.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_struct_param.data.traceback);
 }
 
 void struct_param_mock_implementation(void (*implementation)(struct struct_param_type *data))
 {
     nala_state_for_struct_param.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_struct_param.data.implementation = implementation;
+    nala_traceback(&nala_state_for_struct_param.data.traceback);
 }
 
 void struct_param_mock_real(void)
 {
     nala_state_for_struct_param.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_struct_param.data.traceback);
 }
 
 void struct_param_mock_real_once(void)
@@ -12216,7 +12395,8 @@ struct struct_param_type __wrap_struct_param_and_return_type(struct struct_param
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("struct_param_and_return_type");
+        nala_mock_none_fail(&nala_state_for_struct_param_and_return_type.data.traceback,
+                            "struct_param_and_return_type");
         exit(1);
         break;
 
@@ -12235,6 +12415,7 @@ void struct_param_and_return_type_mock(struct struct_param_type return_value)
     nala_state_for_struct_param_and_return_type.data.return_value = return_value;
     nala_state_for_struct_param_and_return_type.data.errno_value = 0;
     nala_state_for_struct_param_and_return_type.data.callback = NULL;
+    nala_traceback(&nala_state_for_struct_param_and_return_type.data.traceback);
 }
 
 void struct_param_and_return_type_mock_once(struct struct_param_type return_value)
@@ -12292,17 +12473,20 @@ void struct_param_and_return_type_mock_set_callback(void (*callback)(struct stru
 void struct_param_and_return_type_mock_none(void)
 {
     nala_state_for_struct_param_and_return_type.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_struct_param_and_return_type.data.traceback);
 }
 
 void struct_param_and_return_type_mock_implementation(struct struct_param_type (*implementation)(struct struct_param_type arg))
 {
     nala_state_for_struct_param_and_return_type.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_struct_param_and_return_type.data.implementation = implementation;
+    nala_traceback(&nala_state_for_struct_param_and_return_type.data.traceback);
 }
 
 void struct_param_and_return_type_mock_real(void)
 {
     nala_state_for_struct_param_and_return_type.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_struct_param_and_return_type.data.traceback);
 }
 
 void struct_param_and_return_type_mock_real_once(void)
@@ -12474,7 +12658,8 @@ time_t __wrap_time(time_t *tloc)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("time");
+        nala_mock_none_fail(&nala_state_for_time.data.traceback,
+                            "time");
         exit(1);
         break;
 
@@ -12495,6 +12680,7 @@ void time_mock(time_t return_value)
     nala_state_for_time.data.return_value = return_value;
     nala_state_for_time.data.errno_value = 0;
     nala_state_for_time.data.callback = NULL;
+    nala_traceback(&nala_state_for_time.data.traceback);
 }
 
 void time_mock_once(time_t return_value)
@@ -12598,17 +12784,20 @@ void time_mock_set_tloc_out_copy(void (*callback)(time_t *tloc, const void *nala
 void time_mock_none(void)
 {
     nala_state_for_time.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_time.data.traceback);
 }
 
 void time_mock_implementation(time_t (*implementation)(time_t *tloc))
 {
     nala_state_for_time.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_time.data.implementation = implementation;
+    nala_traceback(&nala_state_for_time.data.traceback);
 }
 
 void time_mock_real(void)
 {
     nala_state_for_time.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_time.data.traceback);
 }
 
 void time_mock_real_once(void)
@@ -12798,7 +12987,8 @@ int __wrap_timerfd_settime(int fd, int flags, const struct itimerspec *new_value
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("timerfd_settime");
+        nala_mock_none_fail(&nala_state_for_timerfd_settime.data.traceback,
+                            "timerfd_settime");
         exit(1);
         break;
 
@@ -12825,6 +13015,7 @@ void timerfd_settime_mock(int fd, int flags, int return_value)
     nala_state_for_timerfd_settime.data.return_value = return_value;
     nala_state_for_timerfd_settime.data.errno_value = 0;
     nala_state_for_timerfd_settime.data.callback = NULL;
+    nala_traceback(&nala_state_for_timerfd_settime.data.traceback);
 }
 
 void timerfd_settime_mock_once(int fd, int flags, int return_value)
@@ -12992,17 +13183,20 @@ void timerfd_settime_mock_set_old_value_out_copy(void (*callback)(struct itimers
 void timerfd_settime_mock_none(void)
 {
     nala_state_for_timerfd_settime.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_timerfd_settime.data.traceback);
 }
 
 void timerfd_settime_mock_implementation(int (*implementation)(int fd, int flags, const struct itimerspec *new_value, struct itimerspec *old_value))
 {
     nala_state_for_timerfd_settime.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_timerfd_settime.data.implementation = implementation;
+    nala_traceback(&nala_state_for_timerfd_settime.data.traceback);
 }
 
 void timerfd_settime_mock_real(void)
 {
     nala_state_for_timerfd_settime.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_timerfd_settime.data.traceback);
 }
 
 void timerfd_settime_mock_real_once(void)
@@ -13163,7 +13357,8 @@ FILE *__wrap_tmpfile(void)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("tmpfile");
+        nala_mock_none_fail(&nala_state_for_tmpfile.data.traceback,
+                            "tmpfile");
         exit(1);
         break;
 
@@ -13182,6 +13377,7 @@ void tmpfile_mock(FILE *return_value)
     nala_state_for_tmpfile.data.return_value = return_value;
     nala_state_for_tmpfile.data.errno_value = 0;
     nala_state_for_tmpfile.data.callback = NULL;
+    nala_traceback(&nala_state_for_tmpfile.data.traceback);
 }
 
 void tmpfile_mock_once(FILE *return_value)
@@ -13239,17 +13435,20 @@ void tmpfile_mock_set_callback(void (*callback)(void))
 void tmpfile_mock_none(void)
 {
     nala_state_for_tmpfile.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_tmpfile.data.traceback);
 }
 
 void tmpfile_mock_implementation(FILE *(*implementation)(void))
 {
     nala_state_for_tmpfile.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_tmpfile.data.implementation = implementation;
+    nala_traceback(&nala_state_for_tmpfile.data.traceback);
 }
 
 void tmpfile_mock_real(void)
 {
     nala_state_for_tmpfile.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_tmpfile.data.traceback);
 }
 
 void tmpfile_mock_real_once(void)
@@ -13410,7 +13609,8 @@ struct_param_type __wrap_typedef_struct_param_and_return_type(struct_param_type 
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("typedef_struct_param_and_return_type");
+        nala_mock_none_fail(&nala_state_for_typedef_struct_param_and_return_type.data.traceback,
+                            "typedef_struct_param_and_return_type");
         exit(1);
         break;
 
@@ -13429,6 +13629,7 @@ void typedef_struct_param_and_return_type_mock(struct_param_type return_value)
     nala_state_for_typedef_struct_param_and_return_type.data.return_value = return_value;
     nala_state_for_typedef_struct_param_and_return_type.data.errno_value = 0;
     nala_state_for_typedef_struct_param_and_return_type.data.callback = NULL;
+    nala_traceback(&nala_state_for_typedef_struct_param_and_return_type.data.traceback);
 }
 
 void typedef_struct_param_and_return_type_mock_once(struct_param_type return_value)
@@ -13486,17 +13687,20 @@ void typedef_struct_param_and_return_type_mock_set_callback(void (*callback)(str
 void typedef_struct_param_and_return_type_mock_none(void)
 {
     nala_state_for_typedef_struct_param_and_return_type.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_typedef_struct_param_and_return_type.data.traceback);
 }
 
 void typedef_struct_param_and_return_type_mock_implementation(struct_param_type (*implementation)(struct_param_type arg))
 {
     nala_state_for_typedef_struct_param_and_return_type.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_typedef_struct_param_and_return_type.data.implementation = implementation;
+    nala_traceback(&nala_state_for_typedef_struct_param_and_return_type.data.traceback);
 }
 
 void typedef_struct_param_and_return_type_mock_real(void)
 {
     nala_state_for_typedef_struct_param_and_return_type.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_typedef_struct_param_and_return_type.data.traceback);
 }
 
 void typedef_struct_param_and_return_type_mock_real_once(void)
@@ -13657,7 +13861,8 @@ union_type __wrap_typedef_union_param_and_return_type(union_type arg)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("typedef_union_param_and_return_type");
+        nala_mock_none_fail(&nala_state_for_typedef_union_param_and_return_type.data.traceback,
+                            "typedef_union_param_and_return_type");
         exit(1);
         break;
 
@@ -13676,6 +13881,7 @@ void typedef_union_param_and_return_type_mock(union_type return_value)
     nala_state_for_typedef_union_param_and_return_type.data.return_value = return_value;
     nala_state_for_typedef_union_param_and_return_type.data.errno_value = 0;
     nala_state_for_typedef_union_param_and_return_type.data.callback = NULL;
+    nala_traceback(&nala_state_for_typedef_union_param_and_return_type.data.traceback);
 }
 
 void typedef_union_param_and_return_type_mock_once(union_type return_value)
@@ -13733,17 +13939,20 @@ void typedef_union_param_and_return_type_mock_set_callback(void (*callback)(unio
 void typedef_union_param_and_return_type_mock_none(void)
 {
     nala_state_for_typedef_union_param_and_return_type.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_typedef_union_param_and_return_type.data.traceback);
 }
 
 void typedef_union_param_and_return_type_mock_implementation(union_type (*implementation)(union_type arg))
 {
     nala_state_for_typedef_union_param_and_return_type.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_typedef_union_param_and_return_type.data.implementation = implementation;
+    nala_traceback(&nala_state_for_typedef_union_param_and_return_type.data.traceback);
 }
 
 void typedef_union_param_and_return_type_mock_real(void)
 {
     nala_state_for_typedef_union_param_and_return_type.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_typedef_union_param_and_return_type.data.traceback);
 }
 
 void typedef_union_param_and_return_type_mock_real_once(void)
@@ -13904,7 +14113,8 @@ union union_type __wrap_union_param_and_return_type(union union_type arg)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("union_param_and_return_type");
+        nala_mock_none_fail(&nala_state_for_union_param_and_return_type.data.traceback,
+                            "union_param_and_return_type");
         exit(1);
         break;
 
@@ -13923,6 +14133,7 @@ void union_param_and_return_type_mock(union union_type return_value)
     nala_state_for_union_param_and_return_type.data.return_value = return_value;
     nala_state_for_union_param_and_return_type.data.errno_value = 0;
     nala_state_for_union_param_and_return_type.data.callback = NULL;
+    nala_traceback(&nala_state_for_union_param_and_return_type.data.traceback);
 }
 
 void union_param_and_return_type_mock_once(union union_type return_value)
@@ -13980,17 +14191,20 @@ void union_param_and_return_type_mock_set_callback(void (*callback)(union union_
 void union_param_and_return_type_mock_none(void)
 {
     nala_state_for_union_param_and_return_type.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_union_param_and_return_type.data.traceback);
 }
 
 void union_param_and_return_type_mock_implementation(union union_type (*implementation)(union union_type arg))
 {
     nala_state_for_union_param_and_return_type.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_union_param_and_return_type.data.implementation = implementation;
+    nala_traceback(&nala_state_for_union_param_and_return_type.data.traceback);
 }
 
 void union_param_and_return_type_mock_real(void)
 {
     nala_state_for_union_param_and_return_type.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_union_param_and_return_type.data.traceback);
 }
 
 void union_param_and_return_type_mock_real_once(void)
@@ -14153,7 +14367,8 @@ int __wrap_usleep(__useconds_t usec)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("usleep");
+        nala_mock_none_fail(&nala_state_for_usleep.data.traceback,
+                            "usleep");
         exit(1);
         break;
 
@@ -14174,6 +14389,7 @@ void usleep_mock(__useconds_t usec, int return_value)
     nala_state_for_usleep.data.return_value = return_value;
     nala_state_for_usleep.data.errno_value = 0;
     nala_state_for_usleep.data.callback = NULL;
+    nala_traceback(&nala_state_for_usleep.data.traceback);
 }
 
 void usleep_mock_once(__useconds_t usec, int return_value)
@@ -14240,17 +14456,20 @@ void usleep_mock_ignore_usec_in(void)
 void usleep_mock_none(void)
 {
     nala_state_for_usleep.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_usleep.data.traceback);
 }
 
 void usleep_mock_implementation(int (*implementation)(__useconds_t usec))
 {
     nala_state_for_usleep.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_usleep.data.implementation = implementation;
+    nala_traceback(&nala_state_for_usleep.data.traceback);
 }
 
 void usleep_mock_real(void)
 {
     nala_state_for_usleep.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_usleep.data.traceback);
 }
 
 void usleep_mock_real_once(void)
@@ -14428,7 +14647,8 @@ ssize_t __wrap_write(int fd, const void *buf, size_t count)
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("write");
+        nala_mock_none_fail(&nala_state_for_write.data.traceback,
+                            "write");
         exit(1);
         break;
 
@@ -14453,6 +14673,7 @@ void write_mock(int fd, size_t count, ssize_t return_value)
     nala_state_for_write.data.return_value = return_value;
     nala_state_for_write.data.errno_value = 0;
     nala_state_for_write.data.callback = NULL;
+    nala_traceback(&nala_state_for_write.data.traceback);
 }
 
 void write_mock_once(int fd, size_t count, ssize_t return_value)
@@ -14574,17 +14795,20 @@ void write_mock_set_buf_out_copy(void (*callback)(const void *buf, const void *n
 void write_mock_none(void)
 {
     nala_state_for_write.state.mode = MODE_NONE;
+    nala_traceback(&nala_state_for_write.data.traceback);
 }
 
 void write_mock_implementation(ssize_t (*implementation)(int fd, const void *buf, size_t count))
 {
     nala_state_for_write.state.mode = MODE_IMPLEMENTATION;
     nala_state_for_write.data.implementation = implementation;
+    nala_traceback(&nala_state_for_write.data.traceback);
 }
 
 void write_mock_real(void)
 {
     nala_state_for_write.state.mode = MODE_REAL;
+    nala_traceback(&nala_state_for_write.data.traceback);
 }
 
 void write_mock_real_once(void)

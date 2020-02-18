@@ -233,7 +233,8 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
         break;
 
     case MODE_NONE:
-        nala_mock_none_fail("{{mock.func_name}}");
+        nala_mock_none_fail(&{{mock.state_name}}.data.traceback,
+                            "{{mock.func_name}}");
         exit(1);
         break;
 
@@ -303,6 +304,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
     {% endif %}
     {{mock.state_name}}.data.errno_value = 0;
     {{mock.state_name}}.data.callback = NULL;
+    nala_traceback(&{{mock.state_name}}.data.traceback);
 }
 
 {{mock.mock_once_func | render}}
@@ -525,17 +527,20 @@ void {{mock.func_name}}_mock_set_va_arg_out_at(unsigned int index, const void *b
 void {{mock.func_name}}_mock_none(void)
 {
     {{mock.state_name}}.state.mode = MODE_NONE;
+    nala_traceback(&{{mock.state_name}}.data.traceback);
 }
 
 void {{mock.func_name}}_mock_implementation({{mock.implementation_decl | render}})
 {
     {{mock.state_name}}.state.mode = MODE_IMPLEMENTATION;
     {{mock.state_name}}.data.implementation = implementation;
+    nala_traceback(&{{mock.state_name}}.data.traceback);
 }
 
 void {{mock.func_name}}_mock_real(void)
 {
     {{mock.state_name}}.state.mode = MODE_REAL;
+    nala_traceback(&{{mock.state_name}}.data.traceback);
 }
 
 void {{mock.func_name}}_mock_real_once(void)
