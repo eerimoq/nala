@@ -77,6 +77,8 @@ __attribute__ ((weak)) void nala_resume_all_mocks(void)
 
 __attribute__ ((weak)) int nala_print_call_mask = 0;
 
+static bool exit_on_failure = false;
+
 static const char *get_node(void)
 {
     static char buf[128];
@@ -288,17 +290,25 @@ static const char *test_result(struct nala_test_t *test_p, bool color)
 {
     const char *result_p;
 
-    if (test_p->exit_code == 0) {
-        if (color) {
-            result_p = COLOR_BOLD(GREEN, "PASSED");
+    if (test_p->executed) {
+        if (test_p->exit_code == 0) {
+            if (color) {
+                result_p = COLOR_BOLD(GREEN, "PASSED");
+            } else {
+                result_p = "PASSED";
+            }
         } else {
-            result_p = "PASSED";
+            if (color) {
+                result_p = COLOR_BOLD(RED, "FAILED");
+            } else {
+                result_p = "FAILED";
+            }
         }
     } else {
         if (color) {
-            result_p = COLOR_BOLD(RED, "FAILED");
+            result_p = COLOR_BOLD(YELLOW, "SKIPPED");
         } else {
-            result_p = "FAILED";
+            result_p = "SKIPPED";
         }
     }
 
@@ -326,18 +336,24 @@ static void print_summary(struct nala_test_t *test_p,
     int total;
     int passed;
     int failed;
+    int skipped;
 
     total = 0;
     passed = 0;
     failed = 0;
+    skipped = 0;
 
     while (test_p != NULL) {
         total++;
 
-        if (test_p->exit_code == 0) {
-            passed++;
+        if (test_p->executed) {
+            if (test_p->exit_code == 0) {
+                passed++;
+            } else {
+                failed++;
+            }
         } else {
-            failed++;
+            skipped++;
         }
 
         test_p = test_p->next_p;
@@ -351,6 +367,10 @@ static void print_summary(struct nala_test_t *test_p,
 
     if (passed > 0) {
         printf(COLOR_BOLD(GREEN, "%d passed") ", ", passed);
+    }
+
+    if (skipped > 0) {
+        printf(COLOR_BOLD(YELLOW, "%d skipped") ", ", skipped);
     }
 
     printf("%d total\n", total);
@@ -428,6 +448,13 @@ static int run_tests(struct nala_test_t *tests_p)
     struct nala_subprocess_result_t *result_p;
 
     test_p = tests_p;
+
+    while (test_p != NULL) {
+        test_p->executed = false;
+        test_p = test_p->next_p;
+    }
+
+    test_p = tests_p;
     gettimeofday(&start_time, NULL);
     res = 0;
 
@@ -438,6 +465,7 @@ static int run_tests(struct nala_test_t *tests_p)
 
         result_p = nala_subprocess_call(test_entry, test_p);
 
+        test_p->executed = true;
         test_p->exit_code = result_p->exit_code;
         test_p->signal_number = result_p->signal_number;
         nala_subprocess_result_free(result_p);
@@ -455,6 +483,11 @@ static int run_tests(struct nala_test_t *tests_p)
         }
 
         print_test_result(test_p);
+
+        if ((res != 0) && exit_on_failure) {
+            break;
+        }
+
         test_p = test_p->next_p;
     }
 
@@ -836,7 +869,7 @@ int nala_run_tests()
 
 static void print_usage_and_exit(const char *program_name_p, int exit_code)
 {
-    printf("usage: %s [-h] [-v] [-a] [<test-pattern>]\n"
+    printf("usage: %s [-h] [-v] [-e] [-a] [<test-pattern>]\n"
            "\n"
            "Run tests.\n"
            "\n"
@@ -846,6 +879,7 @@ static void print_usage_and_exit(const char *program_name_p, int exit_code)
            "optional arguments:\n"
            "  -h, --help                Show this help message and exit.\n"
            "  -v, --version             Print version information.\n"
+           "  -e, --exit-on-failure     Exit on first test failure.\n"
            "  -a, --print-all-calls     Print all calls to ease debugging.\n",
            program_name_p);
     exit(exit_code);
@@ -883,6 +917,7 @@ __attribute__((weak)) int main(int argc, char *argv[])
     static struct option long_options[] = {
         { "help",            no_argument, NULL, 'h' },
         { "version",         no_argument, NULL, 'v' },
+        { "exit-on-failure", no_argument, NULL, 'e' },
         { "print-all-calls", no_argument, NULL, 'a' },
         { NULL,              no_argument, NULL, 0 }
     };
@@ -906,6 +941,10 @@ __attribute__((weak)) int main(int argc, char *argv[])
 
         case 'v':
             print_version_and_exit();
+            break;
+
+        case 'e':
+            exit_on_failure = true;
             break;
 
         case 'a':

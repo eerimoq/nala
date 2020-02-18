@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NALA_VERSION "0.87.0"
+#define NALA_VERSION "0.88.0"
 
 /**
  * Assert that given characters, numbers, pointers or strings are
@@ -162,6 +162,7 @@ struct nala_test_t {
     int line;
     void (*func)(void);
     void (*before_fork_func)(void);
+    bool executed;
     int exit_code;
     int signal_number;
     float elapsed_time_ms;
