@@ -11,7 +11,7 @@ NALA ?= PYTHONPATH=../.. python3 -m nala
 
 test: nala_mocks.h
 	$(CC) $(CFLAGS) $$(cat nala_mocks.ld) *.c ../../nala/dist/nala.c -o main
-	./main
+	./main --continue-on-failure
 
 nala_mocks.h: main.c
 	[ -f nala_mocks.h ] || touch nala_mocks.h

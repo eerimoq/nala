@@ -77,7 +77,7 @@ __attribute__ ((weak)) void nala_resume_all_mocks(void)
 
 __attribute__ ((weak)) int nala_print_call_mask = 0;
 
-static bool exit_on_failure = false;
+static bool continue_on_failure = false;
 
 static const char *get_node(void)
 {
@@ -484,7 +484,7 @@ static int run_tests(struct nala_test_t *tests_p)
 
         print_test_result(test_p);
 
-        if ((res != 0) && exit_on_failure) {
+        if ((res != 0) && !continue_on_failure) {
             break;
         }
 
@@ -877,10 +877,10 @@ static void print_usage_and_exit(const char *program_name_p, int exit_code)
            "  test-pattern          Only run tests containing given pattern.\n"
            "\n"
            "optional arguments:\n"
-           "  -h, --help                Show this help message and exit.\n"
-           "  -v, --version             Print version information.\n"
-           "  -e, --exit-on-failure     Exit on first test failure.\n"
-           "  -a, --print-all-calls     Print all calls to ease debugging.\n",
+           "  -h, --help                    Show this help message and exit.\n"
+           "  -v, --version                 Print version information.\n"
+           "  -c, --continue-on-failure     Always run all tests.\n"
+           "  -a, --print-all-calls         Print all calls to ease debugging.\n",
            program_name_p);
     exit(exit_code);
 }
@@ -915,11 +915,11 @@ static void filter_tests(const char *test_pattern_p)
 __attribute__((weak)) int main(int argc, char *argv[])
 {
     static struct option long_options[] = {
-        { "help",            no_argument, NULL, 'h' },
-        { "version",         no_argument, NULL, 'v' },
-        { "exit-on-failure", no_argument, NULL, 'e' },
-        { "print-all-calls", no_argument, NULL, 'a' },
-        { NULL,              no_argument, NULL, 0 }
+        { "help",                no_argument, NULL, 'h' },
+        { "version",             no_argument, NULL, 'v' },
+        { "continue-on-failure", no_argument, NULL, 'c' },
+        { "print-all-calls",     no_argument, NULL, 'a' },
+        { NULL,                  no_argument, NULL, 0 }
     };
     int option;
 
@@ -943,8 +943,8 @@ __attribute__((weak)) int main(int argc, char *argv[])
             print_version_and_exit();
             break;
 
-        case 'e':
-            exit_on_failure = true;
+        case 'c':
+            continue_on_failure = true;
             break;
 
         case 'a':
