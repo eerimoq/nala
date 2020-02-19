@@ -21,6 +21,14 @@ struct nala_traceback_t {
     int depth;
 };
 
+typedef void (*nala_mock_assert_in_t)(
+    struct nala_traceback_t *traceback_p,
+    const char *func_p,
+    const char *param_p,
+    const void *left_p,
+    const void *right_p,
+    size_t size);
+
 void nala_suspend_all_mocks(void);
 void nala_resume_all_mocks(void);
 void nala_reset_all_mocks(void);

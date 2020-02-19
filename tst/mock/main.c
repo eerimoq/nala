@@ -447,7 +447,7 @@ TEST(variadic_function)
     bar_1 = 4;
     bar_2 = 4;
     io_control_mock_once(3, 0, "%p");
-    io_control_mock_set_va_arg_in_at(0, &bar_1, sizeof(bar_1));
+    io_control_mock_set_va_arg_in_at(0, &bar_1, sizeof(bar_1), NULL);
     ASSERT_EQ(io_control(3, &bar_2), 0);
 
     bar_1 = 3;
@@ -546,13 +546,39 @@ static void variadic_function_error_va_arg_in_entry(void *arg_p)
     bar_1 = 3;
     bar_2 = 4;
     io_control_mock_once(3, 0, "%p");
-    io_control_mock_set_va_arg_in_at(0, &bar_1, sizeof(bar_1));
+    io_control_mock_set_va_arg_in_at(0, &bar_1, sizeof(bar_1), NULL);
     io_control(3, &bar_2);
 }
 
 TEST(variadic_function_error_va_arg_in)
 {
     function_error_in_subprocess(variadic_function_error_va_arg_in_entry, NULL);
+}
+
+static void variadic_function_error_va_arg_in_custom_assert_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    struct variadic_function_t bar_1;
+    struct variadic_function_t bar_2;
+
+    bar_1.a = 3;
+    bar_1.b = 4;
+    bar_2.a = 3;
+    bar_2.b = 5;
+    io_control_mock_once(3, 0, "%p");
+    io_control_mock_set_va_arg_in_at(0,
+                                     &bar_1,
+                                     sizeof(bar_1),
+                                     nala_mock_assert_in_struct_variadic_function_t);
+    io_control(3, &bar_2);
+}
+
+TEST(variadic_function_error_va_arg_in_custom_assert)
+{
+    function_error_in_subprocess(
+        variadic_function_error_va_arg_in_custom_assert_entry,
+        "->b): 5 != 4");
 }
 
 static void variadic_function_error_bad_formt_string_entry(void *arg_p)

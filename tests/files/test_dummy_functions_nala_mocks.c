@@ -106,6 +106,7 @@ struct nala_va_arg_item_t {
     };
     struct nala_set_param in;
     struct nala_set_param out;
+    nala_mock_assert_in_t assert_in;
     struct nala_va_arg_item_t *next_p;
 };
 
@@ -339,7 +340,16 @@ void nala_va_arg_list_assert_p(struct nala_va_arg_item_t *item_p,
     }
 
     if (item_p->in.buf_p != NULL) {
-        ASSERT_MEMORY(value_p, item_p->in.buf_p, item_p->in.size);
+        if (item_p->assert_in != NULL) {
+            item_p->assert_in(NULL,
+                              "func",
+                              "param",
+                              value_p,
+                              item_p->in.buf_p,
+                              item_p->in.size);
+        } else {
+            ASSERT_MEMORY(value_p, item_p->in.buf_p, item_p->in.size);
+        }
     }
 
     if (item_p->out.buf_p != NULL) {
@@ -419,9 +429,14 @@ char *format_mock_traceback(const char *message_p,
     size_t file_size;
     char *formatted_traceback_p;
 
-    formatted_traceback_p = nala_mock_traceback_format(
-        &traceback_p->addresses[0],
-        traceback_p->depth);
+    if (traceback_p != NULL) {
+        formatted_traceback_p = nala_mock_traceback_format(
+            &traceback_p->addresses[0],
+            traceback_p->depth);
+    } else {
+        formatted_traceback_p = strdup("  Traceback missing.\n");
+    }
+
     file_p = open_memstream(&buf_p, &file_size);
     fprintf(file_p, "%s%s", message_p, formatted_traceback_p);
     fputc('\0', file_p);
@@ -7778,7 +7793,7 @@ void io_control_mock_ignore_va_arg_in_at(unsigned int index)
     nala_va_arg_list_get(va_arg_list_p, index)->ignore_in = true;
 }
 
-void io_control_mock_set_va_arg_in_at(unsigned int index, const void *buf_p, size_t size)
+void io_control_mock_set_va_arg_in_at(unsigned int index, const void *buf_p, size_t size, nala_mock_assert_in_t assert_in)
 {
     struct nala_va_arg_list_t *va_arg_list_p;
     struct nala_va_arg_item_t *item_p;
@@ -7786,6 +7801,7 @@ void io_control_mock_set_va_arg_in_at(unsigned int index, const void *buf_p, siz
     va_arg_list_p = &nala_get_params_io_control()->_nala_va_arg_list;
     item_p = nala_va_arg_list_get(va_arg_list_p, index);
     nala_set_param_buf(&item_p->in, buf_p, size);
+    item_p->assert_in = assert_in;
 }
 
 void io_control_mock_set_va_arg_in_pointer_at(unsigned int index, const void *buf_p)

@@ -27,6 +27,11 @@ typedef union union_type union_type;
 
 typedef struct struct_param_type struct_param_type;
 
+struct variadic_function_t {
+    int a;
+    int b;
+};
+
 int add(int x, int y);
 void output_message(const char *message);
 void keep_args_output_message(const char *message);

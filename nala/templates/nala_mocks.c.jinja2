@@ -487,7 +487,7 @@ void {{mock.func_name}}_mock_ignore_va_arg_in_at(unsigned int index)
     nala_va_arg_list_get(va_arg_list_p, index)->ignore_in = true;
 }
 
-void {{mock.func_name}}_mock_set_va_arg_in_at(unsigned int index, const void *buf_p, size_t size)
+void {{mock.func_name}}_mock_set_va_arg_in_at(unsigned int index, const void *buf_p, size_t size, nala_mock_assert_in_t assert_in)
 {
     struct nala_va_arg_list_t *va_arg_list_p;
     struct nala_va_arg_item_t *item_p;
@@ -495,6 +495,7 @@ void {{mock.func_name}}_mock_set_va_arg_in_at(unsigned int index, const void *bu
     va_arg_list_p = &nala_get_params_{{mock.func_name}}()->_nala_va_arg_list;
     item_p = nala_va_arg_list_get(va_arg_list_p, index);
     nala_set_param_buf(&item_p->in, buf_p, size);
+    item_p->assert_in = assert_in;
 }
 
 void {{mock.func_name}}_mock_set_va_arg_in_pointer_at(unsigned int index, const void *buf_p)
