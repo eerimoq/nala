@@ -415,6 +415,8 @@ char *format_mock_traceback(const char *message_p,
     size_t file_size;
     char *formatted_traceback_p;
 
+    nala_reset_all_mocks();
+
     if (traceback_p != NULL) {
         formatted_traceback_p = nala_mock_traceback_format(
             &traceback_p->addresses[0],
