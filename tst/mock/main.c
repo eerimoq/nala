@@ -742,12 +742,15 @@ TEST(double_pointer_function)
 
 TEST(rename_parameters)
 {
+    clock_gettime_mock_ignore_in(0);
+    clock_settime_mock_ignore_in(0);
     close_mock_ignore_in(0);
     connect_mock_ignore_in(0);
     endmntent_mock_ignore_in(0);
     fclose_mock(0);
     fopen_mock_ignore_in(NULL);
     /* fread_mock(ptr, size, nmemb, stream); */
+    freeaddrinfo_mock_ignore_in();
     fseek_mock_ignore_in(0);
     ftell_mock_ignore_in(0);
     fwrite_mock_ignore_in(0);

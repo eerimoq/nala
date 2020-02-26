@@ -3,6 +3,8 @@
 # In alphabetical order.
 #
 
+clock_gettime(clk_id, tp)
+clock_settime(clk_id, tp)
 close(fd)
 connect(sockfd, addr, addrlen)
 dup(oldfd)
@@ -14,6 +16,7 @@ fileno(stream)
 fopen(path, mode)
 fread(ptr, size, nmemb, stream)
 free(ptr)
+freeaddrinfo(res)
 fseek(stream, offset, whence)
 ftell(stream)
 fwrite(ptr, size, nmemb, stream)
