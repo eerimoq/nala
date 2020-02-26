@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <poll.h>
 #include <mntent.h>
+#include <netdb.h>
 
 #include "subprocess.h"
 #include "nala.h"
@@ -742,6 +743,7 @@ TEST(double_pointer_function)
 TEST(rename_parameters)
 {
     close_mock_ignore_in(0);
+    connect_mock_ignore_in(0);
     endmntent_mock_ignore_in(0);
     fclose_mock(0);
     fopen_mock_ignore_in(NULL);
@@ -749,6 +751,7 @@ TEST(rename_parameters)
     fseek_mock_ignore_in(0);
     ftell_mock_ignore_in(0);
     fwrite_mock_ignore_in(0);
+    getaddrinfo_mock_ignore_in(0);
     getmntent_mock_ignore_in(NULL);
     mount_mock_ignore_in(0);
     /* nftw_mock(dirpath, fn, nopenfd, flags); */
@@ -757,6 +760,7 @@ TEST(rename_parameters)
     read_mock_ignore_in(0);
     sendto_mock_ignore_in(0);
     setsockopt_mock_ignore_in(0);
+    socket_mock_ignore_in(0);
     sleep_mock_ignore_in(0);
     statvfs_mock_ignore_in(0);
     time_mock_ignore_in(0);
