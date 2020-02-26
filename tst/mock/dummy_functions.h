@@ -32,6 +32,13 @@ struct variadic_function_t {
     int b;
 };
 
+struct likely_undefined_padding_t {
+    char a;
+    long b;
+    char c;
+    long d;
+};
+
 int add(int x, int y);
 void output_message(const char *message);
 void keep_args_output_message(const char *message);
@@ -54,5 +61,6 @@ union union_type union_param_and_return_type(union union_type arg);
 struct_param_type typedef_struct_param_and_return_type(struct_param_type arg);
 union_type typedef_union_param_and_return_type(union_type arg);
 int double_pointer(int **value_pp);
+void likely_undefined_padding(struct likely_undefined_padding_t *value_p);
 
 #endif

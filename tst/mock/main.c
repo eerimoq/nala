@@ -859,3 +859,33 @@ TEST(poll_real_once)
     ASSERT_EQ(poll(&fds[0], 1, -1), 1);
     ASSERT_EQ(fds[0].revents, POLLHUP);
 }
+
+TEST(assert_structs_with_likely_undefined_padding)
+{
+    struct likely_undefined_padding_t value;
+
+    /* Padding -1. */
+    memset(&value, -1, sizeof(value));
+    value.a = 0;
+    value.b = 0;
+    value.c = 0;
+    value.d = 0;
+    likely_undefined_padding_mock_once();
+    likely_undefined_padding_mock_set_value_p_in(&value, sizeof(value));
+
+    value.a = 0;
+    value.b = 2;
+    value.c = 0;
+    value.d = 2;
+    likely_undefined_padding_mock_set_value_p_out(&value, sizeof(value));
+
+    /* Padding 0 (different from -1). */
+    memset(&value, 0, sizeof(value));
+    value.a = 0;
+    value.b = 0;
+    value.c = 0;
+    value.d = 0;
+    likely_undefined_padding(&value);
+    ASSERT_EQ(value.b, 2);
+    ASSERT_EQ(value.d, 2);
+}

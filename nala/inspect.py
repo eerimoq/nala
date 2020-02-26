@@ -118,6 +118,39 @@ def rename_parameters(function_declaration, param_names):
     return function_declaration
 
 
+PRIMITIVE_TYPES = [
+    'char',
+    'signed char',
+    'unsigned char',
+    'short',
+    'short int',
+    'signed short',
+    'signed short int',
+    'unsigned short',
+    'unsigned short int',
+    'int',
+    'signed',
+    'signed int',
+    'unsigned',
+    'unsigned int',
+    'long',
+    'long int',
+    'signed long',
+    'signed long int',
+    'unsigned long',
+    'unsigned long int',
+    'long long',
+    'long long int',
+    'signed long long',
+    'signed long long int',
+    'unsigned long long',
+    'unsigned long long int',
+    'float',
+    'double',
+    'long double'
+]
+
+
 class ForgivingDeclarationParser:
     linemarker = re.compile(r'^# \d+ "((?:\\.|[^\\"])*)"((?: [1234])*)$')
 
@@ -244,7 +277,7 @@ class ForgivingDeclarationParser:
 
         if isinstance(member.type, node.TypeDecl):
             if isinstance(member.type.type, node.IdentifierType):
-                if 'int' in member.type.type.names:
+                if ' '.join(member.type.type.names) in PRIMITIVE_TYPES:
                     item = ('assert-eq', member.name)
 
         return item

@@ -121,3 +121,9 @@ int double_pointer(int **value_pp)
 
     return (5);
 }
+
+void likely_undefined_padding(struct likely_undefined_padding_t *value_p)
+{
+    value_p->b++;
+    value_p->d++;
+}
