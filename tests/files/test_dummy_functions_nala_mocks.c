@@ -1355,7 +1355,18 @@ void call_mock_set_callback_in(const void *buf_p, size_t size)
 
 void call_mock_set_callback_in_assert(void (*callback)(int (*callback)(int value), const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_call()->callback_in_assert = callback;
+    struct _nala_data_params_for_call *_nala_params_p;
+
+    _nala_params_p = nala_get_params_call();
+
+    if (_nala_params_p->callback_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "call_mock_set_callback_in() must be called "
+                "before call_mock_set_callback_in_assert().\n"));
+    }
+
+    _nala_params_p->callback_in_assert = callback;
 }
 
 void call_mock_set_callback_in_pointer(int (*callback)(int value))
@@ -1958,7 +1969,18 @@ void compose_twice_mock_set_dummy_struct_in(const void *buf_p, size_t size)
 
 void compose_twice_mock_set_dummy_struct_in_assert(void (*callback)(DummyStruct *dummy_struct, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_compose_twice()->dummy_struct_in_assert = callback;
+    struct _nala_data_params_for_compose_twice *_nala_params_p;
+
+    _nala_params_p = nala_get_params_compose_twice();
+
+    if (_nala_params_p->dummy_struct_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "compose_twice_mock_set_dummy_struct_in() must be called "
+                "before compose_twice_mock_set_dummy_struct_in_assert().\n"));
+    }
+
+    _nala_params_p->dummy_struct_in_assert = callback;
 }
 
 void compose_twice_mock_set_dummy_struct_in_pointer(DummyStruct *dummy_struct)
@@ -1991,7 +2013,18 @@ void compose_twice_mock_set_dummy_struct_modifier_in(const void *buf_p, size_t s
 
 void compose_twice_mock_set_dummy_struct_modifier_in_assert(void (*callback)(DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct), const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_compose_twice()->dummy_struct_modifier_in_assert = callback;
+    struct _nala_data_params_for_compose_twice *_nala_params_p;
+
+    _nala_params_p = nala_get_params_compose_twice();
+
+    if (_nala_params_p->dummy_struct_modifier_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "compose_twice_mock_set_dummy_struct_modifier_in() must be called "
+                "before compose_twice_mock_set_dummy_struct_modifier_in_assert().\n"));
+    }
+
+    _nala_params_p->dummy_struct_modifier_in_assert = callback;
 }
 
 void compose_twice_mock_set_dummy_struct_modifier_in_pointer(DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct))
@@ -2302,7 +2335,18 @@ void double_pointer_mock_set_value_pp_in(const void *buf_p, size_t size)
 
 void double_pointer_mock_set_value_pp_in_assert(void (*callback)(int **value_pp, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_double_pointer()->value_pp_in_assert = callback;
+    struct _nala_data_params_for_double_pointer *_nala_params_p;
+
+    _nala_params_p = nala_get_params_double_pointer();
+
+    if (_nala_params_p->value_pp_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "double_pointer_mock_set_value_pp_in() must be called "
+                "before double_pointer_mock_set_value_pp_in_assert().\n"));
+    }
+
+    _nala_params_p->value_pp_in_assert = callback;
 }
 
 void double_pointer_mock_set_value_pp_in_pointer(int **value_pp)
@@ -3171,7 +3215,18 @@ void edit_number_mock_set_dummy_struct_in(const void *buf_p, size_t size)
 
 void edit_number_mock_set_dummy_struct_in_assert(void (*callback)(DummyStruct *dummy_struct, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_edit_number()->dummy_struct_in_assert = callback;
+    struct _nala_data_params_for_edit_number *_nala_params_p;
+
+    _nala_params_p = nala_get_params_edit_number();
+
+    if (_nala_params_p->dummy_struct_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "edit_number_mock_set_dummy_struct_in() must be called "
+                "before edit_number_mock_set_dummy_struct_in_assert().\n"));
+    }
+
+    _nala_params_p->dummy_struct_in_assert = callback;
 }
 
 void edit_number_mock_set_dummy_struct_in_pointer(DummyStruct *dummy_struct)
@@ -3482,7 +3537,18 @@ void endmntent_mock_set_streamp_in(const void *buf_p, size_t size)
 
 void endmntent_mock_set_streamp_in_assert(void (*callback)(FILE *streamp, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_endmntent()->streamp_in_assert = callback;
+    struct _nala_data_params_for_endmntent *_nala_params_p;
+
+    _nala_params_p = nala_get_params_endmntent();
+
+    if (_nala_params_p->streamp_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "endmntent_mock_set_streamp_in() must be called "
+                "before endmntent_mock_set_streamp_in_assert().\n"));
+    }
+
+    _nala_params_p->streamp_in_assert = callback;
 }
 
 void endmntent_mock_set_streamp_in_pointer(FILE *streamp)
@@ -4048,7 +4114,18 @@ void fclose_mock_set_stream_in(const void *buf_p, size_t size)
 
 void fclose_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_fclose()->stream_in_assert = callback;
+    struct _nala_data_params_for_fclose *_nala_params_p;
+
+    _nala_params_p = nala_get_params_fclose();
+
+    if (_nala_params_p->stream_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "fclose_mock_set_stream_in() must be called "
+                "before fclose_mock_set_stream_in_assert().\n"));
+    }
+
+    _nala_params_p->stream_in_assert = callback;
 }
 
 void fclose_mock_set_stream_in_pointer(FILE *stream)
@@ -4359,7 +4436,18 @@ void fflush_mock_set_stream_in(const void *buf_p, size_t size)
 
 void fflush_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_fflush()->stream_in_assert = callback;
+    struct _nala_data_params_for_fflush *_nala_params_p;
+
+    _nala_params_p = nala_get_params_fflush();
+
+    if (_nala_params_p->stream_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "fflush_mock_set_stream_in() must be called "
+                "before fflush_mock_set_stream_in_assert().\n"));
+    }
+
+    _nala_params_p->stream_in_assert = callback;
 }
 
 void fflush_mock_set_stream_in_pointer(FILE *stream)
@@ -4670,7 +4758,18 @@ void fileno_mock_set_stream_in(const void *buf_p, size_t size)
 
 void fileno_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_fileno()->stream_in_assert = callback;
+    struct _nala_data_params_for_fileno *_nala_params_p;
+
+    _nala_params_p = nala_get_params_fileno();
+
+    if (_nala_params_p->stream_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "fileno_mock_set_stream_in() must be called "
+                "before fileno_mock_set_stream_in_assert().\n"));
+    }
+
+    _nala_params_p->stream_in_assert = callback;
 }
 
 void fileno_mock_set_stream_in_pointer(FILE *stream)
@@ -5050,7 +5149,18 @@ void fopen_mock_set_path_in(const void *buf_p, size_t size)
 
 void fopen_mock_set_path_in_assert(void (*callback)(const char *path, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_fopen()->path_in_assert = callback;
+    struct _nala_data_params_for_fopen *_nala_params_p;
+
+    _nala_params_p = nala_get_params_fopen();
+
+    if (_nala_params_p->path_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "fopen_mock_set_path_in() must be called "
+                "before fopen_mock_set_path_in_assert().\n"));
+    }
+
+    _nala_params_p->path_in_assert = callback;
 }
 
 void fopen_mock_set_path_in_pointer(const char *path)
@@ -5083,7 +5193,18 @@ void fopen_mock_set_mode_in(const void *buf_p, size_t size)
 
 void fopen_mock_set_mode_in_assert(void (*callback)(const char *mode, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_fopen()->mode_in_assert = callback;
+    struct _nala_data_params_for_fopen *_nala_params_p;
+
+    _nala_params_p = nala_get_params_fopen();
+
+    if (_nala_params_p->mode_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "fopen_mock_set_mode_in() must be called "
+                "before fopen_mock_set_mode_in_assert().\n"));
+    }
+
+    _nala_params_p->mode_in_assert = callback;
 }
 
 void fopen_mock_set_mode_in_pointer(const char *mode)
@@ -5449,7 +5570,18 @@ void fread_mock_set_ptr_in(const void *buf_p, size_t size)
 
 void fread_mock_set_ptr_in_assert(void (*callback)(void *ptr, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_fread()->ptr_in_assert = callback;
+    struct _nala_data_params_for_fread *_nala_params_p;
+
+    _nala_params_p = nala_get_params_fread();
+
+    if (_nala_params_p->ptr_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "fread_mock_set_ptr_in() must be called "
+                "before fread_mock_set_ptr_in_assert().\n"));
+    }
+
+    _nala_params_p->ptr_in_assert = callback;
 }
 
 void fread_mock_set_ptr_in_pointer(void *ptr)
@@ -5482,7 +5614,18 @@ void fread_mock_set_stream_in(const void *buf_p, size_t size)
 
 void fread_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_fread()->stream_in_assert = callback;
+    struct _nala_data_params_for_fread *_nala_params_p;
+
+    _nala_params_p = nala_get_params_fread();
+
+    if (_nala_params_p->stream_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "fread_mock_set_stream_in() must be called "
+                "before fread_mock_set_stream_in_assert().\n"));
+    }
+
+    _nala_params_p->stream_in_assert = callback;
 }
 
 void fread_mock_set_stream_in_pointer(FILE *stream)
@@ -5783,7 +5926,18 @@ void free_mock_set_ptr_in(const void *buf_p, size_t size)
 
 void free_mock_set_ptr_in_assert(void (*callback)(void *ptr, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_free()->ptr_in_assert = callback;
+    struct _nala_data_params_for_free *_nala_params_p;
+
+    _nala_params_p = nala_get_params_free();
+
+    if (_nala_params_p->ptr_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "free_mock_set_ptr_in() must be called "
+                "before free_mock_set_ptr_in_assert().\n"));
+    }
+
+    _nala_params_p->ptr_in_assert = callback;
 }
 
 void free_mock_set_ptr_in_pointer(void *ptr)
@@ -6122,7 +6276,18 @@ void fseek_mock_set_stream_in(const void *buf_p, size_t size)
 
 void fseek_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_fseek()->stream_in_assert = callback;
+    struct _nala_data_params_for_fseek *_nala_params_p;
+
+    _nala_params_p = nala_get_params_fseek();
+
+    if (_nala_params_p->stream_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "fseek_mock_set_stream_in() must be called "
+                "before fseek_mock_set_stream_in_assert().\n"));
+    }
+
+    _nala_params_p->stream_in_assert = callback;
 }
 
 void fseek_mock_set_stream_in_pointer(FILE *stream)
@@ -6433,7 +6598,18 @@ void ftell_mock_set_stream_in(const void *buf_p, size_t size)
 
 void ftell_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_ftell()->stream_in_assert = callback;
+    struct _nala_data_params_for_ftell *_nala_params_p;
+
+    _nala_params_p = nala_get_params_ftell();
+
+    if (_nala_params_p->stream_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "ftell_mock_set_stream_in() must be called "
+                "before ftell_mock_set_stream_in_assert().\n"));
+    }
+
+    _nala_params_p->stream_in_assert = callback;
 }
 
 void ftell_mock_set_stream_in_pointer(FILE *stream)
@@ -6799,7 +6975,18 @@ void fwrite_mock_set_ptr_in(const void *buf_p, size_t size)
 
 void fwrite_mock_set_ptr_in_assert(void (*callback)(const void *ptr, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_fwrite()->ptr_in_assert = callback;
+    struct _nala_data_params_for_fwrite *_nala_params_p;
+
+    _nala_params_p = nala_get_params_fwrite();
+
+    if (_nala_params_p->ptr_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "fwrite_mock_set_ptr_in() must be called "
+                "before fwrite_mock_set_ptr_in_assert().\n"));
+    }
+
+    _nala_params_p->ptr_in_assert = callback;
 }
 
 void fwrite_mock_set_ptr_in_pointer(const void *ptr)
@@ -6832,7 +7019,18 @@ void fwrite_mock_set_stream_in(const void *buf_p, size_t size)
 
 void fwrite_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_fwrite()->stream_in_assert = callback;
+    struct _nala_data_params_for_fwrite *_nala_params_p;
+
+    _nala_params_p = nala_get_params_fwrite();
+
+    if (_nala_params_p->stream_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "fwrite_mock_set_stream_in() must be called "
+                "before fwrite_mock_set_stream_in_assert().\n"));
+    }
+
+    _nala_params_p->stream_in_assert = callback;
 }
 
 void fwrite_mock_set_stream_in_pointer(FILE *stream)
@@ -7143,7 +7341,18 @@ void getmntent_mock_set_stream_in(const void *buf_p, size_t size)
 
 void getmntent_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_getmntent()->stream_in_assert = callback;
+    struct _nala_data_params_for_getmntent *_nala_params_p;
+
+    _nala_params_p = nala_get_params_getmntent();
+
+    if (_nala_params_p->stream_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "getmntent_mock_set_stream_in() must be called "
+                "before getmntent_mock_set_stream_in_assert().\n"));
+    }
+
+    _nala_params_p->stream_in_assert = callback;
 }
 
 void getmntent_mock_set_stream_in_pointer(FILE *stream)
@@ -7444,7 +7653,18 @@ void in_out_mock_set_buf_p_in(const void *buf_p, size_t size)
 
 void in_out_mock_set_buf_p_in_assert(void (*callback)(int *buf_p, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_in_out()->buf_p_in_assert = callback;
+    struct _nala_data_params_for_in_out *_nala_params_p;
+
+    _nala_params_p = nala_get_params_in_out();
+
+    if (_nala_params_p->buf_p_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "in_out_mock_set_buf_p_in() must be called "
+                "before in_out_mock_set_buf_p_in_assert().\n"));
+    }
+
+    _nala_params_p->buf_p_in_assert = callback;
 }
 
 void in_out_mock_set_buf_p_in_pointer(int *buf_p)
@@ -8808,7 +9028,18 @@ void mount_mock_set_source_in(const void *buf_p, size_t size)
 
 void mount_mock_set_source_in_assert(void (*callback)(const char *source, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_mount()->source_in_assert = callback;
+    struct _nala_data_params_for_mount *_nala_params_p;
+
+    _nala_params_p = nala_get_params_mount();
+
+    if (_nala_params_p->source_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "mount_mock_set_source_in() must be called "
+                "before mount_mock_set_source_in_assert().\n"));
+    }
+
+    _nala_params_p->source_in_assert = callback;
 }
 
 void mount_mock_set_source_in_pointer(const char *source)
@@ -8841,7 +9072,18 @@ void mount_mock_set_target_in(const void *buf_p, size_t size)
 
 void mount_mock_set_target_in_assert(void (*callback)(const char *target, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_mount()->target_in_assert = callback;
+    struct _nala_data_params_for_mount *_nala_params_p;
+
+    _nala_params_p = nala_get_params_mount();
+
+    if (_nala_params_p->target_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "mount_mock_set_target_in() must be called "
+                "before mount_mock_set_target_in_assert().\n"));
+    }
+
+    _nala_params_p->target_in_assert = callback;
 }
 
 void mount_mock_set_target_in_pointer(const char *target)
@@ -8874,7 +9116,18 @@ void mount_mock_set_filesystemtype_in(const void *buf_p, size_t size)
 
 void mount_mock_set_filesystemtype_in_assert(void (*callback)(const char *filesystemtype, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_mount()->filesystemtype_in_assert = callback;
+    struct _nala_data_params_for_mount *_nala_params_p;
+
+    _nala_params_p = nala_get_params_mount();
+
+    if (_nala_params_p->filesystemtype_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "mount_mock_set_filesystemtype_in() must be called "
+                "before mount_mock_set_filesystemtype_in_assert().\n"));
+    }
+
+    _nala_params_p->filesystemtype_in_assert = callback;
 }
 
 void mount_mock_set_filesystemtype_in_pointer(const char *filesystemtype)
@@ -8907,7 +9160,18 @@ void mount_mock_set_data_in(const void *buf_p, size_t size)
 
 void mount_mock_set_data_in_assert(void (*callback)(const void *data, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_mount()->data_in_assert = callback;
+    struct _nala_data_params_for_mount *_nala_params_p;
+
+    _nala_params_p = nala_get_params_mount();
+
+    if (_nala_params_p->data_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "mount_mock_set_data_in() must be called "
+                "before mount_mock_set_data_in_assert().\n"));
+    }
+
+    _nala_params_p->data_in_assert = callback;
 }
 
 void mount_mock_set_data_in_pointer(const void *data)
@@ -9229,7 +9493,18 @@ void output_message_mock_set_message_in(const void *buf_p, size_t size)
 
 void output_message_mock_set_message_in_assert(void (*callback)(const char *message, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_output_message()->message_in_assert = callback;
+    struct _nala_data_params_for_output_message *_nala_params_p;
+
+    _nala_params_p = nala_get_params_output_message();
+
+    if (_nala_params_p->message_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "output_message_mock_set_message_in() must be called "
+                "before output_message_mock_set_message_in_assert().\n"));
+    }
+
+    _nala_params_p->message_in_assert = callback;
 }
 
 void output_message_mock_set_message_in_pointer(const char *message)
@@ -9540,7 +9815,18 @@ void pipe_mock_set_pipefd_in(const void *buf_p, size_t size)
 
 void pipe_mock_set_pipefd_in_assert(void (*callback)(int pipefd[2], const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_pipe()->pipefd_in_assert = callback;
+    struct _nala_data_params_for_pipe *_nala_params_p;
+
+    _nala_params_p = nala_get_params_pipe();
+
+    if (_nala_params_p->pipefd_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "pipe_mock_set_pipefd_in() must be called "
+                "before pipe_mock_set_pipefd_in_assert().\n"));
+    }
+
+    _nala_params_p->pipefd_in_assert = callback;
 }
 
 void pipe_mock_set_pipefd_in_pointer(int pipefd[2])
@@ -9879,7 +10165,18 @@ void poll_mock_set_fds_in(const void *buf_p, size_t size)
 
 void poll_mock_set_fds_in_assert(void (*callback)(struct pollfd *fds, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_poll()->fds_in_assert = callback;
+    struct _nala_data_params_for_poll *_nala_params_p;
+
+    _nala_params_p = nala_get_params_poll();
+
+    if (_nala_params_p->fds_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "poll_mock_set_fds_in() must be called "
+                "before poll_mock_set_fds_in_assert().\n"));
+    }
+
+    _nala_params_p->fds_in_assert = callback;
 }
 
 void poll_mock_set_fds_in_pointer(struct pollfd *fds)
@@ -10460,7 +10757,18 @@ void read_mock_set_buf_in(const void *buf_p, size_t size)
 
 void read_mock_set_buf_in_assert(void (*callback)(void *buf, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_read()->buf_in_assert = callback;
+    struct _nala_data_params_for_read *_nala_params_p;
+
+    _nala_params_p = nala_get_params_read();
+
+    if (_nala_params_p->buf_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "read_mock_set_buf_in() must be called "
+                "before read_mock_set_buf_in_assert().\n"));
+    }
+
+    _nala_params_p->buf_in_assert = callback;
 }
 
 void read_mock_set_buf_in_pointer(void *buf)
@@ -10854,7 +11162,18 @@ void sendto_mock_set_buf_in(const void *buf_p, size_t size)
 
 void sendto_mock_set_buf_in_assert(void (*callback)(const void *buf, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_sendto()->buf_in_assert = callback;
+    struct _nala_data_params_for_sendto *_nala_params_p;
+
+    _nala_params_p = nala_get_params_sendto();
+
+    if (_nala_params_p->buf_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "sendto_mock_set_buf_in() must be called "
+                "before sendto_mock_set_buf_in_assert().\n"));
+    }
+
+    _nala_params_p->buf_in_assert = callback;
 }
 
 void sendto_mock_set_buf_in_pointer(const void *buf)
@@ -10887,7 +11206,18 @@ void sendto_mock_set_dest_addr_in(const void *buf_p, size_t size)
 
 void sendto_mock_set_dest_addr_in_assert(void (*callback)(const struct sockaddr *dest_addr, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_sendto()->dest_addr_in_assert = callback;
+    struct _nala_data_params_for_sendto *_nala_params_p;
+
+    _nala_params_p = nala_get_params_sendto();
+
+    if (_nala_params_p->dest_addr_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "sendto_mock_set_dest_addr_in() must be called "
+                "before sendto_mock_set_dest_addr_in_assert().\n"));
+    }
+
+    _nala_params_p->dest_addr_in_assert = callback;
 }
 
 void sendto_mock_set_dest_addr_in_pointer(const struct sockaddr *dest_addr)
@@ -11254,7 +11584,18 @@ void setsockopt_mock_set_optval_in(const void *buf_p, size_t size)
 
 void setsockopt_mock_set_optval_in_assert(void (*callback)(const void *optval, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_setsockopt()->optval_in_assert = callback;
+    struct _nala_data_params_for_setsockopt *_nala_params_p;
+
+    _nala_params_p = nala_get_params_setsockopt();
+
+    if (_nala_params_p->optval_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "setsockopt_mock_set_optval_in() must be called "
+                "before setsockopt_mock_set_optval_in_assert().\n"));
+    }
+
+    _nala_params_p->optval_in_assert = callback;
 }
 
 void setsockopt_mock_set_optval_in_pointer(const void *optval)
@@ -11878,7 +12219,18 @@ void statvfs_mock_set_path_in(const void *buf_p, size_t size)
 
 void statvfs_mock_set_path_in_assert(void (*callback)(const char *path, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_statvfs()->path_in_assert = callback;
+    struct _nala_data_params_for_statvfs *_nala_params_p;
+
+    _nala_params_p = nala_get_params_statvfs();
+
+    if (_nala_params_p->path_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "statvfs_mock_set_path_in() must be called "
+                "before statvfs_mock_set_path_in_assert().\n"));
+    }
+
+    _nala_params_p->path_in_assert = callback;
 }
 
 void statvfs_mock_set_path_in_pointer(const char *path)
@@ -11911,7 +12263,18 @@ void statvfs_mock_set_buf_in(const void *buf_p, size_t size)
 
 void statvfs_mock_set_buf_in_assert(void (*callback)(struct statvfs *buf, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_statvfs()->buf_in_assert = callback;
+    struct _nala_data_params_for_statvfs *_nala_params_p;
+
+    _nala_params_p = nala_get_params_statvfs();
+
+    if (_nala_params_p->buf_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "statvfs_mock_set_buf_in() must be called "
+                "before statvfs_mock_set_buf_in_assert().\n"));
+    }
+
+    _nala_params_p->buf_in_assert = callback;
 }
 
 void statvfs_mock_set_buf_in_pointer(struct statvfs *buf)
@@ -12212,7 +12575,18 @@ void struct_param_mock_set_data_in(const void *buf_p, size_t size)
 
 void struct_param_mock_set_data_in_assert(void (*callback)(struct struct_param_type *data, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_struct_param()->data_in_assert = callback;
+    struct _nala_data_params_for_struct_param *_nala_params_p;
+
+    _nala_params_p = nala_get_params_struct_param();
+
+    if (_nala_params_p->data_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "struct_param_mock_set_data_in() must be called "
+                "before struct_param_mock_set_data_in_assert().\n"));
+    }
+
+    _nala_params_p->data_in_assert = callback;
 }
 
 void struct_param_mock_set_data_in_pointer(struct struct_param_type *data)
@@ -12775,7 +13149,18 @@ void time_mock_set_tloc_in(const void *buf_p, size_t size)
 
 void time_mock_set_tloc_in_assert(void (*callback)(time_t *tloc, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_time()->tloc_in_assert = callback;
+    struct _nala_data_params_for_time *_nala_params_p;
+
+    _nala_params_p = nala_get_params_time();
+
+    if (_nala_params_p->tloc_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "time_mock_set_tloc_in() must be called "
+                "before time_mock_set_tloc_in_assert().\n"));
+    }
+
+    _nala_params_p->tloc_in_assert = callback;
 }
 
 void time_mock_set_tloc_in_pointer(time_t *tloc)
@@ -13141,7 +13526,18 @@ void timerfd_settime_mock_set_new_value_in(const void *buf_p, size_t size)
 
 void timerfd_settime_mock_set_new_value_in_assert(void (*callback)(const struct itimerspec *new_value, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_timerfd_settime()->new_value_in_assert = callback;
+    struct _nala_data_params_for_timerfd_settime *_nala_params_p;
+
+    _nala_params_p = nala_get_params_timerfd_settime();
+
+    if (_nala_params_p->new_value_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "timerfd_settime_mock_set_new_value_in() must be called "
+                "before timerfd_settime_mock_set_new_value_in_assert().\n"));
+    }
+
+    _nala_params_p->new_value_in_assert = callback;
 }
 
 void timerfd_settime_mock_set_new_value_in_pointer(const struct itimerspec *new_value)
@@ -13174,7 +13570,18 @@ void timerfd_settime_mock_set_old_value_in(const void *buf_p, size_t size)
 
 void timerfd_settime_mock_set_old_value_in_assert(void (*callback)(struct itimerspec *old_value, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_timerfd_settime()->old_value_in_assert = callback;
+    struct _nala_data_params_for_timerfd_settime *_nala_params_p;
+
+    _nala_params_p = nala_get_params_timerfd_settime();
+
+    if (_nala_params_p->old_value_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "timerfd_settime_mock_set_old_value_in() must be called "
+                "before timerfd_settime_mock_set_old_value_in_assert().\n"));
+    }
+
+    _nala_params_p->old_value_in_assert = callback;
 }
 
 void timerfd_settime_mock_set_old_value_in_pointer(struct itimerspec *old_value)
@@ -14786,7 +15193,18 @@ void write_mock_set_buf_in(const void *buf_p, size_t size)
 
 void write_mock_set_buf_in_assert(void (*callback)(const void *buf, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_write()->buf_in_assert = callback;
+    struct _nala_data_params_for_write *_nala_params_p;
+
+    _nala_params_p = nala_get_params_write();
+
+    if (_nala_params_p->buf_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "write_mock_set_buf_in() must be called "
+                "before write_mock_set_buf_in_assert().\n"));
+    }
+
+    _nala_params_p->buf_in_assert = callback;
 }
 
 void write_mock_set_buf_in_pointer(const void *buf)

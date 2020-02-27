@@ -453,7 +453,18 @@ void {{mock.func_name}}_mock_set_{{param.name}}_in(const void *buf_p, size_t siz
 
 void {{mock.func_name}}_mock_set_{{param.name}}_in_assert(void (*callback)({{param | render}}, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_{{mock.func_name}}()->{{param.name}}_in_assert = callback;
+    struct _nala_data_params_for_{{mock.func_name}} *_nala_params_p;
+
+    _nala_params_p = nala_get_params_{{mock.func_name}}();
+
+    if (_nala_params_p->{{param.name}}_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "{{mock.func_name}}_mock_set_{{param.name}}_in() must be called "
+                "before {{mock.func_name}}_mock_set_{{param.name}}_in_assert().\n"));
+    }
+
+    _nala_params_p->{{param.name}}_in_assert = callback;
 }
 
 void {{mock.func_name}}_mock_set_{{param.name}}_in_pointer({{param | render}})

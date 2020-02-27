@@ -889,3 +889,31 @@ TEST(assert_structs_with_likely_undefined_padding)
     ASSERT_EQ(value.b, 2);
     ASSERT_EQ(value.d, 2);
 }
+
+static void fail_if_in_assert_is_called_before_set_in_in_assert(
+    struct likely_undefined_padding_t *value_p,
+    const void *buf_p,
+    size_t size)
+{
+    (void)value_p;
+    (void)buf_p;
+    (void)size;
+}
+
+static void fail_if_in_assert_is_called_before_set_in_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    likely_undefined_padding_mock_once();
+    likely_undefined_padding_mock_set_value_p_in_assert(
+        fail_if_in_assert_is_called_before_set_in_in_assert);
+    likely_undefined_padding(NULL);
+}
+
+TEST(fail_if_in_assert_is_called_before_set_in)
+{
+    function_error_in_subprocess(
+        fail_if_in_assert_is_called_before_set_in_entry,
+        "likely_undefined_padding_mock_set_value_p_in() must be called "
+        "before likely_undefined_padding_mock_set_value_p_in_assert().");
+}
