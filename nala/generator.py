@@ -55,21 +55,21 @@ def is_struct(param):
     try:
         return isinstance(param.type.type, node.Struct)
     except AttributeError:
-        False
+        return False
 
 
 def is_union(param):
     try:
         return isinstance(param.type.type, node.Union)
     except AttributeError:
-        False
+        return False
 
 
 def is_va_list(param):
     try:
         return param.type.type.names[0] == 'va_list'
     except AttributeError:
-        False
+        return False
 
 
 def is_void(param):
@@ -158,10 +158,10 @@ def va_list_param(name):
 
 
 def is_variadic_func(params):
-    if len(params) == 0:
-        return False
-    else:
+    if params:
         return is_ellipsis(params[-1])
+    else:
+        return False
 
 
 def void_type(name):
@@ -324,7 +324,7 @@ class FunctionMock:
         self.set_params = []
         self.char_pointer_params = []
         self.pointer_params = []
-        self.non_pointer_params  = []
+        self.non_pointer_params = []
         self.ignore_params = []
 
         for param in self.func_params:

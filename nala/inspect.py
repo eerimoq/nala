@@ -8,7 +8,6 @@ from typing import Tuple
 
 from pycparser import c_ast as node
 from pycparser.c_parser import CParser
-from pycparser.plyparser import ParseError
 
 
 class IncludeDirective(NamedTuple):
@@ -173,7 +172,7 @@ class ForgivingDeclarationParser:
         ),
         "PUNCTUATION": (
             r"\.\.\.|>>=|<<=|\+=|-=|\*=|/=|%=|&=|\^=|\|=|>>|<<|\+\+|--|->|&&|\|\|""|<="
-            "|>=|==|!=|;|\{|\}|,|:|=|\(|\)|\[|\]|\.|&|!|~|-|\+|\*|/|%|<|>|\^|\||\?"
+            r"|>=|==|!=|;|\{|\}|,|:|=|\(|\)|\[|\]|\.|&|!|~|-|\+|\*|/|%|<|>|\^|\||\?"
         ),
         "SPACE": r"[ \t\v\n\f]*",
         "IGNORE": r".+?",
@@ -256,7 +255,7 @@ class ForgivingDeclarationParser:
         items = zip(self.func_names, self.func_source_contexts)
         func_offset = len(self.typedefs + self.structs_code)
 
-        for i, (func_name, source_context) in enumerate(items, func_offset):
+        for i, (func_name, _) in enumerate(items, func_offset):
             param_names = self.param_names.get(func_name)
 
             if param_names:
@@ -365,7 +364,7 @@ class ForgivingDeclarationParser:
         code = self.read_source_code(begin, self.current.span[1])
         self.typedefs.append(code)
 
-    def parse_struct(self, begin, name):
+    def parse_struct(self, begin, _name):
         while self.bracket_stack:
             self.next()
 
