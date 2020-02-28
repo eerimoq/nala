@@ -51,7 +51,7 @@ The test program takes optional arguments as below.
    Run tests.
 
    positional arguments:
-     test-pattern          Only run tests containing given pattern.
+     test-pattern                  Only run tests containing given pattern.
 
    optional arguments:
      -h, --help                    Show this help message and exit.
@@ -235,6 +235,12 @@ call functions above.
 
    <func>_mock_set_errno(int)        - errno on return
    <func>_mock_set_callback(*)       - additional checks and/or actions
+
+Get call parameters.
+
+.. code-block::
+
+    <func>_mock_get_params_in(int)   - get call parameters for given mock handle
 
 For selected function parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
