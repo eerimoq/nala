@@ -305,6 +305,8 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
     {{mock.state_name}}.data.errno_value = 0;
     {{mock.state_name}}.data.callback = NULL;
     nala_traceback(&{{mock.state_name}}.data.traceback);
+
+    return (0);
 }
 
 {{mock.mock_once_func | render}}
@@ -365,9 +367,11 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
 
     NALA_INSTANCES_APPEND({{mock.state_name}}.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
+int {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
 {
     {{mock.state_name}}.state.mode = MODE_MOCK;
     {% for param in mock.char_pointer_params %}
@@ -384,9 +388,11 @@ void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
     {% endif %}
     {{mock.state_name}}.data.errno_value = 0;
     {{mock.state_name}}.data.callback = NULL;
+
+    return (0);
 }
 
-void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
+int {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
 {
     struct _nala_instance_type_for_{{mock.func_name}} *instance_p;
 
@@ -424,6 +430,8 @@ void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
 
     NALA_INSTANCES_APPEND({{mock.state_name}}.instances,
                           instance_p);
+
+    return (0);
 }
 
 {{mock.set_errno_func | render}}
@@ -434,6 +442,17 @@ void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
 void {{mock.func_name}}_mock_set_callback({{mock.callback_decl | render}})
 {
     nala_get_data_{{mock.func_name}}()->callback = callback;
+}
+
+struct nala_{{mock.func_name}}_params_t *{{mock.func_name}}_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "{{mock.func_name}}_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 {% for param in mock.ignore_params %}
 

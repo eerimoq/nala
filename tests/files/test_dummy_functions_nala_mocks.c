@@ -985,7 +985,7 @@ int __wrap_add(int x, int y)
     return return_value;
 }
 
-void add_mock(int x, int y, int return_value)
+int add_mock(int x, int y, int return_value)
 {
     nala_state_for_add.state.mode = MODE_MOCK;
     nala_state_for_add.data.params.x = x;
@@ -996,9 +996,11 @@ void add_mock(int x, int y, int return_value)
     nala_state_for_add.data.errno_value = 0;
     nala_state_for_add.data.callback = NULL;
     nala_traceback(&nala_state_for_add.data.traceback);
+
+    return (0);
 }
 
-void add_mock_once(int x, int y, int return_value)
+int add_mock_once(int x, int y, int return_value)
 {
     struct _nala_instance_type_for_add *_nala_instance_p;
 
@@ -1017,9 +1019,11 @@ void add_mock_once(int x, int y, int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_add.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void add_mock_ignore_in(int return_value)
+int add_mock_ignore_in(int return_value)
 {
     nala_state_for_add.state.mode = MODE_MOCK;
     nala_state_for_add.data.params.ignore_x_in = true;
@@ -1027,9 +1031,11 @@ void add_mock_ignore_in(int return_value)
     nala_state_for_add.data.return_value = return_value;
     nala_state_for_add.data.errno_value = 0;
     nala_state_for_add.data.callback = NULL;
+
+    return (0);
 }
 
-void add_mock_ignore_in_once(int return_value)
+int add_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_add *instance_p;
 
@@ -1046,6 +1052,8 @@ void add_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_add.instances,
                           instance_p);
+
+    return (0);
 }
 
 void add_mock_set_errno(int errno_value)
@@ -1056,6 +1064,17 @@ void add_mock_set_errno(int errno_value)
 void add_mock_set_callback(void (*callback)(int x, int y))
 {
     nala_get_data_add()->callback = callback;
+}
+
+struct nala_add_params_t *add_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "add_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void add_mock_ignore_x_in(void)
@@ -1270,7 +1289,7 @@ int __wrap_call(int (*callback)(int value))
     return return_value;
 }
 
-void call_mock(int return_value)
+int call_mock(int return_value)
 {
     nala_state_for_call.state.mode = MODE_MOCK;
     nala_state_for_call.data.params.callback = NULL;
@@ -1279,9 +1298,11 @@ void call_mock(int return_value)
     nala_state_for_call.data.errno_value = 0;
     nala_state_for_call.data.callback = NULL;
     nala_traceback(&nala_state_for_call.data.traceback);
+
+    return (0);
 }
 
-void call_mock_once(int return_value)
+int call_mock_once(int return_value)
 {
     struct _nala_instance_type_for_call *_nala_instance_p;
 
@@ -1302,18 +1323,22 @@ void call_mock_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_call.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void call_mock_ignore_in(int return_value)
+int call_mock_ignore_in(int return_value)
 {
     nala_state_for_call.state.mode = MODE_MOCK;
     nala_state_for_call.data.params.ignore_callback_in = true;
     nala_state_for_call.data.return_value = return_value;
     nala_state_for_call.data.errno_value = 0;
     nala_state_for_call.data.callback = NULL;
+
+    return (0);
 }
 
-void call_mock_ignore_in_once(int return_value)
+int call_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_call *instance_p;
 
@@ -1334,6 +1359,8 @@ void call_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_call.instances,
                           instance_p);
+
+    return (0);
 }
 
 void call_mock_set_errno(int errno_value)
@@ -1344,6 +1371,17 @@ void call_mock_set_errno(int errno_value)
 void call_mock_set_callback(void (*callback)(int (*callback)(int value)))
 {
     nala_get_data_call()->callback = callback;
+}
+
+struct nala_call_params_t *call_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "call_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void call_mock_set_callback_in(const void *buf_p, size_t size)
@@ -1583,7 +1621,7 @@ int __wrap_close(int fd)
     return return_value;
 }
 
-void close_mock(int fd, int return_value)
+int close_mock(int fd, int return_value)
 {
     nala_state_for_close.state.mode = MODE_MOCK;
     nala_state_for_close.data.params.fd = fd;
@@ -1592,9 +1630,11 @@ void close_mock(int fd, int return_value)
     nala_state_for_close.data.errno_value = 0;
     nala_state_for_close.data.callback = NULL;
     nala_traceback(&nala_state_for_close.data.traceback);
+
+    return (0);
 }
 
-void close_mock_once(int fd, int return_value)
+int close_mock_once(int fd, int return_value)
 {
     struct _nala_instance_type_for_close *_nala_instance_p;
 
@@ -1611,18 +1651,22 @@ void close_mock_once(int fd, int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_close.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void close_mock_ignore_in(int return_value)
+int close_mock_ignore_in(int return_value)
 {
     nala_state_for_close.state.mode = MODE_MOCK;
     nala_state_for_close.data.params.ignore_fd_in = true;
     nala_state_for_close.data.return_value = return_value;
     nala_state_for_close.data.errno_value = 0;
     nala_state_for_close.data.callback = NULL;
+
+    return (0);
 }
 
-void close_mock_ignore_in_once(int return_value)
+int close_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_close *instance_p;
 
@@ -1638,6 +1682,8 @@ void close_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_close.instances,
                           instance_p);
+
+    return (0);
 }
 
 void close_mock_set_errno(int errno_value)
@@ -1648,6 +1694,17 @@ void close_mock_set_errno(int errno_value)
 void close_mock_set_callback(void (*callback)(int fd))
 {
     nala_get_data_close()->callback = callback;
+}
+
+struct nala_close_params_t *close_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "close_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void close_mock_ignore_fd_in(void)
@@ -1869,7 +1926,7 @@ DummyStruct *__wrap_compose_twice(DummyStruct *dummy_struct, DummyStruct *(*dumm
     return return_value;
 }
 
-void compose_twice_mock(DummyStruct *return_value)
+int compose_twice_mock(DummyStruct *return_value)
 {
     nala_state_for_compose_twice.state.mode = MODE_MOCK;
     nala_state_for_compose_twice.data.params.dummy_struct = NULL;
@@ -1880,9 +1937,11 @@ void compose_twice_mock(DummyStruct *return_value)
     nala_state_for_compose_twice.data.errno_value = 0;
     nala_state_for_compose_twice.data.callback = NULL;
     nala_traceback(&nala_state_for_compose_twice.data.traceback);
+
+    return (0);
 }
 
-void compose_twice_mock_once(DummyStruct *return_value)
+int compose_twice_mock_once(DummyStruct *return_value)
 {
     struct _nala_instance_type_for_compose_twice *_nala_instance_p;
 
@@ -1909,9 +1968,11 @@ void compose_twice_mock_once(DummyStruct *return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_compose_twice.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void compose_twice_mock_ignore_in(DummyStruct *return_value)
+int compose_twice_mock_ignore_in(DummyStruct *return_value)
 {
     nala_state_for_compose_twice.state.mode = MODE_MOCK;
     nala_state_for_compose_twice.data.params.ignore_dummy_struct_in = true;
@@ -1919,9 +1980,11 @@ void compose_twice_mock_ignore_in(DummyStruct *return_value)
     nala_state_for_compose_twice.data.return_value = return_value;
     nala_state_for_compose_twice.data.errno_value = 0;
     nala_state_for_compose_twice.data.callback = NULL;
+
+    return (0);
 }
 
-void compose_twice_mock_ignore_in_once(DummyStruct *return_value)
+int compose_twice_mock_ignore_in_once(DummyStruct *return_value)
 {
     struct _nala_instance_type_for_compose_twice *instance_p;
 
@@ -1948,6 +2011,8 @@ void compose_twice_mock_ignore_in_once(DummyStruct *return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_compose_twice.instances,
                           instance_p);
+
+    return (0);
 }
 
 void compose_twice_mock_set_errno(int errno_value)
@@ -1958,6 +2023,17 @@ void compose_twice_mock_set_errno(int errno_value)
 void compose_twice_mock_set_callback(void (*callback)(DummyStruct *dummy_struct, DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct)))
 {
     nala_get_data_compose_twice()->callback = callback;
+}
+
+struct nala_compose_twice_params_t *compose_twice_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "compose_twice_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void compose_twice_mock_set_dummy_struct_in(const void *buf_p, size_t size)
@@ -2250,7 +2326,7 @@ int __wrap_double_pointer(int **value_pp)
     return return_value;
 }
 
-void double_pointer_mock(int return_value)
+int double_pointer_mock(int return_value)
 {
     nala_state_for_double_pointer.state.mode = MODE_MOCK;
     nala_state_for_double_pointer.data.params.value_pp = NULL;
@@ -2259,9 +2335,11 @@ void double_pointer_mock(int return_value)
     nala_state_for_double_pointer.data.errno_value = 0;
     nala_state_for_double_pointer.data.callback = NULL;
     nala_traceback(&nala_state_for_double_pointer.data.traceback);
+
+    return (0);
 }
 
-void double_pointer_mock_once(int return_value)
+int double_pointer_mock_once(int return_value)
 {
     struct _nala_instance_type_for_double_pointer *_nala_instance_p;
 
@@ -2282,18 +2360,22 @@ void double_pointer_mock_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_double_pointer.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void double_pointer_mock_ignore_in(int return_value)
+int double_pointer_mock_ignore_in(int return_value)
 {
     nala_state_for_double_pointer.state.mode = MODE_MOCK;
     nala_state_for_double_pointer.data.params.ignore_value_pp_in = true;
     nala_state_for_double_pointer.data.return_value = return_value;
     nala_state_for_double_pointer.data.errno_value = 0;
     nala_state_for_double_pointer.data.callback = NULL;
+
+    return (0);
 }
 
-void double_pointer_mock_ignore_in_once(int return_value)
+int double_pointer_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_double_pointer *instance_p;
 
@@ -2314,6 +2396,8 @@ void double_pointer_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_double_pointer.instances,
                           instance_p);
+
+    return (0);
 }
 
 void double_pointer_mock_set_errno(int errno_value)
@@ -2324,6 +2408,17 @@ void double_pointer_mock_set_errno(int errno_value)
 void double_pointer_mock_set_callback(void (*callback)(int **value_pp))
 {
     nala_get_data_double_pointer()->callback = callback;
+}
+
+struct nala_double_pointer_params_t *double_pointer_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "double_pointer_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void double_pointer_mock_set_value_pp_in(const void *buf_p, size_t size)
@@ -2563,7 +2658,7 @@ int __wrap_dup(int oldfd)
     return return_value;
 }
 
-void dup_mock(int oldfd, int return_value)
+int dup_mock(int oldfd, int return_value)
 {
     nala_state_for_dup.state.mode = MODE_MOCK;
     nala_state_for_dup.data.params.oldfd = oldfd;
@@ -2572,9 +2667,11 @@ void dup_mock(int oldfd, int return_value)
     nala_state_for_dup.data.errno_value = 0;
     nala_state_for_dup.data.callback = NULL;
     nala_traceback(&nala_state_for_dup.data.traceback);
+
+    return (0);
 }
 
-void dup_mock_once(int oldfd, int return_value)
+int dup_mock_once(int oldfd, int return_value)
 {
     struct _nala_instance_type_for_dup *_nala_instance_p;
 
@@ -2591,18 +2688,22 @@ void dup_mock_once(int oldfd, int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_dup.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void dup_mock_ignore_in(int return_value)
+int dup_mock_ignore_in(int return_value)
 {
     nala_state_for_dup.state.mode = MODE_MOCK;
     nala_state_for_dup.data.params.ignore_oldfd_in = true;
     nala_state_for_dup.data.return_value = return_value;
     nala_state_for_dup.data.errno_value = 0;
     nala_state_for_dup.data.callback = NULL;
+
+    return (0);
 }
 
-void dup_mock_ignore_in_once(int return_value)
+int dup_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_dup *instance_p;
 
@@ -2618,6 +2719,8 @@ void dup_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_dup.instances,
                           instance_p);
+
+    return (0);
 }
 
 void dup_mock_set_errno(int errno_value)
@@ -2628,6 +2731,17 @@ void dup_mock_set_errno(int errno_value)
 void dup_mock_set_callback(void (*callback)(int oldfd))
 {
     nala_get_data_dup()->callback = callback;
+}
+
+struct nala_dup_params_t *dup_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "dup_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void dup_mock_ignore_oldfd_in(void)
@@ -2831,7 +2945,7 @@ int __wrap_dup2(int oldfd, int newfd)
     return return_value;
 }
 
-void dup2_mock(int oldfd, int newfd, int return_value)
+int dup2_mock(int oldfd, int newfd, int return_value)
 {
     nala_state_for_dup2.state.mode = MODE_MOCK;
     nala_state_for_dup2.data.params.oldfd = oldfd;
@@ -2842,9 +2956,11 @@ void dup2_mock(int oldfd, int newfd, int return_value)
     nala_state_for_dup2.data.errno_value = 0;
     nala_state_for_dup2.data.callback = NULL;
     nala_traceback(&nala_state_for_dup2.data.traceback);
+
+    return (0);
 }
 
-void dup2_mock_once(int oldfd, int newfd, int return_value)
+int dup2_mock_once(int oldfd, int newfd, int return_value)
 {
     struct _nala_instance_type_for_dup2 *_nala_instance_p;
 
@@ -2863,9 +2979,11 @@ void dup2_mock_once(int oldfd, int newfd, int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_dup2.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void dup2_mock_ignore_in(int return_value)
+int dup2_mock_ignore_in(int return_value)
 {
     nala_state_for_dup2.state.mode = MODE_MOCK;
     nala_state_for_dup2.data.params.ignore_oldfd_in = true;
@@ -2873,9 +2991,11 @@ void dup2_mock_ignore_in(int return_value)
     nala_state_for_dup2.data.return_value = return_value;
     nala_state_for_dup2.data.errno_value = 0;
     nala_state_for_dup2.data.callback = NULL;
+
+    return (0);
 }
 
-void dup2_mock_ignore_in_once(int return_value)
+int dup2_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_dup2 *instance_p;
 
@@ -2892,6 +3012,8 @@ void dup2_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_dup2.instances,
                           instance_p);
+
+    return (0);
 }
 
 void dup2_mock_set_errno(int errno_value)
@@ -2902,6 +3024,17 @@ void dup2_mock_set_errno(int errno_value)
 void dup2_mock_set_callback(void (*callback)(int oldfd, int newfd))
 {
     nala_get_data_dup2()->callback = callback;
+}
+
+struct nala_dup2_params_t *dup2_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "dup2_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void dup2_mock_ignore_oldfd_in(void)
@@ -3119,7 +3252,7 @@ DummyStruct *__wrap_edit_number(DummyStruct *dummy_struct, int number)
     return return_value;
 }
 
-void edit_number_mock(int number, DummyStruct *return_value)
+int edit_number_mock(int number, DummyStruct *return_value)
 {
     nala_state_for_edit_number.state.mode = MODE_MOCK;
     nala_state_for_edit_number.data.params.dummy_struct = NULL;
@@ -3130,9 +3263,11 @@ void edit_number_mock(int number, DummyStruct *return_value)
     nala_state_for_edit_number.data.errno_value = 0;
     nala_state_for_edit_number.data.callback = NULL;
     nala_traceback(&nala_state_for_edit_number.data.traceback);
+
+    return (0);
 }
 
-void edit_number_mock_once(int number, DummyStruct *return_value)
+int edit_number_mock_once(int number, DummyStruct *return_value)
 {
     struct _nala_instance_type_for_edit_number *_nala_instance_p;
 
@@ -3155,9 +3290,11 @@ void edit_number_mock_once(int number, DummyStruct *return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_edit_number.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void edit_number_mock_ignore_in(DummyStruct *return_value)
+int edit_number_mock_ignore_in(DummyStruct *return_value)
 {
     nala_state_for_edit_number.state.mode = MODE_MOCK;
     nala_state_for_edit_number.data.params.ignore_dummy_struct_in = true;
@@ -3165,9 +3302,11 @@ void edit_number_mock_ignore_in(DummyStruct *return_value)
     nala_state_for_edit_number.data.return_value = return_value;
     nala_state_for_edit_number.data.errno_value = 0;
     nala_state_for_edit_number.data.callback = NULL;
+
+    return (0);
 }
 
-void edit_number_mock_ignore_in_once(DummyStruct *return_value)
+int edit_number_mock_ignore_in_once(DummyStruct *return_value)
 {
     struct _nala_instance_type_for_edit_number *instance_p;
 
@@ -3189,6 +3328,8 @@ void edit_number_mock_ignore_in_once(DummyStruct *return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_edit_number.instances,
                           instance_p);
+
+    return (0);
 }
 
 void edit_number_mock_set_errno(int errno_value)
@@ -3199,6 +3340,17 @@ void edit_number_mock_set_errno(int errno_value)
 void edit_number_mock_set_callback(void (*callback)(DummyStruct *dummy_struct, int number))
 {
     nala_get_data_edit_number()->callback = callback;
+}
+
+struct nala_edit_number_params_t *edit_number_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "edit_number_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void edit_number_mock_ignore_number_in(void)
@@ -3452,7 +3604,7 @@ int __wrap_endmntent(FILE *streamp)
     return return_value;
 }
 
-void endmntent_mock(int return_value)
+int endmntent_mock(int return_value)
 {
     nala_state_for_endmntent.state.mode = MODE_MOCK;
     nala_state_for_endmntent.data.params.streamp = NULL;
@@ -3461,9 +3613,11 @@ void endmntent_mock(int return_value)
     nala_state_for_endmntent.data.errno_value = 0;
     nala_state_for_endmntent.data.callback = NULL;
     nala_traceback(&nala_state_for_endmntent.data.traceback);
+
+    return (0);
 }
 
-void endmntent_mock_once(int return_value)
+int endmntent_mock_once(int return_value)
 {
     struct _nala_instance_type_for_endmntent *_nala_instance_p;
 
@@ -3484,18 +3638,22 @@ void endmntent_mock_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_endmntent.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void endmntent_mock_ignore_in(int return_value)
+int endmntent_mock_ignore_in(int return_value)
 {
     nala_state_for_endmntent.state.mode = MODE_MOCK;
     nala_state_for_endmntent.data.params.ignore_streamp_in = true;
     nala_state_for_endmntent.data.return_value = return_value;
     nala_state_for_endmntent.data.errno_value = 0;
     nala_state_for_endmntent.data.callback = NULL;
+
+    return (0);
 }
 
-void endmntent_mock_ignore_in_once(int return_value)
+int endmntent_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_endmntent *instance_p;
 
@@ -3516,6 +3674,8 @@ void endmntent_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_endmntent.instances,
                           instance_p);
+
+    return (0);
 }
 
 void endmntent_mock_set_errno(int errno_value)
@@ -3526,6 +3686,17 @@ void endmntent_mock_set_errno(int errno_value)
 void endmntent_mock_set_callback(void (*callback)(FILE *streamp))
 {
     nala_get_data_endmntent()->callback = callback;
+}
+
+struct nala_endmntent_params_t *endmntent_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "endmntent_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void endmntent_mock_set_streamp_in(const void *buf_p, size_t size)
@@ -3759,7 +3930,7 @@ void __wrap_enum_param(enum enum_param_type value)
     return;
 }
 
-void enum_param_mock(enum enum_param_type value)
+int enum_param_mock(enum enum_param_type value)
 {
     nala_state_for_enum_param.state.mode = MODE_MOCK;
     nala_state_for_enum_param.data.params.value = value;
@@ -3767,9 +3938,11 @@ void enum_param_mock(enum enum_param_type value)
     nala_state_for_enum_param.data.errno_value = 0;
     nala_state_for_enum_param.data.callback = NULL;
     nala_traceback(&nala_state_for_enum_param.data.traceback);
+
+    return (0);
 }
 
-void enum_param_mock_once(enum enum_param_type value)
+int enum_param_mock_once(enum enum_param_type value)
 {
     struct _nala_instance_type_for_enum_param *_nala_instance_p;
 
@@ -3785,17 +3958,21 @@ void enum_param_mock_once(enum enum_param_type value)
 
     NALA_INSTANCES_APPEND(nala_state_for_enum_param.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void enum_param_mock_ignore_in(void)
+int enum_param_mock_ignore_in(void)
 {
     nala_state_for_enum_param.state.mode = MODE_MOCK;
     nala_state_for_enum_param.data.params.ignore_value_in = true;
     nala_state_for_enum_param.data.errno_value = 0;
     nala_state_for_enum_param.data.callback = NULL;
+
+    return (0);
 }
 
-void enum_param_mock_ignore_in_once(void)
+int enum_param_mock_ignore_in_once(void)
 {
     struct _nala_instance_type_for_enum_param *instance_p;
 
@@ -3810,6 +3987,8 @@ void enum_param_mock_ignore_in_once(void)
 
     NALA_INSTANCES_APPEND(nala_state_for_enum_param.instances,
                           instance_p);
+
+    return (0);
 }
 
 void enum_param_mock_set_errno(int errno_value)
@@ -3820,6 +3999,17 @@ void enum_param_mock_set_errno(int errno_value)
 void enum_param_mock_set_callback(void (*callback)(enum enum_param_type value))
 {
     nala_get_data_enum_param()->callback = callback;
+}
+
+struct nala_enum_param_params_t *enum_param_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "enum_param_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void enum_param_mock_ignore_value_in(void)
@@ -4029,7 +4219,7 @@ int __wrap_fclose(FILE *stream)
     return return_value;
 }
 
-void fclose_mock(int return_value)
+int fclose_mock(int return_value)
 {
     nala_state_for_fclose.state.mode = MODE_MOCK;
     nala_state_for_fclose.data.params.stream = NULL;
@@ -4038,9 +4228,11 @@ void fclose_mock(int return_value)
     nala_state_for_fclose.data.errno_value = 0;
     nala_state_for_fclose.data.callback = NULL;
     nala_traceback(&nala_state_for_fclose.data.traceback);
+
+    return (0);
 }
 
-void fclose_mock_once(int return_value)
+int fclose_mock_once(int return_value)
 {
     struct _nala_instance_type_for_fclose *_nala_instance_p;
 
@@ -4061,18 +4253,22 @@ void fclose_mock_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_fclose.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void fclose_mock_ignore_in(int return_value)
+int fclose_mock_ignore_in(int return_value)
 {
     nala_state_for_fclose.state.mode = MODE_MOCK;
     nala_state_for_fclose.data.params.ignore_stream_in = true;
     nala_state_for_fclose.data.return_value = return_value;
     nala_state_for_fclose.data.errno_value = 0;
     nala_state_for_fclose.data.callback = NULL;
+
+    return (0);
 }
 
-void fclose_mock_ignore_in_once(int return_value)
+int fclose_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_fclose *instance_p;
 
@@ -4093,6 +4289,8 @@ void fclose_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_fclose.instances,
                           instance_p);
+
+    return (0);
 }
 
 void fclose_mock_set_errno(int errno_value)
@@ -4103,6 +4301,17 @@ void fclose_mock_set_errno(int errno_value)
 void fclose_mock_set_callback(void (*callback)(FILE *stream))
 {
     nala_get_data_fclose()->callback = callback;
+}
+
+struct nala_fclose_params_t *fclose_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "fclose_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void fclose_mock_set_stream_in(const void *buf_p, size_t size)
@@ -4351,7 +4560,7 @@ int __wrap_fflush(FILE *stream)
     return return_value;
 }
 
-void fflush_mock(int return_value)
+int fflush_mock(int return_value)
 {
     nala_state_for_fflush.state.mode = MODE_MOCK;
     nala_state_for_fflush.data.params.stream = NULL;
@@ -4360,9 +4569,11 @@ void fflush_mock(int return_value)
     nala_state_for_fflush.data.errno_value = 0;
     nala_state_for_fflush.data.callback = NULL;
     nala_traceback(&nala_state_for_fflush.data.traceback);
+
+    return (0);
 }
 
-void fflush_mock_once(int return_value)
+int fflush_mock_once(int return_value)
 {
     struct _nala_instance_type_for_fflush *_nala_instance_p;
 
@@ -4383,18 +4594,22 @@ void fflush_mock_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_fflush.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void fflush_mock_ignore_in(int return_value)
+int fflush_mock_ignore_in(int return_value)
 {
     nala_state_for_fflush.state.mode = MODE_MOCK;
     nala_state_for_fflush.data.params.ignore_stream_in = true;
     nala_state_for_fflush.data.return_value = return_value;
     nala_state_for_fflush.data.errno_value = 0;
     nala_state_for_fflush.data.callback = NULL;
+
+    return (0);
 }
 
-void fflush_mock_ignore_in_once(int return_value)
+int fflush_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_fflush *instance_p;
 
@@ -4415,6 +4630,8 @@ void fflush_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_fflush.instances,
                           instance_p);
+
+    return (0);
 }
 
 void fflush_mock_set_errno(int errno_value)
@@ -4425,6 +4642,17 @@ void fflush_mock_set_errno(int errno_value)
 void fflush_mock_set_callback(void (*callback)(FILE *stream))
 {
     nala_get_data_fflush()->callback = callback;
+}
+
+struct nala_fflush_params_t *fflush_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "fflush_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void fflush_mock_set_stream_in(const void *buf_p, size_t size)
@@ -4673,7 +4901,7 @@ int __wrap_fileno(FILE *stream)
     return return_value;
 }
 
-void fileno_mock(int return_value)
+int fileno_mock(int return_value)
 {
     nala_state_for_fileno.state.mode = MODE_MOCK;
     nala_state_for_fileno.data.params.stream = NULL;
@@ -4682,9 +4910,11 @@ void fileno_mock(int return_value)
     nala_state_for_fileno.data.errno_value = 0;
     nala_state_for_fileno.data.callback = NULL;
     nala_traceback(&nala_state_for_fileno.data.traceback);
+
+    return (0);
 }
 
-void fileno_mock_once(int return_value)
+int fileno_mock_once(int return_value)
 {
     struct _nala_instance_type_for_fileno *_nala_instance_p;
 
@@ -4705,18 +4935,22 @@ void fileno_mock_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_fileno.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void fileno_mock_ignore_in(int return_value)
+int fileno_mock_ignore_in(int return_value)
 {
     nala_state_for_fileno.state.mode = MODE_MOCK;
     nala_state_for_fileno.data.params.ignore_stream_in = true;
     nala_state_for_fileno.data.return_value = return_value;
     nala_state_for_fileno.data.errno_value = 0;
     nala_state_for_fileno.data.callback = NULL;
+
+    return (0);
 }
 
-void fileno_mock_ignore_in_once(int return_value)
+int fileno_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_fileno *instance_p;
 
@@ -4737,6 +4971,8 @@ void fileno_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_fileno.instances,
                           instance_p);
+
+    return (0);
 }
 
 void fileno_mock_set_errno(int errno_value)
@@ -4747,6 +4983,17 @@ void fileno_mock_set_errno(int errno_value)
 void fileno_mock_set_callback(void (*callback)(FILE *stream))
 {
     nala_get_data_fileno()->callback = callback;
+}
+
+struct nala_fileno_params_t *fileno_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "fileno_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void fileno_mock_set_stream_in(const void *buf_p, size_t size)
@@ -5007,7 +5254,7 @@ FILE *__wrap_fopen(const char *path, const char *mode)
     return return_value;
 }
 
-void fopen_mock(const char *path, const char *mode, FILE *return_value)
+int fopen_mock(const char *path, const char *mode, FILE *return_value)
 {
     nala_state_for_fopen.state.mode = MODE_MOCK;
     nala_state_for_fopen.data.params.path = NULL;
@@ -5034,9 +5281,11 @@ void fopen_mock(const char *path, const char *mode, FILE *return_value)
     nala_state_for_fopen.data.errno_value = 0;
     nala_state_for_fopen.data.callback = NULL;
     nala_traceback(&nala_state_for_fopen.data.traceback);
+
+    return (0);
 }
 
-void fopen_mock_once(const char *path, const char *mode, FILE *return_value)
+int fopen_mock_once(const char *path, const char *mode, FILE *return_value)
 {
     struct _nala_instance_type_for_fopen *_nala_instance_p;
 
@@ -5079,9 +5328,11 @@ void fopen_mock_once(const char *path, const char *mode, FILE *return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_fopen.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void fopen_mock_ignore_in(FILE *return_value)
+int fopen_mock_ignore_in(FILE *return_value)
 {
     nala_state_for_fopen.state.mode = MODE_MOCK;
     nala_state_for_fopen.data.params.ignore_path_in = true;
@@ -5089,9 +5340,11 @@ void fopen_mock_ignore_in(FILE *return_value)
     nala_state_for_fopen.data.return_value = return_value;
     nala_state_for_fopen.data.errno_value = 0;
     nala_state_for_fopen.data.callback = NULL;
+
+    return (0);
 }
 
-void fopen_mock_ignore_in_once(FILE *return_value)
+int fopen_mock_ignore_in_once(FILE *return_value)
 {
     struct _nala_instance_type_for_fopen *instance_p;
 
@@ -5118,6 +5371,8 @@ void fopen_mock_ignore_in_once(FILE *return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_fopen.instances,
                           instance_p);
+
+    return (0);
 }
 
 void fopen_mock_set_errno(int errno_value)
@@ -5128,6 +5383,17 @@ void fopen_mock_set_errno(int errno_value)
 void fopen_mock_set_callback(void (*callback)(const char *path, const char *mode))
 {
     nala_get_data_fopen()->callback = callback;
+}
+
+struct nala_fopen_params_t *fopen_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "fopen_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void fopen_mock_ignore_path_in(void)
@@ -5448,7 +5714,7 @@ size_t __wrap_fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
     return return_value;
 }
 
-void fread_mock(size_t size, size_t nmemb, size_t return_value)
+int fread_mock(size_t size, size_t nmemb, size_t return_value)
 {
     nala_state_for_fread.state.mode = MODE_MOCK;
     nala_state_for_fread.data.params.ptr = NULL;
@@ -5463,9 +5729,11 @@ void fread_mock(size_t size, size_t nmemb, size_t return_value)
     nala_state_for_fread.data.errno_value = 0;
     nala_state_for_fread.data.callback = NULL;
     nala_traceback(&nala_state_for_fread.data.traceback);
+
+    return (0);
 }
 
-void fread_mock_once(size_t size, size_t nmemb, size_t return_value)
+int fread_mock_once(size_t size, size_t nmemb, size_t return_value)
 {
     struct _nala_instance_type_for_fread *_nala_instance_p;
 
@@ -5496,9 +5764,11 @@ void fread_mock_once(size_t size, size_t nmemb, size_t return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_fread.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void fread_mock_ignore_in(size_t return_value)
+int fread_mock_ignore_in(size_t return_value)
 {
     nala_state_for_fread.state.mode = MODE_MOCK;
     nala_state_for_fread.data.params.ignore_ptr_in = true;
@@ -5508,9 +5778,11 @@ void fread_mock_ignore_in(size_t return_value)
     nala_state_for_fread.data.return_value = return_value;
     nala_state_for_fread.data.errno_value = 0;
     nala_state_for_fread.data.callback = NULL;
+
+    return (0);
 }
 
-void fread_mock_ignore_in_once(size_t return_value)
+int fread_mock_ignore_in_once(size_t return_value)
 {
     struct _nala_instance_type_for_fread *instance_p;
 
@@ -5539,6 +5811,8 @@ void fread_mock_ignore_in_once(size_t return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_fread.instances,
                           instance_p);
+
+    return (0);
 }
 
 void fread_mock_set_errno(int errno_value)
@@ -5549,6 +5823,17 @@ void fread_mock_set_errno(int errno_value)
 void fread_mock_set_callback(void (*callback)(void *ptr, size_t size, size_t nmemb, FILE *stream))
 {
     nala_get_data_fread()->callback = callback;
+}
+
+struct nala_fread_params_t *fread_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "fread_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void fread_mock_ignore_size_in(void)
@@ -5845,7 +6130,7 @@ void __wrap_free(void *ptr)
     return;
 }
 
-void free_mock()
+int free_mock()
 {
     nala_state_for_free.state.mode = MODE_MOCK;
     nala_state_for_free.data.params.ptr = NULL;
@@ -5853,9 +6138,11 @@ void free_mock()
     nala_state_for_free.data.errno_value = 0;
     nala_state_for_free.data.callback = NULL;
     nala_traceback(&nala_state_for_free.data.traceback);
+
+    return (0);
 }
 
-void free_mock_once()
+int free_mock_once()
 {
     struct _nala_instance_type_for_free *_nala_instance_p;
 
@@ -5875,17 +6162,21 @@ void free_mock_once()
 
     NALA_INSTANCES_APPEND(nala_state_for_free.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void free_mock_ignore_in(void)
+int free_mock_ignore_in(void)
 {
     nala_state_for_free.state.mode = MODE_MOCK;
     nala_state_for_free.data.params.ignore_ptr_in = true;
     nala_state_for_free.data.errno_value = 0;
     nala_state_for_free.data.callback = NULL;
+
+    return (0);
 }
 
-void free_mock_ignore_in_once(void)
+int free_mock_ignore_in_once(void)
 {
     struct _nala_instance_type_for_free *instance_p;
 
@@ -5905,6 +6196,8 @@ void free_mock_ignore_in_once(void)
 
     NALA_INSTANCES_APPEND(nala_state_for_free.instances,
                           instance_p);
+
+    return (0);
 }
 
 void free_mock_set_errno(int errno_value)
@@ -5915,6 +6208,17 @@ void free_mock_set_errno(int errno_value)
 void free_mock_set_callback(void (*callback)(void *ptr))
 {
     nala_get_data_free()->callback = callback;
+}
+
+struct nala_free_params_t *free_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "free_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void free_mock_set_ptr_in(const void *buf_p, size_t size)
@@ -6169,7 +6473,7 @@ int __wrap_fseek(FILE *stream, long int offset, int whence)
     return return_value;
 }
 
-void fseek_mock(long int offset, int whence, int return_value)
+int fseek_mock(long int offset, int whence, int return_value)
 {
     nala_state_for_fseek.state.mode = MODE_MOCK;
     nala_state_for_fseek.data.params.stream = NULL;
@@ -6182,9 +6486,11 @@ void fseek_mock(long int offset, int whence, int return_value)
     nala_state_for_fseek.data.errno_value = 0;
     nala_state_for_fseek.data.callback = NULL;
     nala_traceback(&nala_state_for_fseek.data.traceback);
+
+    return (0);
 }
 
-void fseek_mock_once(long int offset, int whence, int return_value)
+int fseek_mock_once(long int offset, int whence, int return_value)
 {
     struct _nala_instance_type_for_fseek *_nala_instance_p;
 
@@ -6209,9 +6515,11 @@ void fseek_mock_once(long int offset, int whence, int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_fseek.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void fseek_mock_ignore_in(int return_value)
+int fseek_mock_ignore_in(int return_value)
 {
     nala_state_for_fseek.state.mode = MODE_MOCK;
     nala_state_for_fseek.data.params.ignore_stream_in = true;
@@ -6220,9 +6528,11 @@ void fseek_mock_ignore_in(int return_value)
     nala_state_for_fseek.data.return_value = return_value;
     nala_state_for_fseek.data.errno_value = 0;
     nala_state_for_fseek.data.callback = NULL;
+
+    return (0);
 }
 
-void fseek_mock_ignore_in_once(int return_value)
+int fseek_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_fseek *instance_p;
 
@@ -6245,6 +6555,8 @@ void fseek_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_fseek.instances,
                           instance_p);
+
+    return (0);
 }
 
 void fseek_mock_set_errno(int errno_value)
@@ -6255,6 +6567,17 @@ void fseek_mock_set_errno(int errno_value)
 void fseek_mock_set_callback(void (*callback)(FILE *stream, long int offset, int whence))
 {
     nala_get_data_fseek()->callback = callback;
+}
+
+struct nala_fseek_params_t *fseek_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "fseek_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void fseek_mock_ignore_offset_in(void)
@@ -6513,7 +6836,7 @@ long int __wrap_ftell(FILE *stream)
     return return_value;
 }
 
-void ftell_mock(long int return_value)
+int ftell_mock(long int return_value)
 {
     nala_state_for_ftell.state.mode = MODE_MOCK;
     nala_state_for_ftell.data.params.stream = NULL;
@@ -6522,9 +6845,11 @@ void ftell_mock(long int return_value)
     nala_state_for_ftell.data.errno_value = 0;
     nala_state_for_ftell.data.callback = NULL;
     nala_traceback(&nala_state_for_ftell.data.traceback);
+
+    return (0);
 }
 
-void ftell_mock_once(long int return_value)
+int ftell_mock_once(long int return_value)
 {
     struct _nala_instance_type_for_ftell *_nala_instance_p;
 
@@ -6545,18 +6870,22 @@ void ftell_mock_once(long int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_ftell.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void ftell_mock_ignore_in(long int return_value)
+int ftell_mock_ignore_in(long int return_value)
 {
     nala_state_for_ftell.state.mode = MODE_MOCK;
     nala_state_for_ftell.data.params.ignore_stream_in = true;
     nala_state_for_ftell.data.return_value = return_value;
     nala_state_for_ftell.data.errno_value = 0;
     nala_state_for_ftell.data.callback = NULL;
+
+    return (0);
 }
 
-void ftell_mock_ignore_in_once(long int return_value)
+int ftell_mock_ignore_in_once(long int return_value)
 {
     struct _nala_instance_type_for_ftell *instance_p;
 
@@ -6577,6 +6906,8 @@ void ftell_mock_ignore_in_once(long int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_ftell.instances,
                           instance_p);
+
+    return (0);
 }
 
 void ftell_mock_set_errno(int errno_value)
@@ -6587,6 +6918,17 @@ void ftell_mock_set_errno(int errno_value)
 void ftell_mock_set_callback(void (*callback)(FILE *stream))
 {
     nala_get_data_ftell()->callback = callback;
+}
+
+struct nala_ftell_params_t *ftell_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "ftell_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void ftell_mock_set_stream_in(const void *buf_p, size_t size)
@@ -6853,7 +7195,7 @@ size_t __wrap_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
     return return_value;
 }
 
-void fwrite_mock(size_t size, size_t nmemb, size_t return_value)
+int fwrite_mock(size_t size, size_t nmemb, size_t return_value)
 {
     nala_state_for_fwrite.state.mode = MODE_MOCK;
     nala_state_for_fwrite.data.params.ptr = NULL;
@@ -6868,9 +7210,11 @@ void fwrite_mock(size_t size, size_t nmemb, size_t return_value)
     nala_state_for_fwrite.data.errno_value = 0;
     nala_state_for_fwrite.data.callback = NULL;
     nala_traceback(&nala_state_for_fwrite.data.traceback);
+
+    return (0);
 }
 
-void fwrite_mock_once(size_t size, size_t nmemb, size_t return_value)
+int fwrite_mock_once(size_t size, size_t nmemb, size_t return_value)
 {
     struct _nala_instance_type_for_fwrite *_nala_instance_p;
 
@@ -6901,9 +7245,11 @@ void fwrite_mock_once(size_t size, size_t nmemb, size_t return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_fwrite.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void fwrite_mock_ignore_in(size_t return_value)
+int fwrite_mock_ignore_in(size_t return_value)
 {
     nala_state_for_fwrite.state.mode = MODE_MOCK;
     nala_state_for_fwrite.data.params.ignore_ptr_in = true;
@@ -6913,9 +7259,11 @@ void fwrite_mock_ignore_in(size_t return_value)
     nala_state_for_fwrite.data.return_value = return_value;
     nala_state_for_fwrite.data.errno_value = 0;
     nala_state_for_fwrite.data.callback = NULL;
+
+    return (0);
 }
 
-void fwrite_mock_ignore_in_once(size_t return_value)
+int fwrite_mock_ignore_in_once(size_t return_value)
 {
     struct _nala_instance_type_for_fwrite *instance_p;
 
@@ -6944,6 +7292,8 @@ void fwrite_mock_ignore_in_once(size_t return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_fwrite.instances,
                           instance_p);
+
+    return (0);
 }
 
 void fwrite_mock_set_errno(int errno_value)
@@ -6954,6 +7304,17 @@ void fwrite_mock_set_errno(int errno_value)
 void fwrite_mock_set_callback(void (*callback)(const void *ptr, size_t size, size_t nmemb, FILE *stream))
 {
     nala_get_data_fwrite()->callback = callback;
+}
+
+struct nala_fwrite_params_t *fwrite_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "fwrite_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void fwrite_mock_ignore_size_in(void)
@@ -7256,7 +7617,7 @@ struct mntent *__wrap_getmntent(FILE *stream)
     return return_value;
 }
 
-void getmntent_mock(struct mntent *return_value)
+int getmntent_mock(struct mntent *return_value)
 {
     nala_state_for_getmntent.state.mode = MODE_MOCK;
     nala_state_for_getmntent.data.params.stream = NULL;
@@ -7265,9 +7626,11 @@ void getmntent_mock(struct mntent *return_value)
     nala_state_for_getmntent.data.errno_value = 0;
     nala_state_for_getmntent.data.callback = NULL;
     nala_traceback(&nala_state_for_getmntent.data.traceback);
+
+    return (0);
 }
 
-void getmntent_mock_once(struct mntent *return_value)
+int getmntent_mock_once(struct mntent *return_value)
 {
     struct _nala_instance_type_for_getmntent *_nala_instance_p;
 
@@ -7288,18 +7651,22 @@ void getmntent_mock_once(struct mntent *return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_getmntent.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void getmntent_mock_ignore_in(struct mntent *return_value)
+int getmntent_mock_ignore_in(struct mntent *return_value)
 {
     nala_state_for_getmntent.state.mode = MODE_MOCK;
     nala_state_for_getmntent.data.params.ignore_stream_in = true;
     nala_state_for_getmntent.data.return_value = return_value;
     nala_state_for_getmntent.data.errno_value = 0;
     nala_state_for_getmntent.data.callback = NULL;
+
+    return (0);
 }
 
-void getmntent_mock_ignore_in_once(struct mntent *return_value)
+int getmntent_mock_ignore_in_once(struct mntent *return_value)
 {
     struct _nala_instance_type_for_getmntent *instance_p;
 
@@ -7320,6 +7687,8 @@ void getmntent_mock_ignore_in_once(struct mntent *return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_getmntent.instances,
                           instance_p);
+
+    return (0);
 }
 
 void getmntent_mock_set_errno(int errno_value)
@@ -7330,6 +7699,17 @@ void getmntent_mock_set_errno(int errno_value)
 void getmntent_mock_set_callback(void (*callback)(FILE *stream))
 {
     nala_get_data_getmntent()->callback = callback;
+}
+
+struct nala_getmntent_params_t *getmntent_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "getmntent_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void getmntent_mock_set_stream_in(const void *buf_p, size_t size)
@@ -7572,7 +7952,7 @@ void __wrap_in_out(int *buf_p)
     return;
 }
 
-void in_out_mock()
+int in_out_mock()
 {
     nala_state_for_in_out.state.mode = MODE_MOCK;
     nala_state_for_in_out.data.params.buf_p = NULL;
@@ -7580,9 +7960,11 @@ void in_out_mock()
     nala_state_for_in_out.data.errno_value = 0;
     nala_state_for_in_out.data.callback = NULL;
     nala_traceback(&nala_state_for_in_out.data.traceback);
+
+    return (0);
 }
 
-void in_out_mock_once()
+int in_out_mock_once()
 {
     struct _nala_instance_type_for_in_out *_nala_instance_p;
 
@@ -7602,17 +7984,21 @@ void in_out_mock_once()
 
     NALA_INSTANCES_APPEND(nala_state_for_in_out.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void in_out_mock_ignore_in(void)
+int in_out_mock_ignore_in(void)
 {
     nala_state_for_in_out.state.mode = MODE_MOCK;
     nala_state_for_in_out.data.params.ignore_buf_p_in = true;
     nala_state_for_in_out.data.errno_value = 0;
     nala_state_for_in_out.data.callback = NULL;
+
+    return (0);
 }
 
-void in_out_mock_ignore_in_once(void)
+int in_out_mock_ignore_in_once(void)
 {
     struct _nala_instance_type_for_in_out *instance_p;
 
@@ -7632,6 +8018,8 @@ void in_out_mock_ignore_in_once(void)
 
     NALA_INSTANCES_APPEND(nala_state_for_in_out.instances,
                           instance_p);
+
+    return (0);
 }
 
 void in_out_mock_set_errno(int errno_value)
@@ -7642,6 +8030,17 @@ void in_out_mock_set_errno(int errno_value)
 void in_out_mock_set_callback(void (*callback)(int *buf_p))
 {
     nala_get_data_in_out()->callback = callback;
+}
+
+struct nala_in_out_params_t *in_out_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "in_out_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void in_out_mock_set_buf_p_in(const void *buf_p, size_t size)
@@ -7907,7 +8306,7 @@ int __wrap_io_control(int kind, ...)
     return return_value;
 }
 
-void io_control_mock(int kind, int return_value, const char *vafmt_p, ...)
+int io_control_mock(int kind, int return_value, const char *vafmt_p, ...)
 {
     nala_state_for_io_control.state.mode = MODE_MOCK;
 
@@ -7929,9 +8328,11 @@ void io_control_mock(int kind, int return_value, const char *vafmt_p, ...)
     nala_state_for_io_control.data.errno_value = 0;
     nala_state_for_io_control.data.callback = NULL;
     nala_traceback(&nala_state_for_io_control.data.traceback);
+
+    return (0);
 }
 
-void io_control_mock_once(int kind, int return_value, const char *vafmt_p, ...)
+int io_control_mock_once(int kind, int return_value, const char *vafmt_p, ...)
 {
     struct _nala_instance_type_for_io_control *_nala_instance_p;
 
@@ -7961,18 +8362,22 @@ void io_control_mock_once(int kind, int return_value, const char *vafmt_p, ...)
 
     NALA_INSTANCES_APPEND(nala_state_for_io_control.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void io_control_mock_ignore_in(int return_value)
+int io_control_mock_ignore_in(int return_value)
 {
     nala_state_for_io_control.state.mode = MODE_MOCK;
     nala_state_for_io_control.data.params.ignore_kind_in = true;
     nala_state_for_io_control.data.return_value = return_value;
     nala_state_for_io_control.data.errno_value = 0;
     nala_state_for_io_control.data.callback = NULL;
+
+    return (0);
 }
 
-void io_control_mock_ignore_in_once(int return_value)
+int io_control_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_io_control *instance_p;
 
@@ -7990,6 +8395,8 @@ void io_control_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_io_control.instances,
                           instance_p);
+
+    return (0);
 }
 
 void io_control_mock_set_errno(int errno_value)
@@ -8000,6 +8407,17 @@ void io_control_mock_set_errno(int errno_value)
 void io_control_mock_set_callback(void (*callback)(int kind, va_list __nala_va_list))
 {
     nala_get_data_io_control()->callback = callback;
+}
+
+struct nala_io_control_params_t *io_control_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "io_control_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void io_control_mock_ignore_kind_in(void)
@@ -8246,7 +8664,7 @@ int __wrap_io_vcontrol(int kind, va_list ap)
     return return_value;
 }
 
-void io_vcontrol_mock(int kind, int return_value)
+int io_vcontrol_mock(int kind, int return_value)
 {
     nala_state_for_io_vcontrol.state.mode = MODE_MOCK;
     nala_state_for_io_vcontrol.data.params.kind = kind;
@@ -8255,9 +8673,11 @@ void io_vcontrol_mock(int kind, int return_value)
     nala_state_for_io_vcontrol.data.errno_value = 0;
     nala_state_for_io_vcontrol.data.callback = NULL;
     nala_traceback(&nala_state_for_io_vcontrol.data.traceback);
+
+    return (0);
 }
 
-void io_vcontrol_mock_once(int kind, int return_value)
+int io_vcontrol_mock_once(int kind, int return_value)
 {
     struct _nala_instance_type_for_io_vcontrol *_nala_instance_p;
 
@@ -8274,18 +8694,22 @@ void io_vcontrol_mock_once(int kind, int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_io_vcontrol.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void io_vcontrol_mock_ignore_in(int return_value)
+int io_vcontrol_mock_ignore_in(int return_value)
 {
     nala_state_for_io_vcontrol.state.mode = MODE_MOCK;
     nala_state_for_io_vcontrol.data.params.ignore_kind_in = true;
     nala_state_for_io_vcontrol.data.return_value = return_value;
     nala_state_for_io_vcontrol.data.errno_value = 0;
     nala_state_for_io_vcontrol.data.callback = NULL;
+
+    return (0);
 }
 
-void io_vcontrol_mock_ignore_in_once(int return_value)
+int io_vcontrol_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_io_vcontrol *instance_p;
 
@@ -8301,6 +8725,8 @@ void io_vcontrol_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_io_vcontrol.instances,
                           instance_p);
+
+    return (0);
 }
 
 void io_vcontrol_mock_set_errno(int errno_value)
@@ -8311,6 +8737,17 @@ void io_vcontrol_mock_set_errno(int errno_value)
 void io_vcontrol_mock_set_callback(void (*callback)(int kind, va_list ap))
 {
     nala_get_data_io_vcontrol()->callback = callback;
+}
+
+struct nala_io_vcontrol_params_t *io_vcontrol_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "io_vcontrol_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void io_vcontrol_mock_ignore_kind_in(void)
@@ -8511,7 +8948,7 @@ void *__wrap_malloc(size_t size)
     return return_value;
 }
 
-void malloc_mock(size_t size, void *return_value)
+int malloc_mock(size_t size, void *return_value)
 {
     nala_state_for_malloc.state.mode = MODE_MOCK;
     nala_state_for_malloc.data.params.size = size;
@@ -8520,9 +8957,11 @@ void malloc_mock(size_t size, void *return_value)
     nala_state_for_malloc.data.errno_value = 0;
     nala_state_for_malloc.data.callback = NULL;
     nala_traceback(&nala_state_for_malloc.data.traceback);
+
+    return (0);
 }
 
-void malloc_mock_once(size_t size, void *return_value)
+int malloc_mock_once(size_t size, void *return_value)
 {
     struct _nala_instance_type_for_malloc *_nala_instance_p;
 
@@ -8539,18 +8978,22 @@ void malloc_mock_once(size_t size, void *return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_malloc.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void malloc_mock_ignore_in(void *return_value)
+int malloc_mock_ignore_in(void *return_value)
 {
     nala_state_for_malloc.state.mode = MODE_MOCK;
     nala_state_for_malloc.data.params.ignore_size_in = true;
     nala_state_for_malloc.data.return_value = return_value;
     nala_state_for_malloc.data.errno_value = 0;
     nala_state_for_malloc.data.callback = NULL;
+
+    return (0);
 }
 
-void malloc_mock_ignore_in_once(void *return_value)
+int malloc_mock_ignore_in_once(void *return_value)
 {
     struct _nala_instance_type_for_malloc *instance_p;
 
@@ -8566,6 +9009,8 @@ void malloc_mock_ignore_in_once(void *return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_malloc.instances,
                           instance_p);
+
+    return (0);
 }
 
 void malloc_mock_set_errno(int errno_value)
@@ -8576,6 +9021,17 @@ void malloc_mock_set_errno(int errno_value)
 void malloc_mock_set_callback(void (*callback)(size_t size))
 {
     nala_get_data_malloc()->callback = callback;
+}
+
+struct nala_malloc_params_t *malloc_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "malloc_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void malloc_mock_ignore_size_in(void)
@@ -8824,7 +9280,7 @@ int __wrap_mount(const char *source, const char *target, const char *filesystemt
     return return_value;
 }
 
-void mount_mock(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, int return_value)
+int mount_mock(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, int return_value)
 {
     nala_state_for_mount.state.mode = MODE_MOCK;
     nala_state_for_mount.data.params.source = NULL;
@@ -8865,9 +9321,11 @@ void mount_mock(const char *source, const char *target, const char *filesystemty
     nala_state_for_mount.data.errno_value = 0;
     nala_state_for_mount.data.callback = NULL;
     nala_traceback(&nala_state_for_mount.data.traceback);
+
+    return (0);
 }
 
-void mount_mock_once(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, int return_value)
+int mount_mock_once(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, int return_value)
 {
     struct _nala_instance_type_for_mount *_nala_instance_p;
 
@@ -8932,9 +9390,11 @@ void mount_mock_once(const char *source, const char *target, const char *filesys
 
     NALA_INSTANCES_APPEND(nala_state_for_mount.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void mount_mock_ignore_in(int return_value)
+int mount_mock_ignore_in(int return_value)
 {
     nala_state_for_mount.state.mode = MODE_MOCK;
     nala_state_for_mount.data.params.ignore_source_in = true;
@@ -8945,9 +9405,11 @@ void mount_mock_ignore_in(int return_value)
     nala_state_for_mount.data.return_value = return_value;
     nala_state_for_mount.data.errno_value = 0;
     nala_state_for_mount.data.callback = NULL;
+
+    return (0);
 }
 
-void mount_mock_ignore_in_once(int return_value)
+int mount_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_mount *instance_p;
 
@@ -8987,6 +9449,8 @@ void mount_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_mount.instances,
                           instance_p);
+
+    return (0);
 }
 
 void mount_mock_set_errno(int errno_value)
@@ -8997,6 +9461,17 @@ void mount_mock_set_errno(int errno_value)
 void mount_mock_set_callback(void (*callback)(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, const void *data))
 {
     nala_get_data_mount()->callback = callback;
+}
+
+struct nala_mount_params_t *mount_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "mount_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void mount_mock_ignore_source_in(void)
@@ -9391,7 +9866,7 @@ void __wrap_output_message(const char *message)
     return;
 }
 
-void output_message_mock(const char *message)
+int output_message_mock(const char *message)
 {
     nala_state_for_output_message.state.mode = MODE_MOCK;
     nala_state_for_output_message.data.params.message = NULL;
@@ -9407,9 +9882,11 @@ void output_message_mock(const char *message)
     nala_state_for_output_message.data.errno_value = 0;
     nala_state_for_output_message.data.callback = NULL;
     nala_traceback(&nala_state_for_output_message.data.traceback);
+
+    return (0);
 }
 
-void output_message_mock_once(const char *message)
+int output_message_mock_once(const char *message)
 {
     struct _nala_instance_type_for_output_message *_nala_instance_p;
 
@@ -9437,17 +9914,21 @@ void output_message_mock_once(const char *message)
 
     NALA_INSTANCES_APPEND(nala_state_for_output_message.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void output_message_mock_ignore_in(void)
+int output_message_mock_ignore_in(void)
 {
     nala_state_for_output_message.state.mode = MODE_MOCK;
     nala_state_for_output_message.data.params.ignore_message_in = true;
     nala_state_for_output_message.data.errno_value = 0;
     nala_state_for_output_message.data.callback = NULL;
+
+    return (0);
 }
 
-void output_message_mock_ignore_in_once(void)
+int output_message_mock_ignore_in_once(void)
 {
     struct _nala_instance_type_for_output_message *instance_p;
 
@@ -9467,6 +9948,8 @@ void output_message_mock_ignore_in_once(void)
 
     NALA_INSTANCES_APPEND(nala_state_for_output_message.instances,
                           instance_p);
+
+    return (0);
 }
 
 void output_message_mock_set_errno(int errno_value)
@@ -9477,6 +9960,17 @@ void output_message_mock_set_errno(int errno_value)
 void output_message_mock_set_callback(void (*callback)(const char *message))
 {
     nala_get_data_output_message()->callback = callback;
+}
+
+struct nala_output_message_params_t *output_message_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "output_message_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void output_message_mock_ignore_message_in(void)
@@ -9730,7 +10224,7 @@ int __wrap_pipe(int pipefd[2])
     return return_value;
 }
 
-void pipe_mock(int return_value)
+int pipe_mock(int return_value)
 {
     nala_state_for_pipe.state.mode = MODE_MOCK;
     nala_state_for_pipe.data.params.pipefd = NULL;
@@ -9739,9 +10233,11 @@ void pipe_mock(int return_value)
     nala_state_for_pipe.data.errno_value = 0;
     nala_state_for_pipe.data.callback = NULL;
     nala_traceback(&nala_state_for_pipe.data.traceback);
+
+    return (0);
 }
 
-void pipe_mock_once(int return_value)
+int pipe_mock_once(int return_value)
 {
     struct _nala_instance_type_for_pipe *_nala_instance_p;
 
@@ -9762,18 +10258,22 @@ void pipe_mock_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_pipe.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void pipe_mock_ignore_in(int return_value)
+int pipe_mock_ignore_in(int return_value)
 {
     nala_state_for_pipe.state.mode = MODE_MOCK;
     nala_state_for_pipe.data.params.ignore_pipefd_in = true;
     nala_state_for_pipe.data.return_value = return_value;
     nala_state_for_pipe.data.errno_value = 0;
     nala_state_for_pipe.data.callback = NULL;
+
+    return (0);
 }
 
-void pipe_mock_ignore_in_once(int return_value)
+int pipe_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_pipe *instance_p;
 
@@ -9794,6 +10294,8 @@ void pipe_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_pipe.instances,
                           instance_p);
+
+    return (0);
 }
 
 void pipe_mock_set_errno(int errno_value)
@@ -9804,6 +10306,17 @@ void pipe_mock_set_errno(int errno_value)
 void pipe_mock_set_callback(void (*callback)(int pipefd[2]))
 {
     nala_get_data_pipe()->callback = callback;
+}
+
+struct nala_pipe_params_t *pipe_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "pipe_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void pipe_mock_set_pipefd_in(const void *buf_p, size_t size)
@@ -10058,7 +10571,7 @@ int __wrap_poll(struct pollfd *fds, nfds_t nfds, int timeout)
     return return_value;
 }
 
-void poll_mock(nfds_t nfds, int timeout, int return_value)
+int poll_mock(nfds_t nfds, int timeout, int return_value)
 {
     nala_state_for_poll.state.mode = MODE_MOCK;
     nala_state_for_poll.data.params.fds = NULL;
@@ -10071,9 +10584,11 @@ void poll_mock(nfds_t nfds, int timeout, int return_value)
     nala_state_for_poll.data.errno_value = 0;
     nala_state_for_poll.data.callback = NULL;
     nala_traceback(&nala_state_for_poll.data.traceback);
+
+    return (0);
 }
 
-void poll_mock_once(nfds_t nfds, int timeout, int return_value)
+int poll_mock_once(nfds_t nfds, int timeout, int return_value)
 {
     struct _nala_instance_type_for_poll *_nala_instance_p;
 
@@ -10098,9 +10613,11 @@ void poll_mock_once(nfds_t nfds, int timeout, int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_poll.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void poll_mock_ignore_in(int return_value)
+int poll_mock_ignore_in(int return_value)
 {
     nala_state_for_poll.state.mode = MODE_MOCK;
     nala_state_for_poll.data.params.ignore_fds_in = true;
@@ -10109,9 +10626,11 @@ void poll_mock_ignore_in(int return_value)
     nala_state_for_poll.data.return_value = return_value;
     nala_state_for_poll.data.errno_value = 0;
     nala_state_for_poll.data.callback = NULL;
+
+    return (0);
 }
 
-void poll_mock_ignore_in_once(int return_value)
+int poll_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_poll *instance_p;
 
@@ -10134,6 +10653,8 @@ void poll_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_poll.instances,
                           instance_p);
+
+    return (0);
 }
 
 void poll_mock_set_errno(int errno_value)
@@ -10144,6 +10665,17 @@ void poll_mock_set_errno(int errno_value)
 void poll_mock_set_callback(void (*callback)(struct pollfd *fds, nfds_t nfds, int timeout))
 {
     nala_get_data_poll()->callback = callback;
+}
+
+struct nala_poll_params_t *poll_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "poll_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void poll_mock_ignore_nfds_in(void)
@@ -10385,15 +10917,17 @@ void __wrap_print_hello()
     return;
 }
 
-void print_hello_mock()
+int print_hello_mock()
 {
     nala_state_for_print_hello.state.mode = MODE_MOCK;
     nala_state_for_print_hello.data.errno_value = 0;
     nala_state_for_print_hello.data.callback = NULL;
     nala_traceback(&nala_state_for_print_hello.data.traceback);
+
+    return (0);
 }
 
-void print_hello_mock_once()
+int print_hello_mock_once()
 {
     struct _nala_instance_type_for_print_hello *_nala_instance_p;
 
@@ -10407,16 +10941,20 @@ void print_hello_mock_once()
 
     NALA_INSTANCES_APPEND(nala_state_for_print_hello.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void print_hello_mock_ignore_in(void)
+int print_hello_mock_ignore_in(void)
 {
     nala_state_for_print_hello.state.mode = MODE_MOCK;
     nala_state_for_print_hello.data.errno_value = 0;
     nala_state_for_print_hello.data.callback = NULL;
+
+    return (0);
 }
 
-void print_hello_mock_ignore_in_once(void)
+int print_hello_mock_ignore_in_once(void)
 {
     struct _nala_instance_type_for_print_hello *instance_p;
 
@@ -10430,6 +10968,8 @@ void print_hello_mock_ignore_in_once(void)
 
     NALA_INSTANCES_APPEND(nala_state_for_print_hello.instances,
                           instance_p);
+
+    return (0);
 }
 
 void print_hello_mock_set_errno(int errno_value)
@@ -10440,6 +10980,17 @@ void print_hello_mock_set_errno(int errno_value)
 void print_hello_mock_set_callback(void (*callback)())
 {
     nala_get_data_print_hello()->callback = callback;
+}
+
+struct nala_print_hello_params_t *print_hello_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "print_hello_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void print_hello_mock_none(void)
@@ -10650,7 +11201,7 @@ ssize_t __wrap_read(int fd, void *buf, size_t count)
     return return_value;
 }
 
-void read_mock(int fd, size_t count, ssize_t return_value)
+int read_mock(int fd, size_t count, ssize_t return_value)
 {
     nala_state_for_read.state.mode = MODE_MOCK;
     nala_state_for_read.data.params.buf = NULL;
@@ -10663,9 +11214,11 @@ void read_mock(int fd, size_t count, ssize_t return_value)
     nala_state_for_read.data.errno_value = 0;
     nala_state_for_read.data.callback = NULL;
     nala_traceback(&nala_state_for_read.data.traceback);
+
+    return (0);
 }
 
-void read_mock_once(int fd, size_t count, ssize_t return_value)
+int read_mock_once(int fd, size_t count, ssize_t return_value)
 {
     struct _nala_instance_type_for_read *_nala_instance_p;
 
@@ -10690,9 +11243,11 @@ void read_mock_once(int fd, size_t count, ssize_t return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_read.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void read_mock_ignore_in(ssize_t return_value)
+int read_mock_ignore_in(ssize_t return_value)
 {
     nala_state_for_read.state.mode = MODE_MOCK;
     nala_state_for_read.data.params.ignore_buf_in = true;
@@ -10701,9 +11256,11 @@ void read_mock_ignore_in(ssize_t return_value)
     nala_state_for_read.data.return_value = return_value;
     nala_state_for_read.data.errno_value = 0;
     nala_state_for_read.data.callback = NULL;
+
+    return (0);
 }
 
-void read_mock_ignore_in_once(ssize_t return_value)
+int read_mock_ignore_in_once(ssize_t return_value)
 {
     struct _nala_instance_type_for_read *instance_p;
 
@@ -10726,6 +11283,8 @@ void read_mock_ignore_in_once(ssize_t return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_read.instances,
                           instance_p);
+
+    return (0);
 }
 
 void read_mock_set_errno(int errno_value)
@@ -10736,6 +11295,17 @@ void read_mock_set_errno(int errno_value)
 void read_mock_set_callback(void (*callback)(int fd, void *buf, size_t count))
 {
     nala_get_data_read()->callback = callback;
+}
+
+struct nala_read_params_t *read_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "read_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void read_mock_ignore_fd_in(void)
@@ -11018,7 +11588,7 @@ ssize_t __wrap_sendto(int sockfd, const void *buf, size_t len, int flags, const 
     return return_value;
 }
 
-void sendto_mock(int sockfd, size_t len, int flags, socklen_t addrlen, ssize_t return_value)
+int sendto_mock(int sockfd, size_t len, int flags, socklen_t addrlen, ssize_t return_value)
 {
     nala_state_for_sendto.state.mode = MODE_MOCK;
     nala_state_for_sendto.data.params.buf = NULL;
@@ -11037,9 +11607,11 @@ void sendto_mock(int sockfd, size_t len, int flags, socklen_t addrlen, ssize_t r
     nala_state_for_sendto.data.errno_value = 0;
     nala_state_for_sendto.data.callback = NULL;
     nala_traceback(&nala_state_for_sendto.data.traceback);
+
+    return (0);
 }
 
-void sendto_mock_once(int sockfd, size_t len, int flags, socklen_t addrlen, ssize_t return_value)
+int sendto_mock_once(int sockfd, size_t len, int flags, socklen_t addrlen, ssize_t return_value)
 {
     struct _nala_instance_type_for_sendto *_nala_instance_p;
 
@@ -11074,9 +11646,11 @@ void sendto_mock_once(int sockfd, size_t len, int flags, socklen_t addrlen, ssiz
 
     NALA_INSTANCES_APPEND(nala_state_for_sendto.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void sendto_mock_ignore_in(ssize_t return_value)
+int sendto_mock_ignore_in(ssize_t return_value)
 {
     nala_state_for_sendto.state.mode = MODE_MOCK;
     nala_state_for_sendto.data.params.ignore_buf_in = true;
@@ -11088,9 +11662,11 @@ void sendto_mock_ignore_in(ssize_t return_value)
     nala_state_for_sendto.data.return_value = return_value;
     nala_state_for_sendto.data.errno_value = 0;
     nala_state_for_sendto.data.callback = NULL;
+
+    return (0);
 }
 
-void sendto_mock_ignore_in_once(ssize_t return_value)
+int sendto_mock_ignore_in_once(ssize_t return_value)
 {
     struct _nala_instance_type_for_sendto *instance_p;
 
@@ -11121,6 +11697,8 @@ void sendto_mock_ignore_in_once(ssize_t return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_sendto.instances,
                           instance_p);
+
+    return (0);
 }
 
 void sendto_mock_set_errno(int errno_value)
@@ -11131,6 +11709,17 @@ void sendto_mock_set_errno(int errno_value)
 void sendto_mock_set_callback(void (*callback)(int sockfd, const void *buf, size_t len, int flags, const struct sockaddr *dest_addr, socklen_t addrlen))
 {
     nala_get_data_sendto()->callback = callback;
+}
+
+struct nala_sendto_params_t *sendto_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "sendto_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void sendto_mock_ignore_sockfd_in(void)
@@ -11455,7 +12044,7 @@ int __wrap_setsockopt(int sockfd, int level, int optname, const void *optval, so
     return return_value;
 }
 
-void setsockopt_mock(int sockfd, int level, int optname, socklen_t optlen, int return_value)
+int setsockopt_mock(int sockfd, int level, int optname, socklen_t optlen, int return_value)
 {
     nala_state_for_setsockopt.state.mode = MODE_MOCK;
     nala_state_for_setsockopt.data.params.optval = NULL;
@@ -11472,9 +12061,11 @@ void setsockopt_mock(int sockfd, int level, int optname, socklen_t optlen, int r
     nala_state_for_setsockopt.data.errno_value = 0;
     nala_state_for_setsockopt.data.callback = NULL;
     nala_traceback(&nala_state_for_setsockopt.data.traceback);
+
+    return (0);
 }
 
-void setsockopt_mock_once(int sockfd, int level, int optname, socklen_t optlen, int return_value)
+int setsockopt_mock_once(int sockfd, int level, int optname, socklen_t optlen, int return_value)
 {
     struct _nala_instance_type_for_setsockopt *_nala_instance_p;
 
@@ -11503,9 +12094,11 @@ void setsockopt_mock_once(int sockfd, int level, int optname, socklen_t optlen, 
 
     NALA_INSTANCES_APPEND(nala_state_for_setsockopt.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void setsockopt_mock_ignore_in(int return_value)
+int setsockopt_mock_ignore_in(int return_value)
 {
     nala_state_for_setsockopt.state.mode = MODE_MOCK;
     nala_state_for_setsockopt.data.params.ignore_optval_in = true;
@@ -11516,9 +12109,11 @@ void setsockopt_mock_ignore_in(int return_value)
     nala_state_for_setsockopt.data.return_value = return_value;
     nala_state_for_setsockopt.data.errno_value = 0;
     nala_state_for_setsockopt.data.callback = NULL;
+
+    return (0);
 }
 
-void setsockopt_mock_ignore_in_once(int return_value)
+int setsockopt_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_setsockopt *instance_p;
 
@@ -11543,6 +12138,8 @@ void setsockopt_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_setsockopt.instances,
                           instance_p);
+
+    return (0);
 }
 
 void setsockopt_mock_set_errno(int errno_value)
@@ -11553,6 +12150,17 @@ void setsockopt_mock_set_errno(int errno_value)
 void setsockopt_mock_set_callback(void (*callback)(int sockfd, int level, int optname, const void *optval, socklen_t optlen))
 {
     nala_get_data_setsockopt()->callback = callback;
+}
+
+struct nala_setsockopt_params_t *setsockopt_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "setsockopt_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void setsockopt_mock_ignore_sockfd_in(void)
@@ -11812,7 +12420,7 @@ unsigned int __wrap_sleep(unsigned int seconds)
     return return_value;
 }
 
-void sleep_mock(unsigned int seconds, unsigned int return_value)
+int sleep_mock(unsigned int seconds, unsigned int return_value)
 {
     nala_state_for_sleep.state.mode = MODE_MOCK;
     nala_state_for_sleep.data.params.seconds = seconds;
@@ -11821,9 +12429,11 @@ void sleep_mock(unsigned int seconds, unsigned int return_value)
     nala_state_for_sleep.data.errno_value = 0;
     nala_state_for_sleep.data.callback = NULL;
     nala_traceback(&nala_state_for_sleep.data.traceback);
+
+    return (0);
 }
 
-void sleep_mock_once(unsigned int seconds, unsigned int return_value)
+int sleep_mock_once(unsigned int seconds, unsigned int return_value)
 {
     struct _nala_instance_type_for_sleep *_nala_instance_p;
 
@@ -11840,18 +12450,22 @@ void sleep_mock_once(unsigned int seconds, unsigned int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_sleep.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void sleep_mock_ignore_in(unsigned int return_value)
+int sleep_mock_ignore_in(unsigned int return_value)
 {
     nala_state_for_sleep.state.mode = MODE_MOCK;
     nala_state_for_sleep.data.params.ignore_seconds_in = true;
     nala_state_for_sleep.data.return_value = return_value;
     nala_state_for_sleep.data.errno_value = 0;
     nala_state_for_sleep.data.callback = NULL;
+
+    return (0);
 }
 
-void sleep_mock_ignore_in_once(unsigned int return_value)
+int sleep_mock_ignore_in_once(unsigned int return_value)
 {
     struct _nala_instance_type_for_sleep *instance_p;
 
@@ -11867,6 +12481,8 @@ void sleep_mock_ignore_in_once(unsigned int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_sleep.instances,
                           instance_p);
+
+    return (0);
 }
 
 void sleep_mock_set_errno(int errno_value)
@@ -11877,6 +12493,17 @@ void sleep_mock_set_errno(int errno_value)
 void sleep_mock_set_callback(void (*callback)(unsigned int seconds))
 {
     nala_get_data_sleep()->callback = callback;
+}
+
+struct nala_sleep_params_t *sleep_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "sleep_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void sleep_mock_ignore_seconds_in(void)
@@ -12098,7 +12725,7 @@ int __wrap_statvfs(const char *path, struct statvfs *buf)
     return return_value;
 }
 
-void statvfs_mock(const char *path, int return_value)
+int statvfs_mock(const char *path, int return_value)
 {
     nala_state_for_statvfs.state.mode = MODE_MOCK;
     nala_state_for_statvfs.data.params.path = NULL;
@@ -12117,9 +12744,11 @@ void statvfs_mock(const char *path, int return_value)
     nala_state_for_statvfs.data.errno_value = 0;
     nala_state_for_statvfs.data.callback = NULL;
     nala_traceback(&nala_state_for_statvfs.data.traceback);
+
+    return (0);
 }
 
-void statvfs_mock_once(const char *path, int return_value)
+int statvfs_mock_once(const char *path, int return_value)
 {
     struct _nala_instance_type_for_statvfs *_nala_instance_p;
 
@@ -12154,9 +12783,11 @@ void statvfs_mock_once(const char *path, int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_statvfs.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void statvfs_mock_ignore_in(int return_value)
+int statvfs_mock_ignore_in(int return_value)
 {
     nala_state_for_statvfs.state.mode = MODE_MOCK;
     nala_state_for_statvfs.data.params.ignore_path_in = true;
@@ -12164,9 +12795,11 @@ void statvfs_mock_ignore_in(int return_value)
     nala_state_for_statvfs.data.return_value = return_value;
     nala_state_for_statvfs.data.errno_value = 0;
     nala_state_for_statvfs.data.callback = NULL;
+
+    return (0);
 }
 
-void statvfs_mock_ignore_in_once(int return_value)
+int statvfs_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_statvfs *instance_p;
 
@@ -12193,6 +12826,8 @@ void statvfs_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_statvfs.instances,
                           instance_p);
+
+    return (0);
 }
 
 void statvfs_mock_set_errno(int errno_value)
@@ -12203,6 +12838,17 @@ void statvfs_mock_set_errno(int errno_value)
 void statvfs_mock_set_callback(void (*callback)(const char *path, struct statvfs *buf))
 {
     nala_get_data_statvfs()->callback = callback;
+}
+
+struct nala_statvfs_params_t *statvfs_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "statvfs_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void statvfs_mock_ignore_path_in(void)
@@ -12494,7 +13140,7 @@ void __wrap_struct_param(struct struct_param_type *data)
     return;
 }
 
-void struct_param_mock()
+int struct_param_mock()
 {
     nala_state_for_struct_param.state.mode = MODE_MOCK;
     nala_state_for_struct_param.data.params.data = NULL;
@@ -12502,9 +13148,11 @@ void struct_param_mock()
     nala_state_for_struct_param.data.errno_value = 0;
     nala_state_for_struct_param.data.callback = NULL;
     nala_traceback(&nala_state_for_struct_param.data.traceback);
+
+    return (0);
 }
 
-void struct_param_mock_once()
+int struct_param_mock_once()
 {
     struct _nala_instance_type_for_struct_param *_nala_instance_p;
 
@@ -12524,17 +13172,21 @@ void struct_param_mock_once()
 
     NALA_INSTANCES_APPEND(nala_state_for_struct_param.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void struct_param_mock_ignore_in(void)
+int struct_param_mock_ignore_in(void)
 {
     nala_state_for_struct_param.state.mode = MODE_MOCK;
     nala_state_for_struct_param.data.params.ignore_data_in = true;
     nala_state_for_struct_param.data.errno_value = 0;
     nala_state_for_struct_param.data.callback = NULL;
+
+    return (0);
 }
 
-void struct_param_mock_ignore_in_once(void)
+int struct_param_mock_ignore_in_once(void)
 {
     struct _nala_instance_type_for_struct_param *instance_p;
 
@@ -12554,6 +13206,8 @@ void struct_param_mock_ignore_in_once(void)
 
     NALA_INSTANCES_APPEND(nala_state_for_struct_param.instances,
                           instance_p);
+
+    return (0);
 }
 
 void struct_param_mock_set_errno(int errno_value)
@@ -12564,6 +13218,17 @@ void struct_param_mock_set_errno(int errno_value)
 void struct_param_mock_set_callback(void (*callback)(struct struct_param_type *data))
 {
     nala_get_data_struct_param()->callback = callback;
+}
+
+struct nala_struct_param_params_t *struct_param_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "struct_param_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void struct_param_mock_set_data_in(const void *buf_p, size_t size)
@@ -12801,16 +13466,18 @@ struct struct_param_type __wrap_struct_param_and_return_type(struct struct_param
     return return_value;
 }
 
-void struct_param_and_return_type_mock(struct struct_param_type return_value)
+int struct_param_and_return_type_mock(struct struct_param_type return_value)
 {
     nala_state_for_struct_param_and_return_type.state.mode = MODE_MOCK;
     nala_state_for_struct_param_and_return_type.data.return_value = return_value;
     nala_state_for_struct_param_and_return_type.data.errno_value = 0;
     nala_state_for_struct_param_and_return_type.data.callback = NULL;
     nala_traceback(&nala_state_for_struct_param_and_return_type.data.traceback);
+
+    return (0);
 }
 
-void struct_param_and_return_type_mock_once(struct struct_param_type return_value)
+int struct_param_and_return_type_mock_once(struct struct_param_type return_value)
 {
     struct _nala_instance_type_for_struct_param_and_return_type *_nala_instance_p;
 
@@ -12825,17 +13492,21 @@ void struct_param_and_return_type_mock_once(struct struct_param_type return_valu
 
     NALA_INSTANCES_APPEND(nala_state_for_struct_param_and_return_type.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void struct_param_and_return_type_mock_ignore_in(struct struct_param_type return_value)
+int struct_param_and_return_type_mock_ignore_in(struct struct_param_type return_value)
 {
     nala_state_for_struct_param_and_return_type.state.mode = MODE_MOCK;
     nala_state_for_struct_param_and_return_type.data.return_value = return_value;
     nala_state_for_struct_param_and_return_type.data.errno_value = 0;
     nala_state_for_struct_param_and_return_type.data.callback = NULL;
+
+    return (0);
 }
 
-void struct_param_and_return_type_mock_ignore_in_once(struct struct_param_type return_value)
+int struct_param_and_return_type_mock_ignore_in_once(struct struct_param_type return_value)
 {
     struct _nala_instance_type_for_struct_param_and_return_type *instance_p;
 
@@ -12850,6 +13521,8 @@ void struct_param_and_return_type_mock_ignore_in_once(struct struct_param_type r
 
     NALA_INSTANCES_APPEND(nala_state_for_struct_param_and_return_type.instances,
                           instance_p);
+
+    return (0);
 }
 
 void struct_param_and_return_type_mock_set_errno(int errno_value)
@@ -12860,6 +13533,17 @@ void struct_param_and_return_type_mock_set_errno(int errno_value)
 void struct_param_and_return_type_mock_set_callback(void (*callback)(struct struct_param_type arg))
 {
     nala_get_data_struct_param_and_return_type()->callback = callback;
+}
+
+struct nala_struct_param_and_return_type_params_t *struct_param_and_return_type_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "struct_param_and_return_type_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void struct_param_and_return_type_mock_none(void)
@@ -13064,7 +13748,7 @@ time_t __wrap_time(time_t *tloc)
     return return_value;
 }
 
-void time_mock(time_t return_value)
+int time_mock(time_t return_value)
 {
     nala_state_for_time.state.mode = MODE_MOCK;
     nala_state_for_time.data.params.tloc = NULL;
@@ -13073,9 +13757,11 @@ void time_mock(time_t return_value)
     nala_state_for_time.data.errno_value = 0;
     nala_state_for_time.data.callback = NULL;
     nala_traceback(&nala_state_for_time.data.traceback);
+
+    return (0);
 }
 
-void time_mock_once(time_t return_value)
+int time_mock_once(time_t return_value)
 {
     struct _nala_instance_type_for_time *_nala_instance_p;
 
@@ -13096,18 +13782,22 @@ void time_mock_once(time_t return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_time.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void time_mock_ignore_in(time_t return_value)
+int time_mock_ignore_in(time_t return_value)
 {
     nala_state_for_time.state.mode = MODE_MOCK;
     nala_state_for_time.data.params.ignore_tloc_in = true;
     nala_state_for_time.data.return_value = return_value;
     nala_state_for_time.data.errno_value = 0;
     nala_state_for_time.data.callback = NULL;
+
+    return (0);
 }
 
-void time_mock_ignore_in_once(time_t return_value)
+int time_mock_ignore_in_once(time_t return_value)
 {
     struct _nala_instance_type_for_time *instance_p;
 
@@ -13128,6 +13818,8 @@ void time_mock_ignore_in_once(time_t return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_time.instances,
                           instance_p);
+
+    return (0);
 }
 
 void time_mock_set_errno(int errno_value)
@@ -13138,6 +13830,17 @@ void time_mock_set_errno(int errno_value)
 void time_mock_set_callback(void (*callback)(time_t *tloc))
 {
     nala_get_data_time()->callback = callback;
+}
+
+struct nala_time_params_t *time_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "time_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void time_mock_set_tloc_in(const void *buf_p, size_t size)
@@ -13404,7 +14107,7 @@ int __wrap_timerfd_settime(int fd, int flags, const struct itimerspec *new_value
     return return_value;
 }
 
-void timerfd_settime_mock(int fd, int flags, int return_value)
+int timerfd_settime_mock(int fd, int flags, int return_value)
 {
     nala_state_for_timerfd_settime.state.mode = MODE_MOCK;
     nala_state_for_timerfd_settime.data.params.new_value = NULL;
@@ -13419,9 +14122,11 @@ void timerfd_settime_mock(int fd, int flags, int return_value)
     nala_state_for_timerfd_settime.data.errno_value = 0;
     nala_state_for_timerfd_settime.data.callback = NULL;
     nala_traceback(&nala_state_for_timerfd_settime.data.traceback);
+
+    return (0);
 }
 
-void timerfd_settime_mock_once(int fd, int flags, int return_value)
+int timerfd_settime_mock_once(int fd, int flags, int return_value)
 {
     struct _nala_instance_type_for_timerfd_settime *_nala_instance_p;
 
@@ -13452,9 +14157,11 @@ void timerfd_settime_mock_once(int fd, int flags, int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_timerfd_settime.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void timerfd_settime_mock_ignore_in(int return_value)
+int timerfd_settime_mock_ignore_in(int return_value)
 {
     nala_state_for_timerfd_settime.state.mode = MODE_MOCK;
     nala_state_for_timerfd_settime.data.params.ignore_new_value_in = true;
@@ -13464,9 +14171,11 @@ void timerfd_settime_mock_ignore_in(int return_value)
     nala_state_for_timerfd_settime.data.return_value = return_value;
     nala_state_for_timerfd_settime.data.errno_value = 0;
     nala_state_for_timerfd_settime.data.callback = NULL;
+
+    return (0);
 }
 
-void timerfd_settime_mock_ignore_in_once(int return_value)
+int timerfd_settime_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_timerfd_settime *instance_p;
 
@@ -13495,6 +14204,8 @@ void timerfd_settime_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_timerfd_settime.instances,
                           instance_p);
+
+    return (0);
 }
 
 void timerfd_settime_mock_set_errno(int errno_value)
@@ -13505,6 +14216,17 @@ void timerfd_settime_mock_set_errno(int errno_value)
 void timerfd_settime_mock_set_callback(void (*callback)(int fd, int flags, const struct itimerspec *new_value, struct itimerspec *old_value))
 {
     nala_get_data_timerfd_settime()->callback = callback;
+}
+
+struct nala_timerfd_settime_params_t *timerfd_settime_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "timerfd_settime_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void timerfd_settime_mock_ignore_fd_in(void)
@@ -13796,16 +14518,18 @@ FILE *__wrap_tmpfile(void)
     return return_value;
 }
 
-void tmpfile_mock(FILE *return_value)
+int tmpfile_mock(FILE *return_value)
 {
     nala_state_for_tmpfile.state.mode = MODE_MOCK;
     nala_state_for_tmpfile.data.return_value = return_value;
     nala_state_for_tmpfile.data.errno_value = 0;
     nala_state_for_tmpfile.data.callback = NULL;
     nala_traceback(&nala_state_for_tmpfile.data.traceback);
+
+    return (0);
 }
 
-void tmpfile_mock_once(FILE *return_value)
+int tmpfile_mock_once(FILE *return_value)
 {
     struct _nala_instance_type_for_tmpfile *_nala_instance_p;
 
@@ -13820,17 +14544,21 @@ void tmpfile_mock_once(FILE *return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_tmpfile.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void tmpfile_mock_ignore_in(FILE *return_value)
+int tmpfile_mock_ignore_in(FILE *return_value)
 {
     nala_state_for_tmpfile.state.mode = MODE_MOCK;
     nala_state_for_tmpfile.data.return_value = return_value;
     nala_state_for_tmpfile.data.errno_value = 0;
     nala_state_for_tmpfile.data.callback = NULL;
+
+    return (0);
 }
 
-void tmpfile_mock_ignore_in_once(FILE *return_value)
+int tmpfile_mock_ignore_in_once(FILE *return_value)
 {
     struct _nala_instance_type_for_tmpfile *instance_p;
 
@@ -13845,6 +14573,8 @@ void tmpfile_mock_ignore_in_once(FILE *return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_tmpfile.instances,
                           instance_p);
+
+    return (0);
 }
 
 void tmpfile_mock_set_errno(int errno_value)
@@ -13855,6 +14585,17 @@ void tmpfile_mock_set_errno(int errno_value)
 void tmpfile_mock_set_callback(void (*callback)(void))
 {
     nala_get_data_tmpfile()->callback = callback;
+}
+
+struct nala_tmpfile_params_t *tmpfile_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "tmpfile_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void tmpfile_mock_none(void)
@@ -14048,16 +14789,18 @@ struct_param_type __wrap_typedef_struct_param_and_return_type(struct_param_type 
     return return_value;
 }
 
-void typedef_struct_param_and_return_type_mock(struct_param_type return_value)
+int typedef_struct_param_and_return_type_mock(struct_param_type return_value)
 {
     nala_state_for_typedef_struct_param_and_return_type.state.mode = MODE_MOCK;
     nala_state_for_typedef_struct_param_and_return_type.data.return_value = return_value;
     nala_state_for_typedef_struct_param_and_return_type.data.errno_value = 0;
     nala_state_for_typedef_struct_param_and_return_type.data.callback = NULL;
     nala_traceback(&nala_state_for_typedef_struct_param_and_return_type.data.traceback);
+
+    return (0);
 }
 
-void typedef_struct_param_and_return_type_mock_once(struct_param_type return_value)
+int typedef_struct_param_and_return_type_mock_once(struct_param_type return_value)
 {
     struct _nala_instance_type_for_typedef_struct_param_and_return_type *_nala_instance_p;
 
@@ -14072,17 +14815,21 @@ void typedef_struct_param_and_return_type_mock_once(struct_param_type return_val
 
     NALA_INSTANCES_APPEND(nala_state_for_typedef_struct_param_and_return_type.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void typedef_struct_param_and_return_type_mock_ignore_in(struct_param_type return_value)
+int typedef_struct_param_and_return_type_mock_ignore_in(struct_param_type return_value)
 {
     nala_state_for_typedef_struct_param_and_return_type.state.mode = MODE_MOCK;
     nala_state_for_typedef_struct_param_and_return_type.data.return_value = return_value;
     nala_state_for_typedef_struct_param_and_return_type.data.errno_value = 0;
     nala_state_for_typedef_struct_param_and_return_type.data.callback = NULL;
+
+    return (0);
 }
 
-void typedef_struct_param_and_return_type_mock_ignore_in_once(struct_param_type return_value)
+int typedef_struct_param_and_return_type_mock_ignore_in_once(struct_param_type return_value)
 {
     struct _nala_instance_type_for_typedef_struct_param_and_return_type *instance_p;
 
@@ -14097,6 +14844,8 @@ void typedef_struct_param_and_return_type_mock_ignore_in_once(struct_param_type 
 
     NALA_INSTANCES_APPEND(nala_state_for_typedef_struct_param_and_return_type.instances,
                           instance_p);
+
+    return (0);
 }
 
 void typedef_struct_param_and_return_type_mock_set_errno(int errno_value)
@@ -14107,6 +14856,17 @@ void typedef_struct_param_and_return_type_mock_set_errno(int errno_value)
 void typedef_struct_param_and_return_type_mock_set_callback(void (*callback)(struct_param_type arg))
 {
     nala_get_data_typedef_struct_param_and_return_type()->callback = callback;
+}
+
+struct nala_typedef_struct_param_and_return_type_params_t *typedef_struct_param_and_return_type_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "typedef_struct_param_and_return_type_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void typedef_struct_param_and_return_type_mock_none(void)
@@ -14300,16 +15060,18 @@ union_type __wrap_typedef_union_param_and_return_type(union_type arg)
     return return_value;
 }
 
-void typedef_union_param_and_return_type_mock(union_type return_value)
+int typedef_union_param_and_return_type_mock(union_type return_value)
 {
     nala_state_for_typedef_union_param_and_return_type.state.mode = MODE_MOCK;
     nala_state_for_typedef_union_param_and_return_type.data.return_value = return_value;
     nala_state_for_typedef_union_param_and_return_type.data.errno_value = 0;
     nala_state_for_typedef_union_param_and_return_type.data.callback = NULL;
     nala_traceback(&nala_state_for_typedef_union_param_and_return_type.data.traceback);
+
+    return (0);
 }
 
-void typedef_union_param_and_return_type_mock_once(union_type return_value)
+int typedef_union_param_and_return_type_mock_once(union_type return_value)
 {
     struct _nala_instance_type_for_typedef_union_param_and_return_type *_nala_instance_p;
 
@@ -14324,17 +15086,21 @@ void typedef_union_param_and_return_type_mock_once(union_type return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_typedef_union_param_and_return_type.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void typedef_union_param_and_return_type_mock_ignore_in(union_type return_value)
+int typedef_union_param_and_return_type_mock_ignore_in(union_type return_value)
 {
     nala_state_for_typedef_union_param_and_return_type.state.mode = MODE_MOCK;
     nala_state_for_typedef_union_param_and_return_type.data.return_value = return_value;
     nala_state_for_typedef_union_param_and_return_type.data.errno_value = 0;
     nala_state_for_typedef_union_param_and_return_type.data.callback = NULL;
+
+    return (0);
 }
 
-void typedef_union_param_and_return_type_mock_ignore_in_once(union_type return_value)
+int typedef_union_param_and_return_type_mock_ignore_in_once(union_type return_value)
 {
     struct _nala_instance_type_for_typedef_union_param_and_return_type *instance_p;
 
@@ -14349,6 +15115,8 @@ void typedef_union_param_and_return_type_mock_ignore_in_once(union_type return_v
 
     NALA_INSTANCES_APPEND(nala_state_for_typedef_union_param_and_return_type.instances,
                           instance_p);
+
+    return (0);
 }
 
 void typedef_union_param_and_return_type_mock_set_errno(int errno_value)
@@ -14359,6 +15127,17 @@ void typedef_union_param_and_return_type_mock_set_errno(int errno_value)
 void typedef_union_param_and_return_type_mock_set_callback(void (*callback)(union_type arg))
 {
     nala_get_data_typedef_union_param_and_return_type()->callback = callback;
+}
+
+struct nala_typedef_union_param_and_return_type_params_t *typedef_union_param_and_return_type_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "typedef_union_param_and_return_type_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void typedef_union_param_and_return_type_mock_none(void)
@@ -14552,16 +15331,18 @@ union union_type __wrap_union_param_and_return_type(union union_type arg)
     return return_value;
 }
 
-void union_param_and_return_type_mock(union union_type return_value)
+int union_param_and_return_type_mock(union union_type return_value)
 {
     nala_state_for_union_param_and_return_type.state.mode = MODE_MOCK;
     nala_state_for_union_param_and_return_type.data.return_value = return_value;
     nala_state_for_union_param_and_return_type.data.errno_value = 0;
     nala_state_for_union_param_and_return_type.data.callback = NULL;
     nala_traceback(&nala_state_for_union_param_and_return_type.data.traceback);
+
+    return (0);
 }
 
-void union_param_and_return_type_mock_once(union union_type return_value)
+int union_param_and_return_type_mock_once(union union_type return_value)
 {
     struct _nala_instance_type_for_union_param_and_return_type *_nala_instance_p;
 
@@ -14576,17 +15357,21 @@ void union_param_and_return_type_mock_once(union union_type return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_union_param_and_return_type.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void union_param_and_return_type_mock_ignore_in(union union_type return_value)
+int union_param_and_return_type_mock_ignore_in(union union_type return_value)
 {
     nala_state_for_union_param_and_return_type.state.mode = MODE_MOCK;
     nala_state_for_union_param_and_return_type.data.return_value = return_value;
     nala_state_for_union_param_and_return_type.data.errno_value = 0;
     nala_state_for_union_param_and_return_type.data.callback = NULL;
+
+    return (0);
 }
 
-void union_param_and_return_type_mock_ignore_in_once(union union_type return_value)
+int union_param_and_return_type_mock_ignore_in_once(union union_type return_value)
 {
     struct _nala_instance_type_for_union_param_and_return_type *instance_p;
 
@@ -14601,6 +15386,8 @@ void union_param_and_return_type_mock_ignore_in_once(union union_type return_val
 
     NALA_INSTANCES_APPEND(nala_state_for_union_param_and_return_type.instances,
                           instance_p);
+
+    return (0);
 }
 
 void union_param_and_return_type_mock_set_errno(int errno_value)
@@ -14611,6 +15398,17 @@ void union_param_and_return_type_mock_set_errno(int errno_value)
 void union_param_and_return_type_mock_set_callback(void (*callback)(union union_type arg))
 {
     nala_get_data_union_param_and_return_type()->callback = callback;
+}
+
+struct nala_union_param_and_return_type_params_t *union_param_and_return_type_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "union_param_and_return_type_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void union_param_and_return_type_mock_none(void)
@@ -14806,7 +15604,7 @@ int __wrap_usleep(__useconds_t usec)
     return return_value;
 }
 
-void usleep_mock(__useconds_t usec, int return_value)
+int usleep_mock(__useconds_t usec, int return_value)
 {
     nala_state_for_usleep.state.mode = MODE_MOCK;
     nala_state_for_usleep.data.params.usec = usec;
@@ -14815,9 +15613,11 @@ void usleep_mock(__useconds_t usec, int return_value)
     nala_state_for_usleep.data.errno_value = 0;
     nala_state_for_usleep.data.callback = NULL;
     nala_traceback(&nala_state_for_usleep.data.traceback);
+
+    return (0);
 }
 
-void usleep_mock_once(__useconds_t usec, int return_value)
+int usleep_mock_once(__useconds_t usec, int return_value)
 {
     struct _nala_instance_type_for_usleep *_nala_instance_p;
 
@@ -14834,18 +15634,22 @@ void usleep_mock_once(__useconds_t usec, int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_usleep.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void usleep_mock_ignore_in(int return_value)
+int usleep_mock_ignore_in(int return_value)
 {
     nala_state_for_usleep.state.mode = MODE_MOCK;
     nala_state_for_usleep.data.params.ignore_usec_in = true;
     nala_state_for_usleep.data.return_value = return_value;
     nala_state_for_usleep.data.errno_value = 0;
     nala_state_for_usleep.data.callback = NULL;
+
+    return (0);
 }
 
-void usleep_mock_ignore_in_once(int return_value)
+int usleep_mock_ignore_in_once(int return_value)
 {
     struct _nala_instance_type_for_usleep *instance_p;
 
@@ -14861,6 +15665,8 @@ void usleep_mock_ignore_in_once(int return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_usleep.instances,
                           instance_p);
+
+    return (0);
 }
 
 void usleep_mock_set_errno(int errno_value)
@@ -14871,6 +15677,17 @@ void usleep_mock_set_errno(int errno_value)
 void usleep_mock_set_callback(void (*callback)(__useconds_t usec))
 {
     nala_get_data_usleep()->callback = callback;
+}
+
+struct nala_usleep_params_t *usleep_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "usleep_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void usleep_mock_ignore_usec_in(void)
@@ -15086,7 +15903,7 @@ ssize_t __wrap_write(int fd, const void *buf, size_t count)
     return return_value;
 }
 
-void write_mock(int fd, size_t count, ssize_t return_value)
+int write_mock(int fd, size_t count, ssize_t return_value)
 {
     nala_state_for_write.state.mode = MODE_MOCK;
     nala_state_for_write.data.params.buf = NULL;
@@ -15099,9 +15916,11 @@ void write_mock(int fd, size_t count, ssize_t return_value)
     nala_state_for_write.data.errno_value = 0;
     nala_state_for_write.data.callback = NULL;
     nala_traceback(&nala_state_for_write.data.traceback);
+
+    return (0);
 }
 
-void write_mock_once(int fd, size_t count, ssize_t return_value)
+int write_mock_once(int fd, size_t count, ssize_t return_value)
 {
     struct _nala_instance_type_for_write *_nala_instance_p;
 
@@ -15126,9 +15945,11 @@ void write_mock_once(int fd, size_t count, ssize_t return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_write.instances,
                           _nala_instance_p);
+
+    return (0);
 }
 
-void write_mock_ignore_in(ssize_t return_value)
+int write_mock_ignore_in(ssize_t return_value)
 {
     nala_state_for_write.state.mode = MODE_MOCK;
     nala_state_for_write.data.params.ignore_buf_in = true;
@@ -15137,9 +15958,11 @@ void write_mock_ignore_in(ssize_t return_value)
     nala_state_for_write.data.return_value = return_value;
     nala_state_for_write.data.errno_value = 0;
     nala_state_for_write.data.callback = NULL;
+
+    return (0);
 }
 
-void write_mock_ignore_in_once(ssize_t return_value)
+int write_mock_ignore_in_once(ssize_t return_value)
 {
     struct _nala_instance_type_for_write *instance_p;
 
@@ -15162,6 +15985,8 @@ void write_mock_ignore_in_once(ssize_t return_value)
 
     NALA_INSTANCES_APPEND(nala_state_for_write.instances,
                           instance_p);
+
+    return (0);
 }
 
 void write_mock_set_errno(int errno_value)
@@ -15172,6 +15997,17 @@ void write_mock_set_errno(int errno_value)
 void write_mock_set_callback(void (*callback)(int fd, const void *buf, size_t count))
 {
     nala_get_data_write()->callback = callback;
+}
+
+struct nala_write_params_t *write_mock_get_params_in(int handle)
+{
+    (void)handle;
+
+    nala_test_failure(
+        nala_format(
+            "write_mock_get_params_in() is not yet implemented.\n"));
+
+    return (NULL);
 }
 
 void write_mock_ignore_fd_in(void)

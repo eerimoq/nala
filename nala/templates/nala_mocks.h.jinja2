@@ -36,15 +36,22 @@ void nala_assert_all_mocks_completed(void);
 
 {{ mock.DECL_MARKER }} {{ mock.func_name }}
 
+struct nala_{{mock.func_name}}_params_t {
+    {% for param in mock.params_struct %}
+    {{param | render}};
+    {% endfor %}
+};
+
 {% if mock.is_variadic_func %}
 {{ mock.variadic_func_real_wrapper_decl | render }};
 {% endif %}
 {{mock.mock_func | render}};
 {{mock.mock_once_func | render}};
-void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}});
-void {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}});
+int {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}});
+int {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}});
 {{mock.set_errno_func | render}};
 void {{mock.func_name}}_mock_set_callback({{mock.callback_decl | render}});
+struct nala_{{mock.func_name}}_params_t *{{mock.func_name}}_mock_get_params_in(int handle);
 {% for param in mock.ignore_params %}
 void {{mock.func_name}}_mock_ignore_{{param}}_in(void);
 {% endfor %}

@@ -168,6 +168,10 @@ def void_type(name):
     return node.TypeDecl(name, [], node.IdentifierType(['void']))
 
 
+def int_type(name):
+    return node.TypeDecl(name, [], node.IdentifierType(['int']))
+
+
 def rename_return_type(return_type, name):
     return_type = deepcopy(return_type)
     type_decl = return_type
@@ -291,9 +295,9 @@ class FunctionMock:
             "implementation",
             rename_return_type(return_type, "implementation"),
             create_implementation_params(self.func_params))
-        self.mock_func = self.void_function_decl(f'{self.func_name}_mock',
-                                                 mock_params)
-        self.mock_once_func = self.void_function_decl(
+        self.mock_func = self.int_function_decl(f'{self.func_name}_mock',
+                                                mock_params)
+        self.mock_once_func = self.int_function_decl(
             f'{self.func_name}_mock_once',
             mock_params)
         self.set_errno_func = self.void_function_decl(
@@ -371,6 +375,10 @@ class FunctionMock:
     def void_function_decl(self, name, parameters):
         return node.FuncDecl(node.ParamList(parameters),
                              void_type(name))
+
+    def int_function_decl(self, name, parameters):
+        return node.FuncDecl(node.ParamList(parameters),
+                             int_type(name))
 
     def rename_function(self, name):
         return decl(

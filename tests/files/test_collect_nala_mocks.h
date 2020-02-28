@@ -36,12 +36,17 @@ void nala_assert_all_mocks_completed(void);
 
 // NALA_DECLARATION bar
 
-void bar_mock(int return_value);
-void bar_mock_once(int return_value);
-void bar_mock_ignore_in(int return_value);
-void bar_mock_ignore_in_once(int return_value);
+struct nala_bar_params_t {
+    int dummy;
+};
+
+int bar_mock(int return_value);
+int bar_mock_once(int return_value);
+int bar_mock_ignore_in(int return_value);
+int bar_mock_ignore_in_once(int return_value);
 void bar_mock_set_errno(int errno_value);
 void bar_mock_set_callback(void (*callback)());
+struct nala_bar_params_t *bar_mock_get_params_in(int handle);
 void bar_mock_none(void);
 void bar_mock_implementation(int (*implementation)());
 void bar_mock_real(void);
@@ -53,12 +58,17 @@ void bar_mock_assert_completed(void);
 
 // NALA_DECLARATION fie
 
-void fie_mock(int return_value);
-void fie_mock_once(int return_value);
-void fie_mock_ignore_in(int return_value);
-void fie_mock_ignore_in_once(int return_value);
+struct nala_fie_params_t {
+    int dummy;
+};
+
+int fie_mock(int return_value);
+int fie_mock_once(int return_value);
+int fie_mock_ignore_in(int return_value);
+int fie_mock_ignore_in_once(int return_value);
 void fie_mock_set_errno(int errno_value);
 void fie_mock_set_callback(void (*callback)());
+struct nala_fie_params_t *fie_mock_get_params_in(int handle);
 void fie_mock_none(void);
 void fie_mock_implementation(int (*implementation)());
 void fie_mock_real(void);
@@ -70,12 +80,17 @@ void fie_mock_assert_completed(void);
 
 // NALA_DECLARATION foo
 
-void foo_mock(int return_value);
-void foo_mock_once(int return_value);
-void foo_mock_ignore_in(int return_value);
-void foo_mock_ignore_in_once(int return_value);
+struct nala_foo_params_t {
+    int dummy;
+};
+
+int foo_mock(int return_value);
+int foo_mock_once(int return_value);
+int foo_mock_ignore_in(int return_value);
+int foo_mock_ignore_in_once(int return_value);
 void foo_mock_set_errno(int errno_value);
 void foo_mock_set_callback(void (*callback)());
+struct nala_foo_params_t *foo_mock_get_params_in(int handle);
 void foo_mock_none(void);
 void foo_mock_implementation(int (*implementation)());
 void foo_mock_real(void);
@@ -87,12 +102,17 @@ void foo_mock_assert_completed(void);
 
 // NALA_DECLARATION fum
 
-void fum_mock(int return_value);
-void fum_mock_once(int return_value);
-void fum_mock_ignore_in(int return_value);
-void fum_mock_ignore_in_once(int return_value);
+struct nala_fum_params_t {
+    int dummy;
+};
+
+int fum_mock(int return_value);
+int fum_mock_once(int return_value);
+int fum_mock_ignore_in(int return_value);
+int fum_mock_ignore_in_once(int return_value);
 void fum_mock_set_errno(int errno_value);
 void fum_mock_set_callback(void (*callback)());
+struct nala_fum_params_t *fum_mock_get_params_in(int handle);
 void fum_mock_none(void);
 void fum_mock_implementation(int (*implementation)());
 void fum_mock_real(void);
@@ -104,12 +124,17 @@ void fum_mock_assert_completed(void);
 
 // NALA_DECLARATION gam
 
-void gam_mock(int return_value);
-void gam_mock_once(int return_value);
-void gam_mock_ignore_in(int return_value);
-void gam_mock_ignore_in_once(int return_value);
+struct nala_gam_params_t {
+    int dummy;
+};
+
+int gam_mock(int return_value);
+int gam_mock_once(int return_value);
+int gam_mock_ignore_in(int return_value);
+int gam_mock_ignore_in_once(int return_value);
 void gam_mock_set_errno(int errno_value);
 void gam_mock_set_callback(void (*callback)());
+struct nala_gam_params_t *gam_mock_get_params_in(int handle);
 void gam_mock_none(void);
 void gam_mock_implementation(int (*implementation)());
 void gam_mock_real(void);
@@ -121,12 +146,17 @@ void gam_mock_assert_completed(void);
 
 // NALA_DECLARATION hit
 
-void hit_mock(int return_value);
-void hit_mock_once(int return_value);
-void hit_mock_ignore_in(int return_value);
-void hit_mock_ignore_in_once(int return_value);
+struct nala_hit_params_t {
+    int dummy;
+};
+
+int hit_mock(int return_value);
+int hit_mock_once(int return_value);
+int hit_mock_ignore_in(int return_value);
+int hit_mock_ignore_in_once(int return_value);
 void hit_mock_set_errno(int errno_value);
 void hit_mock_set_callback(void (*callback)());
+struct nala_hit_params_t *hit_mock_get_params_in(int handle);
 void hit_mock_none(void);
 void hit_mock_implementation(int (*implementation)());
 void hit_mock_real(void);

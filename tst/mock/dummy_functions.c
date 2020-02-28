@@ -127,3 +127,8 @@ void likely_undefined_padding(struct likely_undefined_padding_t *value_p)
     value_p->b++;
     value_p->d++;
 }
+
+int call_with_arg(call_with_arg_t func, void *arg_p)
+{
+    return (func(arg_p));
+}

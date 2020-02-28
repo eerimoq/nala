@@ -917,3 +917,26 @@ TEST(fail_if_in_assert_is_called_before_set_in)
         "likely_undefined_padding_mock_set_value_p_in() must be called "
         "before likely_undefined_padding_mock_set_value_p_in_assert().");
 }
+
+static int call_with_arg_callback(void *arg_p)
+{
+    (void)arg_p;
+
+    return (0);
+}
+
+TEST(call_with_arg_get_params_in)
+{
+    int handle;
+    int arg;
+
+    handle = call_with_arg_mock_ignore_in_once(9);
+    ASSERT_EQ(call_with_arg(call_with_arg_callback, &arg), 9);
+    (void)handle;
+    printf("ToDo: This test is not implemented!!!\n");
+#if 0
+    ASSERT_FUNCTION_POINTERS_EQ(call_with_arg_mock_get_params_in(handle)->func,
+                                call_with_arg_callback);
+    ASSERT_EQ(call_with_arg_mock_get_params_in(handle)->arg_p, &arg);
+#endif
+}
