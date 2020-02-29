@@ -227,7 +227,6 @@ Per call control.
    <func>_mock_once(<params>, <res>) - check parameters and return once (per call)
    <func>_mock_ignore_in_once(<res>) - ignore parameters and return once (per call)
    <func>_mock_real_once()           - call real implementation once (per call)
-   <func>_mock_get_params_in(int)    - get call parameters for given handle
 
 Change behaviour of currect mock. Works for both per call and every
 call functions above.
@@ -236,6 +235,12 @@ call functions above.
 
    <func>_mock_set_errno(int)        - errno on return
    <func>_mock_set_callback(*)       - additional checks and/or actions
+
+Get per call input parameters.
+
+.. code-block::
+
+   <func>_mock_get_params_in(int)    - get call parameters for given handle
 
 For selected function parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
