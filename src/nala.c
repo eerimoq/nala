@@ -280,7 +280,7 @@ static void print_test_failure_report_end()
 static void print_signal_failure(struct nala_test_t *test_p)
 {
     print_test_failure_report_begin();
-    printf("  Test:  " COLOR(GREEN, "%s\n"), full_test_name(current_test_p));
+    printf("  Test:  " COLOR_BOLD(CYAN, "%s\n"), full_test_name(current_test_p));
     printf("  Error: " COLOR_BOLD(RED, "Terminated by signal %d.\n"),
            test_p->signal_number);
     print_test_failure_report_end();
@@ -826,7 +826,7 @@ void nala_test_failure(const char *message_p)
     capture_output_destroy(&capture_stdout);
     capture_output_destroy(&capture_stderr);
     print_test_failure_report_begin();
-    printf("  Test:  " COLOR(CYAN, "%s\n"), full_test_name(current_test_p));
+    printf("  Test:  " COLOR_BOLD(CYAN, "%s\n"), full_test_name(current_test_p));
     printf("  Error: %s", message_p);
     printf("\n");
     nala_traceback_print("  ", traceback_skip_filter, NULL);
