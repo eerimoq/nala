@@ -247,22 +247,22 @@ For selected function parameters
 
 .. code-block::
 
-   <func>_mock_ignore_<param>_in()               - ignore on input
-   <func>_mock_set_<param>_in(*, size_t)         - check on input
-   <func>_mock_set_<param>_in_assert(*)          - custom assert function on input
-   <func>_mock_set_<param>_in_pointer(*, size_t) - check pointer (the address) on input
-   <func>_mock_set_<param>_out(*, size_t)        - value on return
-   <func>_mock_set_<param>_out_copy(*)           - custom output copy function
+   void <func>_mock_ignore_<param>_in()               - ignore on input
+   void <func>_mock_set_<param>_in(*, size_t)         - check on input
+   void <func>_mock_set_<param>_in_assert(*)          - custom assert function on input
+   void <func>_mock_set_<param>_in_pointer(*, size_t) - check pointer (the address) on input
+   void <func>_mock_set_<param>_out(*, size_t)        - value on return
+   void <func>_mock_set_<param>_out_copy(*)           - custom output copy function
 
 For variadic functions
 ^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block::
 
-   <func>_mock_ignore_va_arg_in_at(uint)          - ignore on input
-   <func>_mock_set_va_arg_in_at(uint, *, size_t)  - check on input
-   <func>_mock_set_va_arg_in_pointer_at(uint, *)  - check pointer on input
-   <func>_mock_set_va_arg_out_at(uint, *, size_t) - value on return
+   void <func>_mock_ignore_va_arg_in_at(uint)          - ignore on input
+   void <func>_mock_set_va_arg_in_at(uint, *, size_t)  - check on input
+   void <func>_mock_set_va_arg_in_pointer_at(uint, *)  - check pointer on input
+   void <func>_mock_set_va_arg_out_at(uint, *, size_t) - value on return
 
 Limitations
 -----------
