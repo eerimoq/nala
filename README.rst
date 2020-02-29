@@ -213,34 +213,34 @@ Same behaviour for every call.
 
 .. code-block::
 
-   <func>_mock(<params>, <res>)      - check parameters and return
-   <func>_mock_ignore_in(<res>)      - ignore parameters and return
-   <func>_mock_none()                - no calls allowed
-   <func>_mock_implementation(*)     - replace implementation
-   <func>_mock_real()                - call real implementation
-   <func>_mock_reset()               - mock reset
+   void <func>_mock(<params>, <res>)     - check parameters and return
+   void <func>_mock_ignore_in(<res>)     - ignore parameters and return
+   void <func>_mock_none()               - no calls allowed
+   void <func>_mock_implementation(*)    - replace implementation
+   void <func>_mock_real()               - call real implementation
+   void <func>_mock_reset()              - mock reset
 
 Per call control.
 
 .. code-block::
 
-   <func>_mock_once(<params>, <res>) - check parameters and return once (per call)
-   <func>_mock_ignore_in_once(<res>) - ignore parameters and return once (per call)
-   <func>_mock_real_once()           - call real implementation once (per call)
+   int <func>_mock_once(<params>, <res>) - check parameters and return once (per call)
+   int <func>_mock_ignore_in_once(<res>) - ignore parameters and return once (per call)
+   void <func>_mock_real_once()          - call real implementation once (per call)
 
 Change behaviour of currect mock. Works for both per call and every
 call functions above.
 
 .. code-block::
 
-   <func>_mock_set_errno(int)        - errno on return
-   <func>_mock_set_callback(*)       - additional checks and/or actions
+   void <func>_mock_set_errno(int)       - errno on return
+   void <func>_mock_set_callback(*)      - additional checks and/or actions
 
 Get per call input parameters.
 
 .. code-block::
 
-   <func>_mock_get_params_in(int)    - get call parameters for given handle
+   *<func>_mock_get_params_in(int)       - get input parameters for given handle
 
 For selected function parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
