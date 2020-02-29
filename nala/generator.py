@@ -295,8 +295,8 @@ class FunctionMock:
             "implementation",
             rename_return_type(return_type, "implementation"),
             create_implementation_params(self.func_params))
-        self.mock_func = self.int_function_decl(f'{self.func_name}_mock',
-                                                mock_params)
+        self.mock_func = self.void_function_decl(f'{self.func_name}_mock',
+                                                 mock_params)
         self.mock_once_func = self.int_function_decl(
             f'{self.func_name}_mock_once',
             mock_params)

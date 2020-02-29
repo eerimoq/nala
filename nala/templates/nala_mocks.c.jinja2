@@ -67,16 +67,19 @@ struct _nala_data_type_for_{{mock.func_name}} {
     {{mock.implementation_decl | render}};
     {{mock.callback_decl | render}};
     struct nala_traceback_t traceback;
+    struct nala_{{mock.func_name}}_params_t params_in;
 };
 
 struct _nala_instance_type_for_{{mock.func_name}} {
     int mode;
+    int handle;
     struct _nala_data_type_for_{{mock.func_name}} data;
     struct _nala_instance_type_for_{{mock.func_name}} *next_p;
 };
 
 struct _nala_instances_type_for_{{mock.func_name}} {
     struct _nala_instance_type_for_{{mock.func_name}} *head_p;
+    struct _nala_instance_type_for_{{mock.func_name}} *next_p;
     struct _nala_instance_type_for_{{mock.func_name}} *tail_p;
     int length;
 };
@@ -97,6 +100,7 @@ static struct {{mock.state_type}} {{mock.state_name}} = {
     },
     .instances = {
         .head_p = NULL,
+        .next_p = NULL,
         .tail_p = NULL,
         .length = 0
     }
@@ -147,12 +151,15 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
         if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
             {% for param in mock.char_pointer_params %}
             MOCK_ASSERT_IN_EQ(_nala_data_p, {{mock.func_name}}, {{param.name}});
+            _nala_data_p->params_in.{{param.name}} = {{param.name}};
             {% endfor %}
             {% for param in mock.pointer_params %}
             MOCK_ASSERT_IN_EQ(_nala_data_p, {{mock.func_name}}, {{param.name}});
+            _nala_data_p->params_in.{{param.name}} = {{param.name}};
             {% endfor %}
             {% for param in mock.non_pointer_params %}
             MOCK_ASSERT_IN_EQ(_nala_data_p, {{mock.func_name}}, {{param.name}});
+            _nala_data_p->params_in.{{param.name}} = {{param.name}};
             {% endfor %}
 
             {% for param, check in mock.set_params %}
@@ -206,10 +213,6 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
                 {% endif %}
             {{mock.real_func}}({{mock.forward_args}});
             {% endif %}
-        }
-
-        if (_nala_instance_p != NULL) {
-            nala_free(_nala_instance_p);
         }
         break;
 
@@ -305,8 +308,6 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
     {{mock.state_name}}.data.errno_value = 0;
     {{mock.state_name}}.data.callback = NULL;
     nala_traceback(&{{mock.state_name}}.data.traceback);
-
-    return (0);
 }
 
 {{mock.mock_once_func | render}}
@@ -314,9 +315,7 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
     struct _nala_instance_type_for_{{mock.func_name}} *_nala_instance_p;
 
     {{mock.state_name}}.state.mode = MODE_MOCK_ONCE;
-    _nala_instance_p = nala_xmalloc(sizeof(*_nala_instance_p));
-    _nala_instance_p->mode = INSTANCE_MODE_NORMAL;
-    nala_traceback(&_nala_instance_p->data.traceback);
+    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
     {% for param, _ in mock.set_params %}
     nala_set_param_init(&_nala_instance_p->data.params.{{param.name}}_out);
     nala_set_param_init(&_nala_instance_p->data.params.{{param.name}}_in);
@@ -363,15 +362,13 @@ struct _nala_data_params_for_{{mock.func_name}} *nala_get_params_{{mock.func_nam
     {% endif %}
     _nala_instance_p->data.errno_value = 0;
     _nala_instance_p->data.callback = NULL;
-    _nala_instance_p->next_p = NULL;
-
     NALA_INSTANCES_APPEND({{mock.state_name}}.instances,
                           _nala_instance_p);
 
-    return (0);
+    return (_nala_instance_p->handle);
 }
 
-int {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
+void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
 {
     {{mock.state_name}}.state.mode = MODE_MOCK;
     {% for param in mock.char_pointer_params %}
@@ -388,8 +385,6 @@ int {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
     {% endif %}
     {{mock.state_name}}.data.errno_value = 0;
     {{mock.state_name}}.data.callback = NULL;
-
-    return (0);
 }
 
 int {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
@@ -397,9 +392,7 @@ int {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
     struct _nala_instance_type_for_{{mock.func_name}} *instance_p;
 
     {{mock.state_name}}.state.mode = MODE_MOCK_ONCE;
-    instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_NORMAL;
-    nala_traceback(&instance_p->data.traceback);
+    NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
     {% for param, _ in mock.set_params %}
     nala_set_param_init(&instance_p->data.params.{{param.name}}_out);
     nala_set_param_init(&instance_p->data.params.{{param.name}}_in);
@@ -426,12 +419,10 @@ int {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
     {% endif %}
     instance_p->data.errno_value = 0;
     instance_p->data.callback = NULL;
-    instance_p->next_p = NULL;
-
     NALA_INSTANCES_APPEND({{mock.state_name}}.instances,
                           instance_p);
 
-    return (0);
+    return (instance_p->handle);
 }
 
 {{mock.set_errno_func | render}}
@@ -446,13 +437,18 @@ void {{mock.func_name}}_mock_set_callback({{mock.callback_decl | render}})
 
 struct nala_{{mock.func_name}}_params_t *{{mock.func_name}}_mock_get_params_in(int handle)
 {
-    (void)handle;
+    struct _nala_instance_type_for_{{mock.func_name}} *instance_p;
 
-    nala_test_failure(
-        nala_format(
-            "{{mock.func_name}}_mock_get_params_in() is not yet implemented.\n"));
+    NALA_INSTANCES_FIND_USED({{mock.state_name}}.instances, &instance_p, handle);
 
-    return (NULL);
+    if (instance_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "{{mock.func_name}}() has not been called yet for given mock "
+                "handle. No parameters available.\n"));
+    }
+
+    return (&instance_p->data.params_in);
 }
 {% for param in mock.ignore_params %}
 
@@ -579,11 +575,7 @@ void {{mock.func_name}}_mock_real_once(void)
     struct _nala_instance_type_for_{{mock.func_name}} *instance_p;
 
     {{mock.state_name}}.state.mode = MODE_MOCK_ONCE;
-    instance_p = nala_xmalloc(sizeof(*instance_p));
-    instance_p->mode = INSTANCE_MODE_REAL;
-    nala_traceback(&instance_p->data.traceback);
-    instance_p->next_p = NULL;
-
+    NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
     NALA_INSTANCES_APPEND({{mock.state_name}}.instances,
                           instance_p);
 }
@@ -600,7 +592,10 @@ void {{mock.func_name}}_mock_resume(void)
 
 void {{mock.func_name}}_mock_reset(void)
 {
-    NALA_STATE_RESET({{mock.state_name}});
+    struct _nala_instance_type_for_{{mock.func_name}} *current_p;
+    struct _nala_instance_type_for_{{mock.func_name}} *tmp_p;
+
+    NALA_STATE_RESET({{mock.state_name}}, current_p, tmp_p);
 }
 
 void {{mock.func_name}}_mock_assert_completed(void)

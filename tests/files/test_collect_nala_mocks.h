@@ -40,9 +40,9 @@ struct nala_bar_params_t {
     int dummy;
 };
 
-int bar_mock(int return_value);
+void bar_mock(int return_value);
 int bar_mock_once(int return_value);
-int bar_mock_ignore_in(int return_value);
+void bar_mock_ignore_in(int return_value);
 int bar_mock_ignore_in_once(int return_value);
 void bar_mock_set_errno(int errno_value);
 void bar_mock_set_callback(void (*callback)());
@@ -62,9 +62,9 @@ struct nala_fie_params_t {
     int dummy;
 };
 
-int fie_mock(int return_value);
+void fie_mock(int return_value);
 int fie_mock_once(int return_value);
-int fie_mock_ignore_in(int return_value);
+void fie_mock_ignore_in(int return_value);
 int fie_mock_ignore_in_once(int return_value);
 void fie_mock_set_errno(int errno_value);
 void fie_mock_set_callback(void (*callback)());
@@ -84,9 +84,9 @@ struct nala_foo_params_t {
     int dummy;
 };
 
-int foo_mock(int return_value);
+void foo_mock(int return_value);
 int foo_mock_once(int return_value);
-int foo_mock_ignore_in(int return_value);
+void foo_mock_ignore_in(int return_value);
 int foo_mock_ignore_in_once(int return_value);
 void foo_mock_set_errno(int errno_value);
 void foo_mock_set_callback(void (*callback)());
@@ -106,9 +106,9 @@ struct nala_fum_params_t {
     int dummy;
 };
 
-int fum_mock(int return_value);
+void fum_mock(int return_value);
 int fum_mock_once(int return_value);
-int fum_mock_ignore_in(int return_value);
+void fum_mock_ignore_in(int return_value);
 int fum_mock_ignore_in_once(int return_value);
 void fum_mock_set_errno(int errno_value);
 void fum_mock_set_callback(void (*callback)());
@@ -128,9 +128,9 @@ struct nala_gam_params_t {
     int dummy;
 };
 
-int gam_mock(int return_value);
+void gam_mock(int return_value);
 int gam_mock_once(int return_value);
-int gam_mock_ignore_in(int return_value);
+void gam_mock_ignore_in(int return_value);
 int gam_mock_ignore_in_once(int return_value);
 void gam_mock_set_errno(int errno_value);
 void gam_mock_set_callback(void (*callback)());
@@ -150,9 +150,9 @@ struct nala_hit_params_t {
     int dummy;
 };
 
-int hit_mock(int return_value);
+void hit_mock(int return_value);
 int hit_mock_once(int return_value);
-int hit_mock_ignore_in(int return_value);
+void hit_mock_ignore_in(int return_value);
 int hit_mock_ignore_in_once(int return_value);
 void hit_mock_set_errno(int errno_value);
 void hit_mock_set_callback(void (*callback)());

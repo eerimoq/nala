@@ -51,9 +51,9 @@ struct nala_add_params_t {
     int y;
 };
 
-int add_mock(int x, int y, int return_value);
+void add_mock(int x, int y, int return_value);
 int add_mock_once(int x, int y, int return_value);
-int add_mock_ignore_in(int return_value);
+void add_mock_ignore_in(int return_value);
 int add_mock_ignore_in_once(int return_value);
 void add_mock_set_errno(int errno_value);
 void add_mock_set_callback(void (*callback)(int x, int y));
@@ -75,9 +75,9 @@ struct nala_call_params_t {
     int (*callback)(int value);
 };
 
-int call_mock(int return_value);
+void call_mock(int return_value);
 int call_mock_once(int return_value);
-int call_mock_ignore_in(int return_value);
+void call_mock_ignore_in(int return_value);
 int call_mock_ignore_in_once(int return_value);
 void call_mock_set_errno(int errno_value);
 void call_mock_set_callback(void (*callback)(int (*callback)(int value)));
@@ -102,9 +102,9 @@ struct nala_close_params_t {
     int fd;
 };
 
-int close_mock(int fd, int return_value);
+void close_mock(int fd, int return_value);
 int close_mock_once(int fd, int return_value);
-int close_mock_ignore_in(int return_value);
+void close_mock_ignore_in(int return_value);
 int close_mock_ignore_in_once(int return_value);
 void close_mock_set_errno(int errno_value);
 void close_mock_set_callback(void (*callback)(int fd));
@@ -126,9 +126,9 @@ struct nala_compose_twice_params_t {
     DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct);
 };
 
-int compose_twice_mock(DummyStruct *return_value);
+void compose_twice_mock(DummyStruct *return_value);
 int compose_twice_mock_once(DummyStruct *return_value);
-int compose_twice_mock_ignore_in(DummyStruct *return_value);
+void compose_twice_mock_ignore_in(DummyStruct *return_value);
 int compose_twice_mock_ignore_in_once(DummyStruct *return_value);
 void compose_twice_mock_set_errno(int errno_value);
 void compose_twice_mock_set_callback(void (*callback)(DummyStruct *dummy_struct, DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct)));
@@ -158,9 +158,9 @@ struct nala_double_pointer_params_t {
     int **value_pp;
 };
 
-int double_pointer_mock(int return_value);
+void double_pointer_mock(int return_value);
 int double_pointer_mock_once(int return_value);
-int double_pointer_mock_ignore_in(int return_value);
+void double_pointer_mock_ignore_in(int return_value);
 int double_pointer_mock_ignore_in_once(int return_value);
 void double_pointer_mock_set_errno(int errno_value);
 void double_pointer_mock_set_callback(void (*callback)(int **value_pp));
@@ -185,9 +185,9 @@ struct nala_dup_params_t {
     int oldfd;
 };
 
-int dup_mock(int oldfd, int return_value);
+void dup_mock(int oldfd, int return_value);
 int dup_mock_once(int oldfd, int return_value);
-int dup_mock_ignore_in(int return_value);
+void dup_mock_ignore_in(int return_value);
 int dup_mock_ignore_in_once(int return_value);
 void dup_mock_set_errno(int errno_value);
 void dup_mock_set_callback(void (*callback)(int oldfd));
@@ -209,9 +209,9 @@ struct nala_dup2_params_t {
     int newfd;
 };
 
-int dup2_mock(int oldfd, int newfd, int return_value);
+void dup2_mock(int oldfd, int newfd, int return_value);
 int dup2_mock_once(int oldfd, int newfd, int return_value);
-int dup2_mock_ignore_in(int return_value);
+void dup2_mock_ignore_in(int return_value);
 int dup2_mock_ignore_in_once(int return_value);
 void dup2_mock_set_errno(int errno_value);
 void dup2_mock_set_callback(void (*callback)(int oldfd, int newfd));
@@ -234,9 +234,9 @@ struct nala_edit_number_params_t {
     int number;
 };
 
-int edit_number_mock(int number, DummyStruct *return_value);
+void edit_number_mock(int number, DummyStruct *return_value);
 int edit_number_mock_once(int number, DummyStruct *return_value);
-int edit_number_mock_ignore_in(DummyStruct *return_value);
+void edit_number_mock_ignore_in(DummyStruct *return_value);
 int edit_number_mock_ignore_in_once(DummyStruct *return_value);
 void edit_number_mock_set_errno(int errno_value);
 void edit_number_mock_set_callback(void (*callback)(DummyStruct *dummy_struct, int number));
@@ -262,9 +262,9 @@ struct nala_endmntent_params_t {
     FILE *streamp;
 };
 
-int endmntent_mock(int return_value);
+void endmntent_mock(int return_value);
 int endmntent_mock_once(int return_value);
-int endmntent_mock_ignore_in(int return_value);
+void endmntent_mock_ignore_in(int return_value);
 int endmntent_mock_ignore_in_once(int return_value);
 void endmntent_mock_set_errno(int errno_value);
 void endmntent_mock_set_callback(void (*callback)(FILE *streamp));
@@ -289,9 +289,9 @@ struct nala_enum_param_params_t {
     enum enum_param_type value;
 };
 
-int enum_param_mock(enum enum_param_type value);
+void enum_param_mock(enum enum_param_type value);
 int enum_param_mock_once(enum enum_param_type value);
-int enum_param_mock_ignore_in(void);
+void enum_param_mock_ignore_in(void);
 int enum_param_mock_ignore_in_once(void);
 void enum_param_mock_set_errno(int errno_value);
 void enum_param_mock_set_callback(void (*callback)(enum enum_param_type value));
@@ -312,9 +312,9 @@ struct nala_fclose_params_t {
     FILE *stream;
 };
 
-int fclose_mock(int return_value);
+void fclose_mock(int return_value);
 int fclose_mock_once(int return_value);
-int fclose_mock_ignore_in(int return_value);
+void fclose_mock_ignore_in(int return_value);
 int fclose_mock_ignore_in_once(int return_value);
 void fclose_mock_set_errno(int errno_value);
 void fclose_mock_set_callback(void (*callback)(FILE *stream));
@@ -339,9 +339,9 @@ struct nala_fflush_params_t {
     FILE *stream;
 };
 
-int fflush_mock(int return_value);
+void fflush_mock(int return_value);
 int fflush_mock_once(int return_value);
-int fflush_mock_ignore_in(int return_value);
+void fflush_mock_ignore_in(int return_value);
 int fflush_mock_ignore_in_once(int return_value);
 void fflush_mock_set_errno(int errno_value);
 void fflush_mock_set_callback(void (*callback)(FILE *stream));
@@ -366,9 +366,9 @@ struct nala_fileno_params_t {
     FILE *stream;
 };
 
-int fileno_mock(int return_value);
+void fileno_mock(int return_value);
 int fileno_mock_once(int return_value);
-int fileno_mock_ignore_in(int return_value);
+void fileno_mock_ignore_in(int return_value);
 int fileno_mock_ignore_in_once(int return_value);
 void fileno_mock_set_errno(int errno_value);
 void fileno_mock_set_callback(void (*callback)(FILE *stream));
@@ -394,9 +394,9 @@ struct nala_fopen_params_t {
     const char *mode;
 };
 
-int fopen_mock(const char *path, const char *mode, FILE *return_value);
+void fopen_mock(const char *path, const char *mode, FILE *return_value);
 int fopen_mock_once(const char *path, const char *mode, FILE *return_value);
-int fopen_mock_ignore_in(FILE *return_value);
+void fopen_mock_ignore_in(FILE *return_value);
 int fopen_mock_ignore_in_once(FILE *return_value);
 void fopen_mock_set_errno(int errno_value);
 void fopen_mock_set_callback(void (*callback)(const char *path, const char *mode));
@@ -431,9 +431,9 @@ struct nala_fread_params_t {
     FILE *stream;
 };
 
-int fread_mock(size_t size, size_t nmemb, size_t return_value);
+void fread_mock(size_t size, size_t nmemb, size_t return_value);
 int fread_mock_once(size_t size, size_t nmemb, size_t return_value);
-int fread_mock_ignore_in(size_t return_value);
+void fread_mock_ignore_in(size_t return_value);
 int fread_mock_ignore_in_once(size_t return_value);
 void fread_mock_set_errno(int errno_value);
 void fread_mock_set_callback(void (*callback)(void *ptr, size_t size, size_t nmemb, FILE *stream));
@@ -465,9 +465,9 @@ struct nala_free_params_t {
     void *ptr;
 };
 
-int free_mock();
+void free_mock();
 int free_mock_once();
-int free_mock_ignore_in(void);
+void free_mock_ignore_in(void);
 int free_mock_ignore_in_once(void);
 void free_mock_set_errno(int errno_value);
 void free_mock_set_callback(void (*callback)(void *ptr));
@@ -494,9 +494,9 @@ struct nala_fseek_params_t {
     int whence;
 };
 
-int fseek_mock(long int offset, int whence, int return_value);
+void fseek_mock(long int offset, int whence, int return_value);
 int fseek_mock_once(long int offset, int whence, int return_value);
-int fseek_mock_ignore_in(int return_value);
+void fseek_mock_ignore_in(int return_value);
 int fseek_mock_ignore_in_once(int return_value);
 void fseek_mock_set_errno(int errno_value);
 void fseek_mock_set_callback(void (*callback)(FILE *stream, long int offset, int whence));
@@ -523,9 +523,9 @@ struct nala_ftell_params_t {
     FILE *stream;
 };
 
-int ftell_mock(long int return_value);
+void ftell_mock(long int return_value);
 int ftell_mock_once(long int return_value);
-int ftell_mock_ignore_in(long int return_value);
+void ftell_mock_ignore_in(long int return_value);
 int ftell_mock_ignore_in_once(long int return_value);
 void ftell_mock_set_errno(int errno_value);
 void ftell_mock_set_callback(void (*callback)(FILE *stream));
@@ -553,9 +553,9 @@ struct nala_fwrite_params_t {
     FILE *stream;
 };
 
-int fwrite_mock(size_t size, size_t nmemb, size_t return_value);
+void fwrite_mock(size_t size, size_t nmemb, size_t return_value);
 int fwrite_mock_once(size_t size, size_t nmemb, size_t return_value);
-int fwrite_mock_ignore_in(size_t return_value);
+void fwrite_mock_ignore_in(size_t return_value);
 int fwrite_mock_ignore_in_once(size_t return_value);
 void fwrite_mock_set_errno(int errno_value);
 void fwrite_mock_set_callback(void (*callback)(const void *ptr, size_t size, size_t nmemb, FILE *stream));
@@ -587,9 +587,9 @@ struct nala_getmntent_params_t {
     FILE *stream;
 };
 
-int getmntent_mock(struct mntent *return_value);
+void getmntent_mock(struct mntent *return_value);
 int getmntent_mock_once(struct mntent *return_value);
-int getmntent_mock_ignore_in(struct mntent *return_value);
+void getmntent_mock_ignore_in(struct mntent *return_value);
 int getmntent_mock_ignore_in_once(struct mntent *return_value);
 void getmntent_mock_set_errno(int errno_value);
 void getmntent_mock_set_callback(void (*callback)(FILE *stream));
@@ -614,9 +614,9 @@ struct nala_in_out_params_t {
     int *buf_p;
 };
 
-int in_out_mock();
+void in_out_mock();
 int in_out_mock_once();
-int in_out_mock_ignore_in(void);
+void in_out_mock_ignore_in(void);
 int in_out_mock_ignore_in_once(void);
 void in_out_mock_set_errno(int errno_value);
 void in_out_mock_set_callback(void (*callback)(int *buf_p));
@@ -643,9 +643,9 @@ struct nala_io_control_params_t {
 };
 
 int io_control_mock_va_arg_real(int kind, va_list __nala_va_list);
-int io_control_mock(int kind, int return_value, const char *vafmt_p, ...);
+void io_control_mock(int kind, int return_value, const char *vafmt_p, ...);
 int io_control_mock_once(int kind, int return_value, const char *vafmt_p, ...);
-int io_control_mock_ignore_in(int return_value);
+void io_control_mock_ignore_in(int return_value);
 int io_control_mock_ignore_in_once(int return_value);
 void io_control_mock_set_errno(int errno_value);
 void io_control_mock_set_callback(void (*callback)(int kind, va_list __nala_va_list));
@@ -671,9 +671,9 @@ struct nala_io_vcontrol_params_t {
     va_list ap;
 };
 
-int io_vcontrol_mock(int kind, int return_value);
+void io_vcontrol_mock(int kind, int return_value);
 int io_vcontrol_mock_once(int kind, int return_value);
-int io_vcontrol_mock_ignore_in(int return_value);
+void io_vcontrol_mock_ignore_in(int return_value);
 int io_vcontrol_mock_ignore_in_once(int return_value);
 void io_vcontrol_mock_set_errno(int errno_value);
 void io_vcontrol_mock_set_callback(void (*callback)(int kind, va_list ap));
@@ -694,9 +694,9 @@ struct nala_malloc_params_t {
     size_t size;
 };
 
-int malloc_mock(size_t size, void *return_value);
+void malloc_mock(size_t size, void *return_value);
 int malloc_mock_once(size_t size, void *return_value);
-int malloc_mock_ignore_in(void *return_value);
+void malloc_mock_ignore_in(void *return_value);
 int malloc_mock_ignore_in_once(void *return_value);
 void malloc_mock_set_errno(int errno_value);
 void malloc_mock_set_callback(void (*callback)(size_t size));
@@ -721,9 +721,9 @@ struct nala_mount_params_t {
     const void *data;
 };
 
-int mount_mock(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, int return_value);
+void mount_mock(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, int return_value);
 int mount_mock_once(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, int return_value);
-int mount_mock_ignore_in(int return_value);
+void mount_mock_ignore_in(int return_value);
 int mount_mock_ignore_in_once(int return_value);
 void mount_mock_set_errno(int errno_value);
 void mount_mock_set_callback(void (*callback)(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, const void *data));
@@ -767,9 +767,9 @@ struct nala_output_message_params_t {
     const char *message;
 };
 
-int output_message_mock(const char *message);
+void output_message_mock(const char *message);
 int output_message_mock_once(const char *message);
-int output_message_mock_ignore_in(void);
+void output_message_mock_ignore_in(void);
 int output_message_mock_ignore_in_once(void);
 void output_message_mock_set_errno(int errno_value);
 void output_message_mock_set_callback(void (*callback)(const char *message));
@@ -795,9 +795,9 @@ struct nala_pipe_params_t {
     int *pipefd;
 };
 
-int pipe_mock(int return_value);
+void pipe_mock(int return_value);
 int pipe_mock_once(int return_value);
-int pipe_mock_ignore_in(int return_value);
+void pipe_mock_ignore_in(int return_value);
 int pipe_mock_ignore_in_once(int return_value);
 void pipe_mock_set_errno(int errno_value);
 void pipe_mock_set_callback(void (*callback)(int pipefd[2]));
@@ -824,9 +824,9 @@ struct nala_poll_params_t {
     int timeout;
 };
 
-int poll_mock(nfds_t nfds, int timeout, int return_value);
+void poll_mock(nfds_t nfds, int timeout, int return_value);
 int poll_mock_once(nfds_t nfds, int timeout, int return_value);
-int poll_mock_ignore_in(int return_value);
+void poll_mock_ignore_in(int return_value);
 int poll_mock_ignore_in_once(int return_value);
 void poll_mock_set_errno(int errno_value);
 void poll_mock_set_callback(void (*callback)(struct pollfd *fds, nfds_t nfds, int timeout));
@@ -853,9 +853,9 @@ struct nala_print_hello_params_t {
     int dummy;
 };
 
-int print_hello_mock();
+void print_hello_mock();
 int print_hello_mock_once();
-int print_hello_mock_ignore_in(void);
+void print_hello_mock_ignore_in(void);
 int print_hello_mock_ignore_in_once(void);
 void print_hello_mock_set_errno(int errno_value);
 void print_hello_mock_set_callback(void (*callback)());
@@ -877,9 +877,9 @@ struct nala_read_params_t {
     size_t count;
 };
 
-int read_mock(int fd, size_t count, ssize_t return_value);
+void read_mock(int fd, size_t count, ssize_t return_value);
 int read_mock_once(int fd, size_t count, ssize_t return_value);
-int read_mock_ignore_in(ssize_t return_value);
+void read_mock_ignore_in(ssize_t return_value);
 int read_mock_ignore_in_once(ssize_t return_value);
 void read_mock_set_errno(int errno_value);
 void read_mock_set_callback(void (*callback)(int fd, void *buf, size_t count));
@@ -911,9 +911,9 @@ struct nala_sendto_params_t {
     socklen_t addrlen;
 };
 
-int sendto_mock(int sockfd, size_t len, int flags, socklen_t addrlen, ssize_t return_value);
+void sendto_mock(int sockfd, size_t len, int flags, socklen_t addrlen, ssize_t return_value);
 int sendto_mock_once(int sockfd, size_t len, int flags, socklen_t addrlen, ssize_t return_value);
-int sendto_mock_ignore_in(ssize_t return_value);
+void sendto_mock_ignore_in(ssize_t return_value);
 int sendto_mock_ignore_in_once(ssize_t return_value);
 void sendto_mock_set_errno(int errno_value);
 void sendto_mock_set_callback(void (*callback)(int sockfd, const void *buf, size_t len, int flags, const struct sockaddr *dest_addr, socklen_t addrlen));
@@ -951,9 +951,9 @@ struct nala_setsockopt_params_t {
     socklen_t optlen;
 };
 
-int setsockopt_mock(int sockfd, int level, int optname, socklen_t optlen, int return_value);
+void setsockopt_mock(int sockfd, int level, int optname, socklen_t optlen, int return_value);
 int setsockopt_mock_once(int sockfd, int level, int optname, socklen_t optlen, int return_value);
-int setsockopt_mock_ignore_in(int return_value);
+void setsockopt_mock_ignore_in(int return_value);
 int setsockopt_mock_ignore_in_once(int return_value);
 void setsockopt_mock_set_errno(int errno_value);
 void setsockopt_mock_set_callback(void (*callback)(int sockfd, int level, int optname, const void *optval, socklen_t optlen));
@@ -982,9 +982,9 @@ struct nala_sleep_params_t {
     unsigned int seconds;
 };
 
-int sleep_mock(unsigned int seconds, unsigned int return_value);
+void sleep_mock(unsigned int seconds, unsigned int return_value);
 int sleep_mock_once(unsigned int seconds, unsigned int return_value);
-int sleep_mock_ignore_in(unsigned int return_value);
+void sleep_mock_ignore_in(unsigned int return_value);
 int sleep_mock_ignore_in_once(unsigned int return_value);
 void sleep_mock_set_errno(int errno_value);
 void sleep_mock_set_callback(void (*callback)(unsigned int seconds));
@@ -1006,9 +1006,9 @@ struct nala_statvfs_params_t {
     struct statvfs *buf;
 };
 
-int statvfs_mock(const char *path, int return_value);
+void statvfs_mock(const char *path, int return_value);
 int statvfs_mock_once(const char *path, int return_value);
-int statvfs_mock_ignore_in(int return_value);
+void statvfs_mock_ignore_in(int return_value);
 int statvfs_mock_ignore_in_once(int return_value);
 void statvfs_mock_set_errno(int errno_value);
 void statvfs_mock_set_callback(void (*callback)(const char *path, struct statvfs *buf));
@@ -1039,9 +1039,9 @@ struct nala_struct_param_params_t {
     struct struct_param_type *data;
 };
 
-int struct_param_mock();
+void struct_param_mock();
 int struct_param_mock_once();
-int struct_param_mock_ignore_in(void);
+void struct_param_mock_ignore_in(void);
 int struct_param_mock_ignore_in_once(void);
 void struct_param_mock_set_errno(int errno_value);
 void struct_param_mock_set_callback(void (*callback)(struct struct_param_type *data));
@@ -1066,9 +1066,9 @@ struct nala_struct_param_and_return_type_params_t {
     struct struct_param_type arg;
 };
 
-int struct_param_and_return_type_mock(struct struct_param_type return_value);
+void struct_param_and_return_type_mock(struct struct_param_type return_value);
 int struct_param_and_return_type_mock_once(struct struct_param_type return_value);
-int struct_param_and_return_type_mock_ignore_in(struct struct_param_type return_value);
+void struct_param_and_return_type_mock_ignore_in(struct struct_param_type return_value);
 int struct_param_and_return_type_mock_ignore_in_once(struct struct_param_type return_value);
 void struct_param_and_return_type_mock_set_errno(int errno_value);
 void struct_param_and_return_type_mock_set_callback(void (*callback)(struct struct_param_type arg));
@@ -1088,9 +1088,9 @@ struct nala_time_params_t {
     time_t *tloc;
 };
 
-int time_mock(time_t return_value);
+void time_mock(time_t return_value);
 int time_mock_once(time_t return_value);
-int time_mock_ignore_in(time_t return_value);
+void time_mock_ignore_in(time_t return_value);
 int time_mock_ignore_in_once(time_t return_value);
 void time_mock_set_errno(int errno_value);
 void time_mock_set_callback(void (*callback)(time_t *tloc));
@@ -1118,9 +1118,9 @@ struct nala_timerfd_settime_params_t {
     struct itimerspec *old_value;
 };
 
-int timerfd_settime_mock(int fd, int flags, int return_value);
+void timerfd_settime_mock(int fd, int flags, int return_value);
 int timerfd_settime_mock_once(int fd, int flags, int return_value);
-int timerfd_settime_mock_ignore_in(int return_value);
+void timerfd_settime_mock_ignore_in(int return_value);
 int timerfd_settime_mock_ignore_in_once(int return_value);
 void timerfd_settime_mock_set_errno(int errno_value);
 void timerfd_settime_mock_set_callback(void (*callback)(int fd, int flags, const struct itimerspec *new_value, struct itimerspec *old_value));
@@ -1152,9 +1152,9 @@ struct nala_tmpfile_params_t {
     int dummy;
 };
 
-int tmpfile_mock(FILE *return_value);
+void tmpfile_mock(FILE *return_value);
 int tmpfile_mock_once(FILE *return_value);
-int tmpfile_mock_ignore_in(FILE *return_value);
+void tmpfile_mock_ignore_in(FILE *return_value);
 int tmpfile_mock_ignore_in_once(FILE *return_value);
 void tmpfile_mock_set_errno(int errno_value);
 void tmpfile_mock_set_callback(void (*callback)(void));
@@ -1174,9 +1174,9 @@ struct nala_typedef_struct_param_and_return_type_params_t {
     struct_param_type arg;
 };
 
-int typedef_struct_param_and_return_type_mock(struct_param_type return_value);
+void typedef_struct_param_and_return_type_mock(struct_param_type return_value);
 int typedef_struct_param_and_return_type_mock_once(struct_param_type return_value);
-int typedef_struct_param_and_return_type_mock_ignore_in(struct_param_type return_value);
+void typedef_struct_param_and_return_type_mock_ignore_in(struct_param_type return_value);
 int typedef_struct_param_and_return_type_mock_ignore_in_once(struct_param_type return_value);
 void typedef_struct_param_and_return_type_mock_set_errno(int errno_value);
 void typedef_struct_param_and_return_type_mock_set_callback(void (*callback)(struct_param_type arg));
@@ -1196,9 +1196,9 @@ struct nala_typedef_union_param_and_return_type_params_t {
     union_type arg;
 };
 
-int typedef_union_param_and_return_type_mock(union_type return_value);
+void typedef_union_param_and_return_type_mock(union_type return_value);
 int typedef_union_param_and_return_type_mock_once(union_type return_value);
-int typedef_union_param_and_return_type_mock_ignore_in(union_type return_value);
+void typedef_union_param_and_return_type_mock_ignore_in(union_type return_value);
 int typedef_union_param_and_return_type_mock_ignore_in_once(union_type return_value);
 void typedef_union_param_and_return_type_mock_set_errno(int errno_value);
 void typedef_union_param_and_return_type_mock_set_callback(void (*callback)(union_type arg));
@@ -1218,9 +1218,9 @@ struct nala_union_param_and_return_type_params_t {
     union union_type arg;
 };
 
-int union_param_and_return_type_mock(union union_type return_value);
+void union_param_and_return_type_mock(union union_type return_value);
 int union_param_and_return_type_mock_once(union union_type return_value);
-int union_param_and_return_type_mock_ignore_in(union union_type return_value);
+void union_param_and_return_type_mock_ignore_in(union union_type return_value);
 int union_param_and_return_type_mock_ignore_in_once(union union_type return_value);
 void union_param_and_return_type_mock_set_errno(int errno_value);
 void union_param_and_return_type_mock_set_callback(void (*callback)(union union_type arg));
@@ -1240,9 +1240,9 @@ struct nala_usleep_params_t {
     __useconds_t usec;
 };
 
-int usleep_mock(__useconds_t usec, int return_value);
+void usleep_mock(__useconds_t usec, int return_value);
 int usleep_mock_once(__useconds_t usec, int return_value);
-int usleep_mock_ignore_in(int return_value);
+void usleep_mock_ignore_in(int return_value);
 int usleep_mock_ignore_in_once(int return_value);
 void usleep_mock_set_errno(int errno_value);
 void usleep_mock_set_callback(void (*callback)(__useconds_t usec));
@@ -1265,9 +1265,9 @@ struct nala_write_params_t {
     size_t count;
 };
 
-int write_mock(int fd, size_t count, ssize_t return_value);
+void write_mock(int fd, size_t count, ssize_t return_value);
 int write_mock_once(int fd, size_t count, ssize_t return_value);
-int write_mock_ignore_in(ssize_t return_value);
+void write_mock_ignore_in(ssize_t return_value);
 int write_mock_ignore_in_once(ssize_t return_value);
 void write_mock_set_errno(int errno_value);
 void write_mock_set_callback(void (*callback)(int fd, const void *buf, size_t count));

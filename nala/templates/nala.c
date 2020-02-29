@@ -9,6 +9,15 @@
 #define INSTANCE_MODE_NORMAL  0
 #define INSTANCE_MODE_REAL    1
 
+#define NALA_INSTANCE_NEW(instance_p, mode_in)          \
+    do {                                                \
+        instance_p = nala_xmalloc(sizeof(*instance_p)); \
+        instance_p->mode = mode_in;                     \
+        instance_p->handle = next_handle++;             \
+        instance_p->next_p = NULL;                      \
+        nala_traceback(&instance_p->data.traceback);    \
+    } while (0);
+
 #define NALA_INSTANCES_APPEND(list, item_p)     \
     do {                                        \
         if ((list).head_p == NULL) {            \
@@ -17,31 +26,67 @@
             (list).tail_p->next_p = item_p;     \
         }                                       \
                                                 \
+        if ((list).next_p == NULL) {            \
+            (list).next_p = item_p;             \
+        }                                       \
+                                                \
         (list).tail_p = item_p;                 \
         (list).length++;                        \
     } while (0);
 
 #define NALA_INSTANCES_POP(list, instance_pp)           \
     do {                                                \
-        *(instance_pp) = (list).head_p;                 \
+        *(instance_pp) = (list).next_p;                 \
                                                         \
         if (*(instance_pp) != NULL) {                   \
-            (list).head_p = (*(instance_pp))->next_p;   \
+            (list).next_p = (*(instance_pp))->next_p;   \
                                                         \
             if ((*(instance_pp))->next_p == NULL) {     \
-                (list).tail_p = NULL;                   \
+                (list).next_p = NULL;                   \
             }                                           \
                                                         \
             (list).length--;                            \
         }                                               \
     } while (0);
 
-#define NALA_STATE_RESET(_state)                \
-    (_state).state.mode = MODE_REAL;            \
-    (_state).state.suspended.count = 0;         \
-    (_state).instances.head_p = NULL;           \
-    (_state).instances.tail_p = NULL;           \
-    (_state).instances.length = 0;
+#define NALA_INSTANCES_DESTROY(list, current_p, tmp_p)  \
+    do {                                                \
+        current_p = (list).head_p;                      \
+                                                        \
+        while (current_p != NULL) {                     \
+            tmp_p = current_p;                          \
+            current_p = current_p->next_p;              \
+            nala_free(tmp_p);                           \
+        }                                               \
+                                                        \
+        (list).head_p = NULL;                           \
+        (list).next_p = NULL;                           \
+        (list).tail_p = NULL;                           \
+        (list).length = 0;                              \
+    } while (0);
+
+#define NALA_INSTANCES_FIND_USED(list, instance_pp, handle_in)  \
+    do {                                                        \
+        *(instance_pp) = (list).head_p;                         \
+                                                                \
+        while (*(instance_pp) != NULL) {                        \
+            if (*(instance_pp) == (list).next_p) {              \
+                *(instance_pp) = NULL;                          \
+                break;                                          \
+            }                                                   \
+                                                                \
+            if ((*(instance_pp))->handle == handle_in) {        \
+                break;                                          \
+            }                                                   \
+                                                                \
+            *(instance_pp) = (*(instance_pp))->next_p;          \
+        }                                                       \
+    } while (0);
+
+#define NALA_STATE_RESET(_state, current_p, tmp_p)                      \
+    (_state).state.mode = MODE_REAL;                                    \
+    (_state).state.suspended.count = 0;                                 \
+    NALA_INSTANCES_DESTROY((_state).instances, current_p, tmp_p)      
 
 struct nala_set_param {
     void *buf_p;
@@ -415,7 +460,7 @@ char *format_mock_traceback(const char *message_p,
     size_t file_size;
     char *formatted_traceback_p;
 
-    nala_reset_all_mocks();
+    nala_suspend_all_mocks();
 
     if (traceback_p != NULL) {
         formatted_traceback_p = nala_mock_traceback_format(
@@ -460,7 +505,7 @@ char *format_mock_traceback(const char *message_p,
 #define MOCK_ASSERT_IN_EQ(data_p, func, param)                          \
     if (!(data_p)->params.ignore_ ## param ## _in) {                    \
         if ((data_p)->params.param != param) {                          \
-            nala_reset_all_mocks();                                     \
+            nala_suspend_all_mocks();                                   \
             char _nala_assert_format[512];                              \
             snprintf(&_nala_assert_format[0],                           \
                      sizeof(_nala_assert_format),                       \
@@ -482,7 +527,7 @@ char *format_mock_traceback(const char *message_p,
                                 left,                   \
                                 right)                  \
     if ((left) != (right)) {                            \
-        nala_reset_all_mocks();                         \
+        nala_suspend_all_mocks();                       \
         char _nala_assert_format[512];                  \
         snprintf(&_nala_assert_format[0],               \
                  sizeof(_nala_assert_format),           \
@@ -554,7 +599,7 @@ void nala_mock_assert_memory(struct nala_traceback_t *traceback_p,
     char _nala_assert_format[512];
 
     if (!nala_check_memory(left_p, right_p, size)) {
-        nala_reset_all_mocks();
+        nala_suspend_all_mocks();
         snprintf(&_nala_assert_format[0],
                  sizeof(_nala_assert_format),
                  "Mocked %s(%s): ",
@@ -643,3 +688,5 @@ void nala_print_call(const char *function_name_p, struct nala_state_t *state_p)
 
     fprintf(nala_get_stdout(), "%s: %s()\n", mode_p, function_name_p);
 }
+
+static int next_handle = 1;

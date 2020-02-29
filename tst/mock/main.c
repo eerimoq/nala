@@ -932,11 +932,25 @@ TEST(call_with_arg_get_params_in)
 
     handle = call_with_arg_mock_ignore_in_once(9);
     ASSERT_EQ(call_with_arg(call_with_arg_callback, &arg), 9);
-    (void)handle;
-    printf("ToDo: This test is not implemented!!!\n");
-#if 0
     ASSERT_FUNCTION_POINTERS_EQ(call_with_arg_mock_get_params_in(handle)->func,
                                 call_with_arg_callback);
     ASSERT_EQ(call_with_arg_mock_get_params_in(handle)->arg_p, &arg);
-#endif
+}
+
+static void call_with_arg_not_called_error_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    int handle;
+
+    handle = call_with_arg_mock_ignore_in_once(9);
+    call_with_arg_mock_get_params_in(handle);
+}
+
+TEST(call_with_arg_not_called_error)
+{
+    function_error_in_subprocess(
+        call_with_arg_not_called_error_entry,
+        "call_with_arg() has not been called yet for given mock handle. No "
+        "parameters available.");
 }

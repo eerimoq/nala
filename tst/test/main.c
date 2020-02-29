@@ -277,7 +277,7 @@ TEST(assert_function_pointers_eq_error)
 {
     expect_error_in_subprocess(
         assert_function_pointers_eq_entry,
-        "fail");
+        " != 0x");
 }
 
 static void assert_function_pointers_ne_entry()
@@ -289,7 +289,7 @@ TEST(assert_function_pointers_ne_error)
 {
     expect_error_in_subprocess(
         assert_function_pointers_ne_entry,
-        "fail");
+        " == 0x");
 }
 
 static void assert_error_entry()
