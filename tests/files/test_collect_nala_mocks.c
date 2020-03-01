@@ -749,12 +749,12 @@ void nala_assert_all_mocks_completed(void)
 
 int __real_bar();
 
-struct _nala_data_params_for_bar {
+struct nala_data_params_for_bar_t {
     int dummy;
 };
 
-struct _nala_data_type_for_bar {
-    struct _nala_data_params_for_bar params;
+struct nala_data_type_for_bar_t {
+    struct nala_data_params_for_bar_t params;
     int return_value;
     int errno_value;
     int (*implementation)();
@@ -763,27 +763,27 @@ struct _nala_data_type_for_bar {
     struct nala_bar_params_t params_in;
 };
 
-struct _nala_instance_type_for_bar {
+struct nala_instance_type_for_bar_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_bar data;
-    struct _nala_instance_type_for_bar *next_p;
+    struct nala_data_type_for_bar_t data;
+    struct nala_instance_type_for_bar_t *next_p;
 };
 
-struct _nala_instances_type_for_bar {
-    struct _nala_instance_type_for_bar *head_p;
-    struct _nala_instance_type_for_bar *next_p;
-    struct _nala_instance_type_for_bar *tail_p;
+struct nala_instances_type_for_bar_t {
+    struct nala_instance_type_for_bar_t *head_p;
+    struct nala_instance_type_for_bar_t *next_p;
+    struct nala_instance_type_for_bar_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_bar {
+struct nala_state_type_for_bar_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_bar data;
-    struct _nala_instances_type_for_bar instances;
+    struct nala_data_type_for_bar_t data;
+    struct nala_instances_type_for_bar_t instances;
 };
 
-static struct nala_state_type_for_bar nala_state_for_bar = {
+static struct nala_state_type_for_bar_t nala_state_for_bar = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -799,7 +799,7 @@ static struct nala_state_type_for_bar nala_state_for_bar = {
     }
 };
 
-struct _nala_data_type_for_bar *nala_get_data_bar()
+struct nala_data_type_for_bar_t *nala_get_data_bar()
 {
     if (nala_state_for_bar.instances.tail_p != NULL) {
         return (&nala_state_for_bar.instances.tail_p->data);
@@ -808,15 +808,15 @@ struct _nala_data_type_for_bar *nala_get_data_bar()
     }
 }
 
-struct _nala_data_params_for_bar *nala_get_params_bar()
+struct nala_data_params_for_bar_t *nala_get_params_bar()
 {
     return (&nala_get_data_bar()->params);
 }
 
 int __wrap_bar()
 {
-    struct _nala_instance_type_for_bar *_nala_instance_p;
-    struct _nala_data_type_for_bar *_nala_data_p;
+    struct nala_instance_type_for_bar_t *nala_instance_p;
+    struct nala_data_type_for_bar_t *nala_data_p;
     int return_value;
 
     nala_print_call("bar", &nala_state_for_bar.state);
@@ -826,29 +826,29 @@ int __wrap_bar()
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_bar.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_bar.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_bar.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked bar() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_bar.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_bar.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback();
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback();
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_bar();
@@ -886,17 +886,17 @@ void bar_mock(int return_value)
 
 int bar_mock_once(int return_value)
 {
-    struct _nala_instance_type_for_bar *_nala_instance_p;
+    struct nala_instance_type_for_bar_t *nala_instance_p;
 
     nala_state_for_bar.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_bar.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void bar_mock_ignore_in(int return_value)
@@ -909,7 +909,7 @@ void bar_mock_ignore_in(int return_value)
 
 int bar_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_bar *instance_p;
+    struct nala_instance_type_for_bar_t *instance_p;
 
     nala_state_for_bar.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -934,7 +934,7 @@ void bar_mock_set_callback(void (*callback)())
 
 struct nala_bar_params_t *bar_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_bar *instance_p;
+    struct nala_instance_type_for_bar_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_bar.instances, &instance_p, handle);
 
@@ -969,7 +969,7 @@ void bar_mock_real(void)
 
 void bar_mock_real_once(void)
 {
-    struct _nala_instance_type_for_bar *instance_p;
+    struct nala_instance_type_for_bar_t *instance_p;
 
     nala_state_for_bar.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -989,8 +989,8 @@ void bar_mock_resume(void)
 
 void bar_mock_reset(void)
 {
-    struct _nala_instance_type_for_bar *current_p;
-    struct _nala_instance_type_for_bar *tmp_p;
+    struct nala_instance_type_for_bar_t *current_p;
+    struct nala_instance_type_for_bar_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_bar, current_p, tmp_p);
 }
@@ -1012,12 +1012,12 @@ void bar_mock_assert_completed(void)
 
 int __real_fie();
 
-struct _nala_data_params_for_fie {
+struct nala_data_params_for_fie_t {
     int dummy;
 };
 
-struct _nala_data_type_for_fie {
-    struct _nala_data_params_for_fie params;
+struct nala_data_type_for_fie_t {
+    struct nala_data_params_for_fie_t params;
     int return_value;
     int errno_value;
     int (*implementation)();
@@ -1026,27 +1026,27 @@ struct _nala_data_type_for_fie {
     struct nala_fie_params_t params_in;
 };
 
-struct _nala_instance_type_for_fie {
+struct nala_instance_type_for_fie_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_fie data;
-    struct _nala_instance_type_for_fie *next_p;
+    struct nala_data_type_for_fie_t data;
+    struct nala_instance_type_for_fie_t *next_p;
 };
 
-struct _nala_instances_type_for_fie {
-    struct _nala_instance_type_for_fie *head_p;
-    struct _nala_instance_type_for_fie *next_p;
-    struct _nala_instance_type_for_fie *tail_p;
+struct nala_instances_type_for_fie_t {
+    struct nala_instance_type_for_fie_t *head_p;
+    struct nala_instance_type_for_fie_t *next_p;
+    struct nala_instance_type_for_fie_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_fie {
+struct nala_state_type_for_fie_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_fie data;
-    struct _nala_instances_type_for_fie instances;
+    struct nala_data_type_for_fie_t data;
+    struct nala_instances_type_for_fie_t instances;
 };
 
-static struct nala_state_type_for_fie nala_state_for_fie = {
+static struct nala_state_type_for_fie_t nala_state_for_fie = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -1062,7 +1062,7 @@ static struct nala_state_type_for_fie nala_state_for_fie = {
     }
 };
 
-struct _nala_data_type_for_fie *nala_get_data_fie()
+struct nala_data_type_for_fie_t *nala_get_data_fie()
 {
     if (nala_state_for_fie.instances.tail_p != NULL) {
         return (&nala_state_for_fie.instances.tail_p->data);
@@ -1071,15 +1071,15 @@ struct _nala_data_type_for_fie *nala_get_data_fie()
     }
 }
 
-struct _nala_data_params_for_fie *nala_get_params_fie()
+struct nala_data_params_for_fie_t *nala_get_params_fie()
 {
     return (&nala_get_data_fie()->params);
 }
 
 int __wrap_fie()
 {
-    struct _nala_instance_type_for_fie *_nala_instance_p;
-    struct _nala_data_type_for_fie *_nala_data_p;
+    struct nala_instance_type_for_fie_t *nala_instance_p;
+    struct nala_data_type_for_fie_t *nala_data_p;
     int return_value;
 
     nala_print_call("fie", &nala_state_for_fie.state);
@@ -1089,29 +1089,29 @@ int __wrap_fie()
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_fie.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_fie.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_fie.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked fie() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_fie.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_fie.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback();
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback();
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_fie();
@@ -1149,17 +1149,17 @@ void fie_mock(int return_value)
 
 int fie_mock_once(int return_value)
 {
-    struct _nala_instance_type_for_fie *_nala_instance_p;
+    struct nala_instance_type_for_fie_t *nala_instance_p;
 
     nala_state_for_fie.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_fie.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void fie_mock_ignore_in(int return_value)
@@ -1172,7 +1172,7 @@ void fie_mock_ignore_in(int return_value)
 
 int fie_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_fie *instance_p;
+    struct nala_instance_type_for_fie_t *instance_p;
 
     nala_state_for_fie.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -1197,7 +1197,7 @@ void fie_mock_set_callback(void (*callback)())
 
 struct nala_fie_params_t *fie_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_fie *instance_p;
+    struct nala_instance_type_for_fie_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_fie.instances, &instance_p, handle);
 
@@ -1232,7 +1232,7 @@ void fie_mock_real(void)
 
 void fie_mock_real_once(void)
 {
-    struct _nala_instance_type_for_fie *instance_p;
+    struct nala_instance_type_for_fie_t *instance_p;
 
     nala_state_for_fie.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -1252,8 +1252,8 @@ void fie_mock_resume(void)
 
 void fie_mock_reset(void)
 {
-    struct _nala_instance_type_for_fie *current_p;
-    struct _nala_instance_type_for_fie *tmp_p;
+    struct nala_instance_type_for_fie_t *current_p;
+    struct nala_instance_type_for_fie_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_fie, current_p, tmp_p);
 }
@@ -1275,12 +1275,12 @@ void fie_mock_assert_completed(void)
 
 int __real_foo();
 
-struct _nala_data_params_for_foo {
+struct nala_data_params_for_foo_t {
     int dummy;
 };
 
-struct _nala_data_type_for_foo {
-    struct _nala_data_params_for_foo params;
+struct nala_data_type_for_foo_t {
+    struct nala_data_params_for_foo_t params;
     int return_value;
     int errno_value;
     int (*implementation)();
@@ -1289,27 +1289,27 @@ struct _nala_data_type_for_foo {
     struct nala_foo_params_t params_in;
 };
 
-struct _nala_instance_type_for_foo {
+struct nala_instance_type_for_foo_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_foo data;
-    struct _nala_instance_type_for_foo *next_p;
+    struct nala_data_type_for_foo_t data;
+    struct nala_instance_type_for_foo_t *next_p;
 };
 
-struct _nala_instances_type_for_foo {
-    struct _nala_instance_type_for_foo *head_p;
-    struct _nala_instance_type_for_foo *next_p;
-    struct _nala_instance_type_for_foo *tail_p;
+struct nala_instances_type_for_foo_t {
+    struct nala_instance_type_for_foo_t *head_p;
+    struct nala_instance_type_for_foo_t *next_p;
+    struct nala_instance_type_for_foo_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_foo {
+struct nala_state_type_for_foo_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_foo data;
-    struct _nala_instances_type_for_foo instances;
+    struct nala_data_type_for_foo_t data;
+    struct nala_instances_type_for_foo_t instances;
 };
 
-static struct nala_state_type_for_foo nala_state_for_foo = {
+static struct nala_state_type_for_foo_t nala_state_for_foo = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -1325,7 +1325,7 @@ static struct nala_state_type_for_foo nala_state_for_foo = {
     }
 };
 
-struct _nala_data_type_for_foo *nala_get_data_foo()
+struct nala_data_type_for_foo_t *nala_get_data_foo()
 {
     if (nala_state_for_foo.instances.tail_p != NULL) {
         return (&nala_state_for_foo.instances.tail_p->data);
@@ -1334,15 +1334,15 @@ struct _nala_data_type_for_foo *nala_get_data_foo()
     }
 }
 
-struct _nala_data_params_for_foo *nala_get_params_foo()
+struct nala_data_params_for_foo_t *nala_get_params_foo()
 {
     return (&nala_get_data_foo()->params);
 }
 
 int __wrap_foo()
 {
-    struct _nala_instance_type_for_foo *_nala_instance_p;
-    struct _nala_data_type_for_foo *_nala_data_p;
+    struct nala_instance_type_for_foo_t *nala_instance_p;
+    struct nala_data_type_for_foo_t *nala_data_p;
     int return_value;
 
     nala_print_call("foo", &nala_state_for_foo.state);
@@ -1352,29 +1352,29 @@ int __wrap_foo()
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_foo.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_foo.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_foo.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked foo() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_foo.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_foo.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback();
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback();
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_foo();
@@ -1412,17 +1412,17 @@ void foo_mock(int return_value)
 
 int foo_mock_once(int return_value)
 {
-    struct _nala_instance_type_for_foo *_nala_instance_p;
+    struct nala_instance_type_for_foo_t *nala_instance_p;
 
     nala_state_for_foo.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_foo.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void foo_mock_ignore_in(int return_value)
@@ -1435,7 +1435,7 @@ void foo_mock_ignore_in(int return_value)
 
 int foo_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_foo *instance_p;
+    struct nala_instance_type_for_foo_t *instance_p;
 
     nala_state_for_foo.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -1460,7 +1460,7 @@ void foo_mock_set_callback(void (*callback)())
 
 struct nala_foo_params_t *foo_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_foo *instance_p;
+    struct nala_instance_type_for_foo_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_foo.instances, &instance_p, handle);
 
@@ -1495,7 +1495,7 @@ void foo_mock_real(void)
 
 void foo_mock_real_once(void)
 {
-    struct _nala_instance_type_for_foo *instance_p;
+    struct nala_instance_type_for_foo_t *instance_p;
 
     nala_state_for_foo.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -1515,8 +1515,8 @@ void foo_mock_resume(void)
 
 void foo_mock_reset(void)
 {
-    struct _nala_instance_type_for_foo *current_p;
-    struct _nala_instance_type_for_foo *tmp_p;
+    struct nala_instance_type_for_foo_t *current_p;
+    struct nala_instance_type_for_foo_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_foo, current_p, tmp_p);
 }
@@ -1538,12 +1538,12 @@ void foo_mock_assert_completed(void)
 
 int __real_fum();
 
-struct _nala_data_params_for_fum {
+struct nala_data_params_for_fum_t {
     int dummy;
 };
 
-struct _nala_data_type_for_fum {
-    struct _nala_data_params_for_fum params;
+struct nala_data_type_for_fum_t {
+    struct nala_data_params_for_fum_t params;
     int return_value;
     int errno_value;
     int (*implementation)();
@@ -1552,27 +1552,27 @@ struct _nala_data_type_for_fum {
     struct nala_fum_params_t params_in;
 };
 
-struct _nala_instance_type_for_fum {
+struct nala_instance_type_for_fum_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_fum data;
-    struct _nala_instance_type_for_fum *next_p;
+    struct nala_data_type_for_fum_t data;
+    struct nala_instance_type_for_fum_t *next_p;
 };
 
-struct _nala_instances_type_for_fum {
-    struct _nala_instance_type_for_fum *head_p;
-    struct _nala_instance_type_for_fum *next_p;
-    struct _nala_instance_type_for_fum *tail_p;
+struct nala_instances_type_for_fum_t {
+    struct nala_instance_type_for_fum_t *head_p;
+    struct nala_instance_type_for_fum_t *next_p;
+    struct nala_instance_type_for_fum_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_fum {
+struct nala_state_type_for_fum_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_fum data;
-    struct _nala_instances_type_for_fum instances;
+    struct nala_data_type_for_fum_t data;
+    struct nala_instances_type_for_fum_t instances;
 };
 
-static struct nala_state_type_for_fum nala_state_for_fum = {
+static struct nala_state_type_for_fum_t nala_state_for_fum = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -1588,7 +1588,7 @@ static struct nala_state_type_for_fum nala_state_for_fum = {
     }
 };
 
-struct _nala_data_type_for_fum *nala_get_data_fum()
+struct nala_data_type_for_fum_t *nala_get_data_fum()
 {
     if (nala_state_for_fum.instances.tail_p != NULL) {
         return (&nala_state_for_fum.instances.tail_p->data);
@@ -1597,15 +1597,15 @@ struct _nala_data_type_for_fum *nala_get_data_fum()
     }
 }
 
-struct _nala_data_params_for_fum *nala_get_params_fum()
+struct nala_data_params_for_fum_t *nala_get_params_fum()
 {
     return (&nala_get_data_fum()->params);
 }
 
 int __wrap_fum()
 {
-    struct _nala_instance_type_for_fum *_nala_instance_p;
-    struct _nala_data_type_for_fum *_nala_data_p;
+    struct nala_instance_type_for_fum_t *nala_instance_p;
+    struct nala_data_type_for_fum_t *nala_data_p;
     int return_value;
 
     nala_print_call("fum", &nala_state_for_fum.state);
@@ -1615,29 +1615,29 @@ int __wrap_fum()
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_fum.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_fum.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_fum.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked fum() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_fum.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_fum.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback();
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback();
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_fum();
@@ -1675,17 +1675,17 @@ void fum_mock(int return_value)
 
 int fum_mock_once(int return_value)
 {
-    struct _nala_instance_type_for_fum *_nala_instance_p;
+    struct nala_instance_type_for_fum_t *nala_instance_p;
 
     nala_state_for_fum.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_fum.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void fum_mock_ignore_in(int return_value)
@@ -1698,7 +1698,7 @@ void fum_mock_ignore_in(int return_value)
 
 int fum_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_fum *instance_p;
+    struct nala_instance_type_for_fum_t *instance_p;
 
     nala_state_for_fum.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -1723,7 +1723,7 @@ void fum_mock_set_callback(void (*callback)())
 
 struct nala_fum_params_t *fum_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_fum *instance_p;
+    struct nala_instance_type_for_fum_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_fum.instances, &instance_p, handle);
 
@@ -1758,7 +1758,7 @@ void fum_mock_real(void)
 
 void fum_mock_real_once(void)
 {
-    struct _nala_instance_type_for_fum *instance_p;
+    struct nala_instance_type_for_fum_t *instance_p;
 
     nala_state_for_fum.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -1778,8 +1778,8 @@ void fum_mock_resume(void)
 
 void fum_mock_reset(void)
 {
-    struct _nala_instance_type_for_fum *current_p;
-    struct _nala_instance_type_for_fum *tmp_p;
+    struct nala_instance_type_for_fum_t *current_p;
+    struct nala_instance_type_for_fum_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_fum, current_p, tmp_p);
 }
@@ -1801,12 +1801,12 @@ void fum_mock_assert_completed(void)
 
 int __real_gam();
 
-struct _nala_data_params_for_gam {
+struct nala_data_params_for_gam_t {
     int dummy;
 };
 
-struct _nala_data_type_for_gam {
-    struct _nala_data_params_for_gam params;
+struct nala_data_type_for_gam_t {
+    struct nala_data_params_for_gam_t params;
     int return_value;
     int errno_value;
     int (*implementation)();
@@ -1815,27 +1815,27 @@ struct _nala_data_type_for_gam {
     struct nala_gam_params_t params_in;
 };
 
-struct _nala_instance_type_for_gam {
+struct nala_instance_type_for_gam_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_gam data;
-    struct _nala_instance_type_for_gam *next_p;
+    struct nala_data_type_for_gam_t data;
+    struct nala_instance_type_for_gam_t *next_p;
 };
 
-struct _nala_instances_type_for_gam {
-    struct _nala_instance_type_for_gam *head_p;
-    struct _nala_instance_type_for_gam *next_p;
-    struct _nala_instance_type_for_gam *tail_p;
+struct nala_instances_type_for_gam_t {
+    struct nala_instance_type_for_gam_t *head_p;
+    struct nala_instance_type_for_gam_t *next_p;
+    struct nala_instance_type_for_gam_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_gam {
+struct nala_state_type_for_gam_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_gam data;
-    struct _nala_instances_type_for_gam instances;
+    struct nala_data_type_for_gam_t data;
+    struct nala_instances_type_for_gam_t instances;
 };
 
-static struct nala_state_type_for_gam nala_state_for_gam = {
+static struct nala_state_type_for_gam_t nala_state_for_gam = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -1851,7 +1851,7 @@ static struct nala_state_type_for_gam nala_state_for_gam = {
     }
 };
 
-struct _nala_data_type_for_gam *nala_get_data_gam()
+struct nala_data_type_for_gam_t *nala_get_data_gam()
 {
     if (nala_state_for_gam.instances.tail_p != NULL) {
         return (&nala_state_for_gam.instances.tail_p->data);
@@ -1860,15 +1860,15 @@ struct _nala_data_type_for_gam *nala_get_data_gam()
     }
 }
 
-struct _nala_data_params_for_gam *nala_get_params_gam()
+struct nala_data_params_for_gam_t *nala_get_params_gam()
 {
     return (&nala_get_data_gam()->params);
 }
 
 int __wrap_gam()
 {
-    struct _nala_instance_type_for_gam *_nala_instance_p;
-    struct _nala_data_type_for_gam *_nala_data_p;
+    struct nala_instance_type_for_gam_t *nala_instance_p;
+    struct nala_data_type_for_gam_t *nala_data_p;
     int return_value;
 
     nala_print_call("gam", &nala_state_for_gam.state);
@@ -1878,29 +1878,29 @@ int __wrap_gam()
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_gam.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_gam.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_gam.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked gam() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_gam.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_gam.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback();
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback();
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_gam();
@@ -1938,17 +1938,17 @@ void gam_mock(int return_value)
 
 int gam_mock_once(int return_value)
 {
-    struct _nala_instance_type_for_gam *_nala_instance_p;
+    struct nala_instance_type_for_gam_t *nala_instance_p;
 
     nala_state_for_gam.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_gam.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void gam_mock_ignore_in(int return_value)
@@ -1961,7 +1961,7 @@ void gam_mock_ignore_in(int return_value)
 
 int gam_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_gam *instance_p;
+    struct nala_instance_type_for_gam_t *instance_p;
 
     nala_state_for_gam.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -1986,7 +1986,7 @@ void gam_mock_set_callback(void (*callback)())
 
 struct nala_gam_params_t *gam_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_gam *instance_p;
+    struct nala_instance_type_for_gam_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_gam.instances, &instance_p, handle);
 
@@ -2021,7 +2021,7 @@ void gam_mock_real(void)
 
 void gam_mock_real_once(void)
 {
-    struct _nala_instance_type_for_gam *instance_p;
+    struct nala_instance_type_for_gam_t *instance_p;
 
     nala_state_for_gam.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -2041,8 +2041,8 @@ void gam_mock_resume(void)
 
 void gam_mock_reset(void)
 {
-    struct _nala_instance_type_for_gam *current_p;
-    struct _nala_instance_type_for_gam *tmp_p;
+    struct nala_instance_type_for_gam_t *current_p;
+    struct nala_instance_type_for_gam_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_gam, current_p, tmp_p);
 }
@@ -2064,12 +2064,12 @@ void gam_mock_assert_completed(void)
 
 int __real_hit();
 
-struct _nala_data_params_for_hit {
+struct nala_data_params_for_hit_t {
     int dummy;
 };
 
-struct _nala_data_type_for_hit {
-    struct _nala_data_params_for_hit params;
+struct nala_data_type_for_hit_t {
+    struct nala_data_params_for_hit_t params;
     int return_value;
     int errno_value;
     int (*implementation)();
@@ -2078,27 +2078,27 @@ struct _nala_data_type_for_hit {
     struct nala_hit_params_t params_in;
 };
 
-struct _nala_instance_type_for_hit {
+struct nala_instance_type_for_hit_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_hit data;
-    struct _nala_instance_type_for_hit *next_p;
+    struct nala_data_type_for_hit_t data;
+    struct nala_instance_type_for_hit_t *next_p;
 };
 
-struct _nala_instances_type_for_hit {
-    struct _nala_instance_type_for_hit *head_p;
-    struct _nala_instance_type_for_hit *next_p;
-    struct _nala_instance_type_for_hit *tail_p;
+struct nala_instances_type_for_hit_t {
+    struct nala_instance_type_for_hit_t *head_p;
+    struct nala_instance_type_for_hit_t *next_p;
+    struct nala_instance_type_for_hit_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_hit {
+struct nala_state_type_for_hit_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_hit data;
-    struct _nala_instances_type_for_hit instances;
+    struct nala_data_type_for_hit_t data;
+    struct nala_instances_type_for_hit_t instances;
 };
 
-static struct nala_state_type_for_hit nala_state_for_hit = {
+static struct nala_state_type_for_hit_t nala_state_for_hit = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -2114,7 +2114,7 @@ static struct nala_state_type_for_hit nala_state_for_hit = {
     }
 };
 
-struct _nala_data_type_for_hit *nala_get_data_hit()
+struct nala_data_type_for_hit_t *nala_get_data_hit()
 {
     if (nala_state_for_hit.instances.tail_p != NULL) {
         return (&nala_state_for_hit.instances.tail_p->data);
@@ -2123,15 +2123,15 @@ struct _nala_data_type_for_hit *nala_get_data_hit()
     }
 }
 
-struct _nala_data_params_for_hit *nala_get_params_hit()
+struct nala_data_params_for_hit_t *nala_get_params_hit()
 {
     return (&nala_get_data_hit()->params);
 }
 
 int __wrap_hit()
 {
-    struct _nala_instance_type_for_hit *_nala_instance_p;
-    struct _nala_data_type_for_hit *_nala_data_p;
+    struct nala_instance_type_for_hit_t *nala_instance_p;
+    struct nala_data_type_for_hit_t *nala_data_p;
     int return_value;
 
     nala_print_call("hit", &nala_state_for_hit.state);
@@ -2141,29 +2141,29 @@ int __wrap_hit()
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_hit.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_hit.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_hit.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked hit() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_hit.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_hit.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback();
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback();
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_hit();
@@ -2201,17 +2201,17 @@ void hit_mock(int return_value)
 
 int hit_mock_once(int return_value)
 {
-    struct _nala_instance_type_for_hit *_nala_instance_p;
+    struct nala_instance_type_for_hit_t *nala_instance_p;
 
     nala_state_for_hit.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_hit.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void hit_mock_ignore_in(int return_value)
@@ -2224,7 +2224,7 @@ void hit_mock_ignore_in(int return_value)
 
 int hit_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_hit *instance_p;
+    struct nala_instance_type_for_hit_t *instance_p;
 
     nala_state_for_hit.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -2249,7 +2249,7 @@ void hit_mock_set_callback(void (*callback)())
 
 struct nala_hit_params_t *hit_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_hit *instance_p;
+    struct nala_instance_type_for_hit_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_hit.instances, &instance_p, handle);
 
@@ -2284,7 +2284,7 @@ void hit_mock_real(void)
 
 void hit_mock_real_once(void)
 {
-    struct _nala_instance_type_for_hit *instance_p;
+    struct nala_instance_type_for_hit_t *instance_p;
 
     nala_state_for_hit.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -2304,8 +2304,8 @@ void hit_mock_resume(void)
 
 void hit_mock_reset(void)
 {
-    struct _nala_instance_type_for_hit *current_p;
-    struct _nala_instance_type_for_hit *tmp_p;
+    struct nala_instance_type_for_hit_t *current_p;
+    struct nala_instance_type_for_hit_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_hit, current_p, tmp_p);
 }

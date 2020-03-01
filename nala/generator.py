@@ -265,7 +265,7 @@ class FunctionMock:
                              node.TypeDecl("vafmt_p",
                                            ['const'],
                                            node.IdentifierType(["char"])))))
-            self.forward_args += ', __nala_vl'
+            self.forward_args += ', nala_vl'
 
         # -Wpedantic warns on empty structs.
         if not self.params_struct:

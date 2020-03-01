@@ -901,15 +901,15 @@ void nala_assert_all_mocks_completed(void)
 
 int __real_add(int x, int y);
 
-struct _nala_data_params_for_add {
+struct nala_data_params_for_add_t {
     int x;
     int y;
     bool ignore_x_in;
     bool ignore_y_in;
 };
 
-struct _nala_data_type_for_add {
-    struct _nala_data_params_for_add params;
+struct nala_data_type_for_add_t {
+    struct nala_data_params_for_add_t params;
     int return_value;
     int errno_value;
     int (*implementation)(int x, int y);
@@ -918,27 +918,27 @@ struct _nala_data_type_for_add {
     struct nala_add_params_t params_in;
 };
 
-struct _nala_instance_type_for_add {
+struct nala_instance_type_for_add_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_add data;
-    struct _nala_instance_type_for_add *next_p;
+    struct nala_data_type_for_add_t data;
+    struct nala_instance_type_for_add_t *next_p;
 };
 
-struct _nala_instances_type_for_add {
-    struct _nala_instance_type_for_add *head_p;
-    struct _nala_instance_type_for_add *next_p;
-    struct _nala_instance_type_for_add *tail_p;
+struct nala_instances_type_for_add_t {
+    struct nala_instance_type_for_add_t *head_p;
+    struct nala_instance_type_for_add_t *next_p;
+    struct nala_instance_type_for_add_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_add {
+struct nala_state_type_for_add_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_add data;
-    struct _nala_instances_type_for_add instances;
+    struct nala_data_type_for_add_t data;
+    struct nala_instances_type_for_add_t instances;
 };
 
-static struct nala_state_type_for_add nala_state_for_add = {
+static struct nala_state_type_for_add_t nala_state_for_add = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -954,7 +954,7 @@ static struct nala_state_type_for_add nala_state_for_add = {
     }
 };
 
-struct _nala_data_type_for_add *nala_get_data_add()
+struct nala_data_type_for_add_t *nala_get_data_add()
 {
     if (nala_state_for_add.instances.tail_p != NULL) {
         return (&nala_state_for_add.instances.tail_p->data);
@@ -963,15 +963,15 @@ struct _nala_data_type_for_add *nala_get_data_add()
     }
 }
 
-struct _nala_data_params_for_add *nala_get_params_add()
+struct nala_data_params_for_add_t *nala_get_params_add()
 {
     return (&nala_get_data_add()->params);
 }
 
 int __wrap_add(int x, int y)
 {
-    struct _nala_instance_type_for_add *_nala_instance_p;
-    struct _nala_data_type_for_add *_nala_data_p;
+    struct nala_instance_type_for_add_t *nala_instance_p;
+    struct nala_data_type_for_add_t *nala_data_p;
     int return_value;
 
     nala_print_call("add", &nala_state_for_add.state);
@@ -981,33 +981,33 @@ int __wrap_add(int x, int y)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_add.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_add.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_add.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked add() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_add.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_add.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, add, x);
-            _nala_data_p->params_in.x = x;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, add, y);
-            _nala_data_p->params_in.y = y;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, add, x);
+            nala_data_p->params_in.x = x;
+            MOCK_ASSERT_IN_EQ(nala_data_p, add, y);
+            nala_data_p->params_in.y = y;
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(x, y);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(x, y);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_add(x, y);
@@ -1049,21 +1049,21 @@ void add_mock(int x, int y, int return_value)
 
 int add_mock_once(int x, int y, int return_value)
 {
-    struct _nala_instance_type_for_add *_nala_instance_p;
+    struct nala_instance_type_for_add_t *nala_instance_p;
 
     nala_state_for_add.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.params.x = x;
-    _nala_instance_p->data.params.ignore_x_in = false;
-    _nala_instance_p->data.params.y = y;
-    _nala_instance_p->data.params.ignore_y_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.params.x = x;
+    nala_instance_p->data.params.ignore_x_in = false;
+    nala_instance_p->data.params.y = y;
+    nala_instance_p->data.params.ignore_y_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_add.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void add_mock_ignore_in(int return_value)
@@ -1078,7 +1078,7 @@ void add_mock_ignore_in(int return_value)
 
 int add_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_add *instance_p;
+    struct nala_instance_type_for_add_t *instance_p;
 
     nala_state_for_add.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -1105,7 +1105,7 @@ void add_mock_set_callback(void (*callback)(int x, int y))
 
 struct nala_add_params_t *add_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_add *instance_p;
+    struct nala_instance_type_for_add_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_add.instances, &instance_p, handle);
 
@@ -1150,7 +1150,7 @@ void add_mock_real(void)
 
 void add_mock_real_once(void)
 {
-    struct _nala_instance_type_for_add *instance_p;
+    struct nala_instance_type_for_add_t *instance_p;
 
     nala_state_for_add.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -1170,8 +1170,8 @@ void add_mock_resume(void)
 
 void add_mock_reset(void)
 {
-    struct _nala_instance_type_for_add *current_p;
-    struct _nala_instance_type_for_add *tmp_p;
+    struct nala_instance_type_for_add_t *current_p;
+    struct nala_instance_type_for_add_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_add, current_p, tmp_p);
 }
@@ -1193,7 +1193,7 @@ void add_mock_assert_completed(void)
 
 int __real_call(int (*callback)(int value));
 
-struct _nala_data_params_for_call {
+struct nala_data_params_for_call_t {
     int (*callback)(int value);
     bool ignore_callback_in;
     struct nala_set_param callback_in;
@@ -1202,8 +1202,8 @@ struct _nala_data_params_for_call {
     void (*callback_out_copy)(int (*callback)(int value), const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_call {
-    struct _nala_data_params_for_call params;
+struct nala_data_type_for_call_t {
+    struct nala_data_params_for_call_t params;
     int return_value;
     int errno_value;
     int (*implementation)(int (*callback)(int value));
@@ -1212,27 +1212,27 @@ struct _nala_data_type_for_call {
     struct nala_call_params_t params_in;
 };
 
-struct _nala_instance_type_for_call {
+struct nala_instance_type_for_call_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_call data;
-    struct _nala_instance_type_for_call *next_p;
+    struct nala_data_type_for_call_t data;
+    struct nala_instance_type_for_call_t *next_p;
 };
 
-struct _nala_instances_type_for_call {
-    struct _nala_instance_type_for_call *head_p;
-    struct _nala_instance_type_for_call *next_p;
-    struct _nala_instance_type_for_call *tail_p;
+struct nala_instances_type_for_call_t {
+    struct nala_instance_type_for_call_t *head_p;
+    struct nala_instance_type_for_call_t *next_p;
+    struct nala_instance_type_for_call_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_call {
+struct nala_state_type_for_call_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_call data;
-    struct _nala_instances_type_for_call instances;
+    struct nala_data_type_for_call_t data;
+    struct nala_instances_type_for_call_t instances;
 };
 
-static struct nala_state_type_for_call nala_state_for_call = {
+static struct nala_state_type_for_call_t nala_state_for_call = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -1248,7 +1248,7 @@ static struct nala_state_type_for_call nala_state_for_call = {
     }
 };
 
-struct _nala_data_type_for_call *nala_get_data_call()
+struct nala_data_type_for_call_t *nala_get_data_call()
 {
     if (nala_state_for_call.instances.tail_p != NULL) {
         return (&nala_state_for_call.instances.tail_p->data);
@@ -1257,15 +1257,15 @@ struct _nala_data_type_for_call *nala_get_data_call()
     }
 }
 
-struct _nala_data_params_for_call *nala_get_params_call()
+struct nala_data_params_for_call_t *nala_get_params_call()
 {
     return (&nala_get_data_call()->params);
 }
 
 int __wrap_call(int (*callback)(int value))
 {
-    struct _nala_instance_type_for_call *_nala_instance_p;
-    struct _nala_data_type_for_call *_nala_data_p;
+    struct nala_instance_type_for_call_t *nala_instance_p;
+    struct nala_data_type_for_call_t *nala_data_p;
     int return_value;
 
     nala_print_call("call", &nala_state_for_call.state);
@@ -1275,36 +1275,36 @@ int __wrap_call(int (*callback)(int value))
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_call.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_call.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_call.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked call() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_call.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_call.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, call, callback);
-            _nala_data_p->params_in.callback = callback;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, call, callback);
+            nala_data_p->params_in.callback = callback;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        call,
                                        callback);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(callback);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(callback);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_call(callback);
@@ -1344,23 +1344,23 @@ void call_mock(int return_value)
 
 int call_mock_once(int return_value)
 {
-    struct _nala_instance_type_for_call *_nala_instance_p;
+    struct nala_instance_type_for_call_t *nala_instance_p;
 
     nala_state_for_call.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.callback_out);
-    nala_set_param_init(&_nala_instance_p->data.params.callback_in);
-    _nala_instance_p->data.params.callback_in_assert = NULL;
-    _nala_instance_p->data.params.callback_out_copy = NULL;
-    _nala_instance_p->data.params.callback = NULL;
-    _nala_instance_p->data.params.ignore_callback_in = true;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.callback_out);
+    nala_set_param_init(&nala_instance_p->data.params.callback_in);
+    nala_instance_p->data.params.callback_in_assert = NULL;
+    nala_instance_p->data.params.callback_out_copy = NULL;
+    nala_instance_p->data.params.callback = NULL;
+    nala_instance_p->data.params.ignore_callback_in = true;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_call.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void call_mock_ignore_in(int return_value)
@@ -1374,7 +1374,7 @@ void call_mock_ignore_in(int return_value)
 
 int call_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_call *instance_p;
+    struct nala_instance_type_for_call_t *instance_p;
 
     nala_state_for_call.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -1405,7 +1405,7 @@ void call_mock_set_callback(void (*callback)(int (*callback)(int value)))
 
 struct nala_call_params_t *call_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_call *instance_p;
+    struct nala_instance_type_for_call_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_call.instances, &instance_p, handle);
 
@@ -1428,27 +1428,27 @@ void call_mock_set_callback_in(const void *buf_p, size_t size)
 
 void call_mock_set_callback_in_assert(void (*callback)(int (*callback)(int value), const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_call *_nala_params_p;
+    struct nala_data_params_for_call_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_call();
+    nala_params_p = nala_get_params_call();
 
-    if (_nala_params_p->callback_in.buf_p == NULL) {
+    if (nala_params_p->callback_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "call_mock_set_callback_in() must be called "
                 "before call_mock_set_callback_in_assert().\n"));
     }
 
-    _nala_params_p->callback_in_assert = callback;
+    nala_params_p->callback_in_assert = callback;
 }
 
 void call_mock_set_callback_in_pointer(int (*callback)(int value))
 {
-    struct _nala_data_params_for_call *_nala_params_p;
+    struct nala_data_params_for_call_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_call();
-    _nala_params_p->ignore_callback_in = false;
-    _nala_params_p->callback = callback;
+    nala_params_p = nala_get_params_call();
+    nala_params_p->ignore_callback_in = false;
+    nala_params_p->callback = callback;
 }
 
 void call_mock_set_callback_out(const void *buf_p, size_t size)
@@ -1484,7 +1484,7 @@ void call_mock_real(void)
 
 void call_mock_real_once(void)
 {
-    struct _nala_instance_type_for_call *instance_p;
+    struct nala_instance_type_for_call_t *instance_p;
 
     nala_state_for_call.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -1504,8 +1504,8 @@ void call_mock_resume(void)
 
 void call_mock_reset(void)
 {
-    struct _nala_instance_type_for_call *current_p;
-    struct _nala_instance_type_for_call *tmp_p;
+    struct nala_instance_type_for_call_t *current_p;
+    struct nala_instance_type_for_call_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_call, current_p, tmp_p);
 }
@@ -1527,13 +1527,13 @@ void call_mock_assert_completed(void)
 
 int __real_close(int fd);
 
-struct _nala_data_params_for_close {
+struct nala_data_params_for_close_t {
     int fd;
     bool ignore_fd_in;
 };
 
-struct _nala_data_type_for_close {
-    struct _nala_data_params_for_close params;
+struct nala_data_type_for_close_t {
+    struct nala_data_params_for_close_t params;
     int return_value;
     int errno_value;
     int (*implementation)(int fd);
@@ -1542,27 +1542,27 @@ struct _nala_data_type_for_close {
     struct nala_close_params_t params_in;
 };
 
-struct _nala_instance_type_for_close {
+struct nala_instance_type_for_close_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_close data;
-    struct _nala_instance_type_for_close *next_p;
+    struct nala_data_type_for_close_t data;
+    struct nala_instance_type_for_close_t *next_p;
 };
 
-struct _nala_instances_type_for_close {
-    struct _nala_instance_type_for_close *head_p;
-    struct _nala_instance_type_for_close *next_p;
-    struct _nala_instance_type_for_close *tail_p;
+struct nala_instances_type_for_close_t {
+    struct nala_instance_type_for_close_t *head_p;
+    struct nala_instance_type_for_close_t *next_p;
+    struct nala_instance_type_for_close_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_close {
+struct nala_state_type_for_close_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_close data;
-    struct _nala_instances_type_for_close instances;
+    struct nala_data_type_for_close_t data;
+    struct nala_instances_type_for_close_t instances;
 };
 
-static struct nala_state_type_for_close nala_state_for_close = {
+static struct nala_state_type_for_close_t nala_state_for_close = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -1578,7 +1578,7 @@ static struct nala_state_type_for_close nala_state_for_close = {
     }
 };
 
-struct _nala_data_type_for_close *nala_get_data_close()
+struct nala_data_type_for_close_t *nala_get_data_close()
 {
     if (nala_state_for_close.instances.tail_p != NULL) {
         return (&nala_state_for_close.instances.tail_p->data);
@@ -1587,15 +1587,15 @@ struct _nala_data_type_for_close *nala_get_data_close()
     }
 }
 
-struct _nala_data_params_for_close *nala_get_params_close()
+struct nala_data_params_for_close_t *nala_get_params_close()
 {
     return (&nala_get_data_close()->params);
 }
 
 int __wrap_close(int fd)
 {
-    struct _nala_instance_type_for_close *_nala_instance_p;
-    struct _nala_data_type_for_close *_nala_data_p;
+    struct nala_instance_type_for_close_t *nala_instance_p;
+    struct nala_data_type_for_close_t *nala_data_p;
     int return_value;
 
     nala_print_call("close", &nala_state_for_close.state);
@@ -1605,31 +1605,31 @@ int __wrap_close(int fd)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_close.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_close.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_close.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked close() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_close.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_close.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, close, fd);
-            _nala_data_p->params_in.fd = fd;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, close, fd);
+            nala_data_p->params_in.fd = fd;
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(fd);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(fd);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_close(fd);
@@ -1669,19 +1669,19 @@ void close_mock(int fd, int return_value)
 
 int close_mock_once(int fd, int return_value)
 {
-    struct _nala_instance_type_for_close *_nala_instance_p;
+    struct nala_instance_type_for_close_t *nala_instance_p;
 
     nala_state_for_close.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.params.fd = fd;
-    _nala_instance_p->data.params.ignore_fd_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.params.fd = fd;
+    nala_instance_p->data.params.ignore_fd_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_close.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void close_mock_ignore_in(int return_value)
@@ -1695,7 +1695,7 @@ void close_mock_ignore_in(int return_value)
 
 int close_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_close *instance_p;
+    struct nala_instance_type_for_close_t *instance_p;
 
     nala_state_for_close.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -1721,7 +1721,7 @@ void close_mock_set_callback(void (*callback)(int fd))
 
 struct nala_close_params_t *close_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_close *instance_p;
+    struct nala_instance_type_for_close_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_close.instances, &instance_p, handle);
 
@@ -1761,7 +1761,7 @@ void close_mock_real(void)
 
 void close_mock_real_once(void)
 {
-    struct _nala_instance_type_for_close *instance_p;
+    struct nala_instance_type_for_close_t *instance_p;
 
     nala_state_for_close.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -1781,8 +1781,8 @@ void close_mock_resume(void)
 
 void close_mock_reset(void)
 {
-    struct _nala_instance_type_for_close *current_p;
-    struct _nala_instance_type_for_close *tmp_p;
+    struct nala_instance_type_for_close_t *current_p;
+    struct nala_instance_type_for_close_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_close, current_p, tmp_p);
 }
@@ -1804,7 +1804,7 @@ void close_mock_assert_completed(void)
 
 DummyStruct *__real_compose_twice(DummyStruct *dummy_struct, DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct));
 
-struct _nala_data_params_for_compose_twice {
+struct nala_data_params_for_compose_twice_t {
     DummyStruct *dummy_struct;
     DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct);
     bool ignore_dummy_struct_in;
@@ -1819,8 +1819,8 @@ struct _nala_data_params_for_compose_twice {
     void (*dummy_struct_modifier_out_copy)(DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct), const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_compose_twice {
-    struct _nala_data_params_for_compose_twice params;
+struct nala_data_type_for_compose_twice_t {
+    struct nala_data_params_for_compose_twice_t params;
     DummyStruct *return_value;
     int errno_value;
     DummyStruct *(*implementation)(DummyStruct *dummy_struct, DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct));
@@ -1829,27 +1829,27 @@ struct _nala_data_type_for_compose_twice {
     struct nala_compose_twice_params_t params_in;
 };
 
-struct _nala_instance_type_for_compose_twice {
+struct nala_instance_type_for_compose_twice_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_compose_twice data;
-    struct _nala_instance_type_for_compose_twice *next_p;
+    struct nala_data_type_for_compose_twice_t data;
+    struct nala_instance_type_for_compose_twice_t *next_p;
 };
 
-struct _nala_instances_type_for_compose_twice {
-    struct _nala_instance_type_for_compose_twice *head_p;
-    struct _nala_instance_type_for_compose_twice *next_p;
-    struct _nala_instance_type_for_compose_twice *tail_p;
+struct nala_instances_type_for_compose_twice_t {
+    struct nala_instance_type_for_compose_twice_t *head_p;
+    struct nala_instance_type_for_compose_twice_t *next_p;
+    struct nala_instance_type_for_compose_twice_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_compose_twice {
+struct nala_state_type_for_compose_twice_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_compose_twice data;
-    struct _nala_instances_type_for_compose_twice instances;
+    struct nala_data_type_for_compose_twice_t data;
+    struct nala_instances_type_for_compose_twice_t instances;
 };
 
-static struct nala_state_type_for_compose_twice nala_state_for_compose_twice = {
+static struct nala_state_type_for_compose_twice_t nala_state_for_compose_twice = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -1865,7 +1865,7 @@ static struct nala_state_type_for_compose_twice nala_state_for_compose_twice = {
     }
 };
 
-struct _nala_data_type_for_compose_twice *nala_get_data_compose_twice()
+struct nala_data_type_for_compose_twice_t *nala_get_data_compose_twice()
 {
     if (nala_state_for_compose_twice.instances.tail_p != NULL) {
         return (&nala_state_for_compose_twice.instances.tail_p->data);
@@ -1874,15 +1874,15 @@ struct _nala_data_type_for_compose_twice *nala_get_data_compose_twice()
     }
 }
 
-struct _nala_data_params_for_compose_twice *nala_get_params_compose_twice()
+struct nala_data_params_for_compose_twice_t *nala_get_params_compose_twice()
 {
     return (&nala_get_data_compose_twice()->params);
 }
 
 DummyStruct *__wrap_compose_twice(DummyStruct *dummy_struct, DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct))
 {
-    struct _nala_instance_type_for_compose_twice *_nala_instance_p;
-    struct _nala_data_type_for_compose_twice *_nala_data_p;
+    struct nala_instance_type_for_compose_twice_t *nala_instance_p;
+    struct nala_data_type_for_compose_twice_t *nala_data_p;
     DummyStruct *return_value;
 
     nala_print_call("compose_twice", &nala_state_for_compose_twice.state);
@@ -1892,43 +1892,43 @@ DummyStruct *__wrap_compose_twice(DummyStruct *dummy_struct, DummyStruct *(*dumm
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_compose_twice.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_compose_twice.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_compose_twice.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked compose_twice() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_compose_twice.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_compose_twice.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, compose_twice, dummy_struct);
-            _nala_data_p->params_in.dummy_struct = dummy_struct;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, compose_twice, dummy_struct_modifier);
-            _nala_data_p->params_in.dummy_struct_modifier = dummy_struct_modifier;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, compose_twice, dummy_struct);
+            nala_data_p->params_in.dummy_struct = dummy_struct;
+            MOCK_ASSERT_IN_EQ(nala_data_p, compose_twice, dummy_struct_modifier);
+            nala_data_p->params_in.dummy_struct_modifier = dummy_struct_modifier;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        compose_twice,
                                        dummy_struct);
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        compose_twice,
                                        dummy_struct_modifier);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(dummy_struct, dummy_struct_modifier);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(dummy_struct, dummy_struct_modifier);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_compose_twice(dummy_struct, dummy_struct_modifier);
@@ -1970,29 +1970,29 @@ void compose_twice_mock(DummyStruct *return_value)
 
 int compose_twice_mock_once(DummyStruct *return_value)
 {
-    struct _nala_instance_type_for_compose_twice *_nala_instance_p;
+    struct nala_instance_type_for_compose_twice_t *nala_instance_p;
 
     nala_state_for_compose_twice.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.dummy_struct_out);
-    nala_set_param_init(&_nala_instance_p->data.params.dummy_struct_in);
-    _nala_instance_p->data.params.dummy_struct_in_assert = NULL;
-    _nala_instance_p->data.params.dummy_struct_out_copy = NULL;
-    nala_set_param_init(&_nala_instance_p->data.params.dummy_struct_modifier_out);
-    nala_set_param_init(&_nala_instance_p->data.params.dummy_struct_modifier_in);
-    _nala_instance_p->data.params.dummy_struct_modifier_in_assert = NULL;
-    _nala_instance_p->data.params.dummy_struct_modifier_out_copy = NULL;
-    _nala_instance_p->data.params.dummy_struct = NULL;
-    _nala_instance_p->data.params.ignore_dummy_struct_in = true;
-    _nala_instance_p->data.params.dummy_struct_modifier = NULL;
-    _nala_instance_p->data.params.ignore_dummy_struct_modifier_in = true;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.dummy_struct_out);
+    nala_set_param_init(&nala_instance_p->data.params.dummy_struct_in);
+    nala_instance_p->data.params.dummy_struct_in_assert = NULL;
+    nala_instance_p->data.params.dummy_struct_out_copy = NULL;
+    nala_set_param_init(&nala_instance_p->data.params.dummy_struct_modifier_out);
+    nala_set_param_init(&nala_instance_p->data.params.dummy_struct_modifier_in);
+    nala_instance_p->data.params.dummy_struct_modifier_in_assert = NULL;
+    nala_instance_p->data.params.dummy_struct_modifier_out_copy = NULL;
+    nala_instance_p->data.params.dummy_struct = NULL;
+    nala_instance_p->data.params.ignore_dummy_struct_in = true;
+    nala_instance_p->data.params.dummy_struct_modifier = NULL;
+    nala_instance_p->data.params.ignore_dummy_struct_modifier_in = true;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_compose_twice.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void compose_twice_mock_ignore_in(DummyStruct *return_value)
@@ -2007,7 +2007,7 @@ void compose_twice_mock_ignore_in(DummyStruct *return_value)
 
 int compose_twice_mock_ignore_in_once(DummyStruct *return_value)
 {
-    struct _nala_instance_type_for_compose_twice *instance_p;
+    struct nala_instance_type_for_compose_twice_t *instance_p;
 
     nala_state_for_compose_twice.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -2044,7 +2044,7 @@ void compose_twice_mock_set_callback(void (*callback)(DummyStruct *dummy_struct,
 
 struct nala_compose_twice_params_t *compose_twice_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_compose_twice *instance_p;
+    struct nala_instance_type_for_compose_twice_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_compose_twice.instances, &instance_p, handle);
 
@@ -2067,27 +2067,27 @@ void compose_twice_mock_set_dummy_struct_in(const void *buf_p, size_t size)
 
 void compose_twice_mock_set_dummy_struct_in_assert(void (*callback)(DummyStruct *dummy_struct, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_compose_twice *_nala_params_p;
+    struct nala_data_params_for_compose_twice_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_compose_twice();
+    nala_params_p = nala_get_params_compose_twice();
 
-    if (_nala_params_p->dummy_struct_in.buf_p == NULL) {
+    if (nala_params_p->dummy_struct_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "compose_twice_mock_set_dummy_struct_in() must be called "
                 "before compose_twice_mock_set_dummy_struct_in_assert().\n"));
     }
 
-    _nala_params_p->dummy_struct_in_assert = callback;
+    nala_params_p->dummy_struct_in_assert = callback;
 }
 
 void compose_twice_mock_set_dummy_struct_in_pointer(DummyStruct *dummy_struct)
 {
-    struct _nala_data_params_for_compose_twice *_nala_params_p;
+    struct nala_data_params_for_compose_twice_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_compose_twice();
-    _nala_params_p->ignore_dummy_struct_in = false;
-    _nala_params_p->dummy_struct = dummy_struct;
+    nala_params_p = nala_get_params_compose_twice();
+    nala_params_p->ignore_dummy_struct_in = false;
+    nala_params_p->dummy_struct = dummy_struct;
 }
 
 void compose_twice_mock_set_dummy_struct_out(const void *buf_p, size_t size)
@@ -2111,27 +2111,27 @@ void compose_twice_mock_set_dummy_struct_modifier_in(const void *buf_p, size_t s
 
 void compose_twice_mock_set_dummy_struct_modifier_in_assert(void (*callback)(DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct), const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_compose_twice *_nala_params_p;
+    struct nala_data_params_for_compose_twice_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_compose_twice();
+    nala_params_p = nala_get_params_compose_twice();
 
-    if (_nala_params_p->dummy_struct_modifier_in.buf_p == NULL) {
+    if (nala_params_p->dummy_struct_modifier_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "compose_twice_mock_set_dummy_struct_modifier_in() must be called "
                 "before compose_twice_mock_set_dummy_struct_modifier_in_assert().\n"));
     }
 
-    _nala_params_p->dummy_struct_modifier_in_assert = callback;
+    nala_params_p->dummy_struct_modifier_in_assert = callback;
 }
 
 void compose_twice_mock_set_dummy_struct_modifier_in_pointer(DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct))
 {
-    struct _nala_data_params_for_compose_twice *_nala_params_p;
+    struct nala_data_params_for_compose_twice_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_compose_twice();
-    _nala_params_p->ignore_dummy_struct_modifier_in = false;
-    _nala_params_p->dummy_struct_modifier = dummy_struct_modifier;
+    nala_params_p = nala_get_params_compose_twice();
+    nala_params_p->ignore_dummy_struct_modifier_in = false;
+    nala_params_p->dummy_struct_modifier = dummy_struct_modifier;
 }
 
 void compose_twice_mock_set_dummy_struct_modifier_out(const void *buf_p, size_t size)
@@ -2167,7 +2167,7 @@ void compose_twice_mock_real(void)
 
 void compose_twice_mock_real_once(void)
 {
-    struct _nala_instance_type_for_compose_twice *instance_p;
+    struct nala_instance_type_for_compose_twice_t *instance_p;
 
     nala_state_for_compose_twice.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -2187,8 +2187,8 @@ void compose_twice_mock_resume(void)
 
 void compose_twice_mock_reset(void)
 {
-    struct _nala_instance_type_for_compose_twice *current_p;
-    struct _nala_instance_type_for_compose_twice *tmp_p;
+    struct nala_instance_type_for_compose_twice_t *current_p;
+    struct nala_instance_type_for_compose_twice_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_compose_twice, current_p, tmp_p);
 }
@@ -2210,7 +2210,7 @@ void compose_twice_mock_assert_completed(void)
 
 int __real_double_pointer(int **value_pp);
 
-struct _nala_data_params_for_double_pointer {
+struct nala_data_params_for_double_pointer_t {
     int **value_pp;
     bool ignore_value_pp_in;
     struct nala_set_param value_pp_in;
@@ -2219,8 +2219,8 @@ struct _nala_data_params_for_double_pointer {
     void (*value_pp_out_copy)(int **value_pp, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_double_pointer {
-    struct _nala_data_params_for_double_pointer params;
+struct nala_data_type_for_double_pointer_t {
+    struct nala_data_params_for_double_pointer_t params;
     int return_value;
     int errno_value;
     int (*implementation)(int **value_pp);
@@ -2229,27 +2229,27 @@ struct _nala_data_type_for_double_pointer {
     struct nala_double_pointer_params_t params_in;
 };
 
-struct _nala_instance_type_for_double_pointer {
+struct nala_instance_type_for_double_pointer_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_double_pointer data;
-    struct _nala_instance_type_for_double_pointer *next_p;
+    struct nala_data_type_for_double_pointer_t data;
+    struct nala_instance_type_for_double_pointer_t *next_p;
 };
 
-struct _nala_instances_type_for_double_pointer {
-    struct _nala_instance_type_for_double_pointer *head_p;
-    struct _nala_instance_type_for_double_pointer *next_p;
-    struct _nala_instance_type_for_double_pointer *tail_p;
+struct nala_instances_type_for_double_pointer_t {
+    struct nala_instance_type_for_double_pointer_t *head_p;
+    struct nala_instance_type_for_double_pointer_t *next_p;
+    struct nala_instance_type_for_double_pointer_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_double_pointer {
+struct nala_state_type_for_double_pointer_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_double_pointer data;
-    struct _nala_instances_type_for_double_pointer instances;
+    struct nala_data_type_for_double_pointer_t data;
+    struct nala_instances_type_for_double_pointer_t instances;
 };
 
-static struct nala_state_type_for_double_pointer nala_state_for_double_pointer = {
+static struct nala_state_type_for_double_pointer_t nala_state_for_double_pointer = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -2265,7 +2265,7 @@ static struct nala_state_type_for_double_pointer nala_state_for_double_pointer =
     }
 };
 
-struct _nala_data_type_for_double_pointer *nala_get_data_double_pointer()
+struct nala_data_type_for_double_pointer_t *nala_get_data_double_pointer()
 {
     if (nala_state_for_double_pointer.instances.tail_p != NULL) {
         return (&nala_state_for_double_pointer.instances.tail_p->data);
@@ -2274,15 +2274,15 @@ struct _nala_data_type_for_double_pointer *nala_get_data_double_pointer()
     }
 }
 
-struct _nala_data_params_for_double_pointer *nala_get_params_double_pointer()
+struct nala_data_params_for_double_pointer_t *nala_get_params_double_pointer()
 {
     return (&nala_get_data_double_pointer()->params);
 }
 
 int __wrap_double_pointer(int **value_pp)
 {
-    struct _nala_instance_type_for_double_pointer *_nala_instance_p;
-    struct _nala_data_type_for_double_pointer *_nala_data_p;
+    struct nala_instance_type_for_double_pointer_t *nala_instance_p;
+    struct nala_data_type_for_double_pointer_t *nala_data_p;
     int return_value;
 
     nala_print_call("double_pointer", &nala_state_for_double_pointer.state);
@@ -2292,36 +2292,36 @@ int __wrap_double_pointer(int **value_pp)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_double_pointer.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_double_pointer.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_double_pointer.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked double_pointer() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_double_pointer.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_double_pointer.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, double_pointer, value_pp);
-            _nala_data_p->params_in.value_pp = value_pp;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, double_pointer, value_pp);
+            nala_data_p->params_in.value_pp = value_pp;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        double_pointer,
                                        value_pp);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(value_pp);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(value_pp);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_double_pointer(value_pp);
@@ -2361,23 +2361,23 @@ void double_pointer_mock(int return_value)
 
 int double_pointer_mock_once(int return_value)
 {
-    struct _nala_instance_type_for_double_pointer *_nala_instance_p;
+    struct nala_instance_type_for_double_pointer_t *nala_instance_p;
 
     nala_state_for_double_pointer.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.value_pp_out);
-    nala_set_param_init(&_nala_instance_p->data.params.value_pp_in);
-    _nala_instance_p->data.params.value_pp_in_assert = NULL;
-    _nala_instance_p->data.params.value_pp_out_copy = NULL;
-    _nala_instance_p->data.params.value_pp = NULL;
-    _nala_instance_p->data.params.ignore_value_pp_in = true;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.value_pp_out);
+    nala_set_param_init(&nala_instance_p->data.params.value_pp_in);
+    nala_instance_p->data.params.value_pp_in_assert = NULL;
+    nala_instance_p->data.params.value_pp_out_copy = NULL;
+    nala_instance_p->data.params.value_pp = NULL;
+    nala_instance_p->data.params.ignore_value_pp_in = true;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_double_pointer.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void double_pointer_mock_ignore_in(int return_value)
@@ -2391,7 +2391,7 @@ void double_pointer_mock_ignore_in(int return_value)
 
 int double_pointer_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_double_pointer *instance_p;
+    struct nala_instance_type_for_double_pointer_t *instance_p;
 
     nala_state_for_double_pointer.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -2422,7 +2422,7 @@ void double_pointer_mock_set_callback(void (*callback)(int **value_pp))
 
 struct nala_double_pointer_params_t *double_pointer_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_double_pointer *instance_p;
+    struct nala_instance_type_for_double_pointer_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_double_pointer.instances, &instance_p, handle);
 
@@ -2445,27 +2445,27 @@ void double_pointer_mock_set_value_pp_in(const void *buf_p, size_t size)
 
 void double_pointer_mock_set_value_pp_in_assert(void (*callback)(int **value_pp, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_double_pointer *_nala_params_p;
+    struct nala_data_params_for_double_pointer_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_double_pointer();
+    nala_params_p = nala_get_params_double_pointer();
 
-    if (_nala_params_p->value_pp_in.buf_p == NULL) {
+    if (nala_params_p->value_pp_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "double_pointer_mock_set_value_pp_in() must be called "
                 "before double_pointer_mock_set_value_pp_in_assert().\n"));
     }
 
-    _nala_params_p->value_pp_in_assert = callback;
+    nala_params_p->value_pp_in_assert = callback;
 }
 
 void double_pointer_mock_set_value_pp_in_pointer(int **value_pp)
 {
-    struct _nala_data_params_for_double_pointer *_nala_params_p;
+    struct nala_data_params_for_double_pointer_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_double_pointer();
-    _nala_params_p->ignore_value_pp_in = false;
-    _nala_params_p->value_pp = value_pp;
+    nala_params_p = nala_get_params_double_pointer();
+    nala_params_p->ignore_value_pp_in = false;
+    nala_params_p->value_pp = value_pp;
 }
 
 void double_pointer_mock_set_value_pp_out(const void *buf_p, size_t size)
@@ -2501,7 +2501,7 @@ void double_pointer_mock_real(void)
 
 void double_pointer_mock_real_once(void)
 {
-    struct _nala_instance_type_for_double_pointer *instance_p;
+    struct nala_instance_type_for_double_pointer_t *instance_p;
 
     nala_state_for_double_pointer.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -2521,8 +2521,8 @@ void double_pointer_mock_resume(void)
 
 void double_pointer_mock_reset(void)
 {
-    struct _nala_instance_type_for_double_pointer *current_p;
-    struct _nala_instance_type_for_double_pointer *tmp_p;
+    struct nala_instance_type_for_double_pointer_t *current_p;
+    struct nala_instance_type_for_double_pointer_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_double_pointer, current_p, tmp_p);
 }
@@ -2544,13 +2544,13 @@ void double_pointer_mock_assert_completed(void)
 
 int __real_dup(int oldfd);
 
-struct _nala_data_params_for_dup {
+struct nala_data_params_for_dup_t {
     int oldfd;
     bool ignore_oldfd_in;
 };
 
-struct _nala_data_type_for_dup {
-    struct _nala_data_params_for_dup params;
+struct nala_data_type_for_dup_t {
+    struct nala_data_params_for_dup_t params;
     int return_value;
     int errno_value;
     int (*implementation)(int oldfd);
@@ -2559,27 +2559,27 @@ struct _nala_data_type_for_dup {
     struct nala_dup_params_t params_in;
 };
 
-struct _nala_instance_type_for_dup {
+struct nala_instance_type_for_dup_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_dup data;
-    struct _nala_instance_type_for_dup *next_p;
+    struct nala_data_type_for_dup_t data;
+    struct nala_instance_type_for_dup_t *next_p;
 };
 
-struct _nala_instances_type_for_dup {
-    struct _nala_instance_type_for_dup *head_p;
-    struct _nala_instance_type_for_dup *next_p;
-    struct _nala_instance_type_for_dup *tail_p;
+struct nala_instances_type_for_dup_t {
+    struct nala_instance_type_for_dup_t *head_p;
+    struct nala_instance_type_for_dup_t *next_p;
+    struct nala_instance_type_for_dup_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_dup {
+struct nala_state_type_for_dup_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_dup data;
-    struct _nala_instances_type_for_dup instances;
+    struct nala_data_type_for_dup_t data;
+    struct nala_instances_type_for_dup_t instances;
 };
 
-static struct nala_state_type_for_dup nala_state_for_dup = {
+static struct nala_state_type_for_dup_t nala_state_for_dup = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -2595,7 +2595,7 @@ static struct nala_state_type_for_dup nala_state_for_dup = {
     }
 };
 
-struct _nala_data_type_for_dup *nala_get_data_dup()
+struct nala_data_type_for_dup_t *nala_get_data_dup()
 {
     if (nala_state_for_dup.instances.tail_p != NULL) {
         return (&nala_state_for_dup.instances.tail_p->data);
@@ -2604,15 +2604,15 @@ struct _nala_data_type_for_dup *nala_get_data_dup()
     }
 }
 
-struct _nala_data_params_for_dup *nala_get_params_dup()
+struct nala_data_params_for_dup_t *nala_get_params_dup()
 {
     return (&nala_get_data_dup()->params);
 }
 
 int __wrap_dup(int oldfd)
 {
-    struct _nala_instance_type_for_dup *_nala_instance_p;
-    struct _nala_data_type_for_dup *_nala_data_p;
+    struct nala_instance_type_for_dup_t *nala_instance_p;
+    struct nala_data_type_for_dup_t *nala_data_p;
     int return_value;
 
     nala_print_call("dup", &nala_state_for_dup.state);
@@ -2622,31 +2622,31 @@ int __wrap_dup(int oldfd)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_dup.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_dup.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_dup.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked dup() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_dup.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_dup.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, dup, oldfd);
-            _nala_data_p->params_in.oldfd = oldfd;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, dup, oldfd);
+            nala_data_p->params_in.oldfd = oldfd;
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(oldfd);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(oldfd);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_dup(oldfd);
@@ -2686,19 +2686,19 @@ void dup_mock(int oldfd, int return_value)
 
 int dup_mock_once(int oldfd, int return_value)
 {
-    struct _nala_instance_type_for_dup *_nala_instance_p;
+    struct nala_instance_type_for_dup_t *nala_instance_p;
 
     nala_state_for_dup.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.params.oldfd = oldfd;
-    _nala_instance_p->data.params.ignore_oldfd_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.params.oldfd = oldfd;
+    nala_instance_p->data.params.ignore_oldfd_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_dup.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void dup_mock_ignore_in(int return_value)
@@ -2712,7 +2712,7 @@ void dup_mock_ignore_in(int return_value)
 
 int dup_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_dup *instance_p;
+    struct nala_instance_type_for_dup_t *instance_p;
 
     nala_state_for_dup.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -2738,7 +2738,7 @@ void dup_mock_set_callback(void (*callback)(int oldfd))
 
 struct nala_dup_params_t *dup_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_dup *instance_p;
+    struct nala_instance_type_for_dup_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_dup.instances, &instance_p, handle);
 
@@ -2778,7 +2778,7 @@ void dup_mock_real(void)
 
 void dup_mock_real_once(void)
 {
-    struct _nala_instance_type_for_dup *instance_p;
+    struct nala_instance_type_for_dup_t *instance_p;
 
     nala_state_for_dup.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -2798,8 +2798,8 @@ void dup_mock_resume(void)
 
 void dup_mock_reset(void)
 {
-    struct _nala_instance_type_for_dup *current_p;
-    struct _nala_instance_type_for_dup *tmp_p;
+    struct nala_instance_type_for_dup_t *current_p;
+    struct nala_instance_type_for_dup_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_dup, current_p, tmp_p);
 }
@@ -2821,15 +2821,15 @@ void dup_mock_assert_completed(void)
 
 int __real_dup2(int oldfd, int newfd);
 
-struct _nala_data_params_for_dup2 {
+struct nala_data_params_for_dup2_t {
     int oldfd;
     int newfd;
     bool ignore_oldfd_in;
     bool ignore_newfd_in;
 };
 
-struct _nala_data_type_for_dup2 {
-    struct _nala_data_params_for_dup2 params;
+struct nala_data_type_for_dup2_t {
+    struct nala_data_params_for_dup2_t params;
     int return_value;
     int errno_value;
     int (*implementation)(int oldfd, int newfd);
@@ -2838,27 +2838,27 @@ struct _nala_data_type_for_dup2 {
     struct nala_dup2_params_t params_in;
 };
 
-struct _nala_instance_type_for_dup2 {
+struct nala_instance_type_for_dup2_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_dup2 data;
-    struct _nala_instance_type_for_dup2 *next_p;
+    struct nala_data_type_for_dup2_t data;
+    struct nala_instance_type_for_dup2_t *next_p;
 };
 
-struct _nala_instances_type_for_dup2 {
-    struct _nala_instance_type_for_dup2 *head_p;
-    struct _nala_instance_type_for_dup2 *next_p;
-    struct _nala_instance_type_for_dup2 *tail_p;
+struct nala_instances_type_for_dup2_t {
+    struct nala_instance_type_for_dup2_t *head_p;
+    struct nala_instance_type_for_dup2_t *next_p;
+    struct nala_instance_type_for_dup2_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_dup2 {
+struct nala_state_type_for_dup2_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_dup2 data;
-    struct _nala_instances_type_for_dup2 instances;
+    struct nala_data_type_for_dup2_t data;
+    struct nala_instances_type_for_dup2_t instances;
 };
 
-static struct nala_state_type_for_dup2 nala_state_for_dup2 = {
+static struct nala_state_type_for_dup2_t nala_state_for_dup2 = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -2874,7 +2874,7 @@ static struct nala_state_type_for_dup2 nala_state_for_dup2 = {
     }
 };
 
-struct _nala_data_type_for_dup2 *nala_get_data_dup2()
+struct nala_data_type_for_dup2_t *nala_get_data_dup2()
 {
     if (nala_state_for_dup2.instances.tail_p != NULL) {
         return (&nala_state_for_dup2.instances.tail_p->data);
@@ -2883,15 +2883,15 @@ struct _nala_data_type_for_dup2 *nala_get_data_dup2()
     }
 }
 
-struct _nala_data_params_for_dup2 *nala_get_params_dup2()
+struct nala_data_params_for_dup2_t *nala_get_params_dup2()
 {
     return (&nala_get_data_dup2()->params);
 }
 
 int __wrap_dup2(int oldfd, int newfd)
 {
-    struct _nala_instance_type_for_dup2 *_nala_instance_p;
-    struct _nala_data_type_for_dup2 *_nala_data_p;
+    struct nala_instance_type_for_dup2_t *nala_instance_p;
+    struct nala_data_type_for_dup2_t *nala_data_p;
     int return_value;
 
     nala_print_call("dup2", &nala_state_for_dup2.state);
@@ -2901,33 +2901,33 @@ int __wrap_dup2(int oldfd, int newfd)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_dup2.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_dup2.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_dup2.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked dup2() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_dup2.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_dup2.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, dup2, oldfd);
-            _nala_data_p->params_in.oldfd = oldfd;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, dup2, newfd);
-            _nala_data_p->params_in.newfd = newfd;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, dup2, oldfd);
+            nala_data_p->params_in.oldfd = oldfd;
+            MOCK_ASSERT_IN_EQ(nala_data_p, dup2, newfd);
+            nala_data_p->params_in.newfd = newfd;
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(oldfd, newfd);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(oldfd, newfd);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_dup2(oldfd, newfd);
@@ -2969,21 +2969,21 @@ void dup2_mock(int oldfd, int newfd, int return_value)
 
 int dup2_mock_once(int oldfd, int newfd, int return_value)
 {
-    struct _nala_instance_type_for_dup2 *_nala_instance_p;
+    struct nala_instance_type_for_dup2_t *nala_instance_p;
 
     nala_state_for_dup2.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.params.oldfd = oldfd;
-    _nala_instance_p->data.params.ignore_oldfd_in = false;
-    _nala_instance_p->data.params.newfd = newfd;
-    _nala_instance_p->data.params.ignore_newfd_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.params.oldfd = oldfd;
+    nala_instance_p->data.params.ignore_oldfd_in = false;
+    nala_instance_p->data.params.newfd = newfd;
+    nala_instance_p->data.params.ignore_newfd_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_dup2.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void dup2_mock_ignore_in(int return_value)
@@ -2998,7 +2998,7 @@ void dup2_mock_ignore_in(int return_value)
 
 int dup2_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_dup2 *instance_p;
+    struct nala_instance_type_for_dup2_t *instance_p;
 
     nala_state_for_dup2.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -3025,7 +3025,7 @@ void dup2_mock_set_callback(void (*callback)(int oldfd, int newfd))
 
 struct nala_dup2_params_t *dup2_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_dup2 *instance_p;
+    struct nala_instance_type_for_dup2_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_dup2.instances, &instance_p, handle);
 
@@ -3070,7 +3070,7 @@ void dup2_mock_real(void)
 
 void dup2_mock_real_once(void)
 {
-    struct _nala_instance_type_for_dup2 *instance_p;
+    struct nala_instance_type_for_dup2_t *instance_p;
 
     nala_state_for_dup2.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -3090,8 +3090,8 @@ void dup2_mock_resume(void)
 
 void dup2_mock_reset(void)
 {
-    struct _nala_instance_type_for_dup2 *current_p;
-    struct _nala_instance_type_for_dup2 *tmp_p;
+    struct nala_instance_type_for_dup2_t *current_p;
+    struct nala_instance_type_for_dup2_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_dup2, current_p, tmp_p);
 }
@@ -3113,7 +3113,7 @@ void dup2_mock_assert_completed(void)
 
 DummyStruct *__real_edit_number(DummyStruct *dummy_struct, int number);
 
-struct _nala_data_params_for_edit_number {
+struct nala_data_params_for_edit_number_t {
     DummyStruct *dummy_struct;
     int number;
     bool ignore_dummy_struct_in;
@@ -3124,8 +3124,8 @@ struct _nala_data_params_for_edit_number {
     bool ignore_number_in;
 };
 
-struct _nala_data_type_for_edit_number {
-    struct _nala_data_params_for_edit_number params;
+struct nala_data_type_for_edit_number_t {
+    struct nala_data_params_for_edit_number_t params;
     DummyStruct *return_value;
     int errno_value;
     DummyStruct *(*implementation)(DummyStruct *dummy_struct, int number);
@@ -3134,27 +3134,27 @@ struct _nala_data_type_for_edit_number {
     struct nala_edit_number_params_t params_in;
 };
 
-struct _nala_instance_type_for_edit_number {
+struct nala_instance_type_for_edit_number_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_edit_number data;
-    struct _nala_instance_type_for_edit_number *next_p;
+    struct nala_data_type_for_edit_number_t data;
+    struct nala_instance_type_for_edit_number_t *next_p;
 };
 
-struct _nala_instances_type_for_edit_number {
-    struct _nala_instance_type_for_edit_number *head_p;
-    struct _nala_instance_type_for_edit_number *next_p;
-    struct _nala_instance_type_for_edit_number *tail_p;
+struct nala_instances_type_for_edit_number_t {
+    struct nala_instance_type_for_edit_number_t *head_p;
+    struct nala_instance_type_for_edit_number_t *next_p;
+    struct nala_instance_type_for_edit_number_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_edit_number {
+struct nala_state_type_for_edit_number_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_edit_number data;
-    struct _nala_instances_type_for_edit_number instances;
+    struct nala_data_type_for_edit_number_t data;
+    struct nala_instances_type_for_edit_number_t instances;
 };
 
-static struct nala_state_type_for_edit_number nala_state_for_edit_number = {
+static struct nala_state_type_for_edit_number_t nala_state_for_edit_number = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -3170,7 +3170,7 @@ static struct nala_state_type_for_edit_number nala_state_for_edit_number = {
     }
 };
 
-struct _nala_data_type_for_edit_number *nala_get_data_edit_number()
+struct nala_data_type_for_edit_number_t *nala_get_data_edit_number()
 {
     if (nala_state_for_edit_number.instances.tail_p != NULL) {
         return (&nala_state_for_edit_number.instances.tail_p->data);
@@ -3179,15 +3179,15 @@ struct _nala_data_type_for_edit_number *nala_get_data_edit_number()
     }
 }
 
-struct _nala_data_params_for_edit_number *nala_get_params_edit_number()
+struct nala_data_params_for_edit_number_t *nala_get_params_edit_number()
 {
     return (&nala_get_data_edit_number()->params);
 }
 
 DummyStruct *__wrap_edit_number(DummyStruct *dummy_struct, int number)
 {
-    struct _nala_instance_type_for_edit_number *_nala_instance_p;
-    struct _nala_data_type_for_edit_number *_nala_data_p;
+    struct nala_instance_type_for_edit_number_t *nala_instance_p;
+    struct nala_data_type_for_edit_number_t *nala_data_p;
     DummyStruct *return_value;
 
     nala_print_call("edit_number", &nala_state_for_edit_number.state);
@@ -3197,38 +3197,38 @@ DummyStruct *__wrap_edit_number(DummyStruct *dummy_struct, int number)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_edit_number.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_edit_number.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_edit_number.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked edit_number() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_edit_number.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_edit_number.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, edit_number, dummy_struct);
-            _nala_data_p->params_in.dummy_struct = dummy_struct;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, edit_number, number);
-            _nala_data_p->params_in.number = number;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, edit_number, dummy_struct);
+            nala_data_p->params_in.dummy_struct = dummy_struct;
+            MOCK_ASSERT_IN_EQ(nala_data_p, edit_number, number);
+            nala_data_p->params_in.number = number;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        edit_number,
                                        dummy_struct);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(dummy_struct, number);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(dummy_struct, number);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_edit_number(dummy_struct, number);
@@ -3270,25 +3270,25 @@ void edit_number_mock(int number, DummyStruct *return_value)
 
 int edit_number_mock_once(int number, DummyStruct *return_value)
 {
-    struct _nala_instance_type_for_edit_number *_nala_instance_p;
+    struct nala_instance_type_for_edit_number_t *nala_instance_p;
 
     nala_state_for_edit_number.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.dummy_struct_out);
-    nala_set_param_init(&_nala_instance_p->data.params.dummy_struct_in);
-    _nala_instance_p->data.params.dummy_struct_in_assert = NULL;
-    _nala_instance_p->data.params.dummy_struct_out_copy = NULL;
-    _nala_instance_p->data.params.dummy_struct = NULL;
-    _nala_instance_p->data.params.ignore_dummy_struct_in = true;
-    _nala_instance_p->data.params.number = number;
-    _nala_instance_p->data.params.ignore_number_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.dummy_struct_out);
+    nala_set_param_init(&nala_instance_p->data.params.dummy_struct_in);
+    nala_instance_p->data.params.dummy_struct_in_assert = NULL;
+    nala_instance_p->data.params.dummy_struct_out_copy = NULL;
+    nala_instance_p->data.params.dummy_struct = NULL;
+    nala_instance_p->data.params.ignore_dummy_struct_in = true;
+    nala_instance_p->data.params.number = number;
+    nala_instance_p->data.params.ignore_number_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_edit_number.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void edit_number_mock_ignore_in(DummyStruct *return_value)
@@ -3303,7 +3303,7 @@ void edit_number_mock_ignore_in(DummyStruct *return_value)
 
 int edit_number_mock_ignore_in_once(DummyStruct *return_value)
 {
-    struct _nala_instance_type_for_edit_number *instance_p;
+    struct nala_instance_type_for_edit_number_t *instance_p;
 
     nala_state_for_edit_number.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -3335,7 +3335,7 @@ void edit_number_mock_set_callback(void (*callback)(DummyStruct *dummy_struct, i
 
 struct nala_edit_number_params_t *edit_number_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_edit_number *instance_p;
+    struct nala_instance_type_for_edit_number_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_edit_number.instances, &instance_p, handle);
 
@@ -3363,27 +3363,27 @@ void edit_number_mock_set_dummy_struct_in(const void *buf_p, size_t size)
 
 void edit_number_mock_set_dummy_struct_in_assert(void (*callback)(DummyStruct *dummy_struct, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_edit_number *_nala_params_p;
+    struct nala_data_params_for_edit_number_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_edit_number();
+    nala_params_p = nala_get_params_edit_number();
 
-    if (_nala_params_p->dummy_struct_in.buf_p == NULL) {
+    if (nala_params_p->dummy_struct_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "edit_number_mock_set_dummy_struct_in() must be called "
                 "before edit_number_mock_set_dummy_struct_in_assert().\n"));
     }
 
-    _nala_params_p->dummy_struct_in_assert = callback;
+    nala_params_p->dummy_struct_in_assert = callback;
 }
 
 void edit_number_mock_set_dummy_struct_in_pointer(DummyStruct *dummy_struct)
 {
-    struct _nala_data_params_for_edit_number *_nala_params_p;
+    struct nala_data_params_for_edit_number_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_edit_number();
-    _nala_params_p->ignore_dummy_struct_in = false;
-    _nala_params_p->dummy_struct = dummy_struct;
+    nala_params_p = nala_get_params_edit_number();
+    nala_params_p->ignore_dummy_struct_in = false;
+    nala_params_p->dummy_struct = dummy_struct;
 }
 
 void edit_number_mock_set_dummy_struct_out(const void *buf_p, size_t size)
@@ -3419,7 +3419,7 @@ void edit_number_mock_real(void)
 
 void edit_number_mock_real_once(void)
 {
-    struct _nala_instance_type_for_edit_number *instance_p;
+    struct nala_instance_type_for_edit_number_t *instance_p;
 
     nala_state_for_edit_number.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -3439,8 +3439,8 @@ void edit_number_mock_resume(void)
 
 void edit_number_mock_reset(void)
 {
-    struct _nala_instance_type_for_edit_number *current_p;
-    struct _nala_instance_type_for_edit_number *tmp_p;
+    struct nala_instance_type_for_edit_number_t *current_p;
+    struct nala_instance_type_for_edit_number_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_edit_number, current_p, tmp_p);
 }
@@ -3462,7 +3462,7 @@ void edit_number_mock_assert_completed(void)
 
 int __real_endmntent(FILE *streamp);
 
-struct _nala_data_params_for_endmntent {
+struct nala_data_params_for_endmntent_t {
     FILE *streamp;
     bool ignore_streamp_in;
     struct nala_set_param streamp_in;
@@ -3471,8 +3471,8 @@ struct _nala_data_params_for_endmntent {
     void (*streamp_out_copy)(FILE *streamp, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_endmntent {
-    struct _nala_data_params_for_endmntent params;
+struct nala_data_type_for_endmntent_t {
+    struct nala_data_params_for_endmntent_t params;
     int return_value;
     int errno_value;
     int (*implementation)(FILE *streamp);
@@ -3481,27 +3481,27 @@ struct _nala_data_type_for_endmntent {
     struct nala_endmntent_params_t params_in;
 };
 
-struct _nala_instance_type_for_endmntent {
+struct nala_instance_type_for_endmntent_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_endmntent data;
-    struct _nala_instance_type_for_endmntent *next_p;
+    struct nala_data_type_for_endmntent_t data;
+    struct nala_instance_type_for_endmntent_t *next_p;
 };
 
-struct _nala_instances_type_for_endmntent {
-    struct _nala_instance_type_for_endmntent *head_p;
-    struct _nala_instance_type_for_endmntent *next_p;
-    struct _nala_instance_type_for_endmntent *tail_p;
+struct nala_instances_type_for_endmntent_t {
+    struct nala_instance_type_for_endmntent_t *head_p;
+    struct nala_instance_type_for_endmntent_t *next_p;
+    struct nala_instance_type_for_endmntent_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_endmntent {
+struct nala_state_type_for_endmntent_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_endmntent data;
-    struct _nala_instances_type_for_endmntent instances;
+    struct nala_data_type_for_endmntent_t data;
+    struct nala_instances_type_for_endmntent_t instances;
 };
 
-static struct nala_state_type_for_endmntent nala_state_for_endmntent = {
+static struct nala_state_type_for_endmntent_t nala_state_for_endmntent = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -3517,7 +3517,7 @@ static struct nala_state_type_for_endmntent nala_state_for_endmntent = {
     }
 };
 
-struct _nala_data_type_for_endmntent *nala_get_data_endmntent()
+struct nala_data_type_for_endmntent_t *nala_get_data_endmntent()
 {
     if (nala_state_for_endmntent.instances.tail_p != NULL) {
         return (&nala_state_for_endmntent.instances.tail_p->data);
@@ -3526,15 +3526,15 @@ struct _nala_data_type_for_endmntent *nala_get_data_endmntent()
     }
 }
 
-struct _nala_data_params_for_endmntent *nala_get_params_endmntent()
+struct nala_data_params_for_endmntent_t *nala_get_params_endmntent()
 {
     return (&nala_get_data_endmntent()->params);
 }
 
 int __wrap_endmntent(FILE *streamp)
 {
-    struct _nala_instance_type_for_endmntent *_nala_instance_p;
-    struct _nala_data_type_for_endmntent *_nala_data_p;
+    struct nala_instance_type_for_endmntent_t *nala_instance_p;
+    struct nala_data_type_for_endmntent_t *nala_data_p;
     int return_value;
 
     nala_print_call("endmntent", &nala_state_for_endmntent.state);
@@ -3544,36 +3544,36 @@ int __wrap_endmntent(FILE *streamp)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_endmntent.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_endmntent.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_endmntent.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked endmntent() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_endmntent.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_endmntent.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, endmntent, streamp);
-            _nala_data_p->params_in.streamp = streamp;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, endmntent, streamp);
+            nala_data_p->params_in.streamp = streamp;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        endmntent,
                                        streamp);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(streamp);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(streamp);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_endmntent(streamp);
@@ -3613,23 +3613,23 @@ void endmntent_mock(int return_value)
 
 int endmntent_mock_once(int return_value)
 {
-    struct _nala_instance_type_for_endmntent *_nala_instance_p;
+    struct nala_instance_type_for_endmntent_t *nala_instance_p;
 
     nala_state_for_endmntent.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.streamp_out);
-    nala_set_param_init(&_nala_instance_p->data.params.streamp_in);
-    _nala_instance_p->data.params.streamp_in_assert = NULL;
-    _nala_instance_p->data.params.streamp_out_copy = NULL;
-    _nala_instance_p->data.params.streamp = NULL;
-    _nala_instance_p->data.params.ignore_streamp_in = true;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.streamp_out);
+    nala_set_param_init(&nala_instance_p->data.params.streamp_in);
+    nala_instance_p->data.params.streamp_in_assert = NULL;
+    nala_instance_p->data.params.streamp_out_copy = NULL;
+    nala_instance_p->data.params.streamp = NULL;
+    nala_instance_p->data.params.ignore_streamp_in = true;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_endmntent.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void endmntent_mock_ignore_in(int return_value)
@@ -3643,7 +3643,7 @@ void endmntent_mock_ignore_in(int return_value)
 
 int endmntent_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_endmntent *instance_p;
+    struct nala_instance_type_for_endmntent_t *instance_p;
 
     nala_state_for_endmntent.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -3674,7 +3674,7 @@ void endmntent_mock_set_callback(void (*callback)(FILE *streamp))
 
 struct nala_endmntent_params_t *endmntent_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_endmntent *instance_p;
+    struct nala_instance_type_for_endmntent_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_endmntent.instances, &instance_p, handle);
 
@@ -3697,27 +3697,27 @@ void endmntent_mock_set_streamp_in(const void *buf_p, size_t size)
 
 void endmntent_mock_set_streamp_in_assert(void (*callback)(FILE *streamp, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_endmntent *_nala_params_p;
+    struct nala_data_params_for_endmntent_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_endmntent();
+    nala_params_p = nala_get_params_endmntent();
 
-    if (_nala_params_p->streamp_in.buf_p == NULL) {
+    if (nala_params_p->streamp_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "endmntent_mock_set_streamp_in() must be called "
                 "before endmntent_mock_set_streamp_in_assert().\n"));
     }
 
-    _nala_params_p->streamp_in_assert = callback;
+    nala_params_p->streamp_in_assert = callback;
 }
 
 void endmntent_mock_set_streamp_in_pointer(FILE *streamp)
 {
-    struct _nala_data_params_for_endmntent *_nala_params_p;
+    struct nala_data_params_for_endmntent_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_endmntent();
-    _nala_params_p->ignore_streamp_in = false;
-    _nala_params_p->streamp = streamp;
+    nala_params_p = nala_get_params_endmntent();
+    nala_params_p->ignore_streamp_in = false;
+    nala_params_p->streamp = streamp;
 }
 
 void endmntent_mock_set_streamp_out(const void *buf_p, size_t size)
@@ -3753,7 +3753,7 @@ void endmntent_mock_real(void)
 
 void endmntent_mock_real_once(void)
 {
-    struct _nala_instance_type_for_endmntent *instance_p;
+    struct nala_instance_type_for_endmntent_t *instance_p;
 
     nala_state_for_endmntent.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -3773,8 +3773,8 @@ void endmntent_mock_resume(void)
 
 void endmntent_mock_reset(void)
 {
-    struct _nala_instance_type_for_endmntent *current_p;
-    struct _nala_instance_type_for_endmntent *tmp_p;
+    struct nala_instance_type_for_endmntent_t *current_p;
+    struct nala_instance_type_for_endmntent_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_endmntent, current_p, tmp_p);
 }
@@ -3796,13 +3796,13 @@ void endmntent_mock_assert_completed(void)
 
 void __real_enum_param(enum enum_param_type value);
 
-struct _nala_data_params_for_enum_param {
+struct nala_data_params_for_enum_param_t {
     enum enum_param_type value;
     bool ignore_value_in;
 };
 
-struct _nala_data_type_for_enum_param {
-    struct _nala_data_params_for_enum_param params;
+struct nala_data_type_for_enum_param_t {
+    struct nala_data_params_for_enum_param_t params;
     int errno_value;
     void (*implementation)(enum enum_param_type value);
     void (*callback)(enum enum_param_type value);
@@ -3810,27 +3810,27 @@ struct _nala_data_type_for_enum_param {
     struct nala_enum_param_params_t params_in;
 };
 
-struct _nala_instance_type_for_enum_param {
+struct nala_instance_type_for_enum_param_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_enum_param data;
-    struct _nala_instance_type_for_enum_param *next_p;
+    struct nala_data_type_for_enum_param_t data;
+    struct nala_instance_type_for_enum_param_t *next_p;
 };
 
-struct _nala_instances_type_for_enum_param {
-    struct _nala_instance_type_for_enum_param *head_p;
-    struct _nala_instance_type_for_enum_param *next_p;
-    struct _nala_instance_type_for_enum_param *tail_p;
+struct nala_instances_type_for_enum_param_t {
+    struct nala_instance_type_for_enum_param_t *head_p;
+    struct nala_instance_type_for_enum_param_t *next_p;
+    struct nala_instance_type_for_enum_param_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_enum_param {
+struct nala_state_type_for_enum_param_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_enum_param data;
-    struct _nala_instances_type_for_enum_param instances;
+    struct nala_data_type_for_enum_param_t data;
+    struct nala_instances_type_for_enum_param_t instances;
 };
 
-static struct nala_state_type_for_enum_param nala_state_for_enum_param = {
+static struct nala_state_type_for_enum_param_t nala_state_for_enum_param = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -3846,7 +3846,7 @@ static struct nala_state_type_for_enum_param nala_state_for_enum_param = {
     }
 };
 
-struct _nala_data_type_for_enum_param *nala_get_data_enum_param()
+struct nala_data_type_for_enum_param_t *nala_get_data_enum_param()
 {
     if (nala_state_for_enum_param.instances.tail_p != NULL) {
         return (&nala_state_for_enum_param.instances.tail_p->data);
@@ -3855,15 +3855,15 @@ struct _nala_data_type_for_enum_param *nala_get_data_enum_param()
     }
 }
 
-struct _nala_data_params_for_enum_param *nala_get_params_enum_param()
+struct nala_data_params_for_enum_param_t *nala_get_params_enum_param()
 {
     return (&nala_get_data_enum_param()->params);
 }
 
 void __wrap_enum_param(enum enum_param_type value)
 {
-    struct _nala_instance_type_for_enum_param *_nala_instance_p;
-    struct _nala_data_type_for_enum_param *_nala_data_p;
+    struct nala_instance_type_for_enum_param_t *nala_instance_p;
+    struct nala_data_type_for_enum_param_t *nala_data_p;
 
     nala_print_call("enum_param", &nala_state_for_enum_param.state);
 
@@ -3872,28 +3872,28 @@ void __wrap_enum_param(enum enum_param_type value)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_enum_param.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_enum_param.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_enum_param.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked enum_param() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_enum_param.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_enum_param.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, enum_param, value);
-            _nala_data_p->params_in.value = value;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, enum_param, value);
+            nala_data_p->params_in.value = value;
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(value);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(value);
             }
 
         } else {
@@ -3931,18 +3931,18 @@ void enum_param_mock(enum enum_param_type value)
 
 int enum_param_mock_once(enum enum_param_type value)
 {
-    struct _nala_instance_type_for_enum_param *_nala_instance_p;
+    struct nala_instance_type_for_enum_param_t *nala_instance_p;
 
     nala_state_for_enum_param.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.params.value = value;
-    _nala_instance_p->data.params.ignore_value_in = false;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.params.value = value;
+    nala_instance_p->data.params.ignore_value_in = false;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_enum_param.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void enum_param_mock_ignore_in(void)
@@ -3955,7 +3955,7 @@ void enum_param_mock_ignore_in(void)
 
 int enum_param_mock_ignore_in_once(void)
 {
-    struct _nala_instance_type_for_enum_param *instance_p;
+    struct nala_instance_type_for_enum_param_t *instance_p;
 
     nala_state_for_enum_param.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -3980,7 +3980,7 @@ void enum_param_mock_set_callback(void (*callback)(enum enum_param_type value))
 
 struct nala_enum_param_params_t *enum_param_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_enum_param *instance_p;
+    struct nala_instance_type_for_enum_param_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_enum_param.instances, &instance_p, handle);
 
@@ -4020,7 +4020,7 @@ void enum_param_mock_real(void)
 
 void enum_param_mock_real_once(void)
 {
-    struct _nala_instance_type_for_enum_param *instance_p;
+    struct nala_instance_type_for_enum_param_t *instance_p;
 
     nala_state_for_enum_param.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -4040,8 +4040,8 @@ void enum_param_mock_resume(void)
 
 void enum_param_mock_reset(void)
 {
-    struct _nala_instance_type_for_enum_param *current_p;
-    struct _nala_instance_type_for_enum_param *tmp_p;
+    struct nala_instance_type_for_enum_param_t *current_p;
+    struct nala_instance_type_for_enum_param_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_enum_param, current_p, tmp_p);
 }
@@ -4063,7 +4063,7 @@ void enum_param_mock_assert_completed(void)
 
 int __real_fclose(FILE *stream);
 
-struct _nala_data_params_for_fclose {
+struct nala_data_params_for_fclose_t {
     FILE *stream;
     bool ignore_stream_in;
     struct nala_set_param stream_in;
@@ -4072,8 +4072,8 @@ struct _nala_data_params_for_fclose {
     void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_fclose {
-    struct _nala_data_params_for_fclose params;
+struct nala_data_type_for_fclose_t {
+    struct nala_data_params_for_fclose_t params;
     int return_value;
     int errno_value;
     int (*implementation)(FILE *stream);
@@ -4082,27 +4082,27 @@ struct _nala_data_type_for_fclose {
     struct nala_fclose_params_t params_in;
 };
 
-struct _nala_instance_type_for_fclose {
+struct nala_instance_type_for_fclose_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_fclose data;
-    struct _nala_instance_type_for_fclose *next_p;
+    struct nala_data_type_for_fclose_t data;
+    struct nala_instance_type_for_fclose_t *next_p;
 };
 
-struct _nala_instances_type_for_fclose {
-    struct _nala_instance_type_for_fclose *head_p;
-    struct _nala_instance_type_for_fclose *next_p;
-    struct _nala_instance_type_for_fclose *tail_p;
+struct nala_instances_type_for_fclose_t {
+    struct nala_instance_type_for_fclose_t *head_p;
+    struct nala_instance_type_for_fclose_t *next_p;
+    struct nala_instance_type_for_fclose_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_fclose {
+struct nala_state_type_for_fclose_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_fclose data;
-    struct _nala_instances_type_for_fclose instances;
+    struct nala_data_type_for_fclose_t data;
+    struct nala_instances_type_for_fclose_t instances;
 };
 
-static struct nala_state_type_for_fclose nala_state_for_fclose = {
+static struct nala_state_type_for_fclose_t nala_state_for_fclose = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -4118,7 +4118,7 @@ static struct nala_state_type_for_fclose nala_state_for_fclose = {
     }
 };
 
-struct _nala_data_type_for_fclose *nala_get_data_fclose()
+struct nala_data_type_for_fclose_t *nala_get_data_fclose()
 {
     if (nala_state_for_fclose.instances.tail_p != NULL) {
         return (&nala_state_for_fclose.instances.tail_p->data);
@@ -4127,15 +4127,15 @@ struct _nala_data_type_for_fclose *nala_get_data_fclose()
     }
 }
 
-struct _nala_data_params_for_fclose *nala_get_params_fclose()
+struct nala_data_params_for_fclose_t *nala_get_params_fclose()
 {
     return (&nala_get_data_fclose()->params);
 }
 
 int __wrap_fclose(FILE *stream)
 {
-    struct _nala_instance_type_for_fclose *_nala_instance_p;
-    struct _nala_data_type_for_fclose *_nala_data_p;
+    struct nala_instance_type_for_fclose_t *nala_instance_p;
+    struct nala_data_type_for_fclose_t *nala_data_p;
     int return_value;
 
     nala_print_call("fclose", &nala_state_for_fclose.state);
@@ -4145,36 +4145,36 @@ int __wrap_fclose(FILE *stream)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_fclose.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_fclose.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_fclose.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked fclose() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_fclose.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_fclose.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fclose, stream);
-            _nala_data_p->params_in.stream = stream;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, fclose, stream);
+            nala_data_p->params_in.stream = stream;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        fclose,
                                        stream);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(stream);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(stream);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_fclose(stream);
@@ -4214,23 +4214,23 @@ void fclose_mock(int return_value)
 
 int fclose_mock_once(int return_value)
 {
-    struct _nala_instance_type_for_fclose *_nala_instance_p;
+    struct nala_instance_type_for_fclose_t *nala_instance_p;
 
     nala_state_for_fclose.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.stream_out);
-    nala_set_param_init(&_nala_instance_p->data.params.stream_in);
-    _nala_instance_p->data.params.stream_in_assert = NULL;
-    _nala_instance_p->data.params.stream_out_copy = NULL;
-    _nala_instance_p->data.params.stream = NULL;
-    _nala_instance_p->data.params.ignore_stream_in = true;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.stream_out);
+    nala_set_param_init(&nala_instance_p->data.params.stream_in);
+    nala_instance_p->data.params.stream_in_assert = NULL;
+    nala_instance_p->data.params.stream_out_copy = NULL;
+    nala_instance_p->data.params.stream = NULL;
+    nala_instance_p->data.params.ignore_stream_in = true;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_fclose.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void fclose_mock_ignore_in(int return_value)
@@ -4244,7 +4244,7 @@ void fclose_mock_ignore_in(int return_value)
 
 int fclose_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_fclose *instance_p;
+    struct nala_instance_type_for_fclose_t *instance_p;
 
     nala_state_for_fclose.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -4275,7 +4275,7 @@ void fclose_mock_set_callback(void (*callback)(FILE *stream))
 
 struct nala_fclose_params_t *fclose_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_fclose *instance_p;
+    struct nala_instance_type_for_fclose_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_fclose.instances, &instance_p, handle);
 
@@ -4298,27 +4298,27 @@ void fclose_mock_set_stream_in(const void *buf_p, size_t size)
 
 void fclose_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_fclose *_nala_params_p;
+    struct nala_data_params_for_fclose_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fclose();
+    nala_params_p = nala_get_params_fclose();
 
-    if (_nala_params_p->stream_in.buf_p == NULL) {
+    if (nala_params_p->stream_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "fclose_mock_set_stream_in() must be called "
                 "before fclose_mock_set_stream_in_assert().\n"));
     }
 
-    _nala_params_p->stream_in_assert = callback;
+    nala_params_p->stream_in_assert = callback;
 }
 
 void fclose_mock_set_stream_in_pointer(FILE *stream)
 {
-    struct _nala_data_params_for_fclose *_nala_params_p;
+    struct nala_data_params_for_fclose_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fclose();
-    _nala_params_p->ignore_stream_in = false;
-    _nala_params_p->stream = stream;
+    nala_params_p = nala_get_params_fclose();
+    nala_params_p->ignore_stream_in = false;
+    nala_params_p->stream = stream;
 }
 
 void fclose_mock_set_stream_out(const void *buf_p, size_t size)
@@ -4354,7 +4354,7 @@ void fclose_mock_real(void)
 
 void fclose_mock_real_once(void)
 {
-    struct _nala_instance_type_for_fclose *instance_p;
+    struct nala_instance_type_for_fclose_t *instance_p;
 
     nala_state_for_fclose.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -4374,8 +4374,8 @@ void fclose_mock_resume(void)
 
 void fclose_mock_reset(void)
 {
-    struct _nala_instance_type_for_fclose *current_p;
-    struct _nala_instance_type_for_fclose *tmp_p;
+    struct nala_instance_type_for_fclose_t *current_p;
+    struct nala_instance_type_for_fclose_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_fclose, current_p, tmp_p);
 }
@@ -4397,7 +4397,7 @@ void fclose_mock_assert_completed(void)
 
 int __real_fflush(FILE *stream);
 
-struct _nala_data_params_for_fflush {
+struct nala_data_params_for_fflush_t {
     FILE *stream;
     bool ignore_stream_in;
     struct nala_set_param stream_in;
@@ -4406,8 +4406,8 @@ struct _nala_data_params_for_fflush {
     void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_fflush {
-    struct _nala_data_params_for_fflush params;
+struct nala_data_type_for_fflush_t {
+    struct nala_data_params_for_fflush_t params;
     int return_value;
     int errno_value;
     int (*implementation)(FILE *stream);
@@ -4416,27 +4416,27 @@ struct _nala_data_type_for_fflush {
     struct nala_fflush_params_t params_in;
 };
 
-struct _nala_instance_type_for_fflush {
+struct nala_instance_type_for_fflush_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_fflush data;
-    struct _nala_instance_type_for_fflush *next_p;
+    struct nala_data_type_for_fflush_t data;
+    struct nala_instance_type_for_fflush_t *next_p;
 };
 
-struct _nala_instances_type_for_fflush {
-    struct _nala_instance_type_for_fflush *head_p;
-    struct _nala_instance_type_for_fflush *next_p;
-    struct _nala_instance_type_for_fflush *tail_p;
+struct nala_instances_type_for_fflush_t {
+    struct nala_instance_type_for_fflush_t *head_p;
+    struct nala_instance_type_for_fflush_t *next_p;
+    struct nala_instance_type_for_fflush_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_fflush {
+struct nala_state_type_for_fflush_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_fflush data;
-    struct _nala_instances_type_for_fflush instances;
+    struct nala_data_type_for_fflush_t data;
+    struct nala_instances_type_for_fflush_t instances;
 };
 
-static struct nala_state_type_for_fflush nala_state_for_fflush = {
+static struct nala_state_type_for_fflush_t nala_state_for_fflush = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -4452,7 +4452,7 @@ static struct nala_state_type_for_fflush nala_state_for_fflush = {
     }
 };
 
-struct _nala_data_type_for_fflush *nala_get_data_fflush()
+struct nala_data_type_for_fflush_t *nala_get_data_fflush()
 {
     if (nala_state_for_fflush.instances.tail_p != NULL) {
         return (&nala_state_for_fflush.instances.tail_p->data);
@@ -4461,15 +4461,15 @@ struct _nala_data_type_for_fflush *nala_get_data_fflush()
     }
 }
 
-struct _nala_data_params_for_fflush *nala_get_params_fflush()
+struct nala_data_params_for_fflush_t *nala_get_params_fflush()
 {
     return (&nala_get_data_fflush()->params);
 }
 
 int __wrap_fflush(FILE *stream)
 {
-    struct _nala_instance_type_for_fflush *_nala_instance_p;
-    struct _nala_data_type_for_fflush *_nala_data_p;
+    struct nala_instance_type_for_fflush_t *nala_instance_p;
+    struct nala_data_type_for_fflush_t *nala_data_p;
     int return_value;
 
     nala_print_call("fflush", &nala_state_for_fflush.state);
@@ -4479,36 +4479,36 @@ int __wrap_fflush(FILE *stream)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_fflush.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_fflush.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_fflush.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked fflush() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_fflush.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_fflush.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fflush, stream);
-            _nala_data_p->params_in.stream = stream;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, fflush, stream);
+            nala_data_p->params_in.stream = stream;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        fflush,
                                        stream);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(stream);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(stream);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_fflush(stream);
@@ -4548,23 +4548,23 @@ void fflush_mock(int return_value)
 
 int fflush_mock_once(int return_value)
 {
-    struct _nala_instance_type_for_fflush *_nala_instance_p;
+    struct nala_instance_type_for_fflush_t *nala_instance_p;
 
     nala_state_for_fflush.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.stream_out);
-    nala_set_param_init(&_nala_instance_p->data.params.stream_in);
-    _nala_instance_p->data.params.stream_in_assert = NULL;
-    _nala_instance_p->data.params.stream_out_copy = NULL;
-    _nala_instance_p->data.params.stream = NULL;
-    _nala_instance_p->data.params.ignore_stream_in = true;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.stream_out);
+    nala_set_param_init(&nala_instance_p->data.params.stream_in);
+    nala_instance_p->data.params.stream_in_assert = NULL;
+    nala_instance_p->data.params.stream_out_copy = NULL;
+    nala_instance_p->data.params.stream = NULL;
+    nala_instance_p->data.params.ignore_stream_in = true;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_fflush.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void fflush_mock_ignore_in(int return_value)
@@ -4578,7 +4578,7 @@ void fflush_mock_ignore_in(int return_value)
 
 int fflush_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_fflush *instance_p;
+    struct nala_instance_type_for_fflush_t *instance_p;
 
     nala_state_for_fflush.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -4609,7 +4609,7 @@ void fflush_mock_set_callback(void (*callback)(FILE *stream))
 
 struct nala_fflush_params_t *fflush_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_fflush *instance_p;
+    struct nala_instance_type_for_fflush_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_fflush.instances, &instance_p, handle);
 
@@ -4632,27 +4632,27 @@ void fflush_mock_set_stream_in(const void *buf_p, size_t size)
 
 void fflush_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_fflush *_nala_params_p;
+    struct nala_data_params_for_fflush_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fflush();
+    nala_params_p = nala_get_params_fflush();
 
-    if (_nala_params_p->stream_in.buf_p == NULL) {
+    if (nala_params_p->stream_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "fflush_mock_set_stream_in() must be called "
                 "before fflush_mock_set_stream_in_assert().\n"));
     }
 
-    _nala_params_p->stream_in_assert = callback;
+    nala_params_p->stream_in_assert = callback;
 }
 
 void fflush_mock_set_stream_in_pointer(FILE *stream)
 {
-    struct _nala_data_params_for_fflush *_nala_params_p;
+    struct nala_data_params_for_fflush_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fflush();
-    _nala_params_p->ignore_stream_in = false;
-    _nala_params_p->stream = stream;
+    nala_params_p = nala_get_params_fflush();
+    nala_params_p->ignore_stream_in = false;
+    nala_params_p->stream = stream;
 }
 
 void fflush_mock_set_stream_out(const void *buf_p, size_t size)
@@ -4688,7 +4688,7 @@ void fflush_mock_real(void)
 
 void fflush_mock_real_once(void)
 {
-    struct _nala_instance_type_for_fflush *instance_p;
+    struct nala_instance_type_for_fflush_t *instance_p;
 
     nala_state_for_fflush.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -4708,8 +4708,8 @@ void fflush_mock_resume(void)
 
 void fflush_mock_reset(void)
 {
-    struct _nala_instance_type_for_fflush *current_p;
-    struct _nala_instance_type_for_fflush *tmp_p;
+    struct nala_instance_type_for_fflush_t *current_p;
+    struct nala_instance_type_for_fflush_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_fflush, current_p, tmp_p);
 }
@@ -4731,7 +4731,7 @@ void fflush_mock_assert_completed(void)
 
 int __real_fileno(FILE *stream);
 
-struct _nala_data_params_for_fileno {
+struct nala_data_params_for_fileno_t {
     FILE *stream;
     bool ignore_stream_in;
     struct nala_set_param stream_in;
@@ -4740,8 +4740,8 @@ struct _nala_data_params_for_fileno {
     void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_fileno {
-    struct _nala_data_params_for_fileno params;
+struct nala_data_type_for_fileno_t {
+    struct nala_data_params_for_fileno_t params;
     int return_value;
     int errno_value;
     int (*implementation)(FILE *stream);
@@ -4750,27 +4750,27 @@ struct _nala_data_type_for_fileno {
     struct nala_fileno_params_t params_in;
 };
 
-struct _nala_instance_type_for_fileno {
+struct nala_instance_type_for_fileno_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_fileno data;
-    struct _nala_instance_type_for_fileno *next_p;
+    struct nala_data_type_for_fileno_t data;
+    struct nala_instance_type_for_fileno_t *next_p;
 };
 
-struct _nala_instances_type_for_fileno {
-    struct _nala_instance_type_for_fileno *head_p;
-    struct _nala_instance_type_for_fileno *next_p;
-    struct _nala_instance_type_for_fileno *tail_p;
+struct nala_instances_type_for_fileno_t {
+    struct nala_instance_type_for_fileno_t *head_p;
+    struct nala_instance_type_for_fileno_t *next_p;
+    struct nala_instance_type_for_fileno_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_fileno {
+struct nala_state_type_for_fileno_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_fileno data;
-    struct _nala_instances_type_for_fileno instances;
+    struct nala_data_type_for_fileno_t data;
+    struct nala_instances_type_for_fileno_t instances;
 };
 
-static struct nala_state_type_for_fileno nala_state_for_fileno = {
+static struct nala_state_type_for_fileno_t nala_state_for_fileno = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -4786,7 +4786,7 @@ static struct nala_state_type_for_fileno nala_state_for_fileno = {
     }
 };
 
-struct _nala_data_type_for_fileno *nala_get_data_fileno()
+struct nala_data_type_for_fileno_t *nala_get_data_fileno()
 {
     if (nala_state_for_fileno.instances.tail_p != NULL) {
         return (&nala_state_for_fileno.instances.tail_p->data);
@@ -4795,15 +4795,15 @@ struct _nala_data_type_for_fileno *nala_get_data_fileno()
     }
 }
 
-struct _nala_data_params_for_fileno *nala_get_params_fileno()
+struct nala_data_params_for_fileno_t *nala_get_params_fileno()
 {
     return (&nala_get_data_fileno()->params);
 }
 
 int __wrap_fileno(FILE *stream)
 {
-    struct _nala_instance_type_for_fileno *_nala_instance_p;
-    struct _nala_data_type_for_fileno *_nala_data_p;
+    struct nala_instance_type_for_fileno_t *nala_instance_p;
+    struct nala_data_type_for_fileno_t *nala_data_p;
     int return_value;
 
     nala_print_call("fileno", &nala_state_for_fileno.state);
@@ -4813,36 +4813,36 @@ int __wrap_fileno(FILE *stream)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_fileno.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_fileno.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_fileno.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked fileno() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_fileno.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_fileno.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fileno, stream);
-            _nala_data_p->params_in.stream = stream;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, fileno, stream);
+            nala_data_p->params_in.stream = stream;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        fileno,
                                        stream);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(stream);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(stream);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_fileno(stream);
@@ -4882,23 +4882,23 @@ void fileno_mock(int return_value)
 
 int fileno_mock_once(int return_value)
 {
-    struct _nala_instance_type_for_fileno *_nala_instance_p;
+    struct nala_instance_type_for_fileno_t *nala_instance_p;
 
     nala_state_for_fileno.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.stream_out);
-    nala_set_param_init(&_nala_instance_p->data.params.stream_in);
-    _nala_instance_p->data.params.stream_in_assert = NULL;
-    _nala_instance_p->data.params.stream_out_copy = NULL;
-    _nala_instance_p->data.params.stream = NULL;
-    _nala_instance_p->data.params.ignore_stream_in = true;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.stream_out);
+    nala_set_param_init(&nala_instance_p->data.params.stream_in);
+    nala_instance_p->data.params.stream_in_assert = NULL;
+    nala_instance_p->data.params.stream_out_copy = NULL;
+    nala_instance_p->data.params.stream = NULL;
+    nala_instance_p->data.params.ignore_stream_in = true;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_fileno.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void fileno_mock_ignore_in(int return_value)
@@ -4912,7 +4912,7 @@ void fileno_mock_ignore_in(int return_value)
 
 int fileno_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_fileno *instance_p;
+    struct nala_instance_type_for_fileno_t *instance_p;
 
     nala_state_for_fileno.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -4943,7 +4943,7 @@ void fileno_mock_set_callback(void (*callback)(FILE *stream))
 
 struct nala_fileno_params_t *fileno_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_fileno *instance_p;
+    struct nala_instance_type_for_fileno_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_fileno.instances, &instance_p, handle);
 
@@ -4966,27 +4966,27 @@ void fileno_mock_set_stream_in(const void *buf_p, size_t size)
 
 void fileno_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_fileno *_nala_params_p;
+    struct nala_data_params_for_fileno_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fileno();
+    nala_params_p = nala_get_params_fileno();
 
-    if (_nala_params_p->stream_in.buf_p == NULL) {
+    if (nala_params_p->stream_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "fileno_mock_set_stream_in() must be called "
                 "before fileno_mock_set_stream_in_assert().\n"));
     }
 
-    _nala_params_p->stream_in_assert = callback;
+    nala_params_p->stream_in_assert = callback;
 }
 
 void fileno_mock_set_stream_in_pointer(FILE *stream)
 {
-    struct _nala_data_params_for_fileno *_nala_params_p;
+    struct nala_data_params_for_fileno_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fileno();
-    _nala_params_p->ignore_stream_in = false;
-    _nala_params_p->stream = stream;
+    nala_params_p = nala_get_params_fileno();
+    nala_params_p->ignore_stream_in = false;
+    nala_params_p->stream = stream;
 }
 
 void fileno_mock_set_stream_out(const void *buf_p, size_t size)
@@ -5022,7 +5022,7 @@ void fileno_mock_real(void)
 
 void fileno_mock_real_once(void)
 {
-    struct _nala_instance_type_for_fileno *instance_p;
+    struct nala_instance_type_for_fileno_t *instance_p;
 
     nala_state_for_fileno.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -5042,8 +5042,8 @@ void fileno_mock_resume(void)
 
 void fileno_mock_reset(void)
 {
-    struct _nala_instance_type_for_fileno *current_p;
-    struct _nala_instance_type_for_fileno *tmp_p;
+    struct nala_instance_type_for_fileno_t *current_p;
+    struct nala_instance_type_for_fileno_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_fileno, current_p, tmp_p);
 }
@@ -5065,7 +5065,7 @@ void fileno_mock_assert_completed(void)
 
 FILE *__real_fopen(const char *path, const char *mode);
 
-struct _nala_data_params_for_fopen {
+struct nala_data_params_for_fopen_t {
     const char *path;
     const char *mode;
     bool ignore_path_in;
@@ -5080,8 +5080,8 @@ struct _nala_data_params_for_fopen {
     void (*mode_out_copy)(const char *mode, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_fopen {
-    struct _nala_data_params_for_fopen params;
+struct nala_data_type_for_fopen_t {
+    struct nala_data_params_for_fopen_t params;
     FILE *return_value;
     int errno_value;
     FILE *(*implementation)(const char *path, const char *mode);
@@ -5090,27 +5090,27 @@ struct _nala_data_type_for_fopen {
     struct nala_fopen_params_t params_in;
 };
 
-struct _nala_instance_type_for_fopen {
+struct nala_instance_type_for_fopen_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_fopen data;
-    struct _nala_instance_type_for_fopen *next_p;
+    struct nala_data_type_for_fopen_t data;
+    struct nala_instance_type_for_fopen_t *next_p;
 };
 
-struct _nala_instances_type_for_fopen {
-    struct _nala_instance_type_for_fopen *head_p;
-    struct _nala_instance_type_for_fopen *next_p;
-    struct _nala_instance_type_for_fopen *tail_p;
+struct nala_instances_type_for_fopen_t {
+    struct nala_instance_type_for_fopen_t *head_p;
+    struct nala_instance_type_for_fopen_t *next_p;
+    struct nala_instance_type_for_fopen_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_fopen {
+struct nala_state_type_for_fopen_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_fopen data;
-    struct _nala_instances_type_for_fopen instances;
+    struct nala_data_type_for_fopen_t data;
+    struct nala_instances_type_for_fopen_t instances;
 };
 
-static struct nala_state_type_for_fopen nala_state_for_fopen = {
+static struct nala_state_type_for_fopen_t nala_state_for_fopen = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -5126,7 +5126,7 @@ static struct nala_state_type_for_fopen nala_state_for_fopen = {
     }
 };
 
-struct _nala_data_type_for_fopen *nala_get_data_fopen()
+struct nala_data_type_for_fopen_t *nala_get_data_fopen()
 {
     if (nala_state_for_fopen.instances.tail_p != NULL) {
         return (&nala_state_for_fopen.instances.tail_p->data);
@@ -5135,15 +5135,15 @@ struct _nala_data_type_for_fopen *nala_get_data_fopen()
     }
 }
 
-struct _nala_data_params_for_fopen *nala_get_params_fopen()
+struct nala_data_params_for_fopen_t *nala_get_params_fopen()
 {
     return (&nala_get_data_fopen()->params);
 }
 
 FILE *__wrap_fopen(const char *path, const char *mode)
 {
-    struct _nala_instance_type_for_fopen *_nala_instance_p;
-    struct _nala_data_type_for_fopen *_nala_data_p;
+    struct nala_instance_type_for_fopen_t *nala_instance_p;
+    struct nala_data_type_for_fopen_t *nala_data_p;
     FILE *return_value;
 
     nala_print_call("fopen", &nala_state_for_fopen.state);
@@ -5153,43 +5153,43 @@ FILE *__wrap_fopen(const char *path, const char *mode)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_fopen.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_fopen.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_fopen.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked fopen() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_fopen.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_fopen.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fopen, path);
-            _nala_data_p->params_in.path = path;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fopen, mode);
-            _nala_data_p->params_in.mode = mode;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, fopen, path);
+            nala_data_p->params_in.path = path;
+            MOCK_ASSERT_IN_EQ(nala_data_p, fopen, mode);
+            nala_data_p->params_in.mode = mode;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        fopen,
                                        path);
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        fopen,
                                        mode);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(path, mode);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(path, mode);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_fopen(path, mode);
@@ -5247,45 +5247,45 @@ void fopen_mock(const char *path, const char *mode, FILE *return_value)
 
 int fopen_mock_once(const char *path, const char *mode, FILE *return_value)
 {
-    struct _nala_instance_type_for_fopen *_nala_instance_p;
+    struct nala_instance_type_for_fopen_t *nala_instance_p;
 
     nala_state_for_fopen.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.path_out);
-    nala_set_param_init(&_nala_instance_p->data.params.path_in);
-    _nala_instance_p->data.params.path_in_assert = NULL;
-    _nala_instance_p->data.params.path_out_copy = NULL;
-    nala_set_param_init(&_nala_instance_p->data.params.mode_out);
-    nala_set_param_init(&_nala_instance_p->data.params.mode_in);
-    _nala_instance_p->data.params.mode_in_assert = NULL;
-    _nala_instance_p->data.params.mode_out_copy = NULL;
-    _nala_instance_p->data.params.path = NULL;
-    _nala_instance_p->data.params.ignore_path_in = true;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.path_out);
+    nala_set_param_init(&nala_instance_p->data.params.path_in);
+    nala_instance_p->data.params.path_in_assert = NULL;
+    nala_instance_p->data.params.path_out_copy = NULL;
+    nala_set_param_init(&nala_instance_p->data.params.mode_out);
+    nala_set_param_init(&nala_instance_p->data.params.mode_in);
+    nala_instance_p->data.params.mode_in_assert = NULL;
+    nala_instance_p->data.params.mode_out_copy = NULL;
+    nala_instance_p->data.params.path = NULL;
+    nala_instance_p->data.params.ignore_path_in = true;
 
     if (path != NULL) {
-        nala_set_param_string(&_nala_instance_p->data.params.path_in,
+        nala_set_param_string(&nala_instance_p->data.params.path_in,
                               path);
     } else {
-        _nala_instance_p->data.params.ignore_path_in = false;
+        nala_instance_p->data.params.ignore_path_in = false;
     }
 
-    _nala_instance_p->data.params.mode = NULL;
-    _nala_instance_p->data.params.ignore_mode_in = true;
+    nala_instance_p->data.params.mode = NULL;
+    nala_instance_p->data.params.ignore_mode_in = true;
 
     if (mode != NULL) {
-        nala_set_param_string(&_nala_instance_p->data.params.mode_in,
+        nala_set_param_string(&nala_instance_p->data.params.mode_in,
                               mode);
     } else {
-        _nala_instance_p->data.params.ignore_mode_in = false;
+        nala_instance_p->data.params.ignore_mode_in = false;
     }
 
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_fopen.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void fopen_mock_ignore_in(FILE *return_value)
@@ -5300,7 +5300,7 @@ void fopen_mock_ignore_in(FILE *return_value)
 
 int fopen_mock_ignore_in_once(FILE *return_value)
 {
-    struct _nala_instance_type_for_fopen *instance_p;
+    struct nala_instance_type_for_fopen_t *instance_p;
 
     nala_state_for_fopen.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -5337,7 +5337,7 @@ void fopen_mock_set_callback(void (*callback)(const char *path, const char *mode
 
 struct nala_fopen_params_t *fopen_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_fopen *instance_p;
+    struct nala_instance_type_for_fopen_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_fopen.instances, &instance_p, handle);
 
@@ -5370,27 +5370,27 @@ void fopen_mock_set_path_in(const void *buf_p, size_t size)
 
 void fopen_mock_set_path_in_assert(void (*callback)(const char *path, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_fopen *_nala_params_p;
+    struct nala_data_params_for_fopen_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fopen();
+    nala_params_p = nala_get_params_fopen();
 
-    if (_nala_params_p->path_in.buf_p == NULL) {
+    if (nala_params_p->path_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "fopen_mock_set_path_in() must be called "
                 "before fopen_mock_set_path_in_assert().\n"));
     }
 
-    _nala_params_p->path_in_assert = callback;
+    nala_params_p->path_in_assert = callback;
 }
 
 void fopen_mock_set_path_in_pointer(const char *path)
 {
-    struct _nala_data_params_for_fopen *_nala_params_p;
+    struct nala_data_params_for_fopen_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fopen();
-    _nala_params_p->ignore_path_in = false;
-    _nala_params_p->path = path;
+    nala_params_p = nala_get_params_fopen();
+    nala_params_p->ignore_path_in = false;
+    nala_params_p->path = path;
 }
 
 void fopen_mock_set_path_out(const void *buf_p, size_t size)
@@ -5414,27 +5414,27 @@ void fopen_mock_set_mode_in(const void *buf_p, size_t size)
 
 void fopen_mock_set_mode_in_assert(void (*callback)(const char *mode, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_fopen *_nala_params_p;
+    struct nala_data_params_for_fopen_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fopen();
+    nala_params_p = nala_get_params_fopen();
 
-    if (_nala_params_p->mode_in.buf_p == NULL) {
+    if (nala_params_p->mode_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "fopen_mock_set_mode_in() must be called "
                 "before fopen_mock_set_mode_in_assert().\n"));
     }
 
-    _nala_params_p->mode_in_assert = callback;
+    nala_params_p->mode_in_assert = callback;
 }
 
 void fopen_mock_set_mode_in_pointer(const char *mode)
 {
-    struct _nala_data_params_for_fopen *_nala_params_p;
+    struct nala_data_params_for_fopen_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fopen();
-    _nala_params_p->ignore_mode_in = false;
-    _nala_params_p->mode = mode;
+    nala_params_p = nala_get_params_fopen();
+    nala_params_p->ignore_mode_in = false;
+    nala_params_p->mode = mode;
 }
 
 void fopen_mock_set_mode_out(const void *buf_p, size_t size)
@@ -5470,7 +5470,7 @@ void fopen_mock_real(void)
 
 void fopen_mock_real_once(void)
 {
-    struct _nala_instance_type_for_fopen *instance_p;
+    struct nala_instance_type_for_fopen_t *instance_p;
 
     nala_state_for_fopen.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -5490,8 +5490,8 @@ void fopen_mock_resume(void)
 
 void fopen_mock_reset(void)
 {
-    struct _nala_instance_type_for_fopen *current_p;
-    struct _nala_instance_type_for_fopen *tmp_p;
+    struct nala_instance_type_for_fopen_t *current_p;
+    struct nala_instance_type_for_fopen_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_fopen, current_p, tmp_p);
 }
@@ -5513,7 +5513,7 @@ void fopen_mock_assert_completed(void)
 
 size_t __real_fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 
-struct _nala_data_params_for_fread {
+struct nala_data_params_for_fread_t {
     void *ptr;
     size_t size;
     size_t nmemb;
@@ -5532,8 +5532,8 @@ struct _nala_data_params_for_fread {
     void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_fread {
-    struct _nala_data_params_for_fread params;
+struct nala_data_type_for_fread_t {
+    struct nala_data_params_for_fread_t params;
     size_t return_value;
     int errno_value;
     size_t (*implementation)(void *ptr, size_t size, size_t nmemb, FILE *stream);
@@ -5542,27 +5542,27 @@ struct _nala_data_type_for_fread {
     struct nala_fread_params_t params_in;
 };
 
-struct _nala_instance_type_for_fread {
+struct nala_instance_type_for_fread_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_fread data;
-    struct _nala_instance_type_for_fread *next_p;
+    struct nala_data_type_for_fread_t data;
+    struct nala_instance_type_for_fread_t *next_p;
 };
 
-struct _nala_instances_type_for_fread {
-    struct _nala_instance_type_for_fread *head_p;
-    struct _nala_instance_type_for_fread *next_p;
-    struct _nala_instance_type_for_fread *tail_p;
+struct nala_instances_type_for_fread_t {
+    struct nala_instance_type_for_fread_t *head_p;
+    struct nala_instance_type_for_fread_t *next_p;
+    struct nala_instance_type_for_fread_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_fread {
+struct nala_state_type_for_fread_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_fread data;
-    struct _nala_instances_type_for_fread instances;
+    struct nala_data_type_for_fread_t data;
+    struct nala_instances_type_for_fread_t instances;
 };
 
-static struct nala_state_type_for_fread nala_state_for_fread = {
+static struct nala_state_type_for_fread_t nala_state_for_fread = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -5578,7 +5578,7 @@ static struct nala_state_type_for_fread nala_state_for_fread = {
     }
 };
 
-struct _nala_data_type_for_fread *nala_get_data_fread()
+struct nala_data_type_for_fread_t *nala_get_data_fread()
 {
     if (nala_state_for_fread.instances.tail_p != NULL) {
         return (&nala_state_for_fread.instances.tail_p->data);
@@ -5587,15 +5587,15 @@ struct _nala_data_type_for_fread *nala_get_data_fread()
     }
 }
 
-struct _nala_data_params_for_fread *nala_get_params_fread()
+struct nala_data_params_for_fread_t *nala_get_params_fread()
 {
     return (&nala_get_data_fread()->params);
 }
 
 size_t __wrap_fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
-    struct _nala_instance_type_for_fread *_nala_instance_p;
-    struct _nala_data_type_for_fread *_nala_data_p;
+    struct nala_instance_type_for_fread_t *nala_instance_p;
+    struct nala_data_type_for_fread_t *nala_data_p;
     size_t return_value;
 
     nala_print_call("fread", &nala_state_for_fread.state);
@@ -5605,47 +5605,47 @@ size_t __wrap_fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_fread.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_fread.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_fread.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked fread() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_fread.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_fread.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fread, ptr);
-            _nala_data_p->params_in.ptr = ptr;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fread, stream);
-            _nala_data_p->params_in.stream = stream;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fread, size);
-            _nala_data_p->params_in.size = size;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fread, nmemb);
-            _nala_data_p->params_in.nmemb = nmemb;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, fread, ptr);
+            nala_data_p->params_in.ptr = ptr;
+            MOCK_ASSERT_IN_EQ(nala_data_p, fread, stream);
+            nala_data_p->params_in.stream = stream;
+            MOCK_ASSERT_IN_EQ(nala_data_p, fread, size);
+            nala_data_p->params_in.size = size;
+            MOCK_ASSERT_IN_EQ(nala_data_p, fread, nmemb);
+            nala_data_p->params_in.nmemb = nmemb;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        fread,
                                        ptr);
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        fread,
                                        stream);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(ptr, size, nmemb, stream);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(ptr, size, nmemb, stream);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_fread(ptr, size, nmemb, stream);
@@ -5691,33 +5691,33 @@ void fread_mock(size_t size, size_t nmemb, size_t return_value)
 
 int fread_mock_once(size_t size, size_t nmemb, size_t return_value)
 {
-    struct _nala_instance_type_for_fread *_nala_instance_p;
+    struct nala_instance_type_for_fread_t *nala_instance_p;
 
     nala_state_for_fread.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.ptr_out);
-    nala_set_param_init(&_nala_instance_p->data.params.ptr_in);
-    _nala_instance_p->data.params.ptr_in_assert = NULL;
-    _nala_instance_p->data.params.ptr_out_copy = NULL;
-    nala_set_param_init(&_nala_instance_p->data.params.stream_out);
-    nala_set_param_init(&_nala_instance_p->data.params.stream_in);
-    _nala_instance_p->data.params.stream_in_assert = NULL;
-    _nala_instance_p->data.params.stream_out_copy = NULL;
-    _nala_instance_p->data.params.ptr = NULL;
-    _nala_instance_p->data.params.ignore_ptr_in = true;
-    _nala_instance_p->data.params.stream = NULL;
-    _nala_instance_p->data.params.ignore_stream_in = true;
-    _nala_instance_p->data.params.size = size;
-    _nala_instance_p->data.params.ignore_size_in = false;
-    _nala_instance_p->data.params.nmemb = nmemb;
-    _nala_instance_p->data.params.ignore_nmemb_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.ptr_out);
+    nala_set_param_init(&nala_instance_p->data.params.ptr_in);
+    nala_instance_p->data.params.ptr_in_assert = NULL;
+    nala_instance_p->data.params.ptr_out_copy = NULL;
+    nala_set_param_init(&nala_instance_p->data.params.stream_out);
+    nala_set_param_init(&nala_instance_p->data.params.stream_in);
+    nala_instance_p->data.params.stream_in_assert = NULL;
+    nala_instance_p->data.params.stream_out_copy = NULL;
+    nala_instance_p->data.params.ptr = NULL;
+    nala_instance_p->data.params.ignore_ptr_in = true;
+    nala_instance_p->data.params.stream = NULL;
+    nala_instance_p->data.params.ignore_stream_in = true;
+    nala_instance_p->data.params.size = size;
+    nala_instance_p->data.params.ignore_size_in = false;
+    nala_instance_p->data.params.nmemb = nmemb;
+    nala_instance_p->data.params.ignore_nmemb_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_fread.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void fread_mock_ignore_in(size_t return_value)
@@ -5734,7 +5734,7 @@ void fread_mock_ignore_in(size_t return_value)
 
 int fread_mock_ignore_in_once(size_t return_value)
 {
-    struct _nala_instance_type_for_fread *instance_p;
+    struct nala_instance_type_for_fread_t *instance_p;
 
     nala_state_for_fread.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -5773,7 +5773,7 @@ void fread_mock_set_callback(void (*callback)(void *ptr, size_t size, size_t nme
 
 struct nala_fread_params_t *fread_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_fread *instance_p;
+    struct nala_instance_type_for_fread_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_fread.instances, &instance_p, handle);
 
@@ -5806,27 +5806,27 @@ void fread_mock_set_ptr_in(const void *buf_p, size_t size)
 
 void fread_mock_set_ptr_in_assert(void (*callback)(void *ptr, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_fread *_nala_params_p;
+    struct nala_data_params_for_fread_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fread();
+    nala_params_p = nala_get_params_fread();
 
-    if (_nala_params_p->ptr_in.buf_p == NULL) {
+    if (nala_params_p->ptr_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "fread_mock_set_ptr_in() must be called "
                 "before fread_mock_set_ptr_in_assert().\n"));
     }
 
-    _nala_params_p->ptr_in_assert = callback;
+    nala_params_p->ptr_in_assert = callback;
 }
 
 void fread_mock_set_ptr_in_pointer(void *ptr)
 {
-    struct _nala_data_params_for_fread *_nala_params_p;
+    struct nala_data_params_for_fread_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fread();
-    _nala_params_p->ignore_ptr_in = false;
-    _nala_params_p->ptr = ptr;
+    nala_params_p = nala_get_params_fread();
+    nala_params_p->ignore_ptr_in = false;
+    nala_params_p->ptr = ptr;
 }
 
 void fread_mock_set_ptr_out(const void *buf_p, size_t size)
@@ -5850,27 +5850,27 @@ void fread_mock_set_stream_in(const void *buf_p, size_t size)
 
 void fread_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_fread *_nala_params_p;
+    struct nala_data_params_for_fread_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fread();
+    nala_params_p = nala_get_params_fread();
 
-    if (_nala_params_p->stream_in.buf_p == NULL) {
+    if (nala_params_p->stream_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "fread_mock_set_stream_in() must be called "
                 "before fread_mock_set_stream_in_assert().\n"));
     }
 
-    _nala_params_p->stream_in_assert = callback;
+    nala_params_p->stream_in_assert = callback;
 }
 
 void fread_mock_set_stream_in_pointer(FILE *stream)
 {
-    struct _nala_data_params_for_fread *_nala_params_p;
+    struct nala_data_params_for_fread_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fread();
-    _nala_params_p->ignore_stream_in = false;
-    _nala_params_p->stream = stream;
+    nala_params_p = nala_get_params_fread();
+    nala_params_p->ignore_stream_in = false;
+    nala_params_p->stream = stream;
 }
 
 void fread_mock_set_stream_out(const void *buf_p, size_t size)
@@ -5906,7 +5906,7 @@ void fread_mock_real(void)
 
 void fread_mock_real_once(void)
 {
-    struct _nala_instance_type_for_fread *instance_p;
+    struct nala_instance_type_for_fread_t *instance_p;
 
     nala_state_for_fread.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -5926,8 +5926,8 @@ void fread_mock_resume(void)
 
 void fread_mock_reset(void)
 {
-    struct _nala_instance_type_for_fread *current_p;
-    struct _nala_instance_type_for_fread *tmp_p;
+    struct nala_instance_type_for_fread_t *current_p;
+    struct nala_instance_type_for_fread_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_fread, current_p, tmp_p);
 }
@@ -5949,7 +5949,7 @@ void fread_mock_assert_completed(void)
 
 void __real_free(void *ptr);
 
-struct _nala_data_params_for_free {
+struct nala_data_params_for_free_t {
     void *ptr;
     bool ignore_ptr_in;
     struct nala_set_param ptr_in;
@@ -5958,8 +5958,8 @@ struct _nala_data_params_for_free {
     void (*ptr_out_copy)(void *ptr, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_free {
-    struct _nala_data_params_for_free params;
+struct nala_data_type_for_free_t {
+    struct nala_data_params_for_free_t params;
     int errno_value;
     void (*implementation)(void *ptr);
     void (*callback)(void *ptr);
@@ -5967,27 +5967,27 @@ struct _nala_data_type_for_free {
     struct nala_free_params_t params_in;
 };
 
-struct _nala_instance_type_for_free {
+struct nala_instance_type_for_free_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_free data;
-    struct _nala_instance_type_for_free *next_p;
+    struct nala_data_type_for_free_t data;
+    struct nala_instance_type_for_free_t *next_p;
 };
 
-struct _nala_instances_type_for_free {
-    struct _nala_instance_type_for_free *head_p;
-    struct _nala_instance_type_for_free *next_p;
-    struct _nala_instance_type_for_free *tail_p;
+struct nala_instances_type_for_free_t {
+    struct nala_instance_type_for_free_t *head_p;
+    struct nala_instance_type_for_free_t *next_p;
+    struct nala_instance_type_for_free_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_free {
+struct nala_state_type_for_free_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_free data;
-    struct _nala_instances_type_for_free instances;
+    struct nala_data_type_for_free_t data;
+    struct nala_instances_type_for_free_t instances;
 };
 
-static struct nala_state_type_for_free nala_state_for_free = {
+static struct nala_state_type_for_free_t nala_state_for_free = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -6003,7 +6003,7 @@ static struct nala_state_type_for_free nala_state_for_free = {
     }
 };
 
-struct _nala_data_type_for_free *nala_get_data_free()
+struct nala_data_type_for_free_t *nala_get_data_free()
 {
     if (nala_state_for_free.instances.tail_p != NULL) {
         return (&nala_state_for_free.instances.tail_p->data);
@@ -6012,15 +6012,15 @@ struct _nala_data_type_for_free *nala_get_data_free()
     }
 }
 
-struct _nala_data_params_for_free *nala_get_params_free()
+struct nala_data_params_for_free_t *nala_get_params_free()
 {
     return (&nala_get_data_free()->params);
 }
 
 void __wrap_free(void *ptr)
 {
-    struct _nala_instance_type_for_free *_nala_instance_p;
-    struct _nala_data_type_for_free *_nala_data_p;
+    struct nala_instance_type_for_free_t *nala_instance_p;
+    struct nala_data_type_for_free_t *nala_data_p;
 
     nala_print_call("free", &nala_state_for_free.state);
 
@@ -6029,33 +6029,33 @@ void __wrap_free(void *ptr)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_free.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_free.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_free.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked free() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_free.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_free.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, free, ptr);
-            _nala_data_p->params_in.ptr = ptr;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, free, ptr);
+            nala_data_p->params_in.ptr = ptr;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        free,
                                        ptr);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(ptr);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(ptr);
             }
 
         } else {
@@ -6093,22 +6093,22 @@ void free_mock()
 
 int free_mock_once()
 {
-    struct _nala_instance_type_for_free *_nala_instance_p;
+    struct nala_instance_type_for_free_t *nala_instance_p;
 
     nala_state_for_free.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.ptr_out);
-    nala_set_param_init(&_nala_instance_p->data.params.ptr_in);
-    _nala_instance_p->data.params.ptr_in_assert = NULL;
-    _nala_instance_p->data.params.ptr_out_copy = NULL;
-    _nala_instance_p->data.params.ptr = NULL;
-    _nala_instance_p->data.params.ignore_ptr_in = true;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.ptr_out);
+    nala_set_param_init(&nala_instance_p->data.params.ptr_in);
+    nala_instance_p->data.params.ptr_in_assert = NULL;
+    nala_instance_p->data.params.ptr_out_copy = NULL;
+    nala_instance_p->data.params.ptr = NULL;
+    nala_instance_p->data.params.ignore_ptr_in = true;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_free.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void free_mock_ignore_in(void)
@@ -6121,7 +6121,7 @@ void free_mock_ignore_in(void)
 
 int free_mock_ignore_in_once(void)
 {
-    struct _nala_instance_type_for_free *instance_p;
+    struct nala_instance_type_for_free_t *instance_p;
 
     nala_state_for_free.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -6151,7 +6151,7 @@ void free_mock_set_callback(void (*callback)(void *ptr))
 
 struct nala_free_params_t *free_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_free *instance_p;
+    struct nala_instance_type_for_free_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_free.instances, &instance_p, handle);
 
@@ -6174,27 +6174,27 @@ void free_mock_set_ptr_in(const void *buf_p, size_t size)
 
 void free_mock_set_ptr_in_assert(void (*callback)(void *ptr, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_free *_nala_params_p;
+    struct nala_data_params_for_free_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_free();
+    nala_params_p = nala_get_params_free();
 
-    if (_nala_params_p->ptr_in.buf_p == NULL) {
+    if (nala_params_p->ptr_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "free_mock_set_ptr_in() must be called "
                 "before free_mock_set_ptr_in_assert().\n"));
     }
 
-    _nala_params_p->ptr_in_assert = callback;
+    nala_params_p->ptr_in_assert = callback;
 }
 
 void free_mock_set_ptr_in_pointer(void *ptr)
 {
-    struct _nala_data_params_for_free *_nala_params_p;
+    struct nala_data_params_for_free_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_free();
-    _nala_params_p->ignore_ptr_in = false;
-    _nala_params_p->ptr = ptr;
+    nala_params_p = nala_get_params_free();
+    nala_params_p->ignore_ptr_in = false;
+    nala_params_p->ptr = ptr;
 }
 
 void free_mock_set_ptr_out(const void *buf_p, size_t size)
@@ -6230,7 +6230,7 @@ void free_mock_real(void)
 
 void free_mock_real_once(void)
 {
-    struct _nala_instance_type_for_free *instance_p;
+    struct nala_instance_type_for_free_t *instance_p;
 
     nala_state_for_free.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -6250,8 +6250,8 @@ void free_mock_resume(void)
 
 void free_mock_reset(void)
 {
-    struct _nala_instance_type_for_free *current_p;
-    struct _nala_instance_type_for_free *tmp_p;
+    struct nala_instance_type_for_free_t *current_p;
+    struct nala_instance_type_for_free_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_free, current_p, tmp_p);
 }
@@ -6273,7 +6273,7 @@ void free_mock_assert_completed(void)
 
 int __real_fseek(FILE *stream, long int offset, int whence);
 
-struct _nala_data_params_for_fseek {
+struct nala_data_params_for_fseek_t {
     FILE *stream;
     long int offset;
     int whence;
@@ -6286,8 +6286,8 @@ struct _nala_data_params_for_fseek {
     bool ignore_whence_in;
 };
 
-struct _nala_data_type_for_fseek {
-    struct _nala_data_params_for_fseek params;
+struct nala_data_type_for_fseek_t {
+    struct nala_data_params_for_fseek_t params;
     int return_value;
     int errno_value;
     int (*implementation)(FILE *stream, long int offset, int whence);
@@ -6296,27 +6296,27 @@ struct _nala_data_type_for_fseek {
     struct nala_fseek_params_t params_in;
 };
 
-struct _nala_instance_type_for_fseek {
+struct nala_instance_type_for_fseek_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_fseek data;
-    struct _nala_instance_type_for_fseek *next_p;
+    struct nala_data_type_for_fseek_t data;
+    struct nala_instance_type_for_fseek_t *next_p;
 };
 
-struct _nala_instances_type_for_fseek {
-    struct _nala_instance_type_for_fseek *head_p;
-    struct _nala_instance_type_for_fseek *next_p;
-    struct _nala_instance_type_for_fseek *tail_p;
+struct nala_instances_type_for_fseek_t {
+    struct nala_instance_type_for_fseek_t *head_p;
+    struct nala_instance_type_for_fseek_t *next_p;
+    struct nala_instance_type_for_fseek_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_fseek {
+struct nala_state_type_for_fseek_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_fseek data;
-    struct _nala_instances_type_for_fseek instances;
+    struct nala_data_type_for_fseek_t data;
+    struct nala_instances_type_for_fseek_t instances;
 };
 
-static struct nala_state_type_for_fseek nala_state_for_fseek = {
+static struct nala_state_type_for_fseek_t nala_state_for_fseek = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -6332,7 +6332,7 @@ static struct nala_state_type_for_fseek nala_state_for_fseek = {
     }
 };
 
-struct _nala_data_type_for_fseek *nala_get_data_fseek()
+struct nala_data_type_for_fseek_t *nala_get_data_fseek()
 {
     if (nala_state_for_fseek.instances.tail_p != NULL) {
         return (&nala_state_for_fseek.instances.tail_p->data);
@@ -6341,15 +6341,15 @@ struct _nala_data_type_for_fseek *nala_get_data_fseek()
     }
 }
 
-struct _nala_data_params_for_fseek *nala_get_params_fseek()
+struct nala_data_params_for_fseek_t *nala_get_params_fseek()
 {
     return (&nala_get_data_fseek()->params);
 }
 
 int __wrap_fseek(FILE *stream, long int offset, int whence)
 {
-    struct _nala_instance_type_for_fseek *_nala_instance_p;
-    struct _nala_data_type_for_fseek *_nala_data_p;
+    struct nala_instance_type_for_fseek_t *nala_instance_p;
+    struct nala_data_type_for_fseek_t *nala_data_p;
     int return_value;
 
     nala_print_call("fseek", &nala_state_for_fseek.state);
@@ -6359,40 +6359,40 @@ int __wrap_fseek(FILE *stream, long int offset, int whence)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_fseek.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_fseek.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_fseek.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked fseek() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_fseek.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_fseek.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fseek, stream);
-            _nala_data_p->params_in.stream = stream;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fseek, offset);
-            _nala_data_p->params_in.offset = offset;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fseek, whence);
-            _nala_data_p->params_in.whence = whence;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, fseek, stream);
+            nala_data_p->params_in.stream = stream;
+            MOCK_ASSERT_IN_EQ(nala_data_p, fseek, offset);
+            nala_data_p->params_in.offset = offset;
+            MOCK_ASSERT_IN_EQ(nala_data_p, fseek, whence);
+            nala_data_p->params_in.whence = whence;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        fseek,
                                        stream);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(stream, offset, whence);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(stream, offset, whence);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_fseek(stream, offset, whence);
@@ -6436,27 +6436,27 @@ void fseek_mock(long int offset, int whence, int return_value)
 
 int fseek_mock_once(long int offset, int whence, int return_value)
 {
-    struct _nala_instance_type_for_fseek *_nala_instance_p;
+    struct nala_instance_type_for_fseek_t *nala_instance_p;
 
     nala_state_for_fseek.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.stream_out);
-    nala_set_param_init(&_nala_instance_p->data.params.stream_in);
-    _nala_instance_p->data.params.stream_in_assert = NULL;
-    _nala_instance_p->data.params.stream_out_copy = NULL;
-    _nala_instance_p->data.params.stream = NULL;
-    _nala_instance_p->data.params.ignore_stream_in = true;
-    _nala_instance_p->data.params.offset = offset;
-    _nala_instance_p->data.params.ignore_offset_in = false;
-    _nala_instance_p->data.params.whence = whence;
-    _nala_instance_p->data.params.ignore_whence_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.stream_out);
+    nala_set_param_init(&nala_instance_p->data.params.stream_in);
+    nala_instance_p->data.params.stream_in_assert = NULL;
+    nala_instance_p->data.params.stream_out_copy = NULL;
+    nala_instance_p->data.params.stream = NULL;
+    nala_instance_p->data.params.ignore_stream_in = true;
+    nala_instance_p->data.params.offset = offset;
+    nala_instance_p->data.params.ignore_offset_in = false;
+    nala_instance_p->data.params.whence = whence;
+    nala_instance_p->data.params.ignore_whence_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_fseek.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void fseek_mock_ignore_in(int return_value)
@@ -6472,7 +6472,7 @@ void fseek_mock_ignore_in(int return_value)
 
 int fseek_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_fseek *instance_p;
+    struct nala_instance_type_for_fseek_t *instance_p;
 
     nala_state_for_fseek.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -6505,7 +6505,7 @@ void fseek_mock_set_callback(void (*callback)(FILE *stream, long int offset, int
 
 struct nala_fseek_params_t *fseek_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_fseek *instance_p;
+    struct nala_instance_type_for_fseek_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_fseek.instances, &instance_p, handle);
 
@@ -6538,27 +6538,27 @@ void fseek_mock_set_stream_in(const void *buf_p, size_t size)
 
 void fseek_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_fseek *_nala_params_p;
+    struct nala_data_params_for_fseek_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fseek();
+    nala_params_p = nala_get_params_fseek();
 
-    if (_nala_params_p->stream_in.buf_p == NULL) {
+    if (nala_params_p->stream_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "fseek_mock_set_stream_in() must be called "
                 "before fseek_mock_set_stream_in_assert().\n"));
     }
 
-    _nala_params_p->stream_in_assert = callback;
+    nala_params_p->stream_in_assert = callback;
 }
 
 void fseek_mock_set_stream_in_pointer(FILE *stream)
 {
-    struct _nala_data_params_for_fseek *_nala_params_p;
+    struct nala_data_params_for_fseek_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fseek();
-    _nala_params_p->ignore_stream_in = false;
-    _nala_params_p->stream = stream;
+    nala_params_p = nala_get_params_fseek();
+    nala_params_p->ignore_stream_in = false;
+    nala_params_p->stream = stream;
 }
 
 void fseek_mock_set_stream_out(const void *buf_p, size_t size)
@@ -6594,7 +6594,7 @@ void fseek_mock_real(void)
 
 void fseek_mock_real_once(void)
 {
-    struct _nala_instance_type_for_fseek *instance_p;
+    struct nala_instance_type_for_fseek_t *instance_p;
 
     nala_state_for_fseek.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -6614,8 +6614,8 @@ void fseek_mock_resume(void)
 
 void fseek_mock_reset(void)
 {
-    struct _nala_instance_type_for_fseek *current_p;
-    struct _nala_instance_type_for_fseek *tmp_p;
+    struct nala_instance_type_for_fseek_t *current_p;
+    struct nala_instance_type_for_fseek_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_fseek, current_p, tmp_p);
 }
@@ -6637,7 +6637,7 @@ void fseek_mock_assert_completed(void)
 
 long int __real_ftell(FILE *stream);
 
-struct _nala_data_params_for_ftell {
+struct nala_data_params_for_ftell_t {
     FILE *stream;
     bool ignore_stream_in;
     struct nala_set_param stream_in;
@@ -6646,8 +6646,8 @@ struct _nala_data_params_for_ftell {
     void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_ftell {
-    struct _nala_data_params_for_ftell params;
+struct nala_data_type_for_ftell_t {
+    struct nala_data_params_for_ftell_t params;
     long int return_value;
     int errno_value;
     long int (*implementation)(FILE *stream);
@@ -6656,27 +6656,27 @@ struct _nala_data_type_for_ftell {
     struct nala_ftell_params_t params_in;
 };
 
-struct _nala_instance_type_for_ftell {
+struct nala_instance_type_for_ftell_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_ftell data;
-    struct _nala_instance_type_for_ftell *next_p;
+    struct nala_data_type_for_ftell_t data;
+    struct nala_instance_type_for_ftell_t *next_p;
 };
 
-struct _nala_instances_type_for_ftell {
-    struct _nala_instance_type_for_ftell *head_p;
-    struct _nala_instance_type_for_ftell *next_p;
-    struct _nala_instance_type_for_ftell *tail_p;
+struct nala_instances_type_for_ftell_t {
+    struct nala_instance_type_for_ftell_t *head_p;
+    struct nala_instance_type_for_ftell_t *next_p;
+    struct nala_instance_type_for_ftell_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_ftell {
+struct nala_state_type_for_ftell_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_ftell data;
-    struct _nala_instances_type_for_ftell instances;
+    struct nala_data_type_for_ftell_t data;
+    struct nala_instances_type_for_ftell_t instances;
 };
 
-static struct nala_state_type_for_ftell nala_state_for_ftell = {
+static struct nala_state_type_for_ftell_t nala_state_for_ftell = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -6692,7 +6692,7 @@ static struct nala_state_type_for_ftell nala_state_for_ftell = {
     }
 };
 
-struct _nala_data_type_for_ftell *nala_get_data_ftell()
+struct nala_data_type_for_ftell_t *nala_get_data_ftell()
 {
     if (nala_state_for_ftell.instances.tail_p != NULL) {
         return (&nala_state_for_ftell.instances.tail_p->data);
@@ -6701,15 +6701,15 @@ struct _nala_data_type_for_ftell *nala_get_data_ftell()
     }
 }
 
-struct _nala_data_params_for_ftell *nala_get_params_ftell()
+struct nala_data_params_for_ftell_t *nala_get_params_ftell()
 {
     return (&nala_get_data_ftell()->params);
 }
 
 long int __wrap_ftell(FILE *stream)
 {
-    struct _nala_instance_type_for_ftell *_nala_instance_p;
-    struct _nala_data_type_for_ftell *_nala_data_p;
+    struct nala_instance_type_for_ftell_t *nala_instance_p;
+    struct nala_data_type_for_ftell_t *nala_data_p;
     long int return_value;
 
     nala_print_call("ftell", &nala_state_for_ftell.state);
@@ -6719,36 +6719,36 @@ long int __wrap_ftell(FILE *stream)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_ftell.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_ftell.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_ftell.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked ftell() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_ftell.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_ftell.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, ftell, stream);
-            _nala_data_p->params_in.stream = stream;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, ftell, stream);
+            nala_data_p->params_in.stream = stream;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        ftell,
                                        stream);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(stream);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(stream);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_ftell(stream);
@@ -6788,23 +6788,23 @@ void ftell_mock(long int return_value)
 
 int ftell_mock_once(long int return_value)
 {
-    struct _nala_instance_type_for_ftell *_nala_instance_p;
+    struct nala_instance_type_for_ftell_t *nala_instance_p;
 
     nala_state_for_ftell.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.stream_out);
-    nala_set_param_init(&_nala_instance_p->data.params.stream_in);
-    _nala_instance_p->data.params.stream_in_assert = NULL;
-    _nala_instance_p->data.params.stream_out_copy = NULL;
-    _nala_instance_p->data.params.stream = NULL;
-    _nala_instance_p->data.params.ignore_stream_in = true;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.stream_out);
+    nala_set_param_init(&nala_instance_p->data.params.stream_in);
+    nala_instance_p->data.params.stream_in_assert = NULL;
+    nala_instance_p->data.params.stream_out_copy = NULL;
+    nala_instance_p->data.params.stream = NULL;
+    nala_instance_p->data.params.ignore_stream_in = true;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_ftell.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void ftell_mock_ignore_in(long int return_value)
@@ -6818,7 +6818,7 @@ void ftell_mock_ignore_in(long int return_value)
 
 int ftell_mock_ignore_in_once(long int return_value)
 {
-    struct _nala_instance_type_for_ftell *instance_p;
+    struct nala_instance_type_for_ftell_t *instance_p;
 
     nala_state_for_ftell.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -6849,7 +6849,7 @@ void ftell_mock_set_callback(void (*callback)(FILE *stream))
 
 struct nala_ftell_params_t *ftell_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_ftell *instance_p;
+    struct nala_instance_type_for_ftell_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_ftell.instances, &instance_p, handle);
 
@@ -6872,27 +6872,27 @@ void ftell_mock_set_stream_in(const void *buf_p, size_t size)
 
 void ftell_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_ftell *_nala_params_p;
+    struct nala_data_params_for_ftell_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_ftell();
+    nala_params_p = nala_get_params_ftell();
 
-    if (_nala_params_p->stream_in.buf_p == NULL) {
+    if (nala_params_p->stream_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "ftell_mock_set_stream_in() must be called "
                 "before ftell_mock_set_stream_in_assert().\n"));
     }
 
-    _nala_params_p->stream_in_assert = callback;
+    nala_params_p->stream_in_assert = callback;
 }
 
 void ftell_mock_set_stream_in_pointer(FILE *stream)
 {
-    struct _nala_data_params_for_ftell *_nala_params_p;
+    struct nala_data_params_for_ftell_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_ftell();
-    _nala_params_p->ignore_stream_in = false;
-    _nala_params_p->stream = stream;
+    nala_params_p = nala_get_params_ftell();
+    nala_params_p->ignore_stream_in = false;
+    nala_params_p->stream = stream;
 }
 
 void ftell_mock_set_stream_out(const void *buf_p, size_t size)
@@ -6928,7 +6928,7 @@ void ftell_mock_real(void)
 
 void ftell_mock_real_once(void)
 {
-    struct _nala_instance_type_for_ftell *instance_p;
+    struct nala_instance_type_for_ftell_t *instance_p;
 
     nala_state_for_ftell.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -6948,8 +6948,8 @@ void ftell_mock_resume(void)
 
 void ftell_mock_reset(void)
 {
-    struct _nala_instance_type_for_ftell *current_p;
-    struct _nala_instance_type_for_ftell *tmp_p;
+    struct nala_instance_type_for_ftell_t *current_p;
+    struct nala_instance_type_for_ftell_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_ftell, current_p, tmp_p);
 }
@@ -6971,7 +6971,7 @@ void ftell_mock_assert_completed(void)
 
 size_t __real_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
 
-struct _nala_data_params_for_fwrite {
+struct nala_data_params_for_fwrite_t {
     const void *ptr;
     size_t size;
     size_t nmemb;
@@ -6990,8 +6990,8 @@ struct _nala_data_params_for_fwrite {
     void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_fwrite {
-    struct _nala_data_params_for_fwrite params;
+struct nala_data_type_for_fwrite_t {
+    struct nala_data_params_for_fwrite_t params;
     size_t return_value;
     int errno_value;
     size_t (*implementation)(const void *ptr, size_t size, size_t nmemb, FILE *stream);
@@ -7000,27 +7000,27 @@ struct _nala_data_type_for_fwrite {
     struct nala_fwrite_params_t params_in;
 };
 
-struct _nala_instance_type_for_fwrite {
+struct nala_instance_type_for_fwrite_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_fwrite data;
-    struct _nala_instance_type_for_fwrite *next_p;
+    struct nala_data_type_for_fwrite_t data;
+    struct nala_instance_type_for_fwrite_t *next_p;
 };
 
-struct _nala_instances_type_for_fwrite {
-    struct _nala_instance_type_for_fwrite *head_p;
-    struct _nala_instance_type_for_fwrite *next_p;
-    struct _nala_instance_type_for_fwrite *tail_p;
+struct nala_instances_type_for_fwrite_t {
+    struct nala_instance_type_for_fwrite_t *head_p;
+    struct nala_instance_type_for_fwrite_t *next_p;
+    struct nala_instance_type_for_fwrite_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_fwrite {
+struct nala_state_type_for_fwrite_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_fwrite data;
-    struct _nala_instances_type_for_fwrite instances;
+    struct nala_data_type_for_fwrite_t data;
+    struct nala_instances_type_for_fwrite_t instances;
 };
 
-static struct nala_state_type_for_fwrite nala_state_for_fwrite = {
+static struct nala_state_type_for_fwrite_t nala_state_for_fwrite = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -7036,7 +7036,7 @@ static struct nala_state_type_for_fwrite nala_state_for_fwrite = {
     }
 };
 
-struct _nala_data_type_for_fwrite *nala_get_data_fwrite()
+struct nala_data_type_for_fwrite_t *nala_get_data_fwrite()
 {
     if (nala_state_for_fwrite.instances.tail_p != NULL) {
         return (&nala_state_for_fwrite.instances.tail_p->data);
@@ -7045,15 +7045,15 @@ struct _nala_data_type_for_fwrite *nala_get_data_fwrite()
     }
 }
 
-struct _nala_data_params_for_fwrite *nala_get_params_fwrite()
+struct nala_data_params_for_fwrite_t *nala_get_params_fwrite()
 {
     return (&nala_get_data_fwrite()->params);
 }
 
 size_t __wrap_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
-    struct _nala_instance_type_for_fwrite *_nala_instance_p;
-    struct _nala_data_type_for_fwrite *_nala_data_p;
+    struct nala_instance_type_for_fwrite_t *nala_instance_p;
+    struct nala_data_type_for_fwrite_t *nala_data_p;
     size_t return_value;
 
     nala_print_call("fwrite", &nala_state_for_fwrite.state);
@@ -7063,47 +7063,47 @@ size_t __wrap_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_fwrite.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_fwrite.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_fwrite.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked fwrite() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_fwrite.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_fwrite.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fwrite, ptr);
-            _nala_data_p->params_in.ptr = ptr;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fwrite, stream);
-            _nala_data_p->params_in.stream = stream;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fwrite, size);
-            _nala_data_p->params_in.size = size;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, fwrite, nmemb);
-            _nala_data_p->params_in.nmemb = nmemb;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, fwrite, ptr);
+            nala_data_p->params_in.ptr = ptr;
+            MOCK_ASSERT_IN_EQ(nala_data_p, fwrite, stream);
+            nala_data_p->params_in.stream = stream;
+            MOCK_ASSERT_IN_EQ(nala_data_p, fwrite, size);
+            nala_data_p->params_in.size = size;
+            MOCK_ASSERT_IN_EQ(nala_data_p, fwrite, nmemb);
+            nala_data_p->params_in.nmemb = nmemb;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        fwrite,
                                        ptr);
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        fwrite,
                                        stream);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(ptr, size, nmemb, stream);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(ptr, size, nmemb, stream);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_fwrite(ptr, size, nmemb, stream);
@@ -7149,33 +7149,33 @@ void fwrite_mock(size_t size, size_t nmemb, size_t return_value)
 
 int fwrite_mock_once(size_t size, size_t nmemb, size_t return_value)
 {
-    struct _nala_instance_type_for_fwrite *_nala_instance_p;
+    struct nala_instance_type_for_fwrite_t *nala_instance_p;
 
     nala_state_for_fwrite.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.ptr_out);
-    nala_set_param_init(&_nala_instance_p->data.params.ptr_in);
-    _nala_instance_p->data.params.ptr_in_assert = NULL;
-    _nala_instance_p->data.params.ptr_out_copy = NULL;
-    nala_set_param_init(&_nala_instance_p->data.params.stream_out);
-    nala_set_param_init(&_nala_instance_p->data.params.stream_in);
-    _nala_instance_p->data.params.stream_in_assert = NULL;
-    _nala_instance_p->data.params.stream_out_copy = NULL;
-    _nala_instance_p->data.params.ptr = NULL;
-    _nala_instance_p->data.params.ignore_ptr_in = true;
-    _nala_instance_p->data.params.stream = NULL;
-    _nala_instance_p->data.params.ignore_stream_in = true;
-    _nala_instance_p->data.params.size = size;
-    _nala_instance_p->data.params.ignore_size_in = false;
-    _nala_instance_p->data.params.nmemb = nmemb;
-    _nala_instance_p->data.params.ignore_nmemb_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.ptr_out);
+    nala_set_param_init(&nala_instance_p->data.params.ptr_in);
+    nala_instance_p->data.params.ptr_in_assert = NULL;
+    nala_instance_p->data.params.ptr_out_copy = NULL;
+    nala_set_param_init(&nala_instance_p->data.params.stream_out);
+    nala_set_param_init(&nala_instance_p->data.params.stream_in);
+    nala_instance_p->data.params.stream_in_assert = NULL;
+    nala_instance_p->data.params.stream_out_copy = NULL;
+    nala_instance_p->data.params.ptr = NULL;
+    nala_instance_p->data.params.ignore_ptr_in = true;
+    nala_instance_p->data.params.stream = NULL;
+    nala_instance_p->data.params.ignore_stream_in = true;
+    nala_instance_p->data.params.size = size;
+    nala_instance_p->data.params.ignore_size_in = false;
+    nala_instance_p->data.params.nmemb = nmemb;
+    nala_instance_p->data.params.ignore_nmemb_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_fwrite.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void fwrite_mock_ignore_in(size_t return_value)
@@ -7192,7 +7192,7 @@ void fwrite_mock_ignore_in(size_t return_value)
 
 int fwrite_mock_ignore_in_once(size_t return_value)
 {
-    struct _nala_instance_type_for_fwrite *instance_p;
+    struct nala_instance_type_for_fwrite_t *instance_p;
 
     nala_state_for_fwrite.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -7231,7 +7231,7 @@ void fwrite_mock_set_callback(void (*callback)(const void *ptr, size_t size, siz
 
 struct nala_fwrite_params_t *fwrite_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_fwrite *instance_p;
+    struct nala_instance_type_for_fwrite_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_fwrite.instances, &instance_p, handle);
 
@@ -7264,27 +7264,27 @@ void fwrite_mock_set_ptr_in(const void *buf_p, size_t size)
 
 void fwrite_mock_set_ptr_in_assert(void (*callback)(const void *ptr, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_fwrite *_nala_params_p;
+    struct nala_data_params_for_fwrite_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fwrite();
+    nala_params_p = nala_get_params_fwrite();
 
-    if (_nala_params_p->ptr_in.buf_p == NULL) {
+    if (nala_params_p->ptr_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "fwrite_mock_set_ptr_in() must be called "
                 "before fwrite_mock_set_ptr_in_assert().\n"));
     }
 
-    _nala_params_p->ptr_in_assert = callback;
+    nala_params_p->ptr_in_assert = callback;
 }
 
 void fwrite_mock_set_ptr_in_pointer(const void *ptr)
 {
-    struct _nala_data_params_for_fwrite *_nala_params_p;
+    struct nala_data_params_for_fwrite_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fwrite();
-    _nala_params_p->ignore_ptr_in = false;
-    _nala_params_p->ptr = ptr;
+    nala_params_p = nala_get_params_fwrite();
+    nala_params_p->ignore_ptr_in = false;
+    nala_params_p->ptr = ptr;
 }
 
 void fwrite_mock_set_ptr_out(const void *buf_p, size_t size)
@@ -7308,27 +7308,27 @@ void fwrite_mock_set_stream_in(const void *buf_p, size_t size)
 
 void fwrite_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_fwrite *_nala_params_p;
+    struct nala_data_params_for_fwrite_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fwrite();
+    nala_params_p = nala_get_params_fwrite();
 
-    if (_nala_params_p->stream_in.buf_p == NULL) {
+    if (nala_params_p->stream_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "fwrite_mock_set_stream_in() must be called "
                 "before fwrite_mock_set_stream_in_assert().\n"));
     }
 
-    _nala_params_p->stream_in_assert = callback;
+    nala_params_p->stream_in_assert = callback;
 }
 
 void fwrite_mock_set_stream_in_pointer(FILE *stream)
 {
-    struct _nala_data_params_for_fwrite *_nala_params_p;
+    struct nala_data_params_for_fwrite_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_fwrite();
-    _nala_params_p->ignore_stream_in = false;
-    _nala_params_p->stream = stream;
+    nala_params_p = nala_get_params_fwrite();
+    nala_params_p->ignore_stream_in = false;
+    nala_params_p->stream = stream;
 }
 
 void fwrite_mock_set_stream_out(const void *buf_p, size_t size)
@@ -7364,7 +7364,7 @@ void fwrite_mock_real(void)
 
 void fwrite_mock_real_once(void)
 {
-    struct _nala_instance_type_for_fwrite *instance_p;
+    struct nala_instance_type_for_fwrite_t *instance_p;
 
     nala_state_for_fwrite.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -7384,8 +7384,8 @@ void fwrite_mock_resume(void)
 
 void fwrite_mock_reset(void)
 {
-    struct _nala_instance_type_for_fwrite *current_p;
-    struct _nala_instance_type_for_fwrite *tmp_p;
+    struct nala_instance_type_for_fwrite_t *current_p;
+    struct nala_instance_type_for_fwrite_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_fwrite, current_p, tmp_p);
 }
@@ -7407,7 +7407,7 @@ void fwrite_mock_assert_completed(void)
 
 struct mntent *__real_getmntent(FILE *stream);
 
-struct _nala_data_params_for_getmntent {
+struct nala_data_params_for_getmntent_t {
     FILE *stream;
     bool ignore_stream_in;
     struct nala_set_param stream_in;
@@ -7416,8 +7416,8 @@ struct _nala_data_params_for_getmntent {
     void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_getmntent {
-    struct _nala_data_params_for_getmntent params;
+struct nala_data_type_for_getmntent_t {
+    struct nala_data_params_for_getmntent_t params;
     struct mntent *return_value;
     int errno_value;
     struct mntent *(*implementation)(FILE *stream);
@@ -7426,27 +7426,27 @@ struct _nala_data_type_for_getmntent {
     struct nala_getmntent_params_t params_in;
 };
 
-struct _nala_instance_type_for_getmntent {
+struct nala_instance_type_for_getmntent_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_getmntent data;
-    struct _nala_instance_type_for_getmntent *next_p;
+    struct nala_data_type_for_getmntent_t data;
+    struct nala_instance_type_for_getmntent_t *next_p;
 };
 
-struct _nala_instances_type_for_getmntent {
-    struct _nala_instance_type_for_getmntent *head_p;
-    struct _nala_instance_type_for_getmntent *next_p;
-    struct _nala_instance_type_for_getmntent *tail_p;
+struct nala_instances_type_for_getmntent_t {
+    struct nala_instance_type_for_getmntent_t *head_p;
+    struct nala_instance_type_for_getmntent_t *next_p;
+    struct nala_instance_type_for_getmntent_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_getmntent {
+struct nala_state_type_for_getmntent_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_getmntent data;
-    struct _nala_instances_type_for_getmntent instances;
+    struct nala_data_type_for_getmntent_t data;
+    struct nala_instances_type_for_getmntent_t instances;
 };
 
-static struct nala_state_type_for_getmntent nala_state_for_getmntent = {
+static struct nala_state_type_for_getmntent_t nala_state_for_getmntent = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -7462,7 +7462,7 @@ static struct nala_state_type_for_getmntent nala_state_for_getmntent = {
     }
 };
 
-struct _nala_data_type_for_getmntent *nala_get_data_getmntent()
+struct nala_data_type_for_getmntent_t *nala_get_data_getmntent()
 {
     if (nala_state_for_getmntent.instances.tail_p != NULL) {
         return (&nala_state_for_getmntent.instances.tail_p->data);
@@ -7471,15 +7471,15 @@ struct _nala_data_type_for_getmntent *nala_get_data_getmntent()
     }
 }
 
-struct _nala_data_params_for_getmntent *nala_get_params_getmntent()
+struct nala_data_params_for_getmntent_t *nala_get_params_getmntent()
 {
     return (&nala_get_data_getmntent()->params);
 }
 
 struct mntent *__wrap_getmntent(FILE *stream)
 {
-    struct _nala_instance_type_for_getmntent *_nala_instance_p;
-    struct _nala_data_type_for_getmntent *_nala_data_p;
+    struct nala_instance_type_for_getmntent_t *nala_instance_p;
+    struct nala_data_type_for_getmntent_t *nala_data_p;
     struct mntent *return_value;
 
     nala_print_call("getmntent", &nala_state_for_getmntent.state);
@@ -7489,36 +7489,36 @@ struct mntent *__wrap_getmntent(FILE *stream)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_getmntent.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_getmntent.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_getmntent.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked getmntent() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_getmntent.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_getmntent.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, getmntent, stream);
-            _nala_data_p->params_in.stream = stream;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, getmntent, stream);
+            nala_data_p->params_in.stream = stream;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        getmntent,
                                        stream);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(stream);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(stream);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_getmntent(stream);
@@ -7558,23 +7558,23 @@ void getmntent_mock(struct mntent *return_value)
 
 int getmntent_mock_once(struct mntent *return_value)
 {
-    struct _nala_instance_type_for_getmntent *_nala_instance_p;
+    struct nala_instance_type_for_getmntent_t *nala_instance_p;
 
     nala_state_for_getmntent.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.stream_out);
-    nala_set_param_init(&_nala_instance_p->data.params.stream_in);
-    _nala_instance_p->data.params.stream_in_assert = NULL;
-    _nala_instance_p->data.params.stream_out_copy = NULL;
-    _nala_instance_p->data.params.stream = NULL;
-    _nala_instance_p->data.params.ignore_stream_in = true;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.stream_out);
+    nala_set_param_init(&nala_instance_p->data.params.stream_in);
+    nala_instance_p->data.params.stream_in_assert = NULL;
+    nala_instance_p->data.params.stream_out_copy = NULL;
+    nala_instance_p->data.params.stream = NULL;
+    nala_instance_p->data.params.ignore_stream_in = true;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_getmntent.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void getmntent_mock_ignore_in(struct mntent *return_value)
@@ -7588,7 +7588,7 @@ void getmntent_mock_ignore_in(struct mntent *return_value)
 
 int getmntent_mock_ignore_in_once(struct mntent *return_value)
 {
-    struct _nala_instance_type_for_getmntent *instance_p;
+    struct nala_instance_type_for_getmntent_t *instance_p;
 
     nala_state_for_getmntent.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -7619,7 +7619,7 @@ void getmntent_mock_set_callback(void (*callback)(FILE *stream))
 
 struct nala_getmntent_params_t *getmntent_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_getmntent *instance_p;
+    struct nala_instance_type_for_getmntent_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_getmntent.instances, &instance_p, handle);
 
@@ -7642,27 +7642,27 @@ void getmntent_mock_set_stream_in(const void *buf_p, size_t size)
 
 void getmntent_mock_set_stream_in_assert(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_getmntent *_nala_params_p;
+    struct nala_data_params_for_getmntent_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_getmntent();
+    nala_params_p = nala_get_params_getmntent();
 
-    if (_nala_params_p->stream_in.buf_p == NULL) {
+    if (nala_params_p->stream_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "getmntent_mock_set_stream_in() must be called "
                 "before getmntent_mock_set_stream_in_assert().\n"));
     }
 
-    _nala_params_p->stream_in_assert = callback;
+    nala_params_p->stream_in_assert = callback;
 }
 
 void getmntent_mock_set_stream_in_pointer(FILE *stream)
 {
-    struct _nala_data_params_for_getmntent *_nala_params_p;
+    struct nala_data_params_for_getmntent_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_getmntent();
-    _nala_params_p->ignore_stream_in = false;
-    _nala_params_p->stream = stream;
+    nala_params_p = nala_get_params_getmntent();
+    nala_params_p->ignore_stream_in = false;
+    nala_params_p->stream = stream;
 }
 
 void getmntent_mock_set_stream_out(const void *buf_p, size_t size)
@@ -7698,7 +7698,7 @@ void getmntent_mock_real(void)
 
 void getmntent_mock_real_once(void)
 {
-    struct _nala_instance_type_for_getmntent *instance_p;
+    struct nala_instance_type_for_getmntent_t *instance_p;
 
     nala_state_for_getmntent.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -7718,8 +7718,8 @@ void getmntent_mock_resume(void)
 
 void getmntent_mock_reset(void)
 {
-    struct _nala_instance_type_for_getmntent *current_p;
-    struct _nala_instance_type_for_getmntent *tmp_p;
+    struct nala_instance_type_for_getmntent_t *current_p;
+    struct nala_instance_type_for_getmntent_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_getmntent, current_p, tmp_p);
 }
@@ -7741,7 +7741,7 @@ void getmntent_mock_assert_completed(void)
 
 void __real_in_out(int *buf_p);
 
-struct _nala_data_params_for_in_out {
+struct nala_data_params_for_in_out_t {
     int *buf_p;
     bool ignore_buf_p_in;
     struct nala_set_param buf_p_in;
@@ -7750,8 +7750,8 @@ struct _nala_data_params_for_in_out {
     void (*buf_p_out_copy)(int *buf_p, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_in_out {
-    struct _nala_data_params_for_in_out params;
+struct nala_data_type_for_in_out_t {
+    struct nala_data_params_for_in_out_t params;
     int errno_value;
     void (*implementation)(int *buf_p);
     void (*callback)(int *buf_p);
@@ -7759,27 +7759,27 @@ struct _nala_data_type_for_in_out {
     struct nala_in_out_params_t params_in;
 };
 
-struct _nala_instance_type_for_in_out {
+struct nala_instance_type_for_in_out_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_in_out data;
-    struct _nala_instance_type_for_in_out *next_p;
+    struct nala_data_type_for_in_out_t data;
+    struct nala_instance_type_for_in_out_t *next_p;
 };
 
-struct _nala_instances_type_for_in_out {
-    struct _nala_instance_type_for_in_out *head_p;
-    struct _nala_instance_type_for_in_out *next_p;
-    struct _nala_instance_type_for_in_out *tail_p;
+struct nala_instances_type_for_in_out_t {
+    struct nala_instance_type_for_in_out_t *head_p;
+    struct nala_instance_type_for_in_out_t *next_p;
+    struct nala_instance_type_for_in_out_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_in_out {
+struct nala_state_type_for_in_out_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_in_out data;
-    struct _nala_instances_type_for_in_out instances;
+    struct nala_data_type_for_in_out_t data;
+    struct nala_instances_type_for_in_out_t instances;
 };
 
-static struct nala_state_type_for_in_out nala_state_for_in_out = {
+static struct nala_state_type_for_in_out_t nala_state_for_in_out = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -7795,7 +7795,7 @@ static struct nala_state_type_for_in_out nala_state_for_in_out = {
     }
 };
 
-struct _nala_data_type_for_in_out *nala_get_data_in_out()
+struct nala_data_type_for_in_out_t *nala_get_data_in_out()
 {
     if (nala_state_for_in_out.instances.tail_p != NULL) {
         return (&nala_state_for_in_out.instances.tail_p->data);
@@ -7804,15 +7804,15 @@ struct _nala_data_type_for_in_out *nala_get_data_in_out()
     }
 }
 
-struct _nala_data_params_for_in_out *nala_get_params_in_out()
+struct nala_data_params_for_in_out_t *nala_get_params_in_out()
 {
     return (&nala_get_data_in_out()->params);
 }
 
 void __wrap_in_out(int *buf_p)
 {
-    struct _nala_instance_type_for_in_out *_nala_instance_p;
-    struct _nala_data_type_for_in_out *_nala_data_p;
+    struct nala_instance_type_for_in_out_t *nala_instance_p;
+    struct nala_data_type_for_in_out_t *nala_data_p;
 
     nala_print_call("in_out", &nala_state_for_in_out.state);
 
@@ -7821,33 +7821,33 @@ void __wrap_in_out(int *buf_p)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_in_out.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_in_out.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_in_out.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked in_out() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_in_out.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_in_out.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, in_out, buf_p);
-            _nala_data_p->params_in.buf_p = buf_p;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, in_out, buf_p);
+            nala_data_p->params_in.buf_p = buf_p;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        in_out,
                                        buf_p);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(buf_p);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(buf_p);
             }
 
         } else {
@@ -7885,22 +7885,22 @@ void in_out_mock()
 
 int in_out_mock_once()
 {
-    struct _nala_instance_type_for_in_out *_nala_instance_p;
+    struct nala_instance_type_for_in_out_t *nala_instance_p;
 
     nala_state_for_in_out.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.buf_p_out);
-    nala_set_param_init(&_nala_instance_p->data.params.buf_p_in);
-    _nala_instance_p->data.params.buf_p_in_assert = NULL;
-    _nala_instance_p->data.params.buf_p_out_copy = NULL;
-    _nala_instance_p->data.params.buf_p = NULL;
-    _nala_instance_p->data.params.ignore_buf_p_in = true;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.buf_p_out);
+    nala_set_param_init(&nala_instance_p->data.params.buf_p_in);
+    nala_instance_p->data.params.buf_p_in_assert = NULL;
+    nala_instance_p->data.params.buf_p_out_copy = NULL;
+    nala_instance_p->data.params.buf_p = NULL;
+    nala_instance_p->data.params.ignore_buf_p_in = true;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_in_out.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void in_out_mock_ignore_in(void)
@@ -7913,7 +7913,7 @@ void in_out_mock_ignore_in(void)
 
 int in_out_mock_ignore_in_once(void)
 {
-    struct _nala_instance_type_for_in_out *instance_p;
+    struct nala_instance_type_for_in_out_t *instance_p;
 
     nala_state_for_in_out.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -7943,7 +7943,7 @@ void in_out_mock_set_callback(void (*callback)(int *buf_p))
 
 struct nala_in_out_params_t *in_out_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_in_out *instance_p;
+    struct nala_instance_type_for_in_out_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_in_out.instances, &instance_p, handle);
 
@@ -7966,27 +7966,27 @@ void in_out_mock_set_buf_p_in(const void *buf_p, size_t size)
 
 void in_out_mock_set_buf_p_in_assert(void (*callback)(int *buf_p, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_in_out *_nala_params_p;
+    struct nala_data_params_for_in_out_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_in_out();
+    nala_params_p = nala_get_params_in_out();
 
-    if (_nala_params_p->buf_p_in.buf_p == NULL) {
+    if (nala_params_p->buf_p_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "in_out_mock_set_buf_p_in() must be called "
                 "before in_out_mock_set_buf_p_in_assert().\n"));
     }
 
-    _nala_params_p->buf_p_in_assert = callback;
+    nala_params_p->buf_p_in_assert = callback;
 }
 
 void in_out_mock_set_buf_p_in_pointer(int *buf_p)
 {
-    struct _nala_data_params_for_in_out *_nala_params_p;
+    struct nala_data_params_for_in_out_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_in_out();
-    _nala_params_p->ignore_buf_p_in = false;
-    _nala_params_p->buf_p = buf_p;
+    nala_params_p = nala_get_params_in_out();
+    nala_params_p->ignore_buf_p_in = false;
+    nala_params_p->buf_p = buf_p;
 }
 
 void in_out_mock_set_buf_p_out(const void *buf_p, size_t size)
@@ -8022,7 +8022,7 @@ void in_out_mock_real(void)
 
 void in_out_mock_real_once(void)
 {
-    struct _nala_instance_type_for_in_out *instance_p;
+    struct nala_instance_type_for_in_out_t *instance_p;
 
     nala_state_for_in_out.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -8042,8 +8042,8 @@ void in_out_mock_resume(void)
 
 void in_out_mock_reset(void)
 {
-    struct _nala_instance_type_for_in_out *current_p;
-    struct _nala_instance_type_for_in_out *tmp_p;
+    struct nala_instance_type_for_in_out_t *current_p;
+    struct nala_instance_type_for_in_out_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_in_out, current_p, tmp_p);
 }
@@ -8063,15 +8063,15 @@ void in_out_mock_assert_completed(void)
 
 // NALA_IMPLEMENTATION io_control
 
-struct _nala_data_params_for_io_control {
+struct nala_data_params_for_io_control_t {
     int kind;
     const char *vafmt_p;
     bool ignore_kind_in;
-    struct nala_va_arg_list_t _nala_va_arg_list;
+    struct nala_va_arg_list_t nala_va_arg_list;
 };
 
-struct _nala_data_type_for_io_control {
-    struct _nala_data_params_for_io_control params;
+struct nala_data_type_for_io_control_t {
+    struct nala_data_params_for_io_control_t params;
     int return_value;
     int errno_value;
     int (*implementation)(int kind, va_list __nala_va_list);
@@ -8080,27 +8080,27 @@ struct _nala_data_type_for_io_control {
     struct nala_io_control_params_t params_in;
 };
 
-struct _nala_instance_type_for_io_control {
+struct nala_instance_type_for_io_control_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_io_control data;
-    struct _nala_instance_type_for_io_control *next_p;
+    struct nala_data_type_for_io_control_t data;
+    struct nala_instance_type_for_io_control_t *next_p;
 };
 
-struct _nala_instances_type_for_io_control {
-    struct _nala_instance_type_for_io_control *head_p;
-    struct _nala_instance_type_for_io_control *next_p;
-    struct _nala_instance_type_for_io_control *tail_p;
+struct nala_instances_type_for_io_control_t {
+    struct nala_instance_type_for_io_control_t *head_p;
+    struct nala_instance_type_for_io_control_t *next_p;
+    struct nala_instance_type_for_io_control_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_io_control {
+struct nala_state_type_for_io_control_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_io_control data;
-    struct _nala_instances_type_for_io_control instances;
+    struct nala_data_type_for_io_control_t data;
+    struct nala_instances_type_for_io_control_t instances;
 };
 
-static struct nala_state_type_for_io_control nala_state_for_io_control = {
+static struct nala_state_type_for_io_control_t nala_state_for_io_control = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -8116,7 +8116,7 @@ static struct nala_state_type_for_io_control nala_state_for_io_control = {
     }
 };
 
-struct _nala_data_type_for_io_control *nala_get_data_io_control()
+struct nala_data_type_for_io_control_t *nala_get_data_io_control()
 {
     if (nala_state_for_io_control.instances.tail_p != NULL) {
         return (&nala_state_for_io_control.instances.tail_p->data);
@@ -8125,15 +8125,15 @@ struct _nala_data_type_for_io_control *nala_get_data_io_control()
     }
 }
 
-struct _nala_data_params_for_io_control *nala_get_params_io_control()
+struct nala_data_params_for_io_control_t *nala_get_params_io_control()
 {
     return (&nala_get_data_io_control()->params);
 }
 
 int __wrap_io_control(int kind, ...)
 {
-    struct _nala_instance_type_for_io_control *_nala_instance_p;
-    struct _nala_data_type_for_io_control *_nala_data_p;
+    struct nala_instance_type_for_io_control_t *nala_instance_p;
+    struct nala_data_type_for_io_control_t *nala_data_p;
     int return_value;
 
     nala_print_call("io_control", &nala_state_for_io_control.state);
@@ -8143,60 +8143,60 @@ int __wrap_io_control(int kind, ...)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_io_control.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_io_control.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_io_control.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked io_control() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_io_control.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_io_control.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, io_control, kind);
-            _nala_data_p->params_in.kind = kind;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, io_control, kind);
+            nala_data_p->params_in.kind = kind;
 
 
             {
-                va_list __nala_vl;
-                va_start(__nala_vl, kind);
-                nala_va_arg_list_assert(&_nala_data_p->params._nala_va_arg_list, __nala_vl);
-                va_end(__nala_vl);
-                nala_va_arg_list_destroy(&_nala_data_p->params._nala_va_arg_list);
+                va_list nala_vl;
+                va_start(nala_vl, kind);
+                nala_va_arg_list_assert(&nala_data_p->params.nala_va_arg_list, nala_vl);
+                va_end(nala_vl);
+                nala_va_arg_list_destroy(&nala_data_p->params.nala_va_arg_list);
             }
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                va_list __nala_vl;
-                va_start(__nala_vl, kind);
-                _nala_data_p->callback(kind, __nala_vl);
-                va_end(__nala_vl);
+            if (nala_data_p->callback != NULL) {
+                va_list nala_vl;
+                va_start(nala_vl, kind);
+                nala_data_p->callback(kind, nala_vl);
+                va_end(nala_vl);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             {
-                va_list __nala_vl;
-                va_start(__nala_vl, kind);
+                va_list nala_vl;
+                va_start(nala_vl, kind);
                 return_value =
-                io_control_mock_va_arg_real(kind, __nala_vl);
-                va_end(__nala_vl);
+                io_control_mock_va_arg_real(kind, nala_vl);
+                va_end(nala_vl);
             }
         }
         break;
 
     case MODE_IMPLEMENTATION:
         {
-            va_list __nala_vl;
-            va_start(__nala_vl, kind);
+            va_list nala_vl;
+            va_start(nala_vl, kind);
             return_value =
-            nala_state_for_io_control.data.implementation(kind, __nala_vl);
-            va_end(__nala_vl);
+            nala_state_for_io_control.data.implementation(kind, nala_vl);
+            va_end(nala_vl);
         }
         break;
 
@@ -8208,11 +8208,11 @@ int __wrap_io_control(int kind, ...)
 
     default:
         {
-            va_list __nala_vl;
-            va_start(__nala_vl, kind);
+            va_list nala_vl;
+            va_start(nala_vl, kind);
             return_value =
-            io_control_mock_va_arg_real(kind, __nala_vl);
-            va_end(__nala_vl);
+            io_control_mock_va_arg_real(kind, nala_vl);
+            va_end(nala_vl);
         }
         break;
     }
@@ -8229,13 +8229,13 @@ void io_control_mock(int kind, int return_value, const char *vafmt_p, ...)
     }
 
     nala_state_for_io_control.data.params.vafmt_p = vafmt_p;
-    nala_va_arg_list_init(&nala_state_for_io_control.data.params._nala_va_arg_list);
-    va_list __nala_vl;
-    va_start(__nala_vl, vafmt_p);
-    nala_parse_va_list(&nala_state_for_io_control.data.params._nala_va_arg_list,
+    nala_va_arg_list_init(&nala_state_for_io_control.data.params.nala_va_arg_list);
+    va_list nala_vl;
+    va_start(nala_vl, vafmt_p);
+    nala_parse_va_list(&nala_state_for_io_control.data.params.nala_va_arg_list,
                        vafmt_p,
-                       __nala_vl);
-    va_end(__nala_vl);
+                       nala_vl);
+    va_end(nala_vl);
     nala_state_for_io_control.data.params.kind = kind;
     nala_state_for_io_control.data.params.ignore_kind_in = false;
     nala_state_for_io_control.data.return_value = return_value;
@@ -8246,32 +8246,32 @@ void io_control_mock(int kind, int return_value, const char *vafmt_p, ...)
 
 int io_control_mock_once(int kind, int return_value, const char *vafmt_p, ...)
 {
-    struct _nala_instance_type_for_io_control *_nala_instance_p;
+    struct nala_instance_type_for_io_control_t *nala_instance_p;
 
     nala_state_for_io_control.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
 
     if (vafmt_p == NULL) {
         nala_test_failure(nala_format("Variadic format cannot be NULL.\n"));
     }
 
-    _nala_instance_p->data.params.vafmt_p = vafmt_p;
-    nala_va_arg_list_init(&_nala_instance_p->data.params._nala_va_arg_list);
-    va_list __nala_vl;
-    va_start(__nala_vl, vafmt_p);
-    nala_parse_va_list(&_nala_instance_p->data.params._nala_va_arg_list,
+    nala_instance_p->data.params.vafmt_p = vafmt_p;
+    nala_va_arg_list_init(&nala_instance_p->data.params.nala_va_arg_list);
+    va_list nala_vl;
+    va_start(nala_vl, vafmt_p);
+    nala_parse_va_list(&nala_instance_p->data.params.nala_va_arg_list,
                        vafmt_p,
-                       __nala_vl);
-    va_end(__nala_vl);
-    _nala_instance_p->data.params.kind = kind;
-    _nala_instance_p->data.params.ignore_kind_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+                       nala_vl);
+    va_end(nala_vl);
+    nala_instance_p->data.params.kind = kind;
+    nala_instance_p->data.params.ignore_kind_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_io_control.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void io_control_mock_ignore_in(int return_value)
@@ -8285,12 +8285,12 @@ void io_control_mock_ignore_in(int return_value)
 
 int io_control_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_io_control *instance_p;
+    struct nala_instance_type_for_io_control_t *instance_p;
 
     nala_state_for_io_control.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
     instance_p->data.params.vafmt_p = "";
-    nala_va_arg_list_init(&instance_p->data.params._nala_va_arg_list);
+    nala_va_arg_list_init(&instance_p->data.params.nala_va_arg_list);
     instance_p->data.params.ignore_kind_in = true;
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
@@ -8313,7 +8313,7 @@ void io_control_mock_set_callback(void (*callback)(int kind, va_list __nala_va_l
 
 struct nala_io_control_params_t *io_control_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_io_control *instance_p;
+    struct nala_instance_type_for_io_control_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_io_control.instances, &instance_p, handle);
 
@@ -8336,7 +8336,7 @@ void io_control_mock_ignore_va_arg_in_at(unsigned int index)
 {
     struct nala_va_arg_list_t *va_arg_list_p;
 
-    va_arg_list_p = &nala_get_params_io_control()->_nala_va_arg_list;
+    va_arg_list_p = &nala_get_params_io_control()->nala_va_arg_list;
     nala_va_arg_list_get(va_arg_list_p, index)->ignore_in = true;
 }
 
@@ -8345,7 +8345,7 @@ void io_control_mock_set_va_arg_in_at(unsigned int index, const void *buf_p, siz
     struct nala_va_arg_list_t *va_arg_list_p;
     struct nala_va_arg_item_t *item_p;
 
-    va_arg_list_p = &nala_get_params_io_control()->_nala_va_arg_list;
+    va_arg_list_p = &nala_get_params_io_control()->nala_va_arg_list;
     item_p = nala_va_arg_list_get(va_arg_list_p, index);
     nala_set_param_buf(&item_p->in, buf_p, size);
     item_p->assert_in = assert_in;
@@ -8356,7 +8356,7 @@ void io_control_mock_set_va_arg_in_pointer_at(unsigned int index, const void *bu
     (void)index;
     (void)buf_p;
 
-    struct _nala_instance_type_for_io_control *instance_p;
+    struct nala_instance_type_for_io_control_t *instance_p;
 
     instance_p = nala_state_for_io_control.instances.tail_p;
 
@@ -8372,7 +8372,7 @@ void io_control_mock_set_va_arg_out_at(unsigned int index, const void *buf_p, si
     struct nala_va_arg_list_t *va_arg_list_p;
     struct nala_va_arg_item_t *item_p;
 
-    va_arg_list_p = &nala_get_params_io_control()->_nala_va_arg_list;
+    va_arg_list_p = &nala_get_params_io_control()->nala_va_arg_list;
     item_p = nala_va_arg_list_get(va_arg_list_p, index);
     nala_set_param_buf(&item_p->out, buf_p, size);
 }
@@ -8398,7 +8398,7 @@ void io_control_mock_real(void)
 
 void io_control_mock_real_once(void)
 {
-    struct _nala_instance_type_for_io_control *instance_p;
+    struct nala_instance_type_for_io_control_t *instance_p;
 
     nala_state_for_io_control.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -8418,8 +8418,8 @@ void io_control_mock_resume(void)
 
 void io_control_mock_reset(void)
 {
-    struct _nala_instance_type_for_io_control *current_p;
-    struct _nala_instance_type_for_io_control *tmp_p;
+    struct nala_instance_type_for_io_control_t *current_p;
+    struct nala_instance_type_for_io_control_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_io_control, current_p, tmp_p);
 }
@@ -8441,14 +8441,14 @@ void io_control_mock_assert_completed(void)
 
 int __real_io_vcontrol(int kind, va_list ap);
 
-struct _nala_data_params_for_io_vcontrol {
+struct nala_data_params_for_io_vcontrol_t {
     int kind;
     va_list ap;
     bool ignore_kind_in;
 };
 
-struct _nala_data_type_for_io_vcontrol {
-    struct _nala_data_params_for_io_vcontrol params;
+struct nala_data_type_for_io_vcontrol_t {
+    struct nala_data_params_for_io_vcontrol_t params;
     int return_value;
     int errno_value;
     int (*implementation)(int kind, va_list ap);
@@ -8457,27 +8457,27 @@ struct _nala_data_type_for_io_vcontrol {
     struct nala_io_vcontrol_params_t params_in;
 };
 
-struct _nala_instance_type_for_io_vcontrol {
+struct nala_instance_type_for_io_vcontrol_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_io_vcontrol data;
-    struct _nala_instance_type_for_io_vcontrol *next_p;
+    struct nala_data_type_for_io_vcontrol_t data;
+    struct nala_instance_type_for_io_vcontrol_t *next_p;
 };
 
-struct _nala_instances_type_for_io_vcontrol {
-    struct _nala_instance_type_for_io_vcontrol *head_p;
-    struct _nala_instance_type_for_io_vcontrol *next_p;
-    struct _nala_instance_type_for_io_vcontrol *tail_p;
+struct nala_instances_type_for_io_vcontrol_t {
+    struct nala_instance_type_for_io_vcontrol_t *head_p;
+    struct nala_instance_type_for_io_vcontrol_t *next_p;
+    struct nala_instance_type_for_io_vcontrol_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_io_vcontrol {
+struct nala_state_type_for_io_vcontrol_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_io_vcontrol data;
-    struct _nala_instances_type_for_io_vcontrol instances;
+    struct nala_data_type_for_io_vcontrol_t data;
+    struct nala_instances_type_for_io_vcontrol_t instances;
 };
 
-static struct nala_state_type_for_io_vcontrol nala_state_for_io_vcontrol = {
+static struct nala_state_type_for_io_vcontrol_t nala_state_for_io_vcontrol = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -8493,7 +8493,7 @@ static struct nala_state_type_for_io_vcontrol nala_state_for_io_vcontrol = {
     }
 };
 
-struct _nala_data_type_for_io_vcontrol *nala_get_data_io_vcontrol()
+struct nala_data_type_for_io_vcontrol_t *nala_get_data_io_vcontrol()
 {
     if (nala_state_for_io_vcontrol.instances.tail_p != NULL) {
         return (&nala_state_for_io_vcontrol.instances.tail_p->data);
@@ -8502,15 +8502,15 @@ struct _nala_data_type_for_io_vcontrol *nala_get_data_io_vcontrol()
     }
 }
 
-struct _nala_data_params_for_io_vcontrol *nala_get_params_io_vcontrol()
+struct nala_data_params_for_io_vcontrol_t *nala_get_params_io_vcontrol()
 {
     return (&nala_get_data_io_vcontrol()->params);
 }
 
 int __wrap_io_vcontrol(int kind, va_list ap)
 {
-    struct _nala_instance_type_for_io_vcontrol *_nala_instance_p;
-    struct _nala_data_type_for_io_vcontrol *_nala_data_p;
+    struct nala_instance_type_for_io_vcontrol_t *nala_instance_p;
+    struct nala_data_type_for_io_vcontrol_t *nala_data_p;
     int return_value;
 
     nala_print_call("io_vcontrol", &nala_state_for_io_vcontrol.state);
@@ -8520,31 +8520,31 @@ int __wrap_io_vcontrol(int kind, va_list ap)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_io_vcontrol.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_io_vcontrol.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_io_vcontrol.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked io_vcontrol() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_io_vcontrol.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_io_vcontrol.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, io_vcontrol, kind);
-            _nala_data_p->params_in.kind = kind;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, io_vcontrol, kind);
+            nala_data_p->params_in.kind = kind;
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(kind, ap);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(kind, ap);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_io_vcontrol(kind, ap);
@@ -8584,19 +8584,19 @@ void io_vcontrol_mock(int kind, int return_value)
 
 int io_vcontrol_mock_once(int kind, int return_value)
 {
-    struct _nala_instance_type_for_io_vcontrol *_nala_instance_p;
+    struct nala_instance_type_for_io_vcontrol_t *nala_instance_p;
 
     nala_state_for_io_vcontrol.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.params.kind = kind;
-    _nala_instance_p->data.params.ignore_kind_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.params.kind = kind;
+    nala_instance_p->data.params.ignore_kind_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_io_vcontrol.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void io_vcontrol_mock_ignore_in(int return_value)
@@ -8610,7 +8610,7 @@ void io_vcontrol_mock_ignore_in(int return_value)
 
 int io_vcontrol_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_io_vcontrol *instance_p;
+    struct nala_instance_type_for_io_vcontrol_t *instance_p;
 
     nala_state_for_io_vcontrol.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -8636,7 +8636,7 @@ void io_vcontrol_mock_set_callback(void (*callback)(int kind, va_list ap))
 
 struct nala_io_vcontrol_params_t *io_vcontrol_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_io_vcontrol *instance_p;
+    struct nala_instance_type_for_io_vcontrol_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_io_vcontrol.instances, &instance_p, handle);
 
@@ -8676,7 +8676,7 @@ void io_vcontrol_mock_real(void)
 
 void io_vcontrol_mock_real_once(void)
 {
-    struct _nala_instance_type_for_io_vcontrol *instance_p;
+    struct nala_instance_type_for_io_vcontrol_t *instance_p;
 
     nala_state_for_io_vcontrol.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -8696,8 +8696,8 @@ void io_vcontrol_mock_resume(void)
 
 void io_vcontrol_mock_reset(void)
 {
-    struct _nala_instance_type_for_io_vcontrol *current_p;
-    struct _nala_instance_type_for_io_vcontrol *tmp_p;
+    struct nala_instance_type_for_io_vcontrol_t *current_p;
+    struct nala_instance_type_for_io_vcontrol_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_io_vcontrol, current_p, tmp_p);
 }
@@ -8719,13 +8719,13 @@ void io_vcontrol_mock_assert_completed(void)
 
 void *__real_malloc(size_t size);
 
-struct _nala_data_params_for_malloc {
+struct nala_data_params_for_malloc_t {
     size_t size;
     bool ignore_size_in;
 };
 
-struct _nala_data_type_for_malloc {
-    struct _nala_data_params_for_malloc params;
+struct nala_data_type_for_malloc_t {
+    struct nala_data_params_for_malloc_t params;
     void *return_value;
     int errno_value;
     void *(*implementation)(size_t size);
@@ -8734,27 +8734,27 @@ struct _nala_data_type_for_malloc {
     struct nala_malloc_params_t params_in;
 };
 
-struct _nala_instance_type_for_malloc {
+struct nala_instance_type_for_malloc_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_malloc data;
-    struct _nala_instance_type_for_malloc *next_p;
+    struct nala_data_type_for_malloc_t data;
+    struct nala_instance_type_for_malloc_t *next_p;
 };
 
-struct _nala_instances_type_for_malloc {
-    struct _nala_instance_type_for_malloc *head_p;
-    struct _nala_instance_type_for_malloc *next_p;
-    struct _nala_instance_type_for_malloc *tail_p;
+struct nala_instances_type_for_malloc_t {
+    struct nala_instance_type_for_malloc_t *head_p;
+    struct nala_instance_type_for_malloc_t *next_p;
+    struct nala_instance_type_for_malloc_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_malloc {
+struct nala_state_type_for_malloc_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_malloc data;
-    struct _nala_instances_type_for_malloc instances;
+    struct nala_data_type_for_malloc_t data;
+    struct nala_instances_type_for_malloc_t instances;
 };
 
-static struct nala_state_type_for_malloc nala_state_for_malloc = {
+static struct nala_state_type_for_malloc_t nala_state_for_malloc = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -8770,7 +8770,7 @@ static struct nala_state_type_for_malloc nala_state_for_malloc = {
     }
 };
 
-struct _nala_data_type_for_malloc *nala_get_data_malloc()
+struct nala_data_type_for_malloc_t *nala_get_data_malloc()
 {
     if (nala_state_for_malloc.instances.tail_p != NULL) {
         return (&nala_state_for_malloc.instances.tail_p->data);
@@ -8779,15 +8779,15 @@ struct _nala_data_type_for_malloc *nala_get_data_malloc()
     }
 }
 
-struct _nala_data_params_for_malloc *nala_get_params_malloc()
+struct nala_data_params_for_malloc_t *nala_get_params_malloc()
 {
     return (&nala_get_data_malloc()->params);
 }
 
 void *__wrap_malloc(size_t size)
 {
-    struct _nala_instance_type_for_malloc *_nala_instance_p;
-    struct _nala_data_type_for_malloc *_nala_data_p;
+    struct nala_instance_type_for_malloc_t *nala_instance_p;
+    struct nala_data_type_for_malloc_t *nala_data_p;
     void *return_value;
 
     nala_print_call("malloc", &nala_state_for_malloc.state);
@@ -8797,31 +8797,31 @@ void *__wrap_malloc(size_t size)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_malloc.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_malloc.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_malloc.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked malloc() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_malloc.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_malloc.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, malloc, size);
-            _nala_data_p->params_in.size = size;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, malloc, size);
+            nala_data_p->params_in.size = size;
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(size);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(size);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_malloc(size);
@@ -8861,19 +8861,19 @@ void malloc_mock(size_t size, void *return_value)
 
 int malloc_mock_once(size_t size, void *return_value)
 {
-    struct _nala_instance_type_for_malloc *_nala_instance_p;
+    struct nala_instance_type_for_malloc_t *nala_instance_p;
 
     nala_state_for_malloc.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.params.size = size;
-    _nala_instance_p->data.params.ignore_size_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.params.size = size;
+    nala_instance_p->data.params.ignore_size_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_malloc.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void malloc_mock_ignore_in(void *return_value)
@@ -8887,7 +8887,7 @@ void malloc_mock_ignore_in(void *return_value)
 
 int malloc_mock_ignore_in_once(void *return_value)
 {
-    struct _nala_instance_type_for_malloc *instance_p;
+    struct nala_instance_type_for_malloc_t *instance_p;
 
     nala_state_for_malloc.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -8913,7 +8913,7 @@ void malloc_mock_set_callback(void (*callback)(size_t size))
 
 struct nala_malloc_params_t *malloc_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_malloc *instance_p;
+    struct nala_instance_type_for_malloc_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_malloc.instances, &instance_p, handle);
 
@@ -8953,7 +8953,7 @@ void malloc_mock_real(void)
 
 void malloc_mock_real_once(void)
 {
-    struct _nala_instance_type_for_malloc *instance_p;
+    struct nala_instance_type_for_malloc_t *instance_p;
 
     nala_state_for_malloc.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -8973,8 +8973,8 @@ void malloc_mock_resume(void)
 
 void malloc_mock_reset(void)
 {
-    struct _nala_instance_type_for_malloc *current_p;
-    struct _nala_instance_type_for_malloc *tmp_p;
+    struct nala_instance_type_for_malloc_t *current_p;
+    struct nala_instance_type_for_malloc_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_malloc, current_p, tmp_p);
 }
@@ -8996,7 +8996,7 @@ void malloc_mock_assert_completed(void)
 
 int __real_mount(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, const void *data);
 
-struct _nala_data_params_for_mount {
+struct nala_data_params_for_mount_t {
     const char *source;
     const char *target;
     const char *filesystemtype;
@@ -9025,8 +9025,8 @@ struct _nala_data_params_for_mount {
     void (*data_out_copy)(const void *data, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_mount {
-    struct _nala_data_params_for_mount params;
+struct nala_data_type_for_mount_t {
+    struct nala_data_params_for_mount_t params;
     int return_value;
     int errno_value;
     int (*implementation)(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, const void *data);
@@ -9035,27 +9035,27 @@ struct _nala_data_type_for_mount {
     struct nala_mount_params_t params_in;
 };
 
-struct _nala_instance_type_for_mount {
+struct nala_instance_type_for_mount_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_mount data;
-    struct _nala_instance_type_for_mount *next_p;
+    struct nala_data_type_for_mount_t data;
+    struct nala_instance_type_for_mount_t *next_p;
 };
 
-struct _nala_instances_type_for_mount {
-    struct _nala_instance_type_for_mount *head_p;
-    struct _nala_instance_type_for_mount *next_p;
-    struct _nala_instance_type_for_mount *tail_p;
+struct nala_instances_type_for_mount_t {
+    struct nala_instance_type_for_mount_t *head_p;
+    struct nala_instance_type_for_mount_t *next_p;
+    struct nala_instance_type_for_mount_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_mount {
+struct nala_state_type_for_mount_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_mount data;
-    struct _nala_instances_type_for_mount instances;
+    struct nala_data_type_for_mount_t data;
+    struct nala_instances_type_for_mount_t instances;
 };
 
-static struct nala_state_type_for_mount nala_state_for_mount = {
+static struct nala_state_type_for_mount_t nala_state_for_mount = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -9071,7 +9071,7 @@ static struct nala_state_type_for_mount nala_state_for_mount = {
     }
 };
 
-struct _nala_data_type_for_mount *nala_get_data_mount()
+struct nala_data_type_for_mount_t *nala_get_data_mount()
 {
     if (nala_state_for_mount.instances.tail_p != NULL) {
         return (&nala_state_for_mount.instances.tail_p->data);
@@ -9080,15 +9080,15 @@ struct _nala_data_type_for_mount *nala_get_data_mount()
     }
 }
 
-struct _nala_data_params_for_mount *nala_get_params_mount()
+struct nala_data_params_for_mount_t *nala_get_params_mount()
 {
     return (&nala_get_data_mount()->params);
 }
 
 int __wrap_mount(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, const void *data)
 {
-    struct _nala_instance_type_for_mount *_nala_instance_p;
-    struct _nala_data_type_for_mount *_nala_data_p;
+    struct nala_instance_type_for_mount_t *nala_instance_p;
+    struct nala_data_type_for_mount_t *nala_data_p;
     int return_value;
 
     nala_print_call("mount", &nala_state_for_mount.state);
@@ -9098,59 +9098,59 @@ int __wrap_mount(const char *source, const char *target, const char *filesystemt
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_mount.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_mount.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_mount.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked mount() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_mount.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_mount.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, mount, source);
-            _nala_data_p->params_in.source = source;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, mount, target);
-            _nala_data_p->params_in.target = target;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, mount, filesystemtype);
-            _nala_data_p->params_in.filesystemtype = filesystemtype;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, mount, data);
-            _nala_data_p->params_in.data = data;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, mount, mountflags);
-            _nala_data_p->params_in.mountflags = mountflags;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, mount, source);
+            nala_data_p->params_in.source = source;
+            MOCK_ASSERT_IN_EQ(nala_data_p, mount, target);
+            nala_data_p->params_in.target = target;
+            MOCK_ASSERT_IN_EQ(nala_data_p, mount, filesystemtype);
+            nala_data_p->params_in.filesystemtype = filesystemtype;
+            MOCK_ASSERT_IN_EQ(nala_data_p, mount, data);
+            nala_data_p->params_in.data = data;
+            MOCK_ASSERT_IN_EQ(nala_data_p, mount, mountflags);
+            nala_data_p->params_in.mountflags = mountflags;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        mount,
                                        source);
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        mount,
                                        target);
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        mount,
                                        filesystemtype);
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        mount,
                                        data);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(source, target, filesystemtype, mountflags, data);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(source, target, filesystemtype, mountflags, data);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_mount(source, target, filesystemtype, mountflags, data);
@@ -9222,67 +9222,67 @@ void mount_mock(const char *source, const char *target, const char *filesystemty
 
 int mount_mock_once(const char *source, const char *target, const char *filesystemtype, unsigned long int mountflags, int return_value)
 {
-    struct _nala_instance_type_for_mount *_nala_instance_p;
+    struct nala_instance_type_for_mount_t *nala_instance_p;
 
     nala_state_for_mount.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.source_out);
-    nala_set_param_init(&_nala_instance_p->data.params.source_in);
-    _nala_instance_p->data.params.source_in_assert = NULL;
-    _nala_instance_p->data.params.source_out_copy = NULL;
-    nala_set_param_init(&_nala_instance_p->data.params.target_out);
-    nala_set_param_init(&_nala_instance_p->data.params.target_in);
-    _nala_instance_p->data.params.target_in_assert = NULL;
-    _nala_instance_p->data.params.target_out_copy = NULL;
-    nala_set_param_init(&_nala_instance_p->data.params.filesystemtype_out);
-    nala_set_param_init(&_nala_instance_p->data.params.filesystemtype_in);
-    _nala_instance_p->data.params.filesystemtype_in_assert = NULL;
-    _nala_instance_p->data.params.filesystemtype_out_copy = NULL;
-    nala_set_param_init(&_nala_instance_p->data.params.data_out);
-    nala_set_param_init(&_nala_instance_p->data.params.data_in);
-    _nala_instance_p->data.params.data_in_assert = NULL;
-    _nala_instance_p->data.params.data_out_copy = NULL;
-    _nala_instance_p->data.params.source = NULL;
-    _nala_instance_p->data.params.ignore_source_in = true;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.source_out);
+    nala_set_param_init(&nala_instance_p->data.params.source_in);
+    nala_instance_p->data.params.source_in_assert = NULL;
+    nala_instance_p->data.params.source_out_copy = NULL;
+    nala_set_param_init(&nala_instance_p->data.params.target_out);
+    nala_set_param_init(&nala_instance_p->data.params.target_in);
+    nala_instance_p->data.params.target_in_assert = NULL;
+    nala_instance_p->data.params.target_out_copy = NULL;
+    nala_set_param_init(&nala_instance_p->data.params.filesystemtype_out);
+    nala_set_param_init(&nala_instance_p->data.params.filesystemtype_in);
+    nala_instance_p->data.params.filesystemtype_in_assert = NULL;
+    nala_instance_p->data.params.filesystemtype_out_copy = NULL;
+    nala_set_param_init(&nala_instance_p->data.params.data_out);
+    nala_set_param_init(&nala_instance_p->data.params.data_in);
+    nala_instance_p->data.params.data_in_assert = NULL;
+    nala_instance_p->data.params.data_out_copy = NULL;
+    nala_instance_p->data.params.source = NULL;
+    nala_instance_p->data.params.ignore_source_in = true;
 
     if (source != NULL) {
-        nala_set_param_string(&_nala_instance_p->data.params.source_in,
+        nala_set_param_string(&nala_instance_p->data.params.source_in,
                               source);
     } else {
-        _nala_instance_p->data.params.ignore_source_in = false;
+        nala_instance_p->data.params.ignore_source_in = false;
     }
 
-    _nala_instance_p->data.params.target = NULL;
-    _nala_instance_p->data.params.ignore_target_in = true;
+    nala_instance_p->data.params.target = NULL;
+    nala_instance_p->data.params.ignore_target_in = true;
 
     if (target != NULL) {
-        nala_set_param_string(&_nala_instance_p->data.params.target_in,
+        nala_set_param_string(&nala_instance_p->data.params.target_in,
                               target);
     } else {
-        _nala_instance_p->data.params.ignore_target_in = false;
+        nala_instance_p->data.params.ignore_target_in = false;
     }
 
-    _nala_instance_p->data.params.filesystemtype = NULL;
-    _nala_instance_p->data.params.ignore_filesystemtype_in = true;
+    nala_instance_p->data.params.filesystemtype = NULL;
+    nala_instance_p->data.params.ignore_filesystemtype_in = true;
 
     if (filesystemtype != NULL) {
-        nala_set_param_string(&_nala_instance_p->data.params.filesystemtype_in,
+        nala_set_param_string(&nala_instance_p->data.params.filesystemtype_in,
                               filesystemtype);
     } else {
-        _nala_instance_p->data.params.ignore_filesystemtype_in = false;
+        nala_instance_p->data.params.ignore_filesystemtype_in = false;
     }
 
-    _nala_instance_p->data.params.data = NULL;
-    _nala_instance_p->data.params.ignore_data_in = true;
-    _nala_instance_p->data.params.mountflags = mountflags;
-    _nala_instance_p->data.params.ignore_mountflags_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    nala_instance_p->data.params.data = NULL;
+    nala_instance_p->data.params.ignore_data_in = true;
+    nala_instance_p->data.params.mountflags = mountflags;
+    nala_instance_p->data.params.ignore_mountflags_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_mount.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void mount_mock_ignore_in(int return_value)
@@ -9300,7 +9300,7 @@ void mount_mock_ignore_in(int return_value)
 
 int mount_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_mount *instance_p;
+    struct nala_instance_type_for_mount_t *instance_p;
 
     nala_state_for_mount.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -9350,7 +9350,7 @@ void mount_mock_set_callback(void (*callback)(const char *source, const char *ta
 
 struct nala_mount_params_t *mount_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_mount *instance_p;
+    struct nala_instance_type_for_mount_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_mount.instances, &instance_p, handle);
 
@@ -9393,27 +9393,27 @@ void mount_mock_set_source_in(const void *buf_p, size_t size)
 
 void mount_mock_set_source_in_assert(void (*callback)(const char *source, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_mount *_nala_params_p;
+    struct nala_data_params_for_mount_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_mount();
+    nala_params_p = nala_get_params_mount();
 
-    if (_nala_params_p->source_in.buf_p == NULL) {
+    if (nala_params_p->source_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "mount_mock_set_source_in() must be called "
                 "before mount_mock_set_source_in_assert().\n"));
     }
 
-    _nala_params_p->source_in_assert = callback;
+    nala_params_p->source_in_assert = callback;
 }
 
 void mount_mock_set_source_in_pointer(const char *source)
 {
-    struct _nala_data_params_for_mount *_nala_params_p;
+    struct nala_data_params_for_mount_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_mount();
-    _nala_params_p->ignore_source_in = false;
-    _nala_params_p->source = source;
+    nala_params_p = nala_get_params_mount();
+    nala_params_p->ignore_source_in = false;
+    nala_params_p->source = source;
 }
 
 void mount_mock_set_source_out(const void *buf_p, size_t size)
@@ -9437,27 +9437,27 @@ void mount_mock_set_target_in(const void *buf_p, size_t size)
 
 void mount_mock_set_target_in_assert(void (*callback)(const char *target, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_mount *_nala_params_p;
+    struct nala_data_params_for_mount_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_mount();
+    nala_params_p = nala_get_params_mount();
 
-    if (_nala_params_p->target_in.buf_p == NULL) {
+    if (nala_params_p->target_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "mount_mock_set_target_in() must be called "
                 "before mount_mock_set_target_in_assert().\n"));
     }
 
-    _nala_params_p->target_in_assert = callback;
+    nala_params_p->target_in_assert = callback;
 }
 
 void mount_mock_set_target_in_pointer(const char *target)
 {
-    struct _nala_data_params_for_mount *_nala_params_p;
+    struct nala_data_params_for_mount_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_mount();
-    _nala_params_p->ignore_target_in = false;
-    _nala_params_p->target = target;
+    nala_params_p = nala_get_params_mount();
+    nala_params_p->ignore_target_in = false;
+    nala_params_p->target = target;
 }
 
 void mount_mock_set_target_out(const void *buf_p, size_t size)
@@ -9481,27 +9481,27 @@ void mount_mock_set_filesystemtype_in(const void *buf_p, size_t size)
 
 void mount_mock_set_filesystemtype_in_assert(void (*callback)(const char *filesystemtype, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_mount *_nala_params_p;
+    struct nala_data_params_for_mount_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_mount();
+    nala_params_p = nala_get_params_mount();
 
-    if (_nala_params_p->filesystemtype_in.buf_p == NULL) {
+    if (nala_params_p->filesystemtype_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "mount_mock_set_filesystemtype_in() must be called "
                 "before mount_mock_set_filesystemtype_in_assert().\n"));
     }
 
-    _nala_params_p->filesystemtype_in_assert = callback;
+    nala_params_p->filesystemtype_in_assert = callback;
 }
 
 void mount_mock_set_filesystemtype_in_pointer(const char *filesystemtype)
 {
-    struct _nala_data_params_for_mount *_nala_params_p;
+    struct nala_data_params_for_mount_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_mount();
-    _nala_params_p->ignore_filesystemtype_in = false;
-    _nala_params_p->filesystemtype = filesystemtype;
+    nala_params_p = nala_get_params_mount();
+    nala_params_p->ignore_filesystemtype_in = false;
+    nala_params_p->filesystemtype = filesystemtype;
 }
 
 void mount_mock_set_filesystemtype_out(const void *buf_p, size_t size)
@@ -9525,27 +9525,27 @@ void mount_mock_set_data_in(const void *buf_p, size_t size)
 
 void mount_mock_set_data_in_assert(void (*callback)(const void *data, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_mount *_nala_params_p;
+    struct nala_data_params_for_mount_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_mount();
+    nala_params_p = nala_get_params_mount();
 
-    if (_nala_params_p->data_in.buf_p == NULL) {
+    if (nala_params_p->data_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "mount_mock_set_data_in() must be called "
                 "before mount_mock_set_data_in_assert().\n"));
     }
 
-    _nala_params_p->data_in_assert = callback;
+    nala_params_p->data_in_assert = callback;
 }
 
 void mount_mock_set_data_in_pointer(const void *data)
 {
-    struct _nala_data_params_for_mount *_nala_params_p;
+    struct nala_data_params_for_mount_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_mount();
-    _nala_params_p->ignore_data_in = false;
-    _nala_params_p->data = data;
+    nala_params_p = nala_get_params_mount();
+    nala_params_p->ignore_data_in = false;
+    nala_params_p->data = data;
 }
 
 void mount_mock_set_data_out(const void *buf_p, size_t size)
@@ -9581,7 +9581,7 @@ void mount_mock_real(void)
 
 void mount_mock_real_once(void)
 {
-    struct _nala_instance_type_for_mount *instance_p;
+    struct nala_instance_type_for_mount_t *instance_p;
 
     nala_state_for_mount.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -9601,8 +9601,8 @@ void mount_mock_resume(void)
 
 void mount_mock_reset(void)
 {
-    struct _nala_instance_type_for_mount *current_p;
-    struct _nala_instance_type_for_mount *tmp_p;
+    struct nala_instance_type_for_mount_t *current_p;
+    struct nala_instance_type_for_mount_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_mount, current_p, tmp_p);
 }
@@ -9624,7 +9624,7 @@ void mount_mock_assert_completed(void)
 
 void __real_output_message(const char *message);
 
-struct _nala_data_params_for_output_message {
+struct nala_data_params_for_output_message_t {
     const char *message;
     bool ignore_message_in;
     struct nala_set_param message_in;
@@ -9633,8 +9633,8 @@ struct _nala_data_params_for_output_message {
     void (*message_out_copy)(const char *message, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_output_message {
-    struct _nala_data_params_for_output_message params;
+struct nala_data_type_for_output_message_t {
+    struct nala_data_params_for_output_message_t params;
     int errno_value;
     void (*implementation)(const char *message);
     void (*callback)(const char *message);
@@ -9642,27 +9642,27 @@ struct _nala_data_type_for_output_message {
     struct nala_output_message_params_t params_in;
 };
 
-struct _nala_instance_type_for_output_message {
+struct nala_instance_type_for_output_message_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_output_message data;
-    struct _nala_instance_type_for_output_message *next_p;
+    struct nala_data_type_for_output_message_t data;
+    struct nala_instance_type_for_output_message_t *next_p;
 };
 
-struct _nala_instances_type_for_output_message {
-    struct _nala_instance_type_for_output_message *head_p;
-    struct _nala_instance_type_for_output_message *next_p;
-    struct _nala_instance_type_for_output_message *tail_p;
+struct nala_instances_type_for_output_message_t {
+    struct nala_instance_type_for_output_message_t *head_p;
+    struct nala_instance_type_for_output_message_t *next_p;
+    struct nala_instance_type_for_output_message_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_output_message {
+struct nala_state_type_for_output_message_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_output_message data;
-    struct _nala_instances_type_for_output_message instances;
+    struct nala_data_type_for_output_message_t data;
+    struct nala_instances_type_for_output_message_t instances;
 };
 
-static struct nala_state_type_for_output_message nala_state_for_output_message = {
+static struct nala_state_type_for_output_message_t nala_state_for_output_message = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -9678,7 +9678,7 @@ static struct nala_state_type_for_output_message nala_state_for_output_message =
     }
 };
 
-struct _nala_data_type_for_output_message *nala_get_data_output_message()
+struct nala_data_type_for_output_message_t *nala_get_data_output_message()
 {
     if (nala_state_for_output_message.instances.tail_p != NULL) {
         return (&nala_state_for_output_message.instances.tail_p->data);
@@ -9687,15 +9687,15 @@ struct _nala_data_type_for_output_message *nala_get_data_output_message()
     }
 }
 
-struct _nala_data_params_for_output_message *nala_get_params_output_message()
+struct nala_data_params_for_output_message_t *nala_get_params_output_message()
 {
     return (&nala_get_data_output_message()->params);
 }
 
 void __wrap_output_message(const char *message)
 {
-    struct _nala_instance_type_for_output_message *_nala_instance_p;
-    struct _nala_data_type_for_output_message *_nala_data_p;
+    struct nala_instance_type_for_output_message_t *nala_instance_p;
+    struct nala_data_type_for_output_message_t *nala_data_p;
 
     nala_print_call("output_message", &nala_state_for_output_message.state);
 
@@ -9704,33 +9704,33 @@ void __wrap_output_message(const char *message)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_output_message.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_output_message.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_output_message.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked output_message() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_output_message.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_output_message.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, output_message, message);
-            _nala_data_p->params_in.message = message;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, output_message, message);
+            nala_data_p->params_in.message = message;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        output_message,
                                        message);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(message);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(message);
             }
 
         } else {
@@ -9776,30 +9776,30 @@ void output_message_mock(const char *message)
 
 int output_message_mock_once(const char *message)
 {
-    struct _nala_instance_type_for_output_message *_nala_instance_p;
+    struct nala_instance_type_for_output_message_t *nala_instance_p;
 
     nala_state_for_output_message.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.message_out);
-    nala_set_param_init(&_nala_instance_p->data.params.message_in);
-    _nala_instance_p->data.params.message_in_assert = NULL;
-    _nala_instance_p->data.params.message_out_copy = NULL;
-    _nala_instance_p->data.params.message = NULL;
-    _nala_instance_p->data.params.ignore_message_in = true;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.message_out);
+    nala_set_param_init(&nala_instance_p->data.params.message_in);
+    nala_instance_p->data.params.message_in_assert = NULL;
+    nala_instance_p->data.params.message_out_copy = NULL;
+    nala_instance_p->data.params.message = NULL;
+    nala_instance_p->data.params.ignore_message_in = true;
 
     if (message != NULL) {
-        nala_set_param_string(&_nala_instance_p->data.params.message_in,
+        nala_set_param_string(&nala_instance_p->data.params.message_in,
                               message);
     } else {
-        _nala_instance_p->data.params.ignore_message_in = false;
+        nala_instance_p->data.params.ignore_message_in = false;
     }
 
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_output_message.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void output_message_mock_ignore_in(void)
@@ -9812,7 +9812,7 @@ void output_message_mock_ignore_in(void)
 
 int output_message_mock_ignore_in_once(void)
 {
-    struct _nala_instance_type_for_output_message *instance_p;
+    struct nala_instance_type_for_output_message_t *instance_p;
 
     nala_state_for_output_message.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -9842,7 +9842,7 @@ void output_message_mock_set_callback(void (*callback)(const char *message))
 
 struct nala_output_message_params_t *output_message_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_output_message *instance_p;
+    struct nala_instance_type_for_output_message_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_output_message.instances, &instance_p, handle);
 
@@ -9870,27 +9870,27 @@ void output_message_mock_set_message_in(const void *buf_p, size_t size)
 
 void output_message_mock_set_message_in_assert(void (*callback)(const char *message, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_output_message *_nala_params_p;
+    struct nala_data_params_for_output_message_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_output_message();
+    nala_params_p = nala_get_params_output_message();
 
-    if (_nala_params_p->message_in.buf_p == NULL) {
+    if (nala_params_p->message_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "output_message_mock_set_message_in() must be called "
                 "before output_message_mock_set_message_in_assert().\n"));
     }
 
-    _nala_params_p->message_in_assert = callback;
+    nala_params_p->message_in_assert = callback;
 }
 
 void output_message_mock_set_message_in_pointer(const char *message)
 {
-    struct _nala_data_params_for_output_message *_nala_params_p;
+    struct nala_data_params_for_output_message_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_output_message();
-    _nala_params_p->ignore_message_in = false;
-    _nala_params_p->message = message;
+    nala_params_p = nala_get_params_output_message();
+    nala_params_p->ignore_message_in = false;
+    nala_params_p->message = message;
 }
 
 void output_message_mock_set_message_out(const void *buf_p, size_t size)
@@ -9926,7 +9926,7 @@ void output_message_mock_real(void)
 
 void output_message_mock_real_once(void)
 {
-    struct _nala_instance_type_for_output_message *instance_p;
+    struct nala_instance_type_for_output_message_t *instance_p;
 
     nala_state_for_output_message.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -9946,8 +9946,8 @@ void output_message_mock_resume(void)
 
 void output_message_mock_reset(void)
 {
-    struct _nala_instance_type_for_output_message *current_p;
-    struct _nala_instance_type_for_output_message *tmp_p;
+    struct nala_instance_type_for_output_message_t *current_p;
+    struct nala_instance_type_for_output_message_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_output_message, current_p, tmp_p);
 }
@@ -9969,7 +9969,7 @@ void output_message_mock_assert_completed(void)
 
 int __real_pipe(int pipefd[2]);
 
-struct _nala_data_params_for_pipe {
+struct nala_data_params_for_pipe_t {
     int *pipefd;
     bool ignore_pipefd_in;
     struct nala_set_param pipefd_in;
@@ -9978,8 +9978,8 @@ struct _nala_data_params_for_pipe {
     void (*pipefd_out_copy)(int pipefd[2], const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_pipe {
-    struct _nala_data_params_for_pipe params;
+struct nala_data_type_for_pipe_t {
+    struct nala_data_params_for_pipe_t params;
     int return_value;
     int errno_value;
     int (*implementation)(int pipefd[2]);
@@ -9988,27 +9988,27 @@ struct _nala_data_type_for_pipe {
     struct nala_pipe_params_t params_in;
 };
 
-struct _nala_instance_type_for_pipe {
+struct nala_instance_type_for_pipe_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_pipe data;
-    struct _nala_instance_type_for_pipe *next_p;
+    struct nala_data_type_for_pipe_t data;
+    struct nala_instance_type_for_pipe_t *next_p;
 };
 
-struct _nala_instances_type_for_pipe {
-    struct _nala_instance_type_for_pipe *head_p;
-    struct _nala_instance_type_for_pipe *next_p;
-    struct _nala_instance_type_for_pipe *tail_p;
+struct nala_instances_type_for_pipe_t {
+    struct nala_instance_type_for_pipe_t *head_p;
+    struct nala_instance_type_for_pipe_t *next_p;
+    struct nala_instance_type_for_pipe_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_pipe {
+struct nala_state_type_for_pipe_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_pipe data;
-    struct _nala_instances_type_for_pipe instances;
+    struct nala_data_type_for_pipe_t data;
+    struct nala_instances_type_for_pipe_t instances;
 };
 
-static struct nala_state_type_for_pipe nala_state_for_pipe = {
+static struct nala_state_type_for_pipe_t nala_state_for_pipe = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -10024,7 +10024,7 @@ static struct nala_state_type_for_pipe nala_state_for_pipe = {
     }
 };
 
-struct _nala_data_type_for_pipe *nala_get_data_pipe()
+struct nala_data_type_for_pipe_t *nala_get_data_pipe()
 {
     if (nala_state_for_pipe.instances.tail_p != NULL) {
         return (&nala_state_for_pipe.instances.tail_p->data);
@@ -10033,15 +10033,15 @@ struct _nala_data_type_for_pipe *nala_get_data_pipe()
     }
 }
 
-struct _nala_data_params_for_pipe *nala_get_params_pipe()
+struct nala_data_params_for_pipe_t *nala_get_params_pipe()
 {
     return (&nala_get_data_pipe()->params);
 }
 
 int __wrap_pipe(int pipefd[2])
 {
-    struct _nala_instance_type_for_pipe *_nala_instance_p;
-    struct _nala_data_type_for_pipe *_nala_data_p;
+    struct nala_instance_type_for_pipe_t *nala_instance_p;
+    struct nala_data_type_for_pipe_t *nala_data_p;
     int return_value;
 
     nala_print_call("pipe", &nala_state_for_pipe.state);
@@ -10051,36 +10051,36 @@ int __wrap_pipe(int pipefd[2])
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_pipe.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_pipe.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_pipe.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked pipe() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_pipe.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_pipe.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, pipe, pipefd);
-            _nala_data_p->params_in.pipefd = pipefd;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, pipe, pipefd);
+            nala_data_p->params_in.pipefd = pipefd;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        pipe,
                                        pipefd);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(pipefd);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(pipefd);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_pipe(pipefd);
@@ -10120,23 +10120,23 @@ void pipe_mock(int return_value)
 
 int pipe_mock_once(int return_value)
 {
-    struct _nala_instance_type_for_pipe *_nala_instance_p;
+    struct nala_instance_type_for_pipe_t *nala_instance_p;
 
     nala_state_for_pipe.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.pipefd_out);
-    nala_set_param_init(&_nala_instance_p->data.params.pipefd_in);
-    _nala_instance_p->data.params.pipefd_in_assert = NULL;
-    _nala_instance_p->data.params.pipefd_out_copy = NULL;
-    _nala_instance_p->data.params.pipefd = NULL;
-    _nala_instance_p->data.params.ignore_pipefd_in = true;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.pipefd_out);
+    nala_set_param_init(&nala_instance_p->data.params.pipefd_in);
+    nala_instance_p->data.params.pipefd_in_assert = NULL;
+    nala_instance_p->data.params.pipefd_out_copy = NULL;
+    nala_instance_p->data.params.pipefd = NULL;
+    nala_instance_p->data.params.ignore_pipefd_in = true;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_pipe.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void pipe_mock_ignore_in(int return_value)
@@ -10150,7 +10150,7 @@ void pipe_mock_ignore_in(int return_value)
 
 int pipe_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_pipe *instance_p;
+    struct nala_instance_type_for_pipe_t *instance_p;
 
     nala_state_for_pipe.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -10181,7 +10181,7 @@ void pipe_mock_set_callback(void (*callback)(int pipefd[2]))
 
 struct nala_pipe_params_t *pipe_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_pipe *instance_p;
+    struct nala_instance_type_for_pipe_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_pipe.instances, &instance_p, handle);
 
@@ -10204,27 +10204,27 @@ void pipe_mock_set_pipefd_in(const void *buf_p, size_t size)
 
 void pipe_mock_set_pipefd_in_assert(void (*callback)(int pipefd[2], const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_pipe *_nala_params_p;
+    struct nala_data_params_for_pipe_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_pipe();
+    nala_params_p = nala_get_params_pipe();
 
-    if (_nala_params_p->pipefd_in.buf_p == NULL) {
+    if (nala_params_p->pipefd_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "pipe_mock_set_pipefd_in() must be called "
                 "before pipe_mock_set_pipefd_in_assert().\n"));
     }
 
-    _nala_params_p->pipefd_in_assert = callback;
+    nala_params_p->pipefd_in_assert = callback;
 }
 
 void pipe_mock_set_pipefd_in_pointer(int pipefd[2])
 {
-    struct _nala_data_params_for_pipe *_nala_params_p;
+    struct nala_data_params_for_pipe_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_pipe();
-    _nala_params_p->ignore_pipefd_in = false;
-    _nala_params_p->pipefd = pipefd;
+    nala_params_p = nala_get_params_pipe();
+    nala_params_p->ignore_pipefd_in = false;
+    nala_params_p->pipefd = pipefd;
 }
 
 void pipe_mock_set_pipefd_out(const void *buf_p, size_t size)
@@ -10260,7 +10260,7 @@ void pipe_mock_real(void)
 
 void pipe_mock_real_once(void)
 {
-    struct _nala_instance_type_for_pipe *instance_p;
+    struct nala_instance_type_for_pipe_t *instance_p;
 
     nala_state_for_pipe.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -10280,8 +10280,8 @@ void pipe_mock_resume(void)
 
 void pipe_mock_reset(void)
 {
-    struct _nala_instance_type_for_pipe *current_p;
-    struct _nala_instance_type_for_pipe *tmp_p;
+    struct nala_instance_type_for_pipe_t *current_p;
+    struct nala_instance_type_for_pipe_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_pipe, current_p, tmp_p);
 }
@@ -10303,7 +10303,7 @@ void pipe_mock_assert_completed(void)
 
 int __real_poll(struct pollfd *fds, nfds_t nfds, int timeout);
 
-struct _nala_data_params_for_poll {
+struct nala_data_params_for_poll_t {
     struct pollfd *fds;
     nfds_t nfds;
     int timeout;
@@ -10316,8 +10316,8 @@ struct _nala_data_params_for_poll {
     bool ignore_timeout_in;
 };
 
-struct _nala_data_type_for_poll {
-    struct _nala_data_params_for_poll params;
+struct nala_data_type_for_poll_t {
+    struct nala_data_params_for_poll_t params;
     int return_value;
     int errno_value;
     int (*implementation)(struct pollfd *fds, nfds_t nfds, int timeout);
@@ -10326,27 +10326,27 @@ struct _nala_data_type_for_poll {
     struct nala_poll_params_t params_in;
 };
 
-struct _nala_instance_type_for_poll {
+struct nala_instance_type_for_poll_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_poll data;
-    struct _nala_instance_type_for_poll *next_p;
+    struct nala_data_type_for_poll_t data;
+    struct nala_instance_type_for_poll_t *next_p;
 };
 
-struct _nala_instances_type_for_poll {
-    struct _nala_instance_type_for_poll *head_p;
-    struct _nala_instance_type_for_poll *next_p;
-    struct _nala_instance_type_for_poll *tail_p;
+struct nala_instances_type_for_poll_t {
+    struct nala_instance_type_for_poll_t *head_p;
+    struct nala_instance_type_for_poll_t *next_p;
+    struct nala_instance_type_for_poll_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_poll {
+struct nala_state_type_for_poll_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_poll data;
-    struct _nala_instances_type_for_poll instances;
+    struct nala_data_type_for_poll_t data;
+    struct nala_instances_type_for_poll_t instances;
 };
 
-static struct nala_state_type_for_poll nala_state_for_poll = {
+static struct nala_state_type_for_poll_t nala_state_for_poll = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -10362,7 +10362,7 @@ static struct nala_state_type_for_poll nala_state_for_poll = {
     }
 };
 
-struct _nala_data_type_for_poll *nala_get_data_poll()
+struct nala_data_type_for_poll_t *nala_get_data_poll()
 {
     if (nala_state_for_poll.instances.tail_p != NULL) {
         return (&nala_state_for_poll.instances.tail_p->data);
@@ -10371,15 +10371,15 @@ struct _nala_data_type_for_poll *nala_get_data_poll()
     }
 }
 
-struct _nala_data_params_for_poll *nala_get_params_poll()
+struct nala_data_params_for_poll_t *nala_get_params_poll()
 {
     return (&nala_get_data_poll()->params);
 }
 
 int __wrap_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
-    struct _nala_instance_type_for_poll *_nala_instance_p;
-    struct _nala_data_type_for_poll *_nala_data_p;
+    struct nala_instance_type_for_poll_t *nala_instance_p;
+    struct nala_data_type_for_poll_t *nala_data_p;
     int return_value;
 
     nala_print_call("poll", &nala_state_for_poll.state);
@@ -10389,40 +10389,40 @@ int __wrap_poll(struct pollfd *fds, nfds_t nfds, int timeout)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_poll.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_poll.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_poll.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked poll() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_poll.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_poll.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, poll, fds);
-            _nala_data_p->params_in.fds = fds;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, poll, nfds);
-            _nala_data_p->params_in.nfds = nfds;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, poll, timeout);
-            _nala_data_p->params_in.timeout = timeout;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, poll, fds);
+            nala_data_p->params_in.fds = fds;
+            MOCK_ASSERT_IN_EQ(nala_data_p, poll, nfds);
+            nala_data_p->params_in.nfds = nfds;
+            MOCK_ASSERT_IN_EQ(nala_data_p, poll, timeout);
+            nala_data_p->params_in.timeout = timeout;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_in_struct_pollfd,
                                        poll,
                                        fds);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(fds, nfds, timeout);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(fds, nfds, timeout);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_poll(fds, nfds, timeout);
@@ -10466,27 +10466,27 @@ void poll_mock(nfds_t nfds, int timeout, int return_value)
 
 int poll_mock_once(nfds_t nfds, int timeout, int return_value)
 {
-    struct _nala_instance_type_for_poll *_nala_instance_p;
+    struct nala_instance_type_for_poll_t *nala_instance_p;
 
     nala_state_for_poll.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.fds_out);
-    nala_set_param_init(&_nala_instance_p->data.params.fds_in);
-    _nala_instance_p->data.params.fds_in_assert = NULL;
-    _nala_instance_p->data.params.fds_out_copy = NULL;
-    _nala_instance_p->data.params.fds = NULL;
-    _nala_instance_p->data.params.ignore_fds_in = true;
-    _nala_instance_p->data.params.nfds = nfds;
-    _nala_instance_p->data.params.ignore_nfds_in = false;
-    _nala_instance_p->data.params.timeout = timeout;
-    _nala_instance_p->data.params.ignore_timeout_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.fds_out);
+    nala_set_param_init(&nala_instance_p->data.params.fds_in);
+    nala_instance_p->data.params.fds_in_assert = NULL;
+    nala_instance_p->data.params.fds_out_copy = NULL;
+    nala_instance_p->data.params.fds = NULL;
+    nala_instance_p->data.params.ignore_fds_in = true;
+    nala_instance_p->data.params.nfds = nfds;
+    nala_instance_p->data.params.ignore_nfds_in = false;
+    nala_instance_p->data.params.timeout = timeout;
+    nala_instance_p->data.params.ignore_timeout_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_poll.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void poll_mock_ignore_in(int return_value)
@@ -10502,7 +10502,7 @@ void poll_mock_ignore_in(int return_value)
 
 int poll_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_poll *instance_p;
+    struct nala_instance_type_for_poll_t *instance_p;
 
     nala_state_for_poll.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -10535,7 +10535,7 @@ void poll_mock_set_callback(void (*callback)(struct pollfd *fds, nfds_t nfds, in
 
 struct nala_poll_params_t *poll_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_poll *instance_p;
+    struct nala_instance_type_for_poll_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_poll.instances, &instance_p, handle);
 
@@ -10568,27 +10568,27 @@ void poll_mock_set_fds_in(const void *buf_p, size_t size)
 
 void poll_mock_set_fds_in_assert(void (*callback)(struct pollfd *fds, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_poll *_nala_params_p;
+    struct nala_data_params_for_poll_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_poll();
+    nala_params_p = nala_get_params_poll();
 
-    if (_nala_params_p->fds_in.buf_p == NULL) {
+    if (nala_params_p->fds_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "poll_mock_set_fds_in() must be called "
                 "before poll_mock_set_fds_in_assert().\n"));
     }
 
-    _nala_params_p->fds_in_assert = callback;
+    nala_params_p->fds_in_assert = callback;
 }
 
 void poll_mock_set_fds_in_pointer(struct pollfd *fds)
 {
-    struct _nala_data_params_for_poll *_nala_params_p;
+    struct nala_data_params_for_poll_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_poll();
-    _nala_params_p->ignore_fds_in = false;
-    _nala_params_p->fds = fds;
+    nala_params_p = nala_get_params_poll();
+    nala_params_p->ignore_fds_in = false;
+    nala_params_p->fds = fds;
 }
 
 void poll_mock_set_fds_out(const void *buf_p, size_t size)
@@ -10624,7 +10624,7 @@ void poll_mock_real(void)
 
 void poll_mock_real_once(void)
 {
-    struct _nala_instance_type_for_poll *instance_p;
+    struct nala_instance_type_for_poll_t *instance_p;
 
     nala_state_for_poll.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -10644,8 +10644,8 @@ void poll_mock_resume(void)
 
 void poll_mock_reset(void)
 {
-    struct _nala_instance_type_for_poll *current_p;
-    struct _nala_instance_type_for_poll *tmp_p;
+    struct nala_instance_type_for_poll_t *current_p;
+    struct nala_instance_type_for_poll_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_poll, current_p, tmp_p);
 }
@@ -10667,12 +10667,12 @@ void poll_mock_assert_completed(void)
 
 void __real_print_hello();
 
-struct _nala_data_params_for_print_hello {
+struct nala_data_params_for_print_hello_t {
     int dummy;
 };
 
-struct _nala_data_type_for_print_hello {
-    struct _nala_data_params_for_print_hello params;
+struct nala_data_type_for_print_hello_t {
+    struct nala_data_params_for_print_hello_t params;
     int errno_value;
     void (*implementation)();
     void (*callback)();
@@ -10680,27 +10680,27 @@ struct _nala_data_type_for_print_hello {
     struct nala_print_hello_params_t params_in;
 };
 
-struct _nala_instance_type_for_print_hello {
+struct nala_instance_type_for_print_hello_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_print_hello data;
-    struct _nala_instance_type_for_print_hello *next_p;
+    struct nala_data_type_for_print_hello_t data;
+    struct nala_instance_type_for_print_hello_t *next_p;
 };
 
-struct _nala_instances_type_for_print_hello {
-    struct _nala_instance_type_for_print_hello *head_p;
-    struct _nala_instance_type_for_print_hello *next_p;
-    struct _nala_instance_type_for_print_hello *tail_p;
+struct nala_instances_type_for_print_hello_t {
+    struct nala_instance_type_for_print_hello_t *head_p;
+    struct nala_instance_type_for_print_hello_t *next_p;
+    struct nala_instance_type_for_print_hello_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_print_hello {
+struct nala_state_type_for_print_hello_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_print_hello data;
-    struct _nala_instances_type_for_print_hello instances;
+    struct nala_data_type_for_print_hello_t data;
+    struct nala_instances_type_for_print_hello_t instances;
 };
 
-static struct nala_state_type_for_print_hello nala_state_for_print_hello = {
+static struct nala_state_type_for_print_hello_t nala_state_for_print_hello = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -10716,7 +10716,7 @@ static struct nala_state_type_for_print_hello nala_state_for_print_hello = {
     }
 };
 
-struct _nala_data_type_for_print_hello *nala_get_data_print_hello()
+struct nala_data_type_for_print_hello_t *nala_get_data_print_hello()
 {
     if (nala_state_for_print_hello.instances.tail_p != NULL) {
         return (&nala_state_for_print_hello.instances.tail_p->data);
@@ -10725,15 +10725,15 @@ struct _nala_data_type_for_print_hello *nala_get_data_print_hello()
     }
 }
 
-struct _nala_data_params_for_print_hello *nala_get_params_print_hello()
+struct nala_data_params_for_print_hello_t *nala_get_params_print_hello()
 {
     return (&nala_get_data_print_hello()->params);
 }
 
 void __wrap_print_hello()
 {
-    struct _nala_instance_type_for_print_hello *_nala_instance_p;
-    struct _nala_data_type_for_print_hello *_nala_data_p;
+    struct nala_instance_type_for_print_hello_t *nala_instance_p;
+    struct nala_data_type_for_print_hello_t *nala_data_p;
 
     nala_print_call("print_hello", &nala_state_for_print_hello.state);
 
@@ -10742,26 +10742,26 @@ void __wrap_print_hello()
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_print_hello.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_print_hello.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_print_hello.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked print_hello() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_print_hello.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_print_hello.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback();
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback();
             }
 
         } else {
@@ -10797,16 +10797,16 @@ void print_hello_mock()
 
 int print_hello_mock_once()
 {
-    struct _nala_instance_type_for_print_hello *_nala_instance_p;
+    struct nala_instance_type_for_print_hello_t *nala_instance_p;
 
     nala_state_for_print_hello.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_print_hello.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void print_hello_mock_ignore_in(void)
@@ -10818,7 +10818,7 @@ void print_hello_mock_ignore_in(void)
 
 int print_hello_mock_ignore_in_once(void)
 {
-    struct _nala_instance_type_for_print_hello *instance_p;
+    struct nala_instance_type_for_print_hello_t *instance_p;
 
     nala_state_for_print_hello.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -10842,7 +10842,7 @@ void print_hello_mock_set_callback(void (*callback)())
 
 struct nala_print_hello_params_t *print_hello_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_print_hello *instance_p;
+    struct nala_instance_type_for_print_hello_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_print_hello.instances, &instance_p, handle);
 
@@ -10877,7 +10877,7 @@ void print_hello_mock_real(void)
 
 void print_hello_mock_real_once(void)
 {
-    struct _nala_instance_type_for_print_hello *instance_p;
+    struct nala_instance_type_for_print_hello_t *instance_p;
 
     nala_state_for_print_hello.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -10897,8 +10897,8 @@ void print_hello_mock_resume(void)
 
 void print_hello_mock_reset(void)
 {
-    struct _nala_instance_type_for_print_hello *current_p;
-    struct _nala_instance_type_for_print_hello *tmp_p;
+    struct nala_instance_type_for_print_hello_t *current_p;
+    struct nala_instance_type_for_print_hello_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_print_hello, current_p, tmp_p);
 }
@@ -10920,7 +10920,7 @@ void print_hello_mock_assert_completed(void)
 
 ssize_t __real_read(int fd, void *buf, size_t count);
 
-struct _nala_data_params_for_read {
+struct nala_data_params_for_read_t {
     int fd;
     void *buf;
     size_t count;
@@ -10933,8 +10933,8 @@ struct _nala_data_params_for_read {
     bool ignore_count_in;
 };
 
-struct _nala_data_type_for_read {
-    struct _nala_data_params_for_read params;
+struct nala_data_type_for_read_t {
+    struct nala_data_params_for_read_t params;
     ssize_t return_value;
     int errno_value;
     ssize_t (*implementation)(int fd, void *buf, size_t count);
@@ -10943,27 +10943,27 @@ struct _nala_data_type_for_read {
     struct nala_read_params_t params_in;
 };
 
-struct _nala_instance_type_for_read {
+struct nala_instance_type_for_read_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_read data;
-    struct _nala_instance_type_for_read *next_p;
+    struct nala_data_type_for_read_t data;
+    struct nala_instance_type_for_read_t *next_p;
 };
 
-struct _nala_instances_type_for_read {
-    struct _nala_instance_type_for_read *head_p;
-    struct _nala_instance_type_for_read *next_p;
-    struct _nala_instance_type_for_read *tail_p;
+struct nala_instances_type_for_read_t {
+    struct nala_instance_type_for_read_t *head_p;
+    struct nala_instance_type_for_read_t *next_p;
+    struct nala_instance_type_for_read_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_read {
+struct nala_state_type_for_read_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_read data;
-    struct _nala_instances_type_for_read instances;
+    struct nala_data_type_for_read_t data;
+    struct nala_instances_type_for_read_t instances;
 };
 
-static struct nala_state_type_for_read nala_state_for_read = {
+static struct nala_state_type_for_read_t nala_state_for_read = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -10979,7 +10979,7 @@ static struct nala_state_type_for_read nala_state_for_read = {
     }
 };
 
-struct _nala_data_type_for_read *nala_get_data_read()
+struct nala_data_type_for_read_t *nala_get_data_read()
 {
     if (nala_state_for_read.instances.tail_p != NULL) {
         return (&nala_state_for_read.instances.tail_p->data);
@@ -10988,15 +10988,15 @@ struct _nala_data_type_for_read *nala_get_data_read()
     }
 }
 
-struct _nala_data_params_for_read *nala_get_params_read()
+struct nala_data_params_for_read_t *nala_get_params_read()
 {
     return (&nala_get_data_read()->params);
 }
 
 ssize_t __wrap_read(int fd, void *buf, size_t count)
 {
-    struct _nala_instance_type_for_read *_nala_instance_p;
-    struct _nala_data_type_for_read *_nala_data_p;
+    struct nala_instance_type_for_read_t *nala_instance_p;
+    struct nala_data_type_for_read_t *nala_data_p;
     ssize_t return_value;
 
     nala_print_call("read", &nala_state_for_read.state);
@@ -11006,40 +11006,40 @@ ssize_t __wrap_read(int fd, void *buf, size_t count)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_read.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_read.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_read.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked read() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_read.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_read.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, read, buf);
-            _nala_data_p->params_in.buf = buf;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, read, fd);
-            _nala_data_p->params_in.fd = fd;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, read, count);
-            _nala_data_p->params_in.count = count;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, read, buf);
+            nala_data_p->params_in.buf = buf;
+            MOCK_ASSERT_IN_EQ(nala_data_p, read, fd);
+            nala_data_p->params_in.fd = fd;
+            MOCK_ASSERT_IN_EQ(nala_data_p, read, count);
+            nala_data_p->params_in.count = count;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        read,
                                        buf);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(fd, buf, count);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(fd, buf, count);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_read(fd, buf, count);
@@ -11083,27 +11083,27 @@ void read_mock(int fd, size_t count, ssize_t return_value)
 
 int read_mock_once(int fd, size_t count, ssize_t return_value)
 {
-    struct _nala_instance_type_for_read *_nala_instance_p;
+    struct nala_instance_type_for_read_t *nala_instance_p;
 
     nala_state_for_read.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.buf_out);
-    nala_set_param_init(&_nala_instance_p->data.params.buf_in);
-    _nala_instance_p->data.params.buf_in_assert = NULL;
-    _nala_instance_p->data.params.buf_out_copy = NULL;
-    _nala_instance_p->data.params.buf = NULL;
-    _nala_instance_p->data.params.ignore_buf_in = true;
-    _nala_instance_p->data.params.fd = fd;
-    _nala_instance_p->data.params.ignore_fd_in = false;
-    _nala_instance_p->data.params.count = count;
-    _nala_instance_p->data.params.ignore_count_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.buf_out);
+    nala_set_param_init(&nala_instance_p->data.params.buf_in);
+    nala_instance_p->data.params.buf_in_assert = NULL;
+    nala_instance_p->data.params.buf_out_copy = NULL;
+    nala_instance_p->data.params.buf = NULL;
+    nala_instance_p->data.params.ignore_buf_in = true;
+    nala_instance_p->data.params.fd = fd;
+    nala_instance_p->data.params.ignore_fd_in = false;
+    nala_instance_p->data.params.count = count;
+    nala_instance_p->data.params.ignore_count_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_read.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void read_mock_ignore_in(ssize_t return_value)
@@ -11119,7 +11119,7 @@ void read_mock_ignore_in(ssize_t return_value)
 
 int read_mock_ignore_in_once(ssize_t return_value)
 {
-    struct _nala_instance_type_for_read *instance_p;
+    struct nala_instance_type_for_read_t *instance_p;
 
     nala_state_for_read.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -11152,7 +11152,7 @@ void read_mock_set_callback(void (*callback)(int fd, void *buf, size_t count))
 
 struct nala_read_params_t *read_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_read *instance_p;
+    struct nala_instance_type_for_read_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_read.instances, &instance_p, handle);
 
@@ -11185,27 +11185,27 @@ void read_mock_set_buf_in(const void *buf_p, size_t size)
 
 void read_mock_set_buf_in_assert(void (*callback)(void *buf, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_read *_nala_params_p;
+    struct nala_data_params_for_read_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_read();
+    nala_params_p = nala_get_params_read();
 
-    if (_nala_params_p->buf_in.buf_p == NULL) {
+    if (nala_params_p->buf_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "read_mock_set_buf_in() must be called "
                 "before read_mock_set_buf_in_assert().\n"));
     }
 
-    _nala_params_p->buf_in_assert = callback;
+    nala_params_p->buf_in_assert = callback;
 }
 
 void read_mock_set_buf_in_pointer(void *buf)
 {
-    struct _nala_data_params_for_read *_nala_params_p;
+    struct nala_data_params_for_read_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_read();
-    _nala_params_p->ignore_buf_in = false;
-    _nala_params_p->buf = buf;
+    nala_params_p = nala_get_params_read();
+    nala_params_p->ignore_buf_in = false;
+    nala_params_p->buf = buf;
 }
 
 void read_mock_set_buf_out(const void *buf_p, size_t size)
@@ -11241,7 +11241,7 @@ void read_mock_real(void)
 
 void read_mock_real_once(void)
 {
-    struct _nala_instance_type_for_read *instance_p;
+    struct nala_instance_type_for_read_t *instance_p;
 
     nala_state_for_read.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -11261,8 +11261,8 @@ void read_mock_resume(void)
 
 void read_mock_reset(void)
 {
-    struct _nala_instance_type_for_read *current_p;
-    struct _nala_instance_type_for_read *tmp_p;
+    struct nala_instance_type_for_read_t *current_p;
+    struct nala_instance_type_for_read_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_read, current_p, tmp_p);
 }
@@ -11284,7 +11284,7 @@ void read_mock_assert_completed(void)
 
 ssize_t __real_sendto(int sockfd, const void *buf, size_t len, int flags, const struct sockaddr *dest_addr, socklen_t addrlen);
 
-struct _nala_data_params_for_sendto {
+struct nala_data_params_for_sendto_t {
     int sockfd;
     const void *buf;
     size_t len;
@@ -11307,8 +11307,8 @@ struct _nala_data_params_for_sendto {
     bool ignore_addrlen_in;
 };
 
-struct _nala_data_type_for_sendto {
-    struct _nala_data_params_for_sendto params;
+struct nala_data_type_for_sendto_t {
+    struct nala_data_params_for_sendto_t params;
     ssize_t return_value;
     int errno_value;
     ssize_t (*implementation)(int sockfd, const void *buf, size_t len, int flags, const struct sockaddr *dest_addr, socklen_t addrlen);
@@ -11317,27 +11317,27 @@ struct _nala_data_type_for_sendto {
     struct nala_sendto_params_t params_in;
 };
 
-struct _nala_instance_type_for_sendto {
+struct nala_instance_type_for_sendto_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_sendto data;
-    struct _nala_instance_type_for_sendto *next_p;
+    struct nala_data_type_for_sendto_t data;
+    struct nala_instance_type_for_sendto_t *next_p;
 };
 
-struct _nala_instances_type_for_sendto {
-    struct _nala_instance_type_for_sendto *head_p;
-    struct _nala_instance_type_for_sendto *next_p;
-    struct _nala_instance_type_for_sendto *tail_p;
+struct nala_instances_type_for_sendto_t {
+    struct nala_instance_type_for_sendto_t *head_p;
+    struct nala_instance_type_for_sendto_t *next_p;
+    struct nala_instance_type_for_sendto_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_sendto {
+struct nala_state_type_for_sendto_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_sendto data;
-    struct _nala_instances_type_for_sendto instances;
+    struct nala_data_type_for_sendto_t data;
+    struct nala_instances_type_for_sendto_t instances;
 };
 
-static struct nala_state_type_for_sendto nala_state_for_sendto = {
+static struct nala_state_type_for_sendto_t nala_state_for_sendto = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -11353,7 +11353,7 @@ static struct nala_state_type_for_sendto nala_state_for_sendto = {
     }
 };
 
-struct _nala_data_type_for_sendto *nala_get_data_sendto()
+struct nala_data_type_for_sendto_t *nala_get_data_sendto()
 {
     if (nala_state_for_sendto.instances.tail_p != NULL) {
         return (&nala_state_for_sendto.instances.tail_p->data);
@@ -11362,15 +11362,15 @@ struct _nala_data_type_for_sendto *nala_get_data_sendto()
     }
 }
 
-struct _nala_data_params_for_sendto *nala_get_params_sendto()
+struct nala_data_params_for_sendto_t *nala_get_params_sendto()
 {
     return (&nala_get_data_sendto()->params);
 }
 
 ssize_t __wrap_sendto(int sockfd, const void *buf, size_t len, int flags, const struct sockaddr *dest_addr, socklen_t addrlen)
 {
-    struct _nala_instance_type_for_sendto *_nala_instance_p;
-    struct _nala_data_type_for_sendto *_nala_data_p;
+    struct nala_instance_type_for_sendto_t *nala_instance_p;
+    struct nala_data_type_for_sendto_t *nala_data_p;
     ssize_t return_value;
 
     nala_print_call("sendto", &nala_state_for_sendto.state);
@@ -11380,51 +11380,51 @@ ssize_t __wrap_sendto(int sockfd, const void *buf, size_t len, int flags, const 
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_sendto.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_sendto.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_sendto.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked sendto() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_sendto.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_sendto.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, sendto, buf);
-            _nala_data_p->params_in.buf = buf;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, sendto, dest_addr);
-            _nala_data_p->params_in.dest_addr = dest_addr;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, sendto, sockfd);
-            _nala_data_p->params_in.sockfd = sockfd;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, sendto, len);
-            _nala_data_p->params_in.len = len;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, sendto, flags);
-            _nala_data_p->params_in.flags = flags;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, sendto, addrlen);
-            _nala_data_p->params_in.addrlen = addrlen;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, sendto, buf);
+            nala_data_p->params_in.buf = buf;
+            MOCK_ASSERT_IN_EQ(nala_data_p, sendto, dest_addr);
+            nala_data_p->params_in.dest_addr = dest_addr;
+            MOCK_ASSERT_IN_EQ(nala_data_p, sendto, sockfd);
+            nala_data_p->params_in.sockfd = sockfd;
+            MOCK_ASSERT_IN_EQ(nala_data_p, sendto, len);
+            nala_data_p->params_in.len = len;
+            MOCK_ASSERT_IN_EQ(nala_data_p, sendto, flags);
+            nala_data_p->params_in.flags = flags;
+            MOCK_ASSERT_IN_EQ(nala_data_p, sendto, addrlen);
+            nala_data_p->params_in.addrlen = addrlen;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        sendto,
                                        buf);
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_in_struct_sockaddr,
                                        sendto,
                                        dest_addr);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(sockfd, buf, len, flags, dest_addr, addrlen);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(sockfd, buf, len, flags, dest_addr, addrlen);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_sendto(sockfd, buf, len, flags, dest_addr, addrlen);
@@ -11474,37 +11474,37 @@ void sendto_mock(int sockfd, size_t len, int flags, socklen_t addrlen, ssize_t r
 
 int sendto_mock_once(int sockfd, size_t len, int flags, socklen_t addrlen, ssize_t return_value)
 {
-    struct _nala_instance_type_for_sendto *_nala_instance_p;
+    struct nala_instance_type_for_sendto_t *nala_instance_p;
 
     nala_state_for_sendto.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.buf_out);
-    nala_set_param_init(&_nala_instance_p->data.params.buf_in);
-    _nala_instance_p->data.params.buf_in_assert = NULL;
-    _nala_instance_p->data.params.buf_out_copy = NULL;
-    nala_set_param_init(&_nala_instance_p->data.params.dest_addr_out);
-    nala_set_param_init(&_nala_instance_p->data.params.dest_addr_in);
-    _nala_instance_p->data.params.dest_addr_in_assert = NULL;
-    _nala_instance_p->data.params.dest_addr_out_copy = NULL;
-    _nala_instance_p->data.params.buf = NULL;
-    _nala_instance_p->data.params.ignore_buf_in = true;
-    _nala_instance_p->data.params.dest_addr = NULL;
-    _nala_instance_p->data.params.ignore_dest_addr_in = true;
-    _nala_instance_p->data.params.sockfd = sockfd;
-    _nala_instance_p->data.params.ignore_sockfd_in = false;
-    _nala_instance_p->data.params.len = len;
-    _nala_instance_p->data.params.ignore_len_in = false;
-    _nala_instance_p->data.params.flags = flags;
-    _nala_instance_p->data.params.ignore_flags_in = false;
-    _nala_instance_p->data.params.addrlen = addrlen;
-    _nala_instance_p->data.params.ignore_addrlen_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.buf_out);
+    nala_set_param_init(&nala_instance_p->data.params.buf_in);
+    nala_instance_p->data.params.buf_in_assert = NULL;
+    nala_instance_p->data.params.buf_out_copy = NULL;
+    nala_set_param_init(&nala_instance_p->data.params.dest_addr_out);
+    nala_set_param_init(&nala_instance_p->data.params.dest_addr_in);
+    nala_instance_p->data.params.dest_addr_in_assert = NULL;
+    nala_instance_p->data.params.dest_addr_out_copy = NULL;
+    nala_instance_p->data.params.buf = NULL;
+    nala_instance_p->data.params.ignore_buf_in = true;
+    nala_instance_p->data.params.dest_addr = NULL;
+    nala_instance_p->data.params.ignore_dest_addr_in = true;
+    nala_instance_p->data.params.sockfd = sockfd;
+    nala_instance_p->data.params.ignore_sockfd_in = false;
+    nala_instance_p->data.params.len = len;
+    nala_instance_p->data.params.ignore_len_in = false;
+    nala_instance_p->data.params.flags = flags;
+    nala_instance_p->data.params.ignore_flags_in = false;
+    nala_instance_p->data.params.addrlen = addrlen;
+    nala_instance_p->data.params.ignore_addrlen_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_sendto.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void sendto_mock_ignore_in(ssize_t return_value)
@@ -11523,7 +11523,7 @@ void sendto_mock_ignore_in(ssize_t return_value)
 
 int sendto_mock_ignore_in_once(ssize_t return_value)
 {
-    struct _nala_instance_type_for_sendto *instance_p;
+    struct nala_instance_type_for_sendto_t *instance_p;
 
     nala_state_for_sendto.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -11564,7 +11564,7 @@ void sendto_mock_set_callback(void (*callback)(int sockfd, const void *buf, size
 
 struct nala_sendto_params_t *sendto_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_sendto *instance_p;
+    struct nala_instance_type_for_sendto_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_sendto.instances, &instance_p, handle);
 
@@ -11607,27 +11607,27 @@ void sendto_mock_set_buf_in(const void *buf_p, size_t size)
 
 void sendto_mock_set_buf_in_assert(void (*callback)(const void *buf, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_sendto *_nala_params_p;
+    struct nala_data_params_for_sendto_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_sendto();
+    nala_params_p = nala_get_params_sendto();
 
-    if (_nala_params_p->buf_in.buf_p == NULL) {
+    if (nala_params_p->buf_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "sendto_mock_set_buf_in() must be called "
                 "before sendto_mock_set_buf_in_assert().\n"));
     }
 
-    _nala_params_p->buf_in_assert = callback;
+    nala_params_p->buf_in_assert = callback;
 }
 
 void sendto_mock_set_buf_in_pointer(const void *buf)
 {
-    struct _nala_data_params_for_sendto *_nala_params_p;
+    struct nala_data_params_for_sendto_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_sendto();
-    _nala_params_p->ignore_buf_in = false;
-    _nala_params_p->buf = buf;
+    nala_params_p = nala_get_params_sendto();
+    nala_params_p->ignore_buf_in = false;
+    nala_params_p->buf = buf;
 }
 
 void sendto_mock_set_buf_out(const void *buf_p, size_t size)
@@ -11651,27 +11651,27 @@ void sendto_mock_set_dest_addr_in(const void *buf_p, size_t size)
 
 void sendto_mock_set_dest_addr_in_assert(void (*callback)(const struct sockaddr *dest_addr, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_sendto *_nala_params_p;
+    struct nala_data_params_for_sendto_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_sendto();
+    nala_params_p = nala_get_params_sendto();
 
-    if (_nala_params_p->dest_addr_in.buf_p == NULL) {
+    if (nala_params_p->dest_addr_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "sendto_mock_set_dest_addr_in() must be called "
                 "before sendto_mock_set_dest_addr_in_assert().\n"));
     }
 
-    _nala_params_p->dest_addr_in_assert = callback;
+    nala_params_p->dest_addr_in_assert = callback;
 }
 
 void sendto_mock_set_dest_addr_in_pointer(const struct sockaddr *dest_addr)
 {
-    struct _nala_data_params_for_sendto *_nala_params_p;
+    struct nala_data_params_for_sendto_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_sendto();
-    _nala_params_p->ignore_dest_addr_in = false;
-    _nala_params_p->dest_addr = dest_addr;
+    nala_params_p = nala_get_params_sendto();
+    nala_params_p->ignore_dest_addr_in = false;
+    nala_params_p->dest_addr = dest_addr;
 }
 
 void sendto_mock_set_dest_addr_out(const void *buf_p, size_t size)
@@ -11707,7 +11707,7 @@ void sendto_mock_real(void)
 
 void sendto_mock_real_once(void)
 {
-    struct _nala_instance_type_for_sendto *instance_p;
+    struct nala_instance_type_for_sendto_t *instance_p;
 
     nala_state_for_sendto.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -11727,8 +11727,8 @@ void sendto_mock_resume(void)
 
 void sendto_mock_reset(void)
 {
-    struct _nala_instance_type_for_sendto *current_p;
-    struct _nala_instance_type_for_sendto *tmp_p;
+    struct nala_instance_type_for_sendto_t *current_p;
+    struct nala_instance_type_for_sendto_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_sendto, current_p, tmp_p);
 }
@@ -11750,7 +11750,7 @@ void sendto_mock_assert_completed(void)
 
 int __real_setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen);
 
-struct _nala_data_params_for_setsockopt {
+struct nala_data_params_for_setsockopt_t {
     int sockfd;
     int level;
     int optname;
@@ -11767,8 +11767,8 @@ struct _nala_data_params_for_setsockopt {
     bool ignore_optlen_in;
 };
 
-struct _nala_data_type_for_setsockopt {
-    struct _nala_data_params_for_setsockopt params;
+struct nala_data_type_for_setsockopt_t {
+    struct nala_data_params_for_setsockopt_t params;
     int return_value;
     int errno_value;
     int (*implementation)(int sockfd, int level, int optname, const void *optval, socklen_t optlen);
@@ -11777,27 +11777,27 @@ struct _nala_data_type_for_setsockopt {
     struct nala_setsockopt_params_t params_in;
 };
 
-struct _nala_instance_type_for_setsockopt {
+struct nala_instance_type_for_setsockopt_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_setsockopt data;
-    struct _nala_instance_type_for_setsockopt *next_p;
+    struct nala_data_type_for_setsockopt_t data;
+    struct nala_instance_type_for_setsockopt_t *next_p;
 };
 
-struct _nala_instances_type_for_setsockopt {
-    struct _nala_instance_type_for_setsockopt *head_p;
-    struct _nala_instance_type_for_setsockopt *next_p;
-    struct _nala_instance_type_for_setsockopt *tail_p;
+struct nala_instances_type_for_setsockopt_t {
+    struct nala_instance_type_for_setsockopt_t *head_p;
+    struct nala_instance_type_for_setsockopt_t *next_p;
+    struct nala_instance_type_for_setsockopt_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_setsockopt {
+struct nala_state_type_for_setsockopt_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_setsockopt data;
-    struct _nala_instances_type_for_setsockopt instances;
+    struct nala_data_type_for_setsockopt_t data;
+    struct nala_instances_type_for_setsockopt_t instances;
 };
 
-static struct nala_state_type_for_setsockopt nala_state_for_setsockopt = {
+static struct nala_state_type_for_setsockopt_t nala_state_for_setsockopt = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -11813,7 +11813,7 @@ static struct nala_state_type_for_setsockopt nala_state_for_setsockopt = {
     }
 };
 
-struct _nala_data_type_for_setsockopt *nala_get_data_setsockopt()
+struct nala_data_type_for_setsockopt_t *nala_get_data_setsockopt()
 {
     if (nala_state_for_setsockopt.instances.tail_p != NULL) {
         return (&nala_state_for_setsockopt.instances.tail_p->data);
@@ -11822,15 +11822,15 @@ struct _nala_data_type_for_setsockopt *nala_get_data_setsockopt()
     }
 }
 
-struct _nala_data_params_for_setsockopt *nala_get_params_setsockopt()
+struct nala_data_params_for_setsockopt_t *nala_get_params_setsockopt()
 {
     return (&nala_get_data_setsockopt()->params);
 }
 
 int __wrap_setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen)
 {
-    struct _nala_instance_type_for_setsockopt *_nala_instance_p;
-    struct _nala_data_type_for_setsockopt *_nala_data_p;
+    struct nala_instance_type_for_setsockopt_t *nala_instance_p;
+    struct nala_data_type_for_setsockopt_t *nala_data_p;
     int return_value;
 
     nala_print_call("setsockopt", &nala_state_for_setsockopt.state);
@@ -11840,44 +11840,44 @@ int __wrap_setsockopt(int sockfd, int level, int optname, const void *optval, so
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_setsockopt.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_setsockopt.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_setsockopt.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked setsockopt() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_setsockopt.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_setsockopt.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, setsockopt, optval);
-            _nala_data_p->params_in.optval = optval;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, setsockopt, sockfd);
-            _nala_data_p->params_in.sockfd = sockfd;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, setsockopt, level);
-            _nala_data_p->params_in.level = level;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, setsockopt, optname);
-            _nala_data_p->params_in.optname = optname;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, setsockopt, optlen);
-            _nala_data_p->params_in.optlen = optlen;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, setsockopt, optval);
+            nala_data_p->params_in.optval = optval;
+            MOCK_ASSERT_IN_EQ(nala_data_p, setsockopt, sockfd);
+            nala_data_p->params_in.sockfd = sockfd;
+            MOCK_ASSERT_IN_EQ(nala_data_p, setsockopt, level);
+            nala_data_p->params_in.level = level;
+            MOCK_ASSERT_IN_EQ(nala_data_p, setsockopt, optname);
+            nala_data_p->params_in.optname = optname;
+            MOCK_ASSERT_IN_EQ(nala_data_p, setsockopt, optlen);
+            nala_data_p->params_in.optlen = optlen;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        setsockopt,
                                        optval);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(sockfd, level, optname, optval, optlen);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(sockfd, level, optname, optval, optlen);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_setsockopt(sockfd, level, optname, optval, optlen);
@@ -11925,31 +11925,31 @@ void setsockopt_mock(int sockfd, int level, int optname, socklen_t optlen, int r
 
 int setsockopt_mock_once(int sockfd, int level, int optname, socklen_t optlen, int return_value)
 {
-    struct _nala_instance_type_for_setsockopt *_nala_instance_p;
+    struct nala_instance_type_for_setsockopt_t *nala_instance_p;
 
     nala_state_for_setsockopt.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.optval_out);
-    nala_set_param_init(&_nala_instance_p->data.params.optval_in);
-    _nala_instance_p->data.params.optval_in_assert = NULL;
-    _nala_instance_p->data.params.optval_out_copy = NULL;
-    _nala_instance_p->data.params.optval = NULL;
-    _nala_instance_p->data.params.ignore_optval_in = true;
-    _nala_instance_p->data.params.sockfd = sockfd;
-    _nala_instance_p->data.params.ignore_sockfd_in = false;
-    _nala_instance_p->data.params.level = level;
-    _nala_instance_p->data.params.ignore_level_in = false;
-    _nala_instance_p->data.params.optname = optname;
-    _nala_instance_p->data.params.ignore_optname_in = false;
-    _nala_instance_p->data.params.optlen = optlen;
-    _nala_instance_p->data.params.ignore_optlen_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.optval_out);
+    nala_set_param_init(&nala_instance_p->data.params.optval_in);
+    nala_instance_p->data.params.optval_in_assert = NULL;
+    nala_instance_p->data.params.optval_out_copy = NULL;
+    nala_instance_p->data.params.optval = NULL;
+    nala_instance_p->data.params.ignore_optval_in = true;
+    nala_instance_p->data.params.sockfd = sockfd;
+    nala_instance_p->data.params.ignore_sockfd_in = false;
+    nala_instance_p->data.params.level = level;
+    nala_instance_p->data.params.ignore_level_in = false;
+    nala_instance_p->data.params.optname = optname;
+    nala_instance_p->data.params.ignore_optname_in = false;
+    nala_instance_p->data.params.optlen = optlen;
+    nala_instance_p->data.params.ignore_optlen_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_setsockopt.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void setsockopt_mock_ignore_in(int return_value)
@@ -11967,7 +11967,7 @@ void setsockopt_mock_ignore_in(int return_value)
 
 int setsockopt_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_setsockopt *instance_p;
+    struct nala_instance_type_for_setsockopt_t *instance_p;
 
     nala_state_for_setsockopt.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -12002,7 +12002,7 @@ void setsockopt_mock_set_callback(void (*callback)(int sockfd, int level, int op
 
 struct nala_setsockopt_params_t *setsockopt_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_setsockopt *instance_p;
+    struct nala_instance_type_for_setsockopt_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_setsockopt.instances, &instance_p, handle);
 
@@ -12045,27 +12045,27 @@ void setsockopt_mock_set_optval_in(const void *buf_p, size_t size)
 
 void setsockopt_mock_set_optval_in_assert(void (*callback)(const void *optval, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_setsockopt *_nala_params_p;
+    struct nala_data_params_for_setsockopt_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_setsockopt();
+    nala_params_p = nala_get_params_setsockopt();
 
-    if (_nala_params_p->optval_in.buf_p == NULL) {
+    if (nala_params_p->optval_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "setsockopt_mock_set_optval_in() must be called "
                 "before setsockopt_mock_set_optval_in_assert().\n"));
     }
 
-    _nala_params_p->optval_in_assert = callback;
+    nala_params_p->optval_in_assert = callback;
 }
 
 void setsockopt_mock_set_optval_in_pointer(const void *optval)
 {
-    struct _nala_data_params_for_setsockopt *_nala_params_p;
+    struct nala_data_params_for_setsockopt_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_setsockopt();
-    _nala_params_p->ignore_optval_in = false;
-    _nala_params_p->optval = optval;
+    nala_params_p = nala_get_params_setsockopt();
+    nala_params_p->ignore_optval_in = false;
+    nala_params_p->optval = optval;
 }
 
 void setsockopt_mock_set_optval_out(const void *buf_p, size_t size)
@@ -12101,7 +12101,7 @@ void setsockopt_mock_real(void)
 
 void setsockopt_mock_real_once(void)
 {
-    struct _nala_instance_type_for_setsockopt *instance_p;
+    struct nala_instance_type_for_setsockopt_t *instance_p;
 
     nala_state_for_setsockopt.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -12121,8 +12121,8 @@ void setsockopt_mock_resume(void)
 
 void setsockopt_mock_reset(void)
 {
-    struct _nala_instance_type_for_setsockopt *current_p;
-    struct _nala_instance_type_for_setsockopt *tmp_p;
+    struct nala_instance_type_for_setsockopt_t *current_p;
+    struct nala_instance_type_for_setsockopt_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_setsockopt, current_p, tmp_p);
 }
@@ -12144,13 +12144,13 @@ void setsockopt_mock_assert_completed(void)
 
 unsigned int __real_sleep(unsigned int seconds);
 
-struct _nala_data_params_for_sleep {
+struct nala_data_params_for_sleep_t {
     unsigned int seconds;
     bool ignore_seconds_in;
 };
 
-struct _nala_data_type_for_sleep {
-    struct _nala_data_params_for_sleep params;
+struct nala_data_type_for_sleep_t {
+    struct nala_data_params_for_sleep_t params;
     unsigned int return_value;
     int errno_value;
     unsigned int (*implementation)(unsigned int seconds);
@@ -12159,27 +12159,27 @@ struct _nala_data_type_for_sleep {
     struct nala_sleep_params_t params_in;
 };
 
-struct _nala_instance_type_for_sleep {
+struct nala_instance_type_for_sleep_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_sleep data;
-    struct _nala_instance_type_for_sleep *next_p;
+    struct nala_data_type_for_sleep_t data;
+    struct nala_instance_type_for_sleep_t *next_p;
 };
 
-struct _nala_instances_type_for_sleep {
-    struct _nala_instance_type_for_sleep *head_p;
-    struct _nala_instance_type_for_sleep *next_p;
-    struct _nala_instance_type_for_sleep *tail_p;
+struct nala_instances_type_for_sleep_t {
+    struct nala_instance_type_for_sleep_t *head_p;
+    struct nala_instance_type_for_sleep_t *next_p;
+    struct nala_instance_type_for_sleep_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_sleep {
+struct nala_state_type_for_sleep_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_sleep data;
-    struct _nala_instances_type_for_sleep instances;
+    struct nala_data_type_for_sleep_t data;
+    struct nala_instances_type_for_sleep_t instances;
 };
 
-static struct nala_state_type_for_sleep nala_state_for_sleep = {
+static struct nala_state_type_for_sleep_t nala_state_for_sleep = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -12195,7 +12195,7 @@ static struct nala_state_type_for_sleep nala_state_for_sleep = {
     }
 };
 
-struct _nala_data_type_for_sleep *nala_get_data_sleep()
+struct nala_data_type_for_sleep_t *nala_get_data_sleep()
 {
     if (nala_state_for_sleep.instances.tail_p != NULL) {
         return (&nala_state_for_sleep.instances.tail_p->data);
@@ -12204,15 +12204,15 @@ struct _nala_data_type_for_sleep *nala_get_data_sleep()
     }
 }
 
-struct _nala_data_params_for_sleep *nala_get_params_sleep()
+struct nala_data_params_for_sleep_t *nala_get_params_sleep()
 {
     return (&nala_get_data_sleep()->params);
 }
 
 unsigned int __wrap_sleep(unsigned int seconds)
 {
-    struct _nala_instance_type_for_sleep *_nala_instance_p;
-    struct _nala_data_type_for_sleep *_nala_data_p;
+    struct nala_instance_type_for_sleep_t *nala_instance_p;
+    struct nala_data_type_for_sleep_t *nala_data_p;
     unsigned int return_value;
 
     nala_print_call("sleep", &nala_state_for_sleep.state);
@@ -12222,31 +12222,31 @@ unsigned int __wrap_sleep(unsigned int seconds)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_sleep.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_sleep.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_sleep.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked sleep() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_sleep.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_sleep.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, sleep, seconds);
-            _nala_data_p->params_in.seconds = seconds;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, sleep, seconds);
+            nala_data_p->params_in.seconds = seconds;
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(seconds);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(seconds);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_sleep(seconds);
@@ -12286,19 +12286,19 @@ void sleep_mock(unsigned int seconds, unsigned int return_value)
 
 int sleep_mock_once(unsigned int seconds, unsigned int return_value)
 {
-    struct _nala_instance_type_for_sleep *_nala_instance_p;
+    struct nala_instance_type_for_sleep_t *nala_instance_p;
 
     nala_state_for_sleep.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.params.seconds = seconds;
-    _nala_instance_p->data.params.ignore_seconds_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.params.seconds = seconds;
+    nala_instance_p->data.params.ignore_seconds_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_sleep.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void sleep_mock_ignore_in(unsigned int return_value)
@@ -12312,7 +12312,7 @@ void sleep_mock_ignore_in(unsigned int return_value)
 
 int sleep_mock_ignore_in_once(unsigned int return_value)
 {
-    struct _nala_instance_type_for_sleep *instance_p;
+    struct nala_instance_type_for_sleep_t *instance_p;
 
     nala_state_for_sleep.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -12338,7 +12338,7 @@ void sleep_mock_set_callback(void (*callback)(unsigned int seconds))
 
 struct nala_sleep_params_t *sleep_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_sleep *instance_p;
+    struct nala_instance_type_for_sleep_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_sleep.instances, &instance_p, handle);
 
@@ -12378,7 +12378,7 @@ void sleep_mock_real(void)
 
 void sleep_mock_real_once(void)
 {
-    struct _nala_instance_type_for_sleep *instance_p;
+    struct nala_instance_type_for_sleep_t *instance_p;
 
     nala_state_for_sleep.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -12398,8 +12398,8 @@ void sleep_mock_resume(void)
 
 void sleep_mock_reset(void)
 {
-    struct _nala_instance_type_for_sleep *current_p;
-    struct _nala_instance_type_for_sleep *tmp_p;
+    struct nala_instance_type_for_sleep_t *current_p;
+    struct nala_instance_type_for_sleep_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_sleep, current_p, tmp_p);
 }
@@ -12421,7 +12421,7 @@ void sleep_mock_assert_completed(void)
 
 int __real_statvfs(const char *path, struct statvfs *buf);
 
-struct _nala_data_params_for_statvfs {
+struct nala_data_params_for_statvfs_t {
     const char *path;
     struct statvfs *buf;
     bool ignore_path_in;
@@ -12436,8 +12436,8 @@ struct _nala_data_params_for_statvfs {
     void (*buf_out_copy)(struct statvfs *buf, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_statvfs {
-    struct _nala_data_params_for_statvfs params;
+struct nala_data_type_for_statvfs_t {
+    struct nala_data_params_for_statvfs_t params;
     int return_value;
     int errno_value;
     int (*implementation)(const char *path, struct statvfs *buf);
@@ -12446,27 +12446,27 @@ struct _nala_data_type_for_statvfs {
     struct nala_statvfs_params_t params_in;
 };
 
-struct _nala_instance_type_for_statvfs {
+struct nala_instance_type_for_statvfs_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_statvfs data;
-    struct _nala_instance_type_for_statvfs *next_p;
+    struct nala_data_type_for_statvfs_t data;
+    struct nala_instance_type_for_statvfs_t *next_p;
 };
 
-struct _nala_instances_type_for_statvfs {
-    struct _nala_instance_type_for_statvfs *head_p;
-    struct _nala_instance_type_for_statvfs *next_p;
-    struct _nala_instance_type_for_statvfs *tail_p;
+struct nala_instances_type_for_statvfs_t {
+    struct nala_instance_type_for_statvfs_t *head_p;
+    struct nala_instance_type_for_statvfs_t *next_p;
+    struct nala_instance_type_for_statvfs_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_statvfs {
+struct nala_state_type_for_statvfs_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_statvfs data;
-    struct _nala_instances_type_for_statvfs instances;
+    struct nala_data_type_for_statvfs_t data;
+    struct nala_instances_type_for_statvfs_t instances;
 };
 
-static struct nala_state_type_for_statvfs nala_state_for_statvfs = {
+static struct nala_state_type_for_statvfs_t nala_state_for_statvfs = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -12482,7 +12482,7 @@ static struct nala_state_type_for_statvfs nala_state_for_statvfs = {
     }
 };
 
-struct _nala_data_type_for_statvfs *nala_get_data_statvfs()
+struct nala_data_type_for_statvfs_t *nala_get_data_statvfs()
 {
     if (nala_state_for_statvfs.instances.tail_p != NULL) {
         return (&nala_state_for_statvfs.instances.tail_p->data);
@@ -12491,15 +12491,15 @@ struct _nala_data_type_for_statvfs *nala_get_data_statvfs()
     }
 }
 
-struct _nala_data_params_for_statvfs *nala_get_params_statvfs()
+struct nala_data_params_for_statvfs_t *nala_get_params_statvfs()
 {
     return (&nala_get_data_statvfs()->params);
 }
 
 int __wrap_statvfs(const char *path, struct statvfs *buf)
 {
-    struct _nala_instance_type_for_statvfs *_nala_instance_p;
-    struct _nala_data_type_for_statvfs *_nala_data_p;
+    struct nala_instance_type_for_statvfs_t *nala_instance_p;
+    struct nala_data_type_for_statvfs_t *nala_data_p;
     int return_value;
 
     nala_print_call("statvfs", &nala_state_for_statvfs.state);
@@ -12509,43 +12509,43 @@ int __wrap_statvfs(const char *path, struct statvfs *buf)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_statvfs.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_statvfs.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_statvfs.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked statvfs() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_statvfs.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_statvfs.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, statvfs, path);
-            _nala_data_p->params_in.path = path;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, statvfs, buf);
-            _nala_data_p->params_in.buf = buf;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, statvfs, path);
+            nala_data_p->params_in.path = path;
+            MOCK_ASSERT_IN_EQ(nala_data_p, statvfs, buf);
+            nala_data_p->params_in.buf = buf;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        statvfs,
                                        path);
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_in_struct_statvfs,
                                        statvfs,
                                        buf);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(path, buf);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(path, buf);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_statvfs(path, buf);
@@ -12595,37 +12595,37 @@ void statvfs_mock(const char *path, int return_value)
 
 int statvfs_mock_once(const char *path, int return_value)
 {
-    struct _nala_instance_type_for_statvfs *_nala_instance_p;
+    struct nala_instance_type_for_statvfs_t *nala_instance_p;
 
     nala_state_for_statvfs.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.path_out);
-    nala_set_param_init(&_nala_instance_p->data.params.path_in);
-    _nala_instance_p->data.params.path_in_assert = NULL;
-    _nala_instance_p->data.params.path_out_copy = NULL;
-    nala_set_param_init(&_nala_instance_p->data.params.buf_out);
-    nala_set_param_init(&_nala_instance_p->data.params.buf_in);
-    _nala_instance_p->data.params.buf_in_assert = NULL;
-    _nala_instance_p->data.params.buf_out_copy = NULL;
-    _nala_instance_p->data.params.path = NULL;
-    _nala_instance_p->data.params.ignore_path_in = true;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.path_out);
+    nala_set_param_init(&nala_instance_p->data.params.path_in);
+    nala_instance_p->data.params.path_in_assert = NULL;
+    nala_instance_p->data.params.path_out_copy = NULL;
+    nala_set_param_init(&nala_instance_p->data.params.buf_out);
+    nala_set_param_init(&nala_instance_p->data.params.buf_in);
+    nala_instance_p->data.params.buf_in_assert = NULL;
+    nala_instance_p->data.params.buf_out_copy = NULL;
+    nala_instance_p->data.params.path = NULL;
+    nala_instance_p->data.params.ignore_path_in = true;
 
     if (path != NULL) {
-        nala_set_param_string(&_nala_instance_p->data.params.path_in,
+        nala_set_param_string(&nala_instance_p->data.params.path_in,
                               path);
     } else {
-        _nala_instance_p->data.params.ignore_path_in = false;
+        nala_instance_p->data.params.ignore_path_in = false;
     }
 
-    _nala_instance_p->data.params.buf = NULL;
-    _nala_instance_p->data.params.ignore_buf_in = true;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    nala_instance_p->data.params.buf = NULL;
+    nala_instance_p->data.params.ignore_buf_in = true;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_statvfs.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void statvfs_mock_ignore_in(int return_value)
@@ -12640,7 +12640,7 @@ void statvfs_mock_ignore_in(int return_value)
 
 int statvfs_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_statvfs *instance_p;
+    struct nala_instance_type_for_statvfs_t *instance_p;
 
     nala_state_for_statvfs.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -12677,7 +12677,7 @@ void statvfs_mock_set_callback(void (*callback)(const char *path, struct statvfs
 
 struct nala_statvfs_params_t *statvfs_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_statvfs *instance_p;
+    struct nala_instance_type_for_statvfs_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_statvfs.instances, &instance_p, handle);
 
@@ -12705,27 +12705,27 @@ void statvfs_mock_set_path_in(const void *buf_p, size_t size)
 
 void statvfs_mock_set_path_in_assert(void (*callback)(const char *path, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_statvfs *_nala_params_p;
+    struct nala_data_params_for_statvfs_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_statvfs();
+    nala_params_p = nala_get_params_statvfs();
 
-    if (_nala_params_p->path_in.buf_p == NULL) {
+    if (nala_params_p->path_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "statvfs_mock_set_path_in() must be called "
                 "before statvfs_mock_set_path_in_assert().\n"));
     }
 
-    _nala_params_p->path_in_assert = callback;
+    nala_params_p->path_in_assert = callback;
 }
 
 void statvfs_mock_set_path_in_pointer(const char *path)
 {
-    struct _nala_data_params_for_statvfs *_nala_params_p;
+    struct nala_data_params_for_statvfs_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_statvfs();
-    _nala_params_p->ignore_path_in = false;
-    _nala_params_p->path = path;
+    nala_params_p = nala_get_params_statvfs();
+    nala_params_p->ignore_path_in = false;
+    nala_params_p->path = path;
 }
 
 void statvfs_mock_set_path_out(const void *buf_p, size_t size)
@@ -12749,27 +12749,27 @@ void statvfs_mock_set_buf_in(const void *buf_p, size_t size)
 
 void statvfs_mock_set_buf_in_assert(void (*callback)(struct statvfs *buf, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_statvfs *_nala_params_p;
+    struct nala_data_params_for_statvfs_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_statvfs();
+    nala_params_p = nala_get_params_statvfs();
 
-    if (_nala_params_p->buf_in.buf_p == NULL) {
+    if (nala_params_p->buf_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "statvfs_mock_set_buf_in() must be called "
                 "before statvfs_mock_set_buf_in_assert().\n"));
     }
 
-    _nala_params_p->buf_in_assert = callback;
+    nala_params_p->buf_in_assert = callback;
 }
 
 void statvfs_mock_set_buf_in_pointer(struct statvfs *buf)
 {
-    struct _nala_data_params_for_statvfs *_nala_params_p;
+    struct nala_data_params_for_statvfs_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_statvfs();
-    _nala_params_p->ignore_buf_in = false;
-    _nala_params_p->buf = buf;
+    nala_params_p = nala_get_params_statvfs();
+    nala_params_p->ignore_buf_in = false;
+    nala_params_p->buf = buf;
 }
 
 void statvfs_mock_set_buf_out(const void *buf_p, size_t size)
@@ -12805,7 +12805,7 @@ void statvfs_mock_real(void)
 
 void statvfs_mock_real_once(void)
 {
-    struct _nala_instance_type_for_statvfs *instance_p;
+    struct nala_instance_type_for_statvfs_t *instance_p;
 
     nala_state_for_statvfs.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -12825,8 +12825,8 @@ void statvfs_mock_resume(void)
 
 void statvfs_mock_reset(void)
 {
-    struct _nala_instance_type_for_statvfs *current_p;
-    struct _nala_instance_type_for_statvfs *tmp_p;
+    struct nala_instance_type_for_statvfs_t *current_p;
+    struct nala_instance_type_for_statvfs_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_statvfs, current_p, tmp_p);
 }
@@ -12848,7 +12848,7 @@ void statvfs_mock_assert_completed(void)
 
 void __real_struct_param(struct struct_param_type *data);
 
-struct _nala_data_params_for_struct_param {
+struct nala_data_params_for_struct_param_t {
     struct struct_param_type *data;
     bool ignore_data_in;
     struct nala_set_param data_in;
@@ -12857,8 +12857,8 @@ struct _nala_data_params_for_struct_param {
     void (*data_out_copy)(struct struct_param_type *data, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_struct_param {
-    struct _nala_data_params_for_struct_param params;
+struct nala_data_type_for_struct_param_t {
+    struct nala_data_params_for_struct_param_t params;
     int errno_value;
     void (*implementation)(struct struct_param_type *data);
     void (*callback)(struct struct_param_type *data);
@@ -12866,27 +12866,27 @@ struct _nala_data_type_for_struct_param {
     struct nala_struct_param_params_t params_in;
 };
 
-struct _nala_instance_type_for_struct_param {
+struct nala_instance_type_for_struct_param_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_struct_param data;
-    struct _nala_instance_type_for_struct_param *next_p;
+    struct nala_data_type_for_struct_param_t data;
+    struct nala_instance_type_for_struct_param_t *next_p;
 };
 
-struct _nala_instances_type_for_struct_param {
-    struct _nala_instance_type_for_struct_param *head_p;
-    struct _nala_instance_type_for_struct_param *next_p;
-    struct _nala_instance_type_for_struct_param *tail_p;
+struct nala_instances_type_for_struct_param_t {
+    struct nala_instance_type_for_struct_param_t *head_p;
+    struct nala_instance_type_for_struct_param_t *next_p;
+    struct nala_instance_type_for_struct_param_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_struct_param {
+struct nala_state_type_for_struct_param_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_struct_param data;
-    struct _nala_instances_type_for_struct_param instances;
+    struct nala_data_type_for_struct_param_t data;
+    struct nala_instances_type_for_struct_param_t instances;
 };
 
-static struct nala_state_type_for_struct_param nala_state_for_struct_param = {
+static struct nala_state_type_for_struct_param_t nala_state_for_struct_param = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -12902,7 +12902,7 @@ static struct nala_state_type_for_struct_param nala_state_for_struct_param = {
     }
 };
 
-struct _nala_data_type_for_struct_param *nala_get_data_struct_param()
+struct nala_data_type_for_struct_param_t *nala_get_data_struct_param()
 {
     if (nala_state_for_struct_param.instances.tail_p != NULL) {
         return (&nala_state_for_struct_param.instances.tail_p->data);
@@ -12911,15 +12911,15 @@ struct _nala_data_type_for_struct_param *nala_get_data_struct_param()
     }
 }
 
-struct _nala_data_params_for_struct_param *nala_get_params_struct_param()
+struct nala_data_params_for_struct_param_t *nala_get_params_struct_param()
 {
     return (&nala_get_data_struct_param()->params);
 }
 
 void __wrap_struct_param(struct struct_param_type *data)
 {
-    struct _nala_instance_type_for_struct_param *_nala_instance_p;
-    struct _nala_data_type_for_struct_param *_nala_data_p;
+    struct nala_instance_type_for_struct_param_t *nala_instance_p;
+    struct nala_data_type_for_struct_param_t *nala_data_p;
 
     nala_print_call("struct_param", &nala_state_for_struct_param.state);
 
@@ -12928,33 +12928,33 @@ void __wrap_struct_param(struct struct_param_type *data)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_struct_param.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_struct_param.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_struct_param.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked struct_param() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_struct_param.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_struct_param.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, struct_param, data);
-            _nala_data_p->params_in.data = data;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, struct_param, data);
+            nala_data_p->params_in.data = data;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_in_struct_struct_param_type,
                                        struct_param,
                                        data);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(data);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(data);
             }
 
         } else {
@@ -12992,22 +12992,22 @@ void struct_param_mock()
 
 int struct_param_mock_once()
 {
-    struct _nala_instance_type_for_struct_param *_nala_instance_p;
+    struct nala_instance_type_for_struct_param_t *nala_instance_p;
 
     nala_state_for_struct_param.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.data_out);
-    nala_set_param_init(&_nala_instance_p->data.params.data_in);
-    _nala_instance_p->data.params.data_in_assert = NULL;
-    _nala_instance_p->data.params.data_out_copy = NULL;
-    _nala_instance_p->data.params.data = NULL;
-    _nala_instance_p->data.params.ignore_data_in = true;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.data_out);
+    nala_set_param_init(&nala_instance_p->data.params.data_in);
+    nala_instance_p->data.params.data_in_assert = NULL;
+    nala_instance_p->data.params.data_out_copy = NULL;
+    nala_instance_p->data.params.data = NULL;
+    nala_instance_p->data.params.ignore_data_in = true;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_struct_param.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void struct_param_mock_ignore_in(void)
@@ -13020,7 +13020,7 @@ void struct_param_mock_ignore_in(void)
 
 int struct_param_mock_ignore_in_once(void)
 {
-    struct _nala_instance_type_for_struct_param *instance_p;
+    struct nala_instance_type_for_struct_param_t *instance_p;
 
     nala_state_for_struct_param.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -13050,7 +13050,7 @@ void struct_param_mock_set_callback(void (*callback)(struct struct_param_type *d
 
 struct nala_struct_param_params_t *struct_param_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_struct_param *instance_p;
+    struct nala_instance_type_for_struct_param_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_struct_param.instances, &instance_p, handle);
 
@@ -13073,27 +13073,27 @@ void struct_param_mock_set_data_in(const void *buf_p, size_t size)
 
 void struct_param_mock_set_data_in_assert(void (*callback)(struct struct_param_type *data, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_struct_param *_nala_params_p;
+    struct nala_data_params_for_struct_param_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_struct_param();
+    nala_params_p = nala_get_params_struct_param();
 
-    if (_nala_params_p->data_in.buf_p == NULL) {
+    if (nala_params_p->data_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "struct_param_mock_set_data_in() must be called "
                 "before struct_param_mock_set_data_in_assert().\n"));
     }
 
-    _nala_params_p->data_in_assert = callback;
+    nala_params_p->data_in_assert = callback;
 }
 
 void struct_param_mock_set_data_in_pointer(struct struct_param_type *data)
 {
-    struct _nala_data_params_for_struct_param *_nala_params_p;
+    struct nala_data_params_for_struct_param_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_struct_param();
-    _nala_params_p->ignore_data_in = false;
-    _nala_params_p->data = data;
+    nala_params_p = nala_get_params_struct_param();
+    nala_params_p->ignore_data_in = false;
+    nala_params_p->data = data;
 }
 
 void struct_param_mock_set_data_out(const void *buf_p, size_t size)
@@ -13129,7 +13129,7 @@ void struct_param_mock_real(void)
 
 void struct_param_mock_real_once(void)
 {
-    struct _nala_instance_type_for_struct_param *instance_p;
+    struct nala_instance_type_for_struct_param_t *instance_p;
 
     nala_state_for_struct_param.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -13149,8 +13149,8 @@ void struct_param_mock_resume(void)
 
 void struct_param_mock_reset(void)
 {
-    struct _nala_instance_type_for_struct_param *current_p;
-    struct _nala_instance_type_for_struct_param *tmp_p;
+    struct nala_instance_type_for_struct_param_t *current_p;
+    struct nala_instance_type_for_struct_param_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_struct_param, current_p, tmp_p);
 }
@@ -13172,12 +13172,12 @@ void struct_param_mock_assert_completed(void)
 
 struct struct_param_type __real_struct_param_and_return_type(struct struct_param_type arg);
 
-struct _nala_data_params_for_struct_param_and_return_type {
+struct nala_data_params_for_struct_param_and_return_type_t {
     struct struct_param_type arg;
 };
 
-struct _nala_data_type_for_struct_param_and_return_type {
-    struct _nala_data_params_for_struct_param_and_return_type params;
+struct nala_data_type_for_struct_param_and_return_type_t {
+    struct nala_data_params_for_struct_param_and_return_type_t params;
     struct struct_param_type return_value;
     int errno_value;
     struct struct_param_type (*implementation)(struct struct_param_type arg);
@@ -13186,27 +13186,27 @@ struct _nala_data_type_for_struct_param_and_return_type {
     struct nala_struct_param_and_return_type_params_t params_in;
 };
 
-struct _nala_instance_type_for_struct_param_and_return_type {
+struct nala_instance_type_for_struct_param_and_return_type_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_struct_param_and_return_type data;
-    struct _nala_instance_type_for_struct_param_and_return_type *next_p;
+    struct nala_data_type_for_struct_param_and_return_type_t data;
+    struct nala_instance_type_for_struct_param_and_return_type_t *next_p;
 };
 
-struct _nala_instances_type_for_struct_param_and_return_type {
-    struct _nala_instance_type_for_struct_param_and_return_type *head_p;
-    struct _nala_instance_type_for_struct_param_and_return_type *next_p;
-    struct _nala_instance_type_for_struct_param_and_return_type *tail_p;
+struct nala_instances_type_for_struct_param_and_return_type_t {
+    struct nala_instance_type_for_struct_param_and_return_type_t *head_p;
+    struct nala_instance_type_for_struct_param_and_return_type_t *next_p;
+    struct nala_instance_type_for_struct_param_and_return_type_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_struct_param_and_return_type {
+struct nala_state_type_for_struct_param_and_return_type_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_struct_param_and_return_type data;
-    struct _nala_instances_type_for_struct_param_and_return_type instances;
+    struct nala_data_type_for_struct_param_and_return_type_t data;
+    struct nala_instances_type_for_struct_param_and_return_type_t instances;
 };
 
-static struct nala_state_type_for_struct_param_and_return_type nala_state_for_struct_param_and_return_type = {
+static struct nala_state_type_for_struct_param_and_return_type_t nala_state_for_struct_param_and_return_type = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -13222,7 +13222,7 @@ static struct nala_state_type_for_struct_param_and_return_type nala_state_for_st
     }
 };
 
-struct _nala_data_type_for_struct_param_and_return_type *nala_get_data_struct_param_and_return_type()
+struct nala_data_type_for_struct_param_and_return_type_t *nala_get_data_struct_param_and_return_type()
 {
     if (nala_state_for_struct_param_and_return_type.instances.tail_p != NULL) {
         return (&nala_state_for_struct_param_and_return_type.instances.tail_p->data);
@@ -13231,15 +13231,15 @@ struct _nala_data_type_for_struct_param_and_return_type *nala_get_data_struct_pa
     }
 }
 
-struct _nala_data_params_for_struct_param_and_return_type *nala_get_params_struct_param_and_return_type()
+struct nala_data_params_for_struct_param_and_return_type_t *nala_get_params_struct_param_and_return_type()
 {
     return (&nala_get_data_struct_param_and_return_type()->params);
 }
 
 struct struct_param_type __wrap_struct_param_and_return_type(struct struct_param_type arg)
 {
-    struct _nala_instance_type_for_struct_param_and_return_type *_nala_instance_p;
-    struct _nala_data_type_for_struct_param_and_return_type *_nala_data_p;
+    struct nala_instance_type_for_struct_param_and_return_type_t *nala_instance_p;
+    struct nala_data_type_for_struct_param_and_return_type_t *nala_data_p;
     struct struct_param_type return_value;
 
     nala_print_call("struct_param_and_return_type", &nala_state_for_struct_param_and_return_type.state);
@@ -13249,29 +13249,29 @@ struct struct_param_type __wrap_struct_param_and_return_type(struct struct_param
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_struct_param_and_return_type.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_struct_param_and_return_type.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_struct_param_and_return_type.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked struct_param_and_return_type() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_struct_param_and_return_type.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_struct_param_and_return_type.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(arg);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(arg);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_struct_param_and_return_type(arg);
@@ -13309,17 +13309,17 @@ void struct_param_and_return_type_mock(struct struct_param_type return_value)
 
 int struct_param_and_return_type_mock_once(struct struct_param_type return_value)
 {
-    struct _nala_instance_type_for_struct_param_and_return_type *_nala_instance_p;
+    struct nala_instance_type_for_struct_param_and_return_type_t *nala_instance_p;
 
     nala_state_for_struct_param_and_return_type.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_struct_param_and_return_type.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void struct_param_and_return_type_mock_ignore_in(struct struct_param_type return_value)
@@ -13332,7 +13332,7 @@ void struct_param_and_return_type_mock_ignore_in(struct struct_param_type return
 
 int struct_param_and_return_type_mock_ignore_in_once(struct struct_param_type return_value)
 {
-    struct _nala_instance_type_for_struct_param_and_return_type *instance_p;
+    struct nala_instance_type_for_struct_param_and_return_type_t *instance_p;
 
     nala_state_for_struct_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -13357,7 +13357,7 @@ void struct_param_and_return_type_mock_set_callback(void (*callback)(struct stru
 
 struct nala_struct_param_and_return_type_params_t *struct_param_and_return_type_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_struct_param_and_return_type *instance_p;
+    struct nala_instance_type_for_struct_param_and_return_type_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_struct_param_and_return_type.instances, &instance_p, handle);
 
@@ -13392,7 +13392,7 @@ void struct_param_and_return_type_mock_real(void)
 
 void struct_param_and_return_type_mock_real_once(void)
 {
-    struct _nala_instance_type_for_struct_param_and_return_type *instance_p;
+    struct nala_instance_type_for_struct_param_and_return_type_t *instance_p;
 
     nala_state_for_struct_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -13412,8 +13412,8 @@ void struct_param_and_return_type_mock_resume(void)
 
 void struct_param_and_return_type_mock_reset(void)
 {
-    struct _nala_instance_type_for_struct_param_and_return_type *current_p;
-    struct _nala_instance_type_for_struct_param_and_return_type *tmp_p;
+    struct nala_instance_type_for_struct_param_and_return_type_t *current_p;
+    struct nala_instance_type_for_struct_param_and_return_type_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_struct_param_and_return_type, current_p, tmp_p);
 }
@@ -13435,7 +13435,7 @@ void struct_param_and_return_type_mock_assert_completed(void)
 
 time_t __real_time(time_t *tloc);
 
-struct _nala_data_params_for_time {
+struct nala_data_params_for_time_t {
     time_t *tloc;
     bool ignore_tloc_in;
     struct nala_set_param tloc_in;
@@ -13444,8 +13444,8 @@ struct _nala_data_params_for_time {
     void (*tloc_out_copy)(time_t *tloc, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_time {
-    struct _nala_data_params_for_time params;
+struct nala_data_type_for_time_t {
+    struct nala_data_params_for_time_t params;
     time_t return_value;
     int errno_value;
     time_t (*implementation)(time_t *tloc);
@@ -13454,27 +13454,27 @@ struct _nala_data_type_for_time {
     struct nala_time_params_t params_in;
 };
 
-struct _nala_instance_type_for_time {
+struct nala_instance_type_for_time_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_time data;
-    struct _nala_instance_type_for_time *next_p;
+    struct nala_data_type_for_time_t data;
+    struct nala_instance_type_for_time_t *next_p;
 };
 
-struct _nala_instances_type_for_time {
-    struct _nala_instance_type_for_time *head_p;
-    struct _nala_instance_type_for_time *next_p;
-    struct _nala_instance_type_for_time *tail_p;
+struct nala_instances_type_for_time_t {
+    struct nala_instance_type_for_time_t *head_p;
+    struct nala_instance_type_for_time_t *next_p;
+    struct nala_instance_type_for_time_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_time {
+struct nala_state_type_for_time_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_time data;
-    struct _nala_instances_type_for_time instances;
+    struct nala_data_type_for_time_t data;
+    struct nala_instances_type_for_time_t instances;
 };
 
-static struct nala_state_type_for_time nala_state_for_time = {
+static struct nala_state_type_for_time_t nala_state_for_time = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -13490,7 +13490,7 @@ static struct nala_state_type_for_time nala_state_for_time = {
     }
 };
 
-struct _nala_data_type_for_time *nala_get_data_time()
+struct nala_data_type_for_time_t *nala_get_data_time()
 {
     if (nala_state_for_time.instances.tail_p != NULL) {
         return (&nala_state_for_time.instances.tail_p->data);
@@ -13499,15 +13499,15 @@ struct _nala_data_type_for_time *nala_get_data_time()
     }
 }
 
-struct _nala_data_params_for_time *nala_get_params_time()
+struct nala_data_params_for_time_t *nala_get_params_time()
 {
     return (&nala_get_data_time()->params);
 }
 
 time_t __wrap_time(time_t *tloc)
 {
-    struct _nala_instance_type_for_time *_nala_instance_p;
-    struct _nala_data_type_for_time *_nala_data_p;
+    struct nala_instance_type_for_time_t *nala_instance_p;
+    struct nala_data_type_for_time_t *nala_data_p;
     time_t return_value;
 
     nala_print_call("time", &nala_state_for_time.state);
@@ -13517,36 +13517,36 @@ time_t __wrap_time(time_t *tloc)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_time.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_time.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_time.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked time() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_time.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_time.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, time, tloc);
-            _nala_data_p->params_in.tloc = tloc;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, time, tloc);
+            nala_data_p->params_in.tloc = tloc;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        time,
                                        tloc);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(tloc);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(tloc);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_time(tloc);
@@ -13586,23 +13586,23 @@ void time_mock(time_t return_value)
 
 int time_mock_once(time_t return_value)
 {
-    struct _nala_instance_type_for_time *_nala_instance_p;
+    struct nala_instance_type_for_time_t *nala_instance_p;
 
     nala_state_for_time.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.tloc_out);
-    nala_set_param_init(&_nala_instance_p->data.params.tloc_in);
-    _nala_instance_p->data.params.tloc_in_assert = NULL;
-    _nala_instance_p->data.params.tloc_out_copy = NULL;
-    _nala_instance_p->data.params.tloc = NULL;
-    _nala_instance_p->data.params.ignore_tloc_in = true;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.tloc_out);
+    nala_set_param_init(&nala_instance_p->data.params.tloc_in);
+    nala_instance_p->data.params.tloc_in_assert = NULL;
+    nala_instance_p->data.params.tloc_out_copy = NULL;
+    nala_instance_p->data.params.tloc = NULL;
+    nala_instance_p->data.params.ignore_tloc_in = true;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_time.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void time_mock_ignore_in(time_t return_value)
@@ -13616,7 +13616,7 @@ void time_mock_ignore_in(time_t return_value)
 
 int time_mock_ignore_in_once(time_t return_value)
 {
-    struct _nala_instance_type_for_time *instance_p;
+    struct nala_instance_type_for_time_t *instance_p;
 
     nala_state_for_time.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -13647,7 +13647,7 @@ void time_mock_set_callback(void (*callback)(time_t *tloc))
 
 struct nala_time_params_t *time_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_time *instance_p;
+    struct nala_instance_type_for_time_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_time.instances, &instance_p, handle);
 
@@ -13670,27 +13670,27 @@ void time_mock_set_tloc_in(const void *buf_p, size_t size)
 
 void time_mock_set_tloc_in_assert(void (*callback)(time_t *tloc, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_time *_nala_params_p;
+    struct nala_data_params_for_time_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_time();
+    nala_params_p = nala_get_params_time();
 
-    if (_nala_params_p->tloc_in.buf_p == NULL) {
+    if (nala_params_p->tloc_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "time_mock_set_tloc_in() must be called "
                 "before time_mock_set_tloc_in_assert().\n"));
     }
 
-    _nala_params_p->tloc_in_assert = callback;
+    nala_params_p->tloc_in_assert = callback;
 }
 
 void time_mock_set_tloc_in_pointer(time_t *tloc)
 {
-    struct _nala_data_params_for_time *_nala_params_p;
+    struct nala_data_params_for_time_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_time();
-    _nala_params_p->ignore_tloc_in = false;
-    _nala_params_p->tloc = tloc;
+    nala_params_p = nala_get_params_time();
+    nala_params_p->ignore_tloc_in = false;
+    nala_params_p->tloc = tloc;
 }
 
 void time_mock_set_tloc_out(const void *buf_p, size_t size)
@@ -13726,7 +13726,7 @@ void time_mock_real(void)
 
 void time_mock_real_once(void)
 {
-    struct _nala_instance_type_for_time *instance_p;
+    struct nala_instance_type_for_time_t *instance_p;
 
     nala_state_for_time.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -13746,8 +13746,8 @@ void time_mock_resume(void)
 
 void time_mock_reset(void)
 {
-    struct _nala_instance_type_for_time *current_p;
-    struct _nala_instance_type_for_time *tmp_p;
+    struct nala_instance_type_for_time_t *current_p;
+    struct nala_instance_type_for_time_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_time, current_p, tmp_p);
 }
@@ -13769,7 +13769,7 @@ void time_mock_assert_completed(void)
 
 int __real_timerfd_settime(int fd, int flags, const struct itimerspec *new_value, struct itimerspec *old_value);
 
-struct _nala_data_params_for_timerfd_settime {
+struct nala_data_params_for_timerfd_settime_t {
     int fd;
     int flags;
     const struct itimerspec *new_value;
@@ -13788,8 +13788,8 @@ struct _nala_data_params_for_timerfd_settime {
     void (*old_value_out_copy)(struct itimerspec *old_value, const void *nala_buf_p, size_t nala_size);
 };
 
-struct _nala_data_type_for_timerfd_settime {
-    struct _nala_data_params_for_timerfd_settime params;
+struct nala_data_type_for_timerfd_settime_t {
+    struct nala_data_params_for_timerfd_settime_t params;
     int return_value;
     int errno_value;
     int (*implementation)(int fd, int flags, const struct itimerspec *new_value, struct itimerspec *old_value);
@@ -13798,27 +13798,27 @@ struct _nala_data_type_for_timerfd_settime {
     struct nala_timerfd_settime_params_t params_in;
 };
 
-struct _nala_instance_type_for_timerfd_settime {
+struct nala_instance_type_for_timerfd_settime_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_timerfd_settime data;
-    struct _nala_instance_type_for_timerfd_settime *next_p;
+    struct nala_data_type_for_timerfd_settime_t data;
+    struct nala_instance_type_for_timerfd_settime_t *next_p;
 };
 
-struct _nala_instances_type_for_timerfd_settime {
-    struct _nala_instance_type_for_timerfd_settime *head_p;
-    struct _nala_instance_type_for_timerfd_settime *next_p;
-    struct _nala_instance_type_for_timerfd_settime *tail_p;
+struct nala_instances_type_for_timerfd_settime_t {
+    struct nala_instance_type_for_timerfd_settime_t *head_p;
+    struct nala_instance_type_for_timerfd_settime_t *next_p;
+    struct nala_instance_type_for_timerfd_settime_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_timerfd_settime {
+struct nala_state_type_for_timerfd_settime_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_timerfd_settime data;
-    struct _nala_instances_type_for_timerfd_settime instances;
+    struct nala_data_type_for_timerfd_settime_t data;
+    struct nala_instances_type_for_timerfd_settime_t instances;
 };
 
-static struct nala_state_type_for_timerfd_settime nala_state_for_timerfd_settime = {
+static struct nala_state_type_for_timerfd_settime_t nala_state_for_timerfd_settime = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -13834,7 +13834,7 @@ static struct nala_state_type_for_timerfd_settime nala_state_for_timerfd_settime
     }
 };
 
-struct _nala_data_type_for_timerfd_settime *nala_get_data_timerfd_settime()
+struct nala_data_type_for_timerfd_settime_t *nala_get_data_timerfd_settime()
 {
     if (nala_state_for_timerfd_settime.instances.tail_p != NULL) {
         return (&nala_state_for_timerfd_settime.instances.tail_p->data);
@@ -13843,15 +13843,15 @@ struct _nala_data_type_for_timerfd_settime *nala_get_data_timerfd_settime()
     }
 }
 
-struct _nala_data_params_for_timerfd_settime *nala_get_params_timerfd_settime()
+struct nala_data_params_for_timerfd_settime_t *nala_get_params_timerfd_settime()
 {
     return (&nala_get_data_timerfd_settime()->params);
 }
 
 int __wrap_timerfd_settime(int fd, int flags, const struct itimerspec *new_value, struct itimerspec *old_value)
 {
-    struct _nala_instance_type_for_timerfd_settime *_nala_instance_p;
-    struct _nala_data_type_for_timerfd_settime *_nala_data_p;
+    struct nala_instance_type_for_timerfd_settime_t *nala_instance_p;
+    struct nala_data_type_for_timerfd_settime_t *nala_data_p;
     int return_value;
 
     nala_print_call("timerfd_settime", &nala_state_for_timerfd_settime.state);
@@ -13861,47 +13861,47 @@ int __wrap_timerfd_settime(int fd, int flags, const struct itimerspec *new_value
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_timerfd_settime.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_timerfd_settime.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_timerfd_settime.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked timerfd_settime() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_timerfd_settime.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_timerfd_settime.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, timerfd_settime, new_value);
-            _nala_data_p->params_in.new_value = new_value;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, timerfd_settime, old_value);
-            _nala_data_p->params_in.old_value = old_value;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, timerfd_settime, fd);
-            _nala_data_p->params_in.fd = fd;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, timerfd_settime, flags);
-            _nala_data_p->params_in.flags = flags;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, timerfd_settime, new_value);
+            nala_data_p->params_in.new_value = new_value;
+            MOCK_ASSERT_IN_EQ(nala_data_p, timerfd_settime, old_value);
+            nala_data_p->params_in.old_value = old_value;
+            MOCK_ASSERT_IN_EQ(nala_data_p, timerfd_settime, fd);
+            nala_data_p->params_in.fd = fd;
+            MOCK_ASSERT_IN_EQ(nala_data_p, timerfd_settime, flags);
+            nala_data_p->params_in.flags = flags;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_in_struct_itimerspec,
                                        timerfd_settime,
                                        new_value);
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_in_struct_itimerspec,
                                        timerfd_settime,
                                        old_value);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(fd, flags, new_value, old_value);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(fd, flags, new_value, old_value);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_timerfd_settime(fd, flags, new_value, old_value);
@@ -13947,33 +13947,33 @@ void timerfd_settime_mock(int fd, int flags, int return_value)
 
 int timerfd_settime_mock_once(int fd, int flags, int return_value)
 {
-    struct _nala_instance_type_for_timerfd_settime *_nala_instance_p;
+    struct nala_instance_type_for_timerfd_settime_t *nala_instance_p;
 
     nala_state_for_timerfd_settime.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.new_value_out);
-    nala_set_param_init(&_nala_instance_p->data.params.new_value_in);
-    _nala_instance_p->data.params.new_value_in_assert = NULL;
-    _nala_instance_p->data.params.new_value_out_copy = NULL;
-    nala_set_param_init(&_nala_instance_p->data.params.old_value_out);
-    nala_set_param_init(&_nala_instance_p->data.params.old_value_in);
-    _nala_instance_p->data.params.old_value_in_assert = NULL;
-    _nala_instance_p->data.params.old_value_out_copy = NULL;
-    _nala_instance_p->data.params.new_value = NULL;
-    _nala_instance_p->data.params.ignore_new_value_in = true;
-    _nala_instance_p->data.params.old_value = NULL;
-    _nala_instance_p->data.params.ignore_old_value_in = true;
-    _nala_instance_p->data.params.fd = fd;
-    _nala_instance_p->data.params.ignore_fd_in = false;
-    _nala_instance_p->data.params.flags = flags;
-    _nala_instance_p->data.params.ignore_flags_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.new_value_out);
+    nala_set_param_init(&nala_instance_p->data.params.new_value_in);
+    nala_instance_p->data.params.new_value_in_assert = NULL;
+    nala_instance_p->data.params.new_value_out_copy = NULL;
+    nala_set_param_init(&nala_instance_p->data.params.old_value_out);
+    nala_set_param_init(&nala_instance_p->data.params.old_value_in);
+    nala_instance_p->data.params.old_value_in_assert = NULL;
+    nala_instance_p->data.params.old_value_out_copy = NULL;
+    nala_instance_p->data.params.new_value = NULL;
+    nala_instance_p->data.params.ignore_new_value_in = true;
+    nala_instance_p->data.params.old_value = NULL;
+    nala_instance_p->data.params.ignore_old_value_in = true;
+    nala_instance_p->data.params.fd = fd;
+    nala_instance_p->data.params.ignore_fd_in = false;
+    nala_instance_p->data.params.flags = flags;
+    nala_instance_p->data.params.ignore_flags_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_timerfd_settime.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void timerfd_settime_mock_ignore_in(int return_value)
@@ -13990,7 +13990,7 @@ void timerfd_settime_mock_ignore_in(int return_value)
 
 int timerfd_settime_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_timerfd_settime *instance_p;
+    struct nala_instance_type_for_timerfd_settime_t *instance_p;
 
     nala_state_for_timerfd_settime.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -14029,7 +14029,7 @@ void timerfd_settime_mock_set_callback(void (*callback)(int fd, int flags, const
 
 struct nala_timerfd_settime_params_t *timerfd_settime_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_timerfd_settime *instance_p;
+    struct nala_instance_type_for_timerfd_settime_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_timerfd_settime.instances, &instance_p, handle);
 
@@ -14062,27 +14062,27 @@ void timerfd_settime_mock_set_new_value_in(const void *buf_p, size_t size)
 
 void timerfd_settime_mock_set_new_value_in_assert(void (*callback)(const struct itimerspec *new_value, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_timerfd_settime *_nala_params_p;
+    struct nala_data_params_for_timerfd_settime_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_timerfd_settime();
+    nala_params_p = nala_get_params_timerfd_settime();
 
-    if (_nala_params_p->new_value_in.buf_p == NULL) {
+    if (nala_params_p->new_value_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "timerfd_settime_mock_set_new_value_in() must be called "
                 "before timerfd_settime_mock_set_new_value_in_assert().\n"));
     }
 
-    _nala_params_p->new_value_in_assert = callback;
+    nala_params_p->new_value_in_assert = callback;
 }
 
 void timerfd_settime_mock_set_new_value_in_pointer(const struct itimerspec *new_value)
 {
-    struct _nala_data_params_for_timerfd_settime *_nala_params_p;
+    struct nala_data_params_for_timerfd_settime_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_timerfd_settime();
-    _nala_params_p->ignore_new_value_in = false;
-    _nala_params_p->new_value = new_value;
+    nala_params_p = nala_get_params_timerfd_settime();
+    nala_params_p->ignore_new_value_in = false;
+    nala_params_p->new_value = new_value;
 }
 
 void timerfd_settime_mock_set_new_value_out(const void *buf_p, size_t size)
@@ -14106,27 +14106,27 @@ void timerfd_settime_mock_set_old_value_in(const void *buf_p, size_t size)
 
 void timerfd_settime_mock_set_old_value_in_assert(void (*callback)(struct itimerspec *old_value, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_timerfd_settime *_nala_params_p;
+    struct nala_data_params_for_timerfd_settime_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_timerfd_settime();
+    nala_params_p = nala_get_params_timerfd_settime();
 
-    if (_nala_params_p->old_value_in.buf_p == NULL) {
+    if (nala_params_p->old_value_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "timerfd_settime_mock_set_old_value_in() must be called "
                 "before timerfd_settime_mock_set_old_value_in_assert().\n"));
     }
 
-    _nala_params_p->old_value_in_assert = callback;
+    nala_params_p->old_value_in_assert = callback;
 }
 
 void timerfd_settime_mock_set_old_value_in_pointer(struct itimerspec *old_value)
 {
-    struct _nala_data_params_for_timerfd_settime *_nala_params_p;
+    struct nala_data_params_for_timerfd_settime_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_timerfd_settime();
-    _nala_params_p->ignore_old_value_in = false;
-    _nala_params_p->old_value = old_value;
+    nala_params_p = nala_get_params_timerfd_settime();
+    nala_params_p->ignore_old_value_in = false;
+    nala_params_p->old_value = old_value;
 }
 
 void timerfd_settime_mock_set_old_value_out(const void *buf_p, size_t size)
@@ -14162,7 +14162,7 @@ void timerfd_settime_mock_real(void)
 
 void timerfd_settime_mock_real_once(void)
 {
-    struct _nala_instance_type_for_timerfd_settime *instance_p;
+    struct nala_instance_type_for_timerfd_settime_t *instance_p;
 
     nala_state_for_timerfd_settime.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -14182,8 +14182,8 @@ void timerfd_settime_mock_resume(void)
 
 void timerfd_settime_mock_reset(void)
 {
-    struct _nala_instance_type_for_timerfd_settime *current_p;
-    struct _nala_instance_type_for_timerfd_settime *tmp_p;
+    struct nala_instance_type_for_timerfd_settime_t *current_p;
+    struct nala_instance_type_for_timerfd_settime_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_timerfd_settime, current_p, tmp_p);
 }
@@ -14205,12 +14205,12 @@ void timerfd_settime_mock_assert_completed(void)
 
 FILE *__real_tmpfile(void);
 
-struct _nala_data_params_for_tmpfile {
+struct nala_data_params_for_tmpfile_t {
     int dummy;
 };
 
-struct _nala_data_type_for_tmpfile {
-    struct _nala_data_params_for_tmpfile params;
+struct nala_data_type_for_tmpfile_t {
+    struct nala_data_params_for_tmpfile_t params;
     FILE *return_value;
     int errno_value;
     FILE *(*implementation)(void);
@@ -14219,27 +14219,27 @@ struct _nala_data_type_for_tmpfile {
     struct nala_tmpfile_params_t params_in;
 };
 
-struct _nala_instance_type_for_tmpfile {
+struct nala_instance_type_for_tmpfile_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_tmpfile data;
-    struct _nala_instance_type_for_tmpfile *next_p;
+    struct nala_data_type_for_tmpfile_t data;
+    struct nala_instance_type_for_tmpfile_t *next_p;
 };
 
-struct _nala_instances_type_for_tmpfile {
-    struct _nala_instance_type_for_tmpfile *head_p;
-    struct _nala_instance_type_for_tmpfile *next_p;
-    struct _nala_instance_type_for_tmpfile *tail_p;
+struct nala_instances_type_for_tmpfile_t {
+    struct nala_instance_type_for_tmpfile_t *head_p;
+    struct nala_instance_type_for_tmpfile_t *next_p;
+    struct nala_instance_type_for_tmpfile_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_tmpfile {
+struct nala_state_type_for_tmpfile_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_tmpfile data;
-    struct _nala_instances_type_for_tmpfile instances;
+    struct nala_data_type_for_tmpfile_t data;
+    struct nala_instances_type_for_tmpfile_t instances;
 };
 
-static struct nala_state_type_for_tmpfile nala_state_for_tmpfile = {
+static struct nala_state_type_for_tmpfile_t nala_state_for_tmpfile = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -14255,7 +14255,7 @@ static struct nala_state_type_for_tmpfile nala_state_for_tmpfile = {
     }
 };
 
-struct _nala_data_type_for_tmpfile *nala_get_data_tmpfile()
+struct nala_data_type_for_tmpfile_t *nala_get_data_tmpfile()
 {
     if (nala_state_for_tmpfile.instances.tail_p != NULL) {
         return (&nala_state_for_tmpfile.instances.tail_p->data);
@@ -14264,15 +14264,15 @@ struct _nala_data_type_for_tmpfile *nala_get_data_tmpfile()
     }
 }
 
-struct _nala_data_params_for_tmpfile *nala_get_params_tmpfile()
+struct nala_data_params_for_tmpfile_t *nala_get_params_tmpfile()
 {
     return (&nala_get_data_tmpfile()->params);
 }
 
 FILE *__wrap_tmpfile(void)
 {
-    struct _nala_instance_type_for_tmpfile *_nala_instance_p;
-    struct _nala_data_type_for_tmpfile *_nala_data_p;
+    struct nala_instance_type_for_tmpfile_t *nala_instance_p;
+    struct nala_data_type_for_tmpfile_t *nala_data_p;
     FILE *return_value;
 
     nala_print_call("tmpfile", &nala_state_for_tmpfile.state);
@@ -14282,29 +14282,29 @@ FILE *__wrap_tmpfile(void)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_tmpfile.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_tmpfile.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_tmpfile.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked tmpfile() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_tmpfile.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_tmpfile.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback();
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback();
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_tmpfile();
@@ -14342,17 +14342,17 @@ void tmpfile_mock(FILE *return_value)
 
 int tmpfile_mock_once(FILE *return_value)
 {
-    struct _nala_instance_type_for_tmpfile *_nala_instance_p;
+    struct nala_instance_type_for_tmpfile_t *nala_instance_p;
 
     nala_state_for_tmpfile.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_tmpfile.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void tmpfile_mock_ignore_in(FILE *return_value)
@@ -14365,7 +14365,7 @@ void tmpfile_mock_ignore_in(FILE *return_value)
 
 int tmpfile_mock_ignore_in_once(FILE *return_value)
 {
-    struct _nala_instance_type_for_tmpfile *instance_p;
+    struct nala_instance_type_for_tmpfile_t *instance_p;
 
     nala_state_for_tmpfile.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -14390,7 +14390,7 @@ void tmpfile_mock_set_callback(void (*callback)(void))
 
 struct nala_tmpfile_params_t *tmpfile_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_tmpfile *instance_p;
+    struct nala_instance_type_for_tmpfile_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_tmpfile.instances, &instance_p, handle);
 
@@ -14425,7 +14425,7 @@ void tmpfile_mock_real(void)
 
 void tmpfile_mock_real_once(void)
 {
-    struct _nala_instance_type_for_tmpfile *instance_p;
+    struct nala_instance_type_for_tmpfile_t *instance_p;
 
     nala_state_for_tmpfile.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -14445,8 +14445,8 @@ void tmpfile_mock_resume(void)
 
 void tmpfile_mock_reset(void)
 {
-    struct _nala_instance_type_for_tmpfile *current_p;
-    struct _nala_instance_type_for_tmpfile *tmp_p;
+    struct nala_instance_type_for_tmpfile_t *current_p;
+    struct nala_instance_type_for_tmpfile_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_tmpfile, current_p, tmp_p);
 }
@@ -14468,12 +14468,12 @@ void tmpfile_mock_assert_completed(void)
 
 struct_param_type __real_typedef_struct_param_and_return_type(struct_param_type arg);
 
-struct _nala_data_params_for_typedef_struct_param_and_return_type {
+struct nala_data_params_for_typedef_struct_param_and_return_type_t {
     struct_param_type arg;
 };
 
-struct _nala_data_type_for_typedef_struct_param_and_return_type {
-    struct _nala_data_params_for_typedef_struct_param_and_return_type params;
+struct nala_data_type_for_typedef_struct_param_and_return_type_t {
+    struct nala_data_params_for_typedef_struct_param_and_return_type_t params;
     struct_param_type return_value;
     int errno_value;
     struct_param_type (*implementation)(struct_param_type arg);
@@ -14482,27 +14482,27 @@ struct _nala_data_type_for_typedef_struct_param_and_return_type {
     struct nala_typedef_struct_param_and_return_type_params_t params_in;
 };
 
-struct _nala_instance_type_for_typedef_struct_param_and_return_type {
+struct nala_instance_type_for_typedef_struct_param_and_return_type_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_typedef_struct_param_and_return_type data;
-    struct _nala_instance_type_for_typedef_struct_param_and_return_type *next_p;
+    struct nala_data_type_for_typedef_struct_param_and_return_type_t data;
+    struct nala_instance_type_for_typedef_struct_param_and_return_type_t *next_p;
 };
 
-struct _nala_instances_type_for_typedef_struct_param_and_return_type {
-    struct _nala_instance_type_for_typedef_struct_param_and_return_type *head_p;
-    struct _nala_instance_type_for_typedef_struct_param_and_return_type *next_p;
-    struct _nala_instance_type_for_typedef_struct_param_and_return_type *tail_p;
+struct nala_instances_type_for_typedef_struct_param_and_return_type_t {
+    struct nala_instance_type_for_typedef_struct_param_and_return_type_t *head_p;
+    struct nala_instance_type_for_typedef_struct_param_and_return_type_t *next_p;
+    struct nala_instance_type_for_typedef_struct_param_and_return_type_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_typedef_struct_param_and_return_type {
+struct nala_state_type_for_typedef_struct_param_and_return_type_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_typedef_struct_param_and_return_type data;
-    struct _nala_instances_type_for_typedef_struct_param_and_return_type instances;
+    struct nala_data_type_for_typedef_struct_param_and_return_type_t data;
+    struct nala_instances_type_for_typedef_struct_param_and_return_type_t instances;
 };
 
-static struct nala_state_type_for_typedef_struct_param_and_return_type nala_state_for_typedef_struct_param_and_return_type = {
+static struct nala_state_type_for_typedef_struct_param_and_return_type_t nala_state_for_typedef_struct_param_and_return_type = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -14518,7 +14518,7 @@ static struct nala_state_type_for_typedef_struct_param_and_return_type nala_stat
     }
 };
 
-struct _nala_data_type_for_typedef_struct_param_and_return_type *nala_get_data_typedef_struct_param_and_return_type()
+struct nala_data_type_for_typedef_struct_param_and_return_type_t *nala_get_data_typedef_struct_param_and_return_type()
 {
     if (nala_state_for_typedef_struct_param_and_return_type.instances.tail_p != NULL) {
         return (&nala_state_for_typedef_struct_param_and_return_type.instances.tail_p->data);
@@ -14527,15 +14527,15 @@ struct _nala_data_type_for_typedef_struct_param_and_return_type *nala_get_data_t
     }
 }
 
-struct _nala_data_params_for_typedef_struct_param_and_return_type *nala_get_params_typedef_struct_param_and_return_type()
+struct nala_data_params_for_typedef_struct_param_and_return_type_t *nala_get_params_typedef_struct_param_and_return_type()
 {
     return (&nala_get_data_typedef_struct_param_and_return_type()->params);
 }
 
 struct_param_type __wrap_typedef_struct_param_and_return_type(struct_param_type arg)
 {
-    struct _nala_instance_type_for_typedef_struct_param_and_return_type *_nala_instance_p;
-    struct _nala_data_type_for_typedef_struct_param_and_return_type *_nala_data_p;
+    struct nala_instance_type_for_typedef_struct_param_and_return_type_t *nala_instance_p;
+    struct nala_data_type_for_typedef_struct_param_and_return_type_t *nala_data_p;
     struct_param_type return_value;
 
     nala_print_call("typedef_struct_param_and_return_type", &nala_state_for_typedef_struct_param_and_return_type.state);
@@ -14545,29 +14545,29 @@ struct_param_type __wrap_typedef_struct_param_and_return_type(struct_param_type 
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_typedef_struct_param_and_return_type.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_typedef_struct_param_and_return_type.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_typedef_struct_param_and_return_type.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked typedef_struct_param_and_return_type() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_typedef_struct_param_and_return_type.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_typedef_struct_param_and_return_type.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(arg);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(arg);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_typedef_struct_param_and_return_type(arg);
@@ -14605,17 +14605,17 @@ void typedef_struct_param_and_return_type_mock(struct_param_type return_value)
 
 int typedef_struct_param_and_return_type_mock_once(struct_param_type return_value)
 {
-    struct _nala_instance_type_for_typedef_struct_param_and_return_type *_nala_instance_p;
+    struct nala_instance_type_for_typedef_struct_param_and_return_type_t *nala_instance_p;
 
     nala_state_for_typedef_struct_param_and_return_type.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_typedef_struct_param_and_return_type.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void typedef_struct_param_and_return_type_mock_ignore_in(struct_param_type return_value)
@@ -14628,7 +14628,7 @@ void typedef_struct_param_and_return_type_mock_ignore_in(struct_param_type retur
 
 int typedef_struct_param_and_return_type_mock_ignore_in_once(struct_param_type return_value)
 {
-    struct _nala_instance_type_for_typedef_struct_param_and_return_type *instance_p;
+    struct nala_instance_type_for_typedef_struct_param_and_return_type_t *instance_p;
 
     nala_state_for_typedef_struct_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -14653,7 +14653,7 @@ void typedef_struct_param_and_return_type_mock_set_callback(void (*callback)(str
 
 struct nala_typedef_struct_param_and_return_type_params_t *typedef_struct_param_and_return_type_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_typedef_struct_param_and_return_type *instance_p;
+    struct nala_instance_type_for_typedef_struct_param_and_return_type_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_typedef_struct_param_and_return_type.instances, &instance_p, handle);
 
@@ -14688,7 +14688,7 @@ void typedef_struct_param_and_return_type_mock_real(void)
 
 void typedef_struct_param_and_return_type_mock_real_once(void)
 {
-    struct _nala_instance_type_for_typedef_struct_param_and_return_type *instance_p;
+    struct nala_instance_type_for_typedef_struct_param_and_return_type_t *instance_p;
 
     nala_state_for_typedef_struct_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -14708,8 +14708,8 @@ void typedef_struct_param_and_return_type_mock_resume(void)
 
 void typedef_struct_param_and_return_type_mock_reset(void)
 {
-    struct _nala_instance_type_for_typedef_struct_param_and_return_type *current_p;
-    struct _nala_instance_type_for_typedef_struct_param_and_return_type *tmp_p;
+    struct nala_instance_type_for_typedef_struct_param_and_return_type_t *current_p;
+    struct nala_instance_type_for_typedef_struct_param_and_return_type_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_typedef_struct_param_and_return_type, current_p, tmp_p);
 }
@@ -14731,12 +14731,12 @@ void typedef_struct_param_and_return_type_mock_assert_completed(void)
 
 union_type __real_typedef_union_param_and_return_type(union_type arg);
 
-struct _nala_data_params_for_typedef_union_param_and_return_type {
+struct nala_data_params_for_typedef_union_param_and_return_type_t {
     union_type arg;
 };
 
-struct _nala_data_type_for_typedef_union_param_and_return_type {
-    struct _nala_data_params_for_typedef_union_param_and_return_type params;
+struct nala_data_type_for_typedef_union_param_and_return_type_t {
+    struct nala_data_params_for_typedef_union_param_and_return_type_t params;
     union_type return_value;
     int errno_value;
     union_type (*implementation)(union_type arg);
@@ -14745,27 +14745,27 @@ struct _nala_data_type_for_typedef_union_param_and_return_type {
     struct nala_typedef_union_param_and_return_type_params_t params_in;
 };
 
-struct _nala_instance_type_for_typedef_union_param_and_return_type {
+struct nala_instance_type_for_typedef_union_param_and_return_type_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_typedef_union_param_and_return_type data;
-    struct _nala_instance_type_for_typedef_union_param_and_return_type *next_p;
+    struct nala_data_type_for_typedef_union_param_and_return_type_t data;
+    struct nala_instance_type_for_typedef_union_param_and_return_type_t *next_p;
 };
 
-struct _nala_instances_type_for_typedef_union_param_and_return_type {
-    struct _nala_instance_type_for_typedef_union_param_and_return_type *head_p;
-    struct _nala_instance_type_for_typedef_union_param_and_return_type *next_p;
-    struct _nala_instance_type_for_typedef_union_param_and_return_type *tail_p;
+struct nala_instances_type_for_typedef_union_param_and_return_type_t {
+    struct nala_instance_type_for_typedef_union_param_and_return_type_t *head_p;
+    struct nala_instance_type_for_typedef_union_param_and_return_type_t *next_p;
+    struct nala_instance_type_for_typedef_union_param_and_return_type_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_typedef_union_param_and_return_type {
+struct nala_state_type_for_typedef_union_param_and_return_type_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_typedef_union_param_and_return_type data;
-    struct _nala_instances_type_for_typedef_union_param_and_return_type instances;
+    struct nala_data_type_for_typedef_union_param_and_return_type_t data;
+    struct nala_instances_type_for_typedef_union_param_and_return_type_t instances;
 };
 
-static struct nala_state_type_for_typedef_union_param_and_return_type nala_state_for_typedef_union_param_and_return_type = {
+static struct nala_state_type_for_typedef_union_param_and_return_type_t nala_state_for_typedef_union_param_and_return_type = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -14781,7 +14781,7 @@ static struct nala_state_type_for_typedef_union_param_and_return_type nala_state
     }
 };
 
-struct _nala_data_type_for_typedef_union_param_and_return_type *nala_get_data_typedef_union_param_and_return_type()
+struct nala_data_type_for_typedef_union_param_and_return_type_t *nala_get_data_typedef_union_param_and_return_type()
 {
     if (nala_state_for_typedef_union_param_and_return_type.instances.tail_p != NULL) {
         return (&nala_state_for_typedef_union_param_and_return_type.instances.tail_p->data);
@@ -14790,15 +14790,15 @@ struct _nala_data_type_for_typedef_union_param_and_return_type *nala_get_data_ty
     }
 }
 
-struct _nala_data_params_for_typedef_union_param_and_return_type *nala_get_params_typedef_union_param_and_return_type()
+struct nala_data_params_for_typedef_union_param_and_return_type_t *nala_get_params_typedef_union_param_and_return_type()
 {
     return (&nala_get_data_typedef_union_param_and_return_type()->params);
 }
 
 union_type __wrap_typedef_union_param_and_return_type(union_type arg)
 {
-    struct _nala_instance_type_for_typedef_union_param_and_return_type *_nala_instance_p;
-    struct _nala_data_type_for_typedef_union_param_and_return_type *_nala_data_p;
+    struct nala_instance_type_for_typedef_union_param_and_return_type_t *nala_instance_p;
+    struct nala_data_type_for_typedef_union_param_and_return_type_t *nala_data_p;
     union_type return_value;
 
     nala_print_call("typedef_union_param_and_return_type", &nala_state_for_typedef_union_param_and_return_type.state);
@@ -14808,29 +14808,29 @@ union_type __wrap_typedef_union_param_and_return_type(union_type arg)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_typedef_union_param_and_return_type.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_typedef_union_param_and_return_type.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_typedef_union_param_and_return_type.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked typedef_union_param_and_return_type() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_typedef_union_param_and_return_type.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_typedef_union_param_and_return_type.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(arg);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(arg);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_typedef_union_param_and_return_type(arg);
@@ -14868,17 +14868,17 @@ void typedef_union_param_and_return_type_mock(union_type return_value)
 
 int typedef_union_param_and_return_type_mock_once(union_type return_value)
 {
-    struct _nala_instance_type_for_typedef_union_param_and_return_type *_nala_instance_p;
+    struct nala_instance_type_for_typedef_union_param_and_return_type_t *nala_instance_p;
 
     nala_state_for_typedef_union_param_and_return_type.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_typedef_union_param_and_return_type.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void typedef_union_param_and_return_type_mock_ignore_in(union_type return_value)
@@ -14891,7 +14891,7 @@ void typedef_union_param_and_return_type_mock_ignore_in(union_type return_value)
 
 int typedef_union_param_and_return_type_mock_ignore_in_once(union_type return_value)
 {
-    struct _nala_instance_type_for_typedef_union_param_and_return_type *instance_p;
+    struct nala_instance_type_for_typedef_union_param_and_return_type_t *instance_p;
 
     nala_state_for_typedef_union_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -14916,7 +14916,7 @@ void typedef_union_param_and_return_type_mock_set_callback(void (*callback)(unio
 
 struct nala_typedef_union_param_and_return_type_params_t *typedef_union_param_and_return_type_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_typedef_union_param_and_return_type *instance_p;
+    struct nala_instance_type_for_typedef_union_param_and_return_type_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_typedef_union_param_and_return_type.instances, &instance_p, handle);
 
@@ -14951,7 +14951,7 @@ void typedef_union_param_and_return_type_mock_real(void)
 
 void typedef_union_param_and_return_type_mock_real_once(void)
 {
-    struct _nala_instance_type_for_typedef_union_param_and_return_type *instance_p;
+    struct nala_instance_type_for_typedef_union_param_and_return_type_t *instance_p;
 
     nala_state_for_typedef_union_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -14971,8 +14971,8 @@ void typedef_union_param_and_return_type_mock_resume(void)
 
 void typedef_union_param_and_return_type_mock_reset(void)
 {
-    struct _nala_instance_type_for_typedef_union_param_and_return_type *current_p;
-    struct _nala_instance_type_for_typedef_union_param_and_return_type *tmp_p;
+    struct nala_instance_type_for_typedef_union_param_and_return_type_t *current_p;
+    struct nala_instance_type_for_typedef_union_param_and_return_type_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_typedef_union_param_and_return_type, current_p, tmp_p);
 }
@@ -14994,12 +14994,12 @@ void typedef_union_param_and_return_type_mock_assert_completed(void)
 
 union union_type __real_union_param_and_return_type(union union_type arg);
 
-struct _nala_data_params_for_union_param_and_return_type {
+struct nala_data_params_for_union_param_and_return_type_t {
     union union_type arg;
 };
 
-struct _nala_data_type_for_union_param_and_return_type {
-    struct _nala_data_params_for_union_param_and_return_type params;
+struct nala_data_type_for_union_param_and_return_type_t {
+    struct nala_data_params_for_union_param_and_return_type_t params;
     union union_type return_value;
     int errno_value;
     union union_type (*implementation)(union union_type arg);
@@ -15008,27 +15008,27 @@ struct _nala_data_type_for_union_param_and_return_type {
     struct nala_union_param_and_return_type_params_t params_in;
 };
 
-struct _nala_instance_type_for_union_param_and_return_type {
+struct nala_instance_type_for_union_param_and_return_type_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_union_param_and_return_type data;
-    struct _nala_instance_type_for_union_param_and_return_type *next_p;
+    struct nala_data_type_for_union_param_and_return_type_t data;
+    struct nala_instance_type_for_union_param_and_return_type_t *next_p;
 };
 
-struct _nala_instances_type_for_union_param_and_return_type {
-    struct _nala_instance_type_for_union_param_and_return_type *head_p;
-    struct _nala_instance_type_for_union_param_and_return_type *next_p;
-    struct _nala_instance_type_for_union_param_and_return_type *tail_p;
+struct nala_instances_type_for_union_param_and_return_type_t {
+    struct nala_instance_type_for_union_param_and_return_type_t *head_p;
+    struct nala_instance_type_for_union_param_and_return_type_t *next_p;
+    struct nala_instance_type_for_union_param_and_return_type_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_union_param_and_return_type {
+struct nala_state_type_for_union_param_and_return_type_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_union_param_and_return_type data;
-    struct _nala_instances_type_for_union_param_and_return_type instances;
+    struct nala_data_type_for_union_param_and_return_type_t data;
+    struct nala_instances_type_for_union_param_and_return_type_t instances;
 };
 
-static struct nala_state_type_for_union_param_and_return_type nala_state_for_union_param_and_return_type = {
+static struct nala_state_type_for_union_param_and_return_type_t nala_state_for_union_param_and_return_type = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -15044,7 +15044,7 @@ static struct nala_state_type_for_union_param_and_return_type nala_state_for_uni
     }
 };
 
-struct _nala_data_type_for_union_param_and_return_type *nala_get_data_union_param_and_return_type()
+struct nala_data_type_for_union_param_and_return_type_t *nala_get_data_union_param_and_return_type()
 {
     if (nala_state_for_union_param_and_return_type.instances.tail_p != NULL) {
         return (&nala_state_for_union_param_and_return_type.instances.tail_p->data);
@@ -15053,15 +15053,15 @@ struct _nala_data_type_for_union_param_and_return_type *nala_get_data_union_para
     }
 }
 
-struct _nala_data_params_for_union_param_and_return_type *nala_get_params_union_param_and_return_type()
+struct nala_data_params_for_union_param_and_return_type_t *nala_get_params_union_param_and_return_type()
 {
     return (&nala_get_data_union_param_and_return_type()->params);
 }
 
 union union_type __wrap_union_param_and_return_type(union union_type arg)
 {
-    struct _nala_instance_type_for_union_param_and_return_type *_nala_instance_p;
-    struct _nala_data_type_for_union_param_and_return_type *_nala_data_p;
+    struct nala_instance_type_for_union_param_and_return_type_t *nala_instance_p;
+    struct nala_data_type_for_union_param_and_return_type_t *nala_data_p;
     union union_type return_value;
 
     nala_print_call("union_param_and_return_type", &nala_state_for_union_param_and_return_type.state);
@@ -15071,29 +15071,29 @@ union union_type __wrap_union_param_and_return_type(union union_type arg)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_union_param_and_return_type.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_union_param_and_return_type.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_union_param_and_return_type.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked union_param_and_return_type() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_union_param_and_return_type.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_union_param_and_return_type.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(arg);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(arg);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_union_param_and_return_type(arg);
@@ -15131,17 +15131,17 @@ void union_param_and_return_type_mock(union union_type return_value)
 
 int union_param_and_return_type_mock_once(union union_type return_value)
 {
-    struct _nala_instance_type_for_union_param_and_return_type *_nala_instance_p;
+    struct nala_instance_type_for_union_param_and_return_type_t *nala_instance_p;
 
     nala_state_for_union_param_and_return_type.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_union_param_and_return_type.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void union_param_and_return_type_mock_ignore_in(union union_type return_value)
@@ -15154,7 +15154,7 @@ void union_param_and_return_type_mock_ignore_in(union union_type return_value)
 
 int union_param_and_return_type_mock_ignore_in_once(union union_type return_value)
 {
-    struct _nala_instance_type_for_union_param_and_return_type *instance_p;
+    struct nala_instance_type_for_union_param_and_return_type_t *instance_p;
 
     nala_state_for_union_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -15179,7 +15179,7 @@ void union_param_and_return_type_mock_set_callback(void (*callback)(union union_
 
 struct nala_union_param_and_return_type_params_t *union_param_and_return_type_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_union_param_and_return_type *instance_p;
+    struct nala_instance_type_for_union_param_and_return_type_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_union_param_and_return_type.instances, &instance_p, handle);
 
@@ -15214,7 +15214,7 @@ void union_param_and_return_type_mock_real(void)
 
 void union_param_and_return_type_mock_real_once(void)
 {
-    struct _nala_instance_type_for_union_param_and_return_type *instance_p;
+    struct nala_instance_type_for_union_param_and_return_type_t *instance_p;
 
     nala_state_for_union_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -15234,8 +15234,8 @@ void union_param_and_return_type_mock_resume(void)
 
 void union_param_and_return_type_mock_reset(void)
 {
-    struct _nala_instance_type_for_union_param_and_return_type *current_p;
-    struct _nala_instance_type_for_union_param_and_return_type *tmp_p;
+    struct nala_instance_type_for_union_param_and_return_type_t *current_p;
+    struct nala_instance_type_for_union_param_and_return_type_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_union_param_and_return_type, current_p, tmp_p);
 }
@@ -15257,13 +15257,13 @@ void union_param_and_return_type_mock_assert_completed(void)
 
 int __real_usleep(__useconds_t usec);
 
-struct _nala_data_params_for_usleep {
+struct nala_data_params_for_usleep_t {
     __useconds_t usec;
     bool ignore_usec_in;
 };
 
-struct _nala_data_type_for_usleep {
-    struct _nala_data_params_for_usleep params;
+struct nala_data_type_for_usleep_t {
+    struct nala_data_params_for_usleep_t params;
     int return_value;
     int errno_value;
     int (*implementation)(__useconds_t usec);
@@ -15272,27 +15272,27 @@ struct _nala_data_type_for_usleep {
     struct nala_usleep_params_t params_in;
 };
 
-struct _nala_instance_type_for_usleep {
+struct nala_instance_type_for_usleep_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_usleep data;
-    struct _nala_instance_type_for_usleep *next_p;
+    struct nala_data_type_for_usleep_t data;
+    struct nala_instance_type_for_usleep_t *next_p;
 };
 
-struct _nala_instances_type_for_usleep {
-    struct _nala_instance_type_for_usleep *head_p;
-    struct _nala_instance_type_for_usleep *next_p;
-    struct _nala_instance_type_for_usleep *tail_p;
+struct nala_instances_type_for_usleep_t {
+    struct nala_instance_type_for_usleep_t *head_p;
+    struct nala_instance_type_for_usleep_t *next_p;
+    struct nala_instance_type_for_usleep_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_usleep {
+struct nala_state_type_for_usleep_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_usleep data;
-    struct _nala_instances_type_for_usleep instances;
+    struct nala_data_type_for_usleep_t data;
+    struct nala_instances_type_for_usleep_t instances;
 };
 
-static struct nala_state_type_for_usleep nala_state_for_usleep = {
+static struct nala_state_type_for_usleep_t nala_state_for_usleep = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -15308,7 +15308,7 @@ static struct nala_state_type_for_usleep nala_state_for_usleep = {
     }
 };
 
-struct _nala_data_type_for_usleep *nala_get_data_usleep()
+struct nala_data_type_for_usleep_t *nala_get_data_usleep()
 {
     if (nala_state_for_usleep.instances.tail_p != NULL) {
         return (&nala_state_for_usleep.instances.tail_p->data);
@@ -15317,15 +15317,15 @@ struct _nala_data_type_for_usleep *nala_get_data_usleep()
     }
 }
 
-struct _nala_data_params_for_usleep *nala_get_params_usleep()
+struct nala_data_params_for_usleep_t *nala_get_params_usleep()
 {
     return (&nala_get_data_usleep()->params);
 }
 
 int __wrap_usleep(__useconds_t usec)
 {
-    struct _nala_instance_type_for_usleep *_nala_instance_p;
-    struct _nala_data_type_for_usleep *_nala_data_p;
+    struct nala_instance_type_for_usleep_t *nala_instance_p;
+    struct nala_data_type_for_usleep_t *nala_data_p;
     int return_value;
 
     nala_print_call("usleep", &nala_state_for_usleep.state);
@@ -15335,31 +15335,31 @@ int __wrap_usleep(__useconds_t usec)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_usleep.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_usleep.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_usleep.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked usleep() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_usleep.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_usleep.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, usleep, usec);
-            _nala_data_p->params_in.usec = usec;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, usleep, usec);
+            nala_data_p->params_in.usec = usec;
 
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(usec);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(usec);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_usleep(usec);
@@ -15399,19 +15399,19 @@ void usleep_mock(__useconds_t usec, int return_value)
 
 int usleep_mock_once(__useconds_t usec, int return_value)
 {
-    struct _nala_instance_type_for_usleep *_nala_instance_p;
+    struct nala_instance_type_for_usleep_t *nala_instance_p;
 
     nala_state_for_usleep.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    _nala_instance_p->data.params.usec = usec;
-    _nala_instance_p->data.params.ignore_usec_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_instance_p->data.params.usec = usec;
+    nala_instance_p->data.params.ignore_usec_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_usleep.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void usleep_mock_ignore_in(int return_value)
@@ -15425,7 +15425,7 @@ void usleep_mock_ignore_in(int return_value)
 
 int usleep_mock_ignore_in_once(int return_value)
 {
-    struct _nala_instance_type_for_usleep *instance_p;
+    struct nala_instance_type_for_usleep_t *instance_p;
 
     nala_state_for_usleep.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -15451,7 +15451,7 @@ void usleep_mock_set_callback(void (*callback)(__useconds_t usec))
 
 struct nala_usleep_params_t *usleep_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_usleep *instance_p;
+    struct nala_instance_type_for_usleep_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_usleep.instances, &instance_p, handle);
 
@@ -15491,7 +15491,7 @@ void usleep_mock_real(void)
 
 void usleep_mock_real_once(void)
 {
-    struct _nala_instance_type_for_usleep *instance_p;
+    struct nala_instance_type_for_usleep_t *instance_p;
 
     nala_state_for_usleep.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -15511,8 +15511,8 @@ void usleep_mock_resume(void)
 
 void usleep_mock_reset(void)
 {
-    struct _nala_instance_type_for_usleep *current_p;
-    struct _nala_instance_type_for_usleep *tmp_p;
+    struct nala_instance_type_for_usleep_t *current_p;
+    struct nala_instance_type_for_usleep_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_usleep, current_p, tmp_p);
 }
@@ -15534,7 +15534,7 @@ void usleep_mock_assert_completed(void)
 
 ssize_t __real_write(int fd, const void *buf, size_t count);
 
-struct _nala_data_params_for_write {
+struct nala_data_params_for_write_t {
     int fd;
     const void *buf;
     size_t count;
@@ -15547,8 +15547,8 @@ struct _nala_data_params_for_write {
     bool ignore_count_in;
 };
 
-struct _nala_data_type_for_write {
-    struct _nala_data_params_for_write params;
+struct nala_data_type_for_write_t {
+    struct nala_data_params_for_write_t params;
     ssize_t return_value;
     int errno_value;
     ssize_t (*implementation)(int fd, const void *buf, size_t count);
@@ -15557,27 +15557,27 @@ struct _nala_data_type_for_write {
     struct nala_write_params_t params_in;
 };
 
-struct _nala_instance_type_for_write {
+struct nala_instance_type_for_write_t {
     int mode;
     int handle;
-    struct _nala_data_type_for_write data;
-    struct _nala_instance_type_for_write *next_p;
+    struct nala_data_type_for_write_t data;
+    struct nala_instance_type_for_write_t *next_p;
 };
 
-struct _nala_instances_type_for_write {
-    struct _nala_instance_type_for_write *head_p;
-    struct _nala_instance_type_for_write *next_p;
-    struct _nala_instance_type_for_write *tail_p;
+struct nala_instances_type_for_write_t {
+    struct nala_instance_type_for_write_t *head_p;
+    struct nala_instance_type_for_write_t *next_p;
+    struct nala_instance_type_for_write_t *tail_p;
     int length;
 };
 
-struct nala_state_type_for_write {
+struct nala_state_type_for_write_t {
     struct nala_state_t state;
-    struct _nala_data_type_for_write data;
-    struct _nala_instances_type_for_write instances;
+    struct nala_data_type_for_write_t data;
+    struct nala_instances_type_for_write_t instances;
 };
 
-static struct nala_state_type_for_write nala_state_for_write = {
+static struct nala_state_type_for_write_t nala_state_for_write = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -15593,7 +15593,7 @@ static struct nala_state_type_for_write nala_state_for_write = {
     }
 };
 
-struct _nala_data_type_for_write *nala_get_data_write()
+struct nala_data_type_for_write_t *nala_get_data_write()
 {
     if (nala_state_for_write.instances.tail_p != NULL) {
         return (&nala_state_for_write.instances.tail_p->data);
@@ -15602,15 +15602,15 @@ struct _nala_data_type_for_write *nala_get_data_write()
     }
 }
 
-struct _nala_data_params_for_write *nala_get_params_write()
+struct nala_data_params_for_write_t *nala_get_params_write()
 {
     return (&nala_get_data_write()->params);
 }
 
 ssize_t __wrap_write(int fd, const void *buf, size_t count)
 {
-    struct _nala_instance_type_for_write *_nala_instance_p;
-    struct _nala_data_type_for_write *_nala_data_p;
+    struct nala_instance_type_for_write_t *nala_instance_p;
+    struct nala_data_type_for_write_t *nala_data_p;
     ssize_t return_value;
 
     nala_print_call("write", &nala_state_for_write.state);
@@ -15620,40 +15620,40 @@ ssize_t __wrap_write(int fd, const void *buf, size_t count)
     case MODE_MOCK_ONCE:
     case MODE_MOCK:
         if (nala_state_for_write.state.mode == MODE_MOCK_ONCE) {
-            NALA_INSTANCES_POP(nala_state_for_write.instances, &_nala_instance_p);
+            NALA_INSTANCES_POP(nala_state_for_write.instances, &nala_instance_p);
 
-            if (_nala_instance_p == NULL) {
+            if (nala_instance_p == NULL) {
                 nala_test_failure(nala_format(
                         "Mocked write() called more times than expected.\n"));
             }
 
-            _nala_data_p = &_nala_instance_p->data;
+            nala_data_p = &nala_instance_p->data;
         } else {
-            _nala_instance_p = NULL;
-            _nala_data_p = &nala_state_for_write.data;
+            nala_instance_p = NULL;
+            nala_data_p = &nala_state_for_write.data;
         }
 
-        if (_nala_instance_p == NULL || _nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
-            MOCK_ASSERT_IN_EQ(_nala_data_p, write, buf);
-            _nala_data_p->params_in.buf = buf;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, write, fd);
-            _nala_data_p->params_in.fd = fd;
-            MOCK_ASSERT_IN_EQ(_nala_data_p, write, count);
-            _nala_data_p->params_in.count = count;
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_IN_EQ(nala_data_p, write, buf);
+            nala_data_p->params_in.buf = buf;
+            MOCK_ASSERT_IN_EQ(nala_data_p, write, fd);
+            nala_data_p->params_in.fd = fd;
+            MOCK_ASSERT_IN_EQ(nala_data_p, write, count);
+            nala_data_p->params_in.count = count;
 
-            MOCK_ASSERT_COPY_SET_PARAM(_nala_instance_p,
-                                       _nala_data_p,
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
                                        nala_mock_assert_memory,
                                        write,
                                        buf);
 
-            errno = _nala_data_p->errno_value;
+            errno = nala_data_p->errno_value;
 
-            if (_nala_data_p->callback != NULL) {
-                _nala_data_p->callback(fd, buf, count);
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(fd, buf, count);
             }
 
-            return_value = _nala_data_p->return_value;
+            return_value = nala_data_p->return_value;
         } else {
             return_value =
             __real_write(fd, buf, count);
@@ -15697,27 +15697,27 @@ void write_mock(int fd, size_t count, ssize_t return_value)
 
 int write_mock_once(int fd, size_t count, ssize_t return_value)
 {
-    struct _nala_instance_type_for_write *_nala_instance_p;
+    struct nala_instance_type_for_write_t *nala_instance_p;
 
     nala_state_for_write.state.mode = MODE_MOCK_ONCE;
-    NALA_INSTANCE_NEW(_nala_instance_p, INSTANCE_MODE_NORMAL);
-    nala_set_param_init(&_nala_instance_p->data.params.buf_out);
-    nala_set_param_init(&_nala_instance_p->data.params.buf_in);
-    _nala_instance_p->data.params.buf_in_assert = NULL;
-    _nala_instance_p->data.params.buf_out_copy = NULL;
-    _nala_instance_p->data.params.buf = NULL;
-    _nala_instance_p->data.params.ignore_buf_in = true;
-    _nala_instance_p->data.params.fd = fd;
-    _nala_instance_p->data.params.ignore_fd_in = false;
-    _nala_instance_p->data.params.count = count;
-    _nala_instance_p->data.params.ignore_count_in = false;
-    _nala_instance_p->data.return_value = return_value;
-    _nala_instance_p->data.errno_value = 0;
-    _nala_instance_p->data.callback = NULL;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.buf_out);
+    nala_set_param_init(&nala_instance_p->data.params.buf_in);
+    nala_instance_p->data.params.buf_in_assert = NULL;
+    nala_instance_p->data.params.buf_out_copy = NULL;
+    nala_instance_p->data.params.buf = NULL;
+    nala_instance_p->data.params.ignore_buf_in = true;
+    nala_instance_p->data.params.fd = fd;
+    nala_instance_p->data.params.ignore_fd_in = false;
+    nala_instance_p->data.params.count = count;
+    nala_instance_p->data.params.ignore_count_in = false;
+    nala_instance_p->data.return_value = return_value;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_state_for_write.instances,
-                          _nala_instance_p);
+                          nala_instance_p);
 
-    return (_nala_instance_p->handle);
+    return (nala_instance_p->handle);
 }
 
 void write_mock_ignore_in(ssize_t return_value)
@@ -15733,7 +15733,7 @@ void write_mock_ignore_in(ssize_t return_value)
 
 int write_mock_ignore_in_once(ssize_t return_value)
 {
-    struct _nala_instance_type_for_write *instance_p;
+    struct nala_instance_type_for_write_t *instance_p;
 
     nala_state_for_write.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -15766,7 +15766,7 @@ void write_mock_set_callback(void (*callback)(int fd, const void *buf, size_t co
 
 struct nala_write_params_t *write_mock_get_params_in(int handle)
 {
-    struct _nala_instance_type_for_write *instance_p;
+    struct nala_instance_type_for_write_t *instance_p;
 
     NALA_INSTANCES_FIND_USED(nala_state_for_write.instances, &instance_p, handle);
 
@@ -15799,27 +15799,27 @@ void write_mock_set_buf_in(const void *buf_p, size_t size)
 
 void write_mock_set_buf_in_assert(void (*callback)(const void *buf, const void *nala_buf_p, size_t nala_size))
 {
-    struct _nala_data_params_for_write *_nala_params_p;
+    struct nala_data_params_for_write_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_write();
+    nala_params_p = nala_get_params_write();
 
-    if (_nala_params_p->buf_in.buf_p == NULL) {
+    if (nala_params_p->buf_in.buf_p == NULL) {
         nala_test_failure(
             nala_format(
                 "write_mock_set_buf_in() must be called "
                 "before write_mock_set_buf_in_assert().\n"));
     }
 
-    _nala_params_p->buf_in_assert = callback;
+    nala_params_p->buf_in_assert = callback;
 }
 
 void write_mock_set_buf_in_pointer(const void *buf)
 {
-    struct _nala_data_params_for_write *_nala_params_p;
+    struct nala_data_params_for_write_t *nala_params_p;
 
-    _nala_params_p = nala_get_params_write();
-    _nala_params_p->ignore_buf_in = false;
-    _nala_params_p->buf = buf;
+    nala_params_p = nala_get_params_write();
+    nala_params_p->ignore_buf_in = false;
+    nala_params_p->buf = buf;
 }
 
 void write_mock_set_buf_out(const void *buf_p, size_t size)
@@ -15855,7 +15855,7 @@ void write_mock_real(void)
 
 void write_mock_real_once(void)
 {
-    struct _nala_instance_type_for_write *instance_p;
+    struct nala_instance_type_for_write_t *instance_p;
 
     nala_state_for_write.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -15875,8 +15875,8 @@ void write_mock_resume(void)
 
 void write_mock_reset(void)
 {
-    struct _nala_instance_type_for_write *current_p;
-    struct _nala_instance_type_for_write *tmp_p;
+    struct nala_instance_type_for_write_t *current_p;
+    struct nala_instance_type_for_write_t *tmp_p;
 
     NALA_STATE_RESET(nala_state_for_write, current_p, tmp_p);
 }
