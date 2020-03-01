@@ -241,9 +241,7 @@ class FunctionMock:
         self.wrapped_func = f"__wrap_{self.func_name}"
         self.real_func = f"__real_{self.func_name}"
 
-        self.state_name = f"nala_state_for_{self.func_name}"
-        self.state_type = f"nala_state_type_for_{self.func_name}"
-        self.params_type = f"struct nala_params_type_for_{self.func_name}"
+        self.state_name = f"nala_mock_{self.func_name}"
 
         self.func_decl = self.function.declaration.type
         self.func_params = self.func_decl.args.params if self.func_decl.args else []

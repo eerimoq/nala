@@ -46,7 +46,7 @@ void nala_assert_all_mocks_completed(void)
 {{mock.real_decl | render}};
 
 {% endif %}
-struct nala_data_params_for_{{mock.func_name}}_t {
+struct nala_params_{{mock.func_name}}_t {
     {% for param in mock.params_struct %}
     {{param | render}};
     {% endfor %}
@@ -58,8 +58,8 @@ struct nala_data_params_for_{{mock.func_name}}_t {
     {% endif %}
 };
 
-struct nala_data_type_for_{{mock.func_name}}_t {
-    struct nala_data_params_for_{{mock.func_name}}_t params;
+struct nala_data_{{mock.func_name}}_t {
+    struct nala_params_{{mock.func_name}}_t params;
     {% if mock.return_value %}
     {{mock.return_value_decl | render}};
     {% endif %}
@@ -70,27 +70,27 @@ struct nala_data_type_for_{{mock.func_name}}_t {
     struct nala_{{mock.func_name}}_params_t params_in;
 };
 
-struct nala_instance_type_for_{{mock.func_name}}_t {
+struct nala_instance_{{mock.func_name}}_t {
     int mode;
     int handle;
-    struct nala_data_type_for_{{mock.func_name}}_t data;
-    struct nala_instance_type_for_{{mock.func_name}}_t *next_p;
+    struct nala_data_{{mock.func_name}}_t data;
+    struct nala_instance_{{mock.func_name}}_t *next_p;
 };
 
-struct nala_instances_type_for_{{mock.func_name}}_t {
-    struct nala_instance_type_for_{{mock.func_name}}_t *head_p;
-    struct nala_instance_type_for_{{mock.func_name}}_t *next_p;
-    struct nala_instance_type_for_{{mock.func_name}}_t *tail_p;
+struct nala_instances_{{mock.func_name}}_t {
+    struct nala_instance_{{mock.func_name}}_t *head_p;
+    struct nala_instance_{{mock.func_name}}_t *next_p;
+    struct nala_instance_{{mock.func_name}}_t *tail_p;
     int length;
 };
 
-struct {{mock.state_type}}_t {
+struct {{mock.state_name}}_t {
     struct nala_state_t state;
-    struct nala_data_type_for_{{mock.func_name}}_t data;
-    struct nala_instances_type_for_{{mock.func_name}}_t instances;
+    struct nala_data_{{mock.func_name}}_t data;
+    struct nala_instances_{{mock.func_name}}_t instances;
 };
 
-static struct {{mock.state_type}}_t {{mock.state_name}} = {
+static struct {{mock.state_name}}_t {{mock.state_name}} = {
     .state = {
         .mode = MODE_REAL,
         .suspended = {
@@ -106,7 +106,7 @@ static struct {{mock.state_type}}_t {{mock.state_name}} = {
     }
 };
 
-struct nala_data_type_for_{{mock.func_name}}_t *nala_get_data_{{mock.func_name}}()
+struct nala_data_{{mock.func_name}}_t *nala_get_data_{{mock.func_name}}()
 {
     if ({{mock.state_name}}.instances.tail_p != NULL) {
         return (&{{mock.state_name}}.instances.tail_p->data);
@@ -115,15 +115,15 @@ struct nala_data_type_for_{{mock.func_name}}_t *nala_get_data_{{mock.func_name}}
     }
 }
 
-struct nala_data_params_for_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
+struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
 {
     return (&nala_get_data_{{mock.func_name}}()->params);
 }
 
 {{mock.wrapped_decl | render}}
 {
-    struct nala_instance_type_for_{{mock.func_name}}_t *nala_instance_p;
-    struct nala_data_type_for_{{mock.func_name}}_t *nala_data_p;
+    struct nala_instance_{{mock.func_name}}_t *nala_instance_p;
+    struct nala_data_{{mock.func_name}}_t *nala_data_p;
     {% if mock.return_value %}
     {{mock.return_value_decl | render}};
     {% endif %}
@@ -145,7 +145,7 @@ struct nala_data_params_for_{{mock.func_name}}_t *nala_get_params_{{mock.func_na
             nala_data_p = &nala_instance_p->data;
         } else {
             nala_instance_p = NULL;
-            nala_data_p = &nala_state_for_{{mock.func_name}}.data;
+            nala_data_p = &nala_mock_{{mock.func_name}}.data;
         }
 
         if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
@@ -312,7 +312,7 @@ struct nala_data_params_for_{{mock.func_name}}_t *nala_get_params_{{mock.func_na
 
 {{mock.mock_once_func | render}}
 {
-    struct nala_instance_type_for_{{mock.func_name}}_t *nala_instance_p;
+    struct nala_instance_{{mock.func_name}}_t *nala_instance_p;
 
     {{mock.state_name}}.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
@@ -389,7 +389,7 @@ void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
 
 int {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
 {
-    struct nala_instance_type_for_{{mock.func_name}}_t *instance_p;
+    struct nala_instance_{{mock.func_name}}_t *instance_p;
 
     {{mock.state_name}}.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
@@ -437,7 +437,7 @@ void {{mock.func_name}}_mock_set_callback({{mock.callback_decl | render}})
 
 struct nala_{{mock.func_name}}_params_t *{{mock.func_name}}_mock_get_params_in(int handle)
 {
-    struct nala_instance_type_for_{{mock.func_name}}_t *instance_p;
+    struct nala_instance_{{mock.func_name}}_t *instance_p;
 
     NALA_INSTANCES_FIND_USED({{mock.state_name}}.instances, &instance_p, handle);
 
@@ -468,7 +468,7 @@ void {{mock.func_name}}_mock_set_{{param.name}}_in(const void *buf_p, size_t siz
 
 void {{mock.func_name}}_mock_set_{{param.name}}_in_assert(void (*callback)({{param | render}}, const void *nala_buf_p, size_t nala_size))
 {
-    struct nala_data_params_for_{{mock.func_name}}_t *nala_params_p;
+    struct nala_params_{{mock.func_name}}_t *nala_params_p;
 
     nala_params_p = nala_get_params_{{mock.func_name}}();
 
@@ -484,7 +484,7 @@ void {{mock.func_name}}_mock_set_{{param.name}}_in_assert(void (*callback)({{par
 
 void {{mock.func_name}}_mock_set_{{param.name}}_in_pointer({{param | render}})
 {
-    struct nala_data_params_for_{{mock.func_name}}_t *nala_params_p;
+    struct nala_params_{{mock.func_name}}_t *nala_params_p;
 
     nala_params_p = nala_get_params_{{mock.func_name}}();
     nala_params_p->ignore_{{param.name}}_in = false;
@@ -529,7 +529,7 @@ void {{mock.func_name}}_mock_set_va_arg_in_pointer_at(unsigned int index, const 
     (void)index;
     (void)buf_p;
 
-    struct nala_instance_type_for_{{mock.func_name}}_t *instance_p;
+    struct nala_instance_{{mock.func_name}}_t *instance_p;
 
     instance_p = {{mock.state_name}}.instances.tail_p;
 
@@ -572,7 +572,7 @@ void {{mock.func_name}}_mock_real(void)
 
 void {{mock.func_name}}_mock_real_once(void)
 {
-    struct nala_instance_type_for_{{mock.func_name}}_t *instance_p;
+    struct nala_instance_{{mock.func_name}}_t *instance_p;
 
     {{mock.state_name}}.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
@@ -592,8 +592,8 @@ void {{mock.func_name}}_mock_resume(void)
 
 void {{mock.func_name}}_mock_reset(void)
 {
-    struct nala_instance_type_for_{{mock.func_name}}_t *current_p;
-    struct nala_instance_type_for_{{mock.func_name}}_t *tmp_p;
+    struct nala_instance_{{mock.func_name}}_t *current_p;
+    struct nala_instance_{{mock.func_name}}_t *tmp_p;
 
     NALA_STATE_RESET({{mock.state_name}}, current_p, tmp_p);
 }
