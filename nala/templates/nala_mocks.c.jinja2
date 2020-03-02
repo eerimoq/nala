@@ -500,7 +500,18 @@ void {{mock.func_name}}_mock_set_{{param.name}}_out(const void *buf_p, size_t si
 
 void {{mock.func_name}}_mock_set_{{param.name}}_out_copy(void (*callback)({{param | render}}, const void *nala_buf_p, size_t nala_size))
 {
-    nala_get_params_{{mock.func_name}}()->{{param.name}}_out_copy = callback;
+    struct nala_params_{{mock.func_name}}_t *nala_params_p;
+
+    nala_params_p = nala_get_params_{{mock.func_name}}();
+
+    if (nala_params_p->{{param.name}}_out.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "{{mock.func_name}}_mock_set_{{param.name}}_out() must be called "
+                "before {{mock.func_name}}_mock_set_{{param.name}}_out_copy().\n"));
+    }
+
+    nala_params_p->{{param.name}}_out_copy = callback;
 }
 {% endfor %}
 {% if mock.is_variadic_func %}

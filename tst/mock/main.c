@@ -740,6 +740,23 @@ TEST(double_pointer_function)
     ASSERT_EQ(value, 2);
 }
 
+static void double_pointer_function_out_copy_before_out_error_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    double_pointer_mock_once(3);
+    /* double_pointer_mock_set_value_pp_out() not called. */
+    double_pointer_mock_set_value_pp_out_copy(double_pointer_out_copy);
+}
+
+TEST(double_pointer_function_out_copy_before_out_error)
+{
+    function_error_in_subprocess(
+        double_pointer_function_out_copy_before_out_error_entry,
+        "double_pointer_mock_set_value_pp_out() must be called before "
+        "double_pointer_mock_set_value_pp_out_copy().");
+}
+
 TEST(rename_parameters)
 {
     clock_gettime_mock_ignore_in(0);

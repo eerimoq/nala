@@ -18,12 +18,10 @@ SRC += dummy_functions.c
 SRC += nala_mocks.c
 SRC += subprocess.c
 
-test: nala_mocks.h
+test:
 	$(MAKE) -C ../.. dist
-	$(CC) $(CFLAGS) $$(cat nala_mocks.ld) $(SRC) -o main
-	./main
-
-nala_mocks.h: main.c
 	[ -f nala_mocks.h ] || (touch nala_mocks.h)
 	$(CC) $(INC) -DNALA_GENERATE_MOCKS -E main.c > main.pp.c
-	cat main.pp.c | $(NALA) generate_mocks
+	cat main.pp.c | $(NALA) generate_mocks --no-cache
+	$(CC) $(CFLAGS) $$(cat nala_mocks.ld) $(SRC) -o main
+	./main
