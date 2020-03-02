@@ -1,4 +1,3 @@
-ASAN_FLAGS = -fsanitize=address
 INC += -I../../nala/dist
 CFLAGS = \
 	$(INC) \
@@ -9,9 +8,7 @@ CFLAGS = \
 	-g \
 	-Og \
 	-no-pie \
-	-fsanitize=address \
 	-Wpedantic \
-	$(ASAN_FLAGS) \
 	-fprofile-arcs \
 	-ftest-coverage
 NALA ?= PYTHONPATH=../.. python3 -m nala
@@ -22,6 +19,7 @@ SRC += nala_mocks.c
 SRC += subprocess.c
 
 test: nala_mocks.h
+	$(MAKE) -C ../.. dist
 	$(CC) $(CFLAGS) $$(cat nala_mocks.ld) $(SRC) -o main
 	./main
 
