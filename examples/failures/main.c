@@ -99,3 +99,8 @@ TEST(eq)
 {
     ASSERT_EQ(1, 2);
 }
+
+TEST(fail)
+{
+    FAIL("The failure message.");
+}

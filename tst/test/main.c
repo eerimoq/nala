@@ -304,12 +304,13 @@ TEST(assert_error)
 
 static void fail_error_entry()
 {
-    FAIL();
+    FAIL("Intentional failure.");
 }
 
 TEST(fail_error)
 {
-    expect_error_in_subprocess(fail_error_entry, "fail");
+    expect_error_in_subprocess(fail_error_entry,
+                               "Intentional failure.");
 }
 
 TEST(capture_output)

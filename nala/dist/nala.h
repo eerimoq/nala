@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NALA_VERSION "0.97.0"
+#define NALA_VERSION "0.98.0"
 
 /**
  * Assert that given characters, numbers, pointers or strings are
@@ -86,9 +86,9 @@
 #define ASSERT(cond) nala_assert(cond)
 
 /**
- * Fail current test.
+ * Fail current test with given message.
  */
-#define FAIL() nala_fail()
+#define FAIL(message) nala_fail(message)
 
 /**
  * A capture output block.
@@ -247,6 +247,6 @@ void nala_assert_memory(const void *actual_p, const void *expected_p, size_t siz
 
 void nala_assert(bool cond);
 
-void nala_fail(void);
+void nala_fail(const char *message_p);
 
 #endif

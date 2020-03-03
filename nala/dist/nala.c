@@ -1447,7 +1447,7 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
         break;                                                          \
                                                                         \
     default:                                                            \
-        FAIL();                                                         \
+        FAIL("Internal nala error.");                                   \
         break;                                                          \
     }
 
@@ -1572,10 +1572,13 @@ void nala_assert(bool cond)
     }
 }
 
-void nala_fail(void)
+void nala_fail(const char *message_p)
 {
     nala_reset_all_mocks();
-    nala_test_failure(nala_format("fail\n"));
+    char message[strlen(message_p) + 2];
+    strcpy(&message[0], message_p);
+    strcat(&message[0], "\n");
+    nala_test_failure(nala_format(&message[0]));
 }
 /*
  * The MIT License (MIT)
