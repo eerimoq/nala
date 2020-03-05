@@ -772,6 +772,7 @@ TEST(rename_parameters)
     ftell_mock_ignore_in(0);
     fwrite_mock_ignore_in(0);
     getaddrinfo_mock_ignore_in(0);
+    getsockopt_mock_ignore_in(0);
     getmntent_mock_ignore_in(NULL);
     mount_mock_ignore_in(0);
     /* nftw_mock(dirpath, fn, nopenfd, flags); */
