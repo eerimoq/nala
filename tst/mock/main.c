@@ -765,6 +765,7 @@ TEST(rename_parameters)
     connect_mock_ignore_in(0);
     endmntent_mock_ignore_in(0);
     fclose_mock(0);
+    fgets_mock_ignore_in(NULL);
     fopen_mock_ignore_in(NULL);
     /* fread_mock(ptr, size, nmemb, stream); */
     freeaddrinfo_mock_ignore_in();
