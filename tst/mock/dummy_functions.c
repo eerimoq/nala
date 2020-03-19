@@ -132,3 +132,8 @@ int call_with_arg(call_with_arg_t func, void *arg_p)
 {
     return (func(arg_p));
 }
+
+int struct_pointer_typedef(struct_pointer_typedef_t value)
+{
+    return (value->number);
+}

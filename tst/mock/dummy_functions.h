@@ -41,6 +41,8 @@ struct likely_undefined_padding_t {
 
 typedef int (*call_with_arg_t)(void *arg_p);
 
+typedef struct DummyStruct * struct_pointer_typedef_t;
+
 int add(int x, int y);
 void output_message(const char *message);
 void keep_args_output_message(const char *message);
@@ -65,5 +67,6 @@ union_type typedef_union_param_and_return_type(union_type arg);
 int double_pointer(int **value_pp);
 void likely_undefined_padding(struct likely_undefined_padding_t *value_p);
 int call_with_arg(call_with_arg_t func, void *arg_p);
+int struct_pointer_typedef(struct_pointer_typedef_t value);
 
 #endif

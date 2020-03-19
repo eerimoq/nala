@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/statvfs.h>
+#include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
 #include <poll.h>
@@ -775,6 +776,7 @@ TEST(rename_parameters)
     getaddrinfo_mock_ignore_in(0);
     getsockopt_mock_ignore_in(0);
     getmntent_mock_ignore_in(NULL);
+    gettimeofday_mock_ignore_in(0);
     mount_mock_ignore_in(0);
     /* nftw_mock(dirpath, fn, nopenfd, flags); */
     pipe_mock_ignore_in(0);
@@ -782,6 +784,7 @@ TEST(rename_parameters)
     read_mock_ignore_in(0);
     sendto_mock_ignore_in(0);
     setsockopt_mock_ignore_in(0);
+    settimeofday_mock_ignore_in(0);
     socket_mock_ignore_in(0);
     sleep_mock_ignore_in(0);
     statvfs_mock_ignore_in(0);
@@ -972,4 +975,17 @@ TEST(call_with_arg_not_called_error)
         call_with_arg_not_called_error_entry,
         "call_with_arg() has not been called yet for given mock handle. No "
         "parameters available.");
+}
+
+TEST(struct_pointer_typedef_function)
+{
+    struct DummyStruct value;
+    struct_pointer_typedef_t value_p;
+
+    value.number = -5;
+    value_p = &value;
+    struct_pointer_typedef_mock_once(-4);
+    struct_pointer_typedef_mock_set_value_in(value_p, sizeof(*value_p));
+
+    ASSERT_EQ(struct_pointer_typedef(&value), -4);
 }

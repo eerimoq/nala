@@ -24,75 +24,11 @@ def is_ellipsis(param):
     return isinstance(param, node.EllipsisParam)
 
 
-def is_char_pointer(param):
-    if is_ellipsis(param):
-        return False
-    elif isinstance(param.type, node.PtrDecl):
-        if isinstance(param.type.type, (node.FuncDecl, node.PtrDecl)):
-            return False
-        elif isinstance(param.type.type.type, node.Struct):
-            return False
-        elif param.type.type.type.names[0] == 'char':
-            return True
-        else:
-            return False
-    else:
-        return False
-
-
-def is_char_pointer_or_non_pointer(param):
-    if is_ellipsis(param):
-        return False
-    elif is_char_pointer(param):
-        return True
-    elif is_pointer(param):
-        return False
-    else:
-        return True
-
-
-def is_struct(param):
-    try:
-        return isinstance(param.type.type, node.Struct)
-    except AttributeError:
-        return False
-
-
-def is_union(param):
-    try:
-        return isinstance(param.type.type, node.Union)
-    except AttributeError:
-        return False
-
-
 def is_va_list(param):
     try:
         return param.type.type.names[0] == 'va_list'
     except AttributeError:
         return False
-
-
-def is_void(param):
-    if is_ellipsis(param):
-        return False
-    elif is_pointer(param):
-        return False
-    elif is_enum(param):
-        return False
-    elif is_struct(param):
-        return False
-    elif is_union(param):
-        return False
-    else:
-        return param.type.type.names[0] == 'void'
-
-
-def is_pointer(param):
-    return isinstance(param.type, (node.PtrDecl, node.ArrayDecl))
-
-
-def is_enum(param):
-    return isinstance(param.type.type, node.Enum)
 
 
 def decl(name, type):
@@ -344,17 +280,17 @@ class FunctionMock:
 
             self.instance_members.append(bool_param(f'ignore_{param.name}_in'))
 
-            if is_char_pointer(param):
+            if self.is_char_pointer(param):
                 self.char_pointer_params.append(param)
-            elif is_pointer(param):
+            elif self.is_pointer(param):
                 self.pointer_params.append(param)
             else:
                 self.non_pointer_params.append(param)
 
-            if is_char_pointer_or_non_pointer(param):
+            if self.is_char_pointer_or_non_pointer(param):
                 self.ignore_params.append(param.name)
 
-            if not is_pointer(param):
+            if not self.is_pointer(param):
                 continue
 
             self.instance_members.append(set_member(f'{param.name}_in'))
@@ -383,6 +319,62 @@ class FunctionMock:
             name,
             node.FuncDecl(self.func_decl.args,
                           rename_return_type(self.func_decl.type, name)))
+
+    def is_char_pointer(self, param):
+        if is_ellipsis(param):
+            return False
+        elif isinstance(param.type, node.PtrDecl):
+            if isinstance(param.type.type, (node.FuncDecl, node.PtrDecl)):
+                return False
+            elif isinstance(param.type.type.type, node.Struct):
+                return False
+            elif param.type.type.type.names[0] == 'char':
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    def is_char_pointer_or_non_pointer(self, param):
+        if is_ellipsis(param):
+            return False
+        elif self.is_char_pointer(param):
+            return True
+        elif self.is_pointer(param):
+            return False
+        else:
+            return True
+
+    def is_void(self, param):
+        if is_ellipsis(param):
+            return False
+        elif self.is_pointer(param):
+            return False
+        elif self.is_enum(param):
+            return False
+        elif self.is_struct(param):
+            return False
+        elif self.is_union(param):
+            return False
+        else:
+            return param.type.type.names[0] == 'void'
+
+    def is_pointer(self, param):
+        if isinstance(param.type, (node.PtrDecl, node.ArrayDecl)):
+            return True
+
+        try:
+            name = param.type.type.names[0]
+            typedef = self.lookup_typedef(name)
+
+            return self.is_pointer(typedef)
+        except AttributeError:
+            pass
+
+        return False
+
+    def is_enum(self, param):
+        return isinstance(param.type.type, node.Enum)
 
     def is_struct(self, param):
         try:
@@ -431,7 +423,7 @@ class FunctionMock:
         variable_arguments_params = []
 
         for param in self.func_params:
-            if is_void(param):
+            if self.is_void(param):
                 continue
             elif self.is_struct(param):
                 continue
@@ -439,7 +431,7 @@ class FunctionMock:
                 continue
             elif is_va_list(param):
                 continue
-            elif is_char_pointer_or_non_pointer(param):
+            elif self.is_char_pointer_or_non_pointer(param):
                 once_params.append(param)
             elif is_ellipsis(param):
                 variable_arguments_params.append(decl(
@@ -450,7 +442,7 @@ class FunctionMock:
                                                node.IdentifierType(["char"])))))
                 variable_arguments_params.append(param)
 
-        if not is_void(self.return_value_decl):
+        if not self.is_void(self.return_value_decl):
             once_params.append(self.return_value_decl)
 
         once_params += variable_arguments_params
