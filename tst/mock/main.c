@@ -621,6 +621,12 @@ TEST(enum_param_function)
     enum_param(enum_param_type_a);
 }
 
+TEST(enum_param_typedef_function)
+{
+    enum_param_typedef_mock(enum_param_type_a);
+    enum_param_typedef(enum_param_type_a);
+}
+
 TEST(call_function)
 {
     call_mock_once(4);
@@ -988,4 +994,35 @@ TEST(struct_pointer_typedef_function)
     struct_pointer_typedef_mock_set_value_in(value_p, sizeof(*value_p));
 
     ASSERT_EQ(struct_pointer_typedef(&value), -4);
+}
+
+TEST(struct_pointer_typedef_2_function)
+{
+    struct DummyStruct value;
+    struct_pointer_typedef_2_t value_p;
+
+    value.number = -5;
+    value_p = &value;
+    struct_pointer_typedef_2_mock_once(-4);
+    struct_pointer_typedef_2_mock_set_value_in(value_p, sizeof(*value_p));
+
+    ASSERT_EQ(struct_pointer_typedef_2(&value), -4);
+}
+
+TEST(struct_typedef_function)
+{
+    struct_typedef_t value;
+
+    struct_typedef_mock_once(-4);
+
+    ASSERT_EQ(struct_typedef(value), -4);
+}
+
+TEST(struct_typedef_2_function)
+{
+    struct_typedef_2_t value;
+
+    struct_typedef_2_mock_once(-4);
+
+    ASSERT_EQ(struct_typedef_2(value), -4);
 }

@@ -77,6 +77,11 @@ void enum_param(enum enum_param_type value)
     (void)value;
 }
 
+void enum_param_typedef(enum_param_type_e value)
+{
+    (void)value;
+}
+
 int call(int (*callback)(int value))
 {
     return (callback(1));
@@ -136,4 +141,19 @@ int call_with_arg(call_with_arg_t func, void *arg_p)
 int struct_pointer_typedef(struct_pointer_typedef_t value)
 {
     return (value->number);
+}
+
+int struct_pointer_typedef_2(struct_pointer_typedef_2_t value)
+{
+    return (value->number);
+}
+
+int struct_typedef(struct_typedef_t value)
+{
+    return (value.number);
+}
+
+int struct_typedef_2(struct_typedef_2_t value)
+{
+    return (value.number);
 }

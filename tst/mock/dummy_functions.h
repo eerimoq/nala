@@ -18,6 +18,8 @@ enum enum_param_type
     enum_param_type_a = 0
 };
 
+typedef enum enum_param_type enum_param_type_e;
+
 union union_type
 {
     struct struct_param_type a;
@@ -43,6 +45,12 @@ typedef int (*call_with_arg_t)(void *arg_p);
 
 typedef struct DummyStruct * struct_pointer_typedef_t;
 
+typedef struct_pointer_typedef_t struct_pointer_typedef_2_t;
+
+typedef struct DummyStruct struct_typedef_t;
+
+typedef struct_typedef_t struct_typedef_2_t;
+
 int add(int x, int y);
 void output_message(const char *message);
 void keep_args_output_message(const char *message);
@@ -58,6 +66,7 @@ int io_control(int kind, ...);
 int io_vcontrol(int kind, va_list ap);
 void struct_param(struct struct_param_type *data);
 void enum_param(enum enum_param_type value);
+void enum_param_typedef(enum_param_type_e value);
 int call(int (*callback)(int value));
 void in_out(int *buf_p);
 struct struct_param_type struct_param_and_return_type(struct struct_param_type arg);
@@ -68,5 +77,8 @@ int double_pointer(int **value_pp);
 void likely_undefined_padding(struct likely_undefined_padding_t *value_p);
 int call_with_arg(call_with_arg_t func, void *arg_p);
 int struct_pointer_typedef(struct_pointer_typedef_t value);
+int struct_pointer_typedef_2(struct_pointer_typedef_2_t value);
+int struct_typedef(struct_typedef_t value);
+int struct_typedef_2(struct_typedef_2_t value);
 
 #endif

@@ -365,9 +365,8 @@ class FunctionMock:
 
         try:
             name = param.type.type.names[0]
-            typedef = self.lookup_typedef(name)
 
-            return self.is_pointer(typedef)
+            return self.is_pointer(self.lookup_typedef(name))
         except AttributeError:
             pass
 
@@ -385,10 +384,8 @@ class FunctionMock:
 
         try:
             name = param.type.type.names[0]
-            typedef = self.lookup_typedef(name)
 
-            if isinstance(typedef.type.type, node.Struct):
-                return True
+            return self.is_struct(self.lookup_typedef(name))
         except AttributeError:
             pass
 
@@ -403,10 +400,8 @@ class FunctionMock:
 
         try:
             name = param.type.type.names[0]
-            typedef = self.lookup_typedef(name)
 
-            if isinstance(typedef.type.type, node.Union):
-                return True
+            return self.is_union(self.lookup_typedef(name));
         except AttributeError:
             pass
 
