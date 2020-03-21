@@ -16,6 +16,7 @@ Features
 - Use the same generic assertions everywhere
 - Assertion failures reported as diffs
 - Easy-to-use output capturing utilities
+- Traceback(s) on failure
 - Amalgamated source file and header ready to drop in your project
 - Mocking support
 - Works well with errors reported by sanitizers
