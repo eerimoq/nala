@@ -27,7 +27,7 @@ Do not edit manually
     do {                                                \
         instance_p = nala_xmalloc(sizeof(*instance_p)); \
         instance_p->mode = mode_in;                     \
-        instance_p->handle = next_handle++;             \
+        instance_p->handle = nala_next_handle++;        \
         instance_p->next_p = NULL;                      \
         nala_traceback(&instance_p->data.traceback);    \
     } while (0);
@@ -703,7 +703,7 @@ void nala_print_call(const char *function_name_p, struct nala_state_t *state_p)
     fprintf(nala_get_stdout(), "%s: %s()\n", mode_p, function_name_p);
 }
 
-static int next_handle = 1;
+int nala_next_handle = 1;
 
 void nala_suspend_all_mocks(void)
 {
