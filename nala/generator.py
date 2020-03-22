@@ -181,6 +181,7 @@ class FunctionMock:
 
         self.func_decl = self.function.declaration.type
         self.func_params = self.func_decl.args.params if self.func_decl.args else []
+        self.assign_names_to_unnamed_params(self.func_params)
         self.is_variadic_func = is_variadic_func(self.func_params)
 
         self.params_struct = [
@@ -298,6 +299,22 @@ class FunctionMock:
             self.instance_members.append(set_member(f'{param.name}_out'))
             self.instance_members.append(out_copy_member(param))
             self.set_params.append((param, self.find_check_function(param)))
+
+    def assign_names_to_unnamed_params(self, params):
+        for i, param in enumerate(params):
+            if not isinstance(param, node.Typename):
+                continue
+
+            if self.is_void(param):
+                continue
+
+            name = f'nala_{i}'
+            param.name = name
+
+            while not isinstance(param, node.TypeDecl):
+                param = param.type
+
+            param.declname = name
 
     def find_check_function(self, param):
         if isinstance(param.type.type, node.TypeDecl):

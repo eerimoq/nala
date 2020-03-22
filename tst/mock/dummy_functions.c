@@ -157,3 +157,8 @@ int struct_typedef_2(struct_typedef_2_t value)
 {
     return (value.number);
 }
+
+int parameter_name_omitted(int a, int *b)
+{
+    return (a + *b);
+}

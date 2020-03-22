@@ -1033,3 +1033,10 @@ TEST(struct_typedef_2_function)
 
     ASSERT_EQ(struct_typedef_2(value), -4);
 }
+
+TEST(parameter_name_omitted_function)
+{
+    parameter_name_omitted_mock_once(1, 2);
+
+    ASSERT_EQ(parameter_name_omitted(1, NULL), 2);
+}
