@@ -42,24 +42,6 @@ Drop the two files in your project, make sure ``nala.c`` is compiled
 and linked just like the other source files of your test program and
 you should be good to go.
 
-The test program takes optional arguments as below.
-
-.. code-block::
-
-   $ ./a.out
-   usage: ./a.out [-h] [-v] [-c] [-a] [<test-pattern>]
-
-   Run tests.
-
-   positional arguments:
-     test-pattern                  Only run tests containing given pattern.
-
-   optional arguments:
-     -h, --help                    Show this help message and exit.
-     -v, --version                 Print version information.
-     -c, --continue-on-failure     Always run all tests.
-     -a, --print-all-calls         Print all calls to ease debugging.
-
 Example
 =======
 
@@ -174,6 +156,25 @@ example above.
    (gdb) r
    (gdb) set follow-fork-mode child
    (gdb) c
+
+The test program takes optional arguments as below, which also can be
+helpful when debugging, especially `--print-all-calls`.
+
+.. code-block::
+
+   $ ./a.out
+   usage: ./a.out [-h] [-v] [-c] [-a] [<test-pattern>]
+
+   Run tests.
+
+   positional arguments:
+     test-pattern                  Only run tests containing given pattern.
+
+   optional arguments:
+     -h, --help                    Show this help message and exit.
+     -v, --version                 Print version information.
+     -c, --continue-on-failure     Always run all tests.
+     -a, --print-all-calls         Print all calls to ease debugging.
 
 Mocking
 =======
