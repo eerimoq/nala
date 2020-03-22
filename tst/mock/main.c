@@ -445,6 +445,9 @@ TEST(variadic_function)
     io_control_mock_once(3, 0, "%p");
     ASSERT_EQ(io_control(3, NULL), 0);
 
+    io_control_mock_once(1, 6, "%s", "foo");
+    ASSERT_EQ(io_control(1, "foo"), 6);
+
     io_control_mock_once(3, 0, "%p");
     io_control_mock_set_va_arg_in_pointer_at(0, NULL);
     ASSERT_EQ(io_control(3, NULL), 0);

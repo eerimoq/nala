@@ -86,7 +86,7 @@
 #define NALA_STATE_RESET(_state, current_p, tmp_p)                      \
     (_state).state.mode = MODE_REAL;                                    \
     (_state).state.suspended.count = 0;                                 \
-    NALA_INSTANCES_DESTROY((_state).instances, current_p, tmp_p)      
+    NALA_INSTANCES_DESTROY((_state).instances, current_p, tmp_p)
 
 struct nala_set_param {
     void *buf_p;
@@ -122,7 +122,8 @@ enum nala_va_arg_item_type_t {
     nala_va_arg_item_type_u_t,
     nala_va_arg_item_type_ld_t,
     nala_va_arg_item_type_lu_t,
-    nala_va_arg_item_type_p_t
+    nala_va_arg_item_type_p_t,
+    nala_va_arg_item_type_s_t
 };
 
 struct nala_va_arg_item_t {
@@ -134,6 +135,7 @@ struct nala_va_arg_item_t {
         long ld;
         unsigned long lu;
         void *p_p;
+        char *s_p;
     };
     struct nala_set_param in;
     struct nala_set_param out;
@@ -279,6 +281,13 @@ void nala_parse_va_arg_non_long(const char **format_pp,
         item_p->p_p = NULL;
         break;
 
+    case 's':
+        /* ToDo: Should save in buffer. */
+        item_p->type = nala_va_arg_item_type_s_t;
+        item_p->ignore_in = false;
+        item_p->s_p = va_arg(vl, char *);
+        break;
+
     default:
         nala_free(item_p);
         nala_test_failure(
@@ -388,6 +397,14 @@ void nala_va_arg_list_assert_p(struct nala_va_arg_item_t *item_p,
     }
 }
 
+void nala_va_arg_list_assert_s(struct nala_va_arg_item_t *item_p,
+                               char *value_p)
+{
+    if (!item_p->ignore_in) {
+        ASSERT_EQ(item_p->s_p, value_p);
+    }
+}
+
 void nala_va_arg_list_assert(struct nala_va_arg_list_t *self_p,
                              va_list vl)
 {
@@ -417,6 +434,10 @@ void nala_va_arg_list_assert(struct nala_va_arg_list_t *self_p,
 
         case nala_va_arg_item_type_p_t:
             nala_va_arg_list_assert_p(item_p, va_arg(vl, void *));
+            break;
+
+        case nala_va_arg_item_type_s_t:
+            nala_va_arg_list_assert_s(item_p, va_arg(vl, char *));
             break;
 
         default:
