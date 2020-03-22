@@ -158,6 +158,13 @@ TEST(output_message_function_check_pointers)
     output_message(NULL);
 }
 
+TEST(output_message_function_check_non_string)
+{
+    output_message_mock_ignore_in_once();
+    output_message_mock_set_message_in("\x00\x01\x02", 3);
+    output_message("\x00\x01\x02");
+}
+
 static void output_message_function_error_check_pointers_entry(void *arg_p)
 {
     (void)arg_p;
