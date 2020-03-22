@@ -148,8 +148,8 @@ struct nala_va_arg_item_t {
         unsigned int u;
         long ld;
         unsigned long lu;
-        void *p_p;
-        char *s_p;
+        const void *p_p;
+        const char *s_p;
     };
     struct nala_set_param in;
     struct nala_set_param out;
@@ -8594,18 +8594,20 @@ void io_control_mock_set_va_arg_in_at(unsigned int index, const void *buf_p, siz
 
 void io_control_mock_set_va_arg_in_pointer_at(unsigned int index, const void *buf_p)
 {
-    (void)index;
-    (void)buf_p;
+    struct nala_va_arg_list_t *va_arg_list_p;
+    struct nala_va_arg_item_t *item_p;
 
-    struct nala_instance_io_control_t *instance_p;
+    va_arg_list_p = &nala_get_params_io_control()->nala_va_arg_list;
+    item_p = nala_va_arg_list_get(va_arg_list_p, index);
 
-    instance_p = nala_mock_io_control.instances.tail_p;
+    if (item_p->type != nala_va_arg_item_type_p_t) {
+        nala_test_failure(
+            nala_format("Only variadic pointer parameters can be set."));
 
-    if (instance_p == NULL) {
-        nala_test_failure(nala_format(
-            "io_control_mock_set_va_arg_in_pointer_at(...) not implemented "
-            "for mock state.\n"));
     }
+
+    item_p->ignore_in = false;
+    item_p->p_p = buf_p;
 }
 
 void io_control_mock_set_va_arg_out_at(unsigned int index, const void *buf_p, size_t size)

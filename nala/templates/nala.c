@@ -134,8 +134,8 @@ struct nala_va_arg_item_t {
         unsigned int u;
         long ld;
         unsigned long lu;
-        void *p_p;
-        char *s_p;
+        const void *p_p;
+        const char *s_p;
     };
     struct nala_set_param in;
     struct nala_set_param out;

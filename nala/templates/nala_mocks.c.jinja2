@@ -537,18 +537,20 @@ void {{mock.func_name}}_mock_set_va_arg_in_at(unsigned int index, const void *bu
 
 void {{mock.func_name}}_mock_set_va_arg_in_pointer_at(unsigned int index, const void *buf_p)
 {
-    (void)index;
-    (void)buf_p;
+    struct nala_va_arg_list_t *va_arg_list_p;
+    struct nala_va_arg_item_t *item_p;
 
-    struct nala_instance_{{mock.func_name}}_t *instance_p;
+    va_arg_list_p = &nala_get_params_{{mock.func_name}}()->nala_va_arg_list;
+    item_p = nala_va_arg_list_get(va_arg_list_p, index);
 
-    instance_p = {{mock.state_name}}.instances.tail_p;
+    if (item_p->type != nala_va_arg_item_type_p_t) {
+        nala_test_failure(
+            nala_format("Only variadic pointer parameters can be set."));
 
-    if (instance_p == NULL) {
-        nala_test_failure(nala_format(
-            "{{mock.func_name}}_mock_set_va_arg_in_pointer_at(...) not implemented "
-            "for mock state.\n"));
     }
+
+    item_p->ignore_in = false;
+    item_p->p_p = buf_p;
 }
 
 void {{mock.func_name}}_mock_set_va_arg_out_at(unsigned int index, const void *buf_p, size_t size)

@@ -606,6 +606,26 @@ TEST(variadic_function_error_bad_format_string)
                                  "Bad format string 'foo'.");
 }
 
+static void variadic_function_pointer_error_wrong_call_order_entry(void *arg_p)
+{
+    (void)arg_p;
+    int a;
+    int b;
+
+    io_control_mock_once(3, 0, "%p");
+    io_control_mock_set_va_arg_in_pointer_at(0, &a);
+    io_control_mock_once(3, 0, "%p");
+    io_control_mock_set_va_arg_in_pointer_at(0, &b);
+    io_control(3, &b);
+    io_control(3, &a);
+}
+
+TEST(variadic_function_pointer_error_wrong_call_order)
+{
+    function_error_in_subprocess(variadic_function_pointer_error_wrong_call_order_entry,
+                                 " != 0x");
+}
+
 TEST(compose_twice_function)
 {
     DummyStruct dummy_struct = { .number = 1 };
