@@ -22,6 +22,9 @@ test:
 	$(MAKE) -C ../.. dist
 	[ -f nala_mocks.h ] || (touch nala_mocks.h)
 	$(CC) $(INC) -DNALA_GENERATE_MOCKS -E main.c > main.pp.c
-	cat main.pp.c | $(NALA) generate_mocks --no-cache
+	cat main.pp.c | $(NALA) generate_mocks \
+				    --no-cache \
+				    -n no_implementation \
+				    -n another
 	$(CC) $(CFLAGS) $$(cat nala_mocks.ld) $(SRC) -o main
 	./main

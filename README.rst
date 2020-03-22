@@ -194,6 +194,10 @@ renames `a few function parameters`_ by default.
 Use ``--no-rename-parameters`` not to rename any function
 parameters. Overrides ``--rename-parameters-file``.
 
+Use ``--no-implementation`` if the implementation of functions
+matching given patterns are not available in the binary (and therefore
+should not be called).
+
 .. code-block:: bash
 
    $ gcc -DNALA_GENERATE_MOCKS -E *.c | nala generate_mocks

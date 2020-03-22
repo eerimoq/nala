@@ -60,10 +60,19 @@ def find_cached_mocked_functions(nala_mocks_h):
     return functions
 
 
+def has_implementation(function_name, no_implementation):
+    for pattern in no_implementation:
+        if pattern in function_name:
+            return False
+
+    return True
+
+
 def generate_mocks(expanded_code,
                    output_directory,
                    rename_parameters_file,
-                   cache):
+                   cache,
+                   no_implementation):
     """Identify mocked functions and generate the source and header files.
 
     """
@@ -95,7 +104,9 @@ def generate_mocks(expanded_code,
                 raise Exception(
                     f"'{function.name}()' cannot be mocked as it is used by Nala.")
 
-            generator.add_mock(function)
+            generator.add_mock(function,
+                               has_implementation(function.name,
+                                                  no_implementation))
 
         generator.write_to_directory(output_directory)
     elif not functions:

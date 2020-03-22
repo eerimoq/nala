@@ -81,5 +81,7 @@ int struct_pointer_typedef_2(struct_pointer_typedef_2_t value);
 int struct_typedef(struct_typedef_t value);
 int struct_typedef_2(struct_typedef_2_t value);
 int parameter_name_omitted(int, int *);
+int no_implementation(void);
+int another_missing_implementation(void);
 
 #endif

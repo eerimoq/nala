@@ -1063,3 +1063,17 @@ TEST(parameter_name_omitted_function)
 
     ASSERT_EQ(parameter_name_omitted(1, NULL), 2);
 }
+
+TEST(no_implementation_function)
+{
+    no_implementation_mock_once(2);
+
+    ASSERT_EQ(no_implementation(), 2);
+}
+
+TEST(another_missing_implementation_function)
+{
+    another_missing_implementation_mock_once(2);
+
+    ASSERT_EQ(another_missing_implementation(), 2);
+}

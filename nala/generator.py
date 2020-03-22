@@ -170,8 +170,9 @@ class FunctionMock:
     DECL_MARKER = "// NALA_DECLARATION"
     IMPL_MARKER = "// NALA_IMPLEMENTATION"
 
-    def __init__(self, function):
+    def __init__(self, function, has_implementation):
         self.function = function
+        self.has_implementation = has_implementation
         self.func_name = function.name
 
         self.wrapped_func = f"__wrap_{self.func_name}"
@@ -481,8 +482,8 @@ class FileGenerator:
         self.struct_assert_ins = []
         self.includes = []
 
-    def add_mock(self, mocked_function):
-        self.mocks.append(FunctionMock(mocked_function))
+    def add_mock(self, mocked_function, has_implementation):
+        self.mocks.append(FunctionMock(mocked_function, has_implementation))
 
     def add_include(self, include):
         self.includes.append((include.path, include.system))
