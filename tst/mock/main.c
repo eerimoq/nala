@@ -620,6 +620,12 @@ static void variadic_function_pointer_error_wrong_call_order_entry(void *arg_p)
     io_control(3, &a);
 }
 
+TEST(io_control_no_implementation_function)
+{
+    io_control_no_implementation_mock_ignore_in_once(2);
+    ASSERT_EQ(io_control_no_implementation(1), 2);
+}
+
 TEST(variadic_function_pointer_error_wrong_call_order)
 {
     function_error_in_subprocess(variadic_function_pointer_error_wrong_call_order_entry,

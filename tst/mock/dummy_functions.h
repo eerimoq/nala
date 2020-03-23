@@ -64,6 +64,7 @@ DummyStruct *add_two(DummyStruct *dummy_struct);
 DummyStruct *(*return_add_one(void))(DummyStruct *dummy_struct);
 int io_control(int kind, ...);
 int io_vcontrol(int kind, va_list ap);
+int io_control_no_implementation(int kind, ...);
 void struct_param(struct struct_param_type *data);
 void enum_param(enum enum_param_type value);
 void enum_param_typedef(enum_param_type_e value);

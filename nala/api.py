@@ -62,7 +62,7 @@ def find_cached_mocked_functions(nala_mocks_h):
 
 def has_implementation(function_name, no_implementation):
     for pattern in no_implementation:
-        if pattern in function_name:
+        if function_name.startswith(pattern):
             return False
 
     return True

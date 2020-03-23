@@ -25,6 +25,7 @@ test:
 	cat main.pp.c | $(NALA) generate_mocks \
 				    --no-cache \
 				    -n no_implementation \
-				    -n another
+				    -n another \
+				    -n io_control_no_implementation
 	$(CC) $(CFLAGS) $$(cat nala_mocks.ld) $(SRC) -o main
 	./main

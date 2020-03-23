@@ -194,9 +194,10 @@ renames `a few function parameters`_ by default.
 Use ``--no-rename-parameters`` not to rename any function
 parameters. Overrides ``--rename-parameters-file``.
 
-Use ``--no-implementation`` if the implementation of functions
-matching given patterns are not available in the binary (and therefore
-should not be called).
+Use ``--no-implementation`` when the implementation of functions
+starting with given pattern are not available in the binary (and
+therefore should not be called by the generated code). This option may
+be given multipe times.
 
 .. code-block:: bash
 
