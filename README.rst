@@ -263,6 +263,33 @@ For selected function parameters
 For variadic functions
 ^^^^^^^^^^^^^^^^^^^^^^
 
+Variadic functions mocks are slightly different from the above. They
+also have a format string and an ellipsis in some "every call" and
+"per call" functions.
+
+.. code-block::
+
+   void <func>_mock(<params>, <res>, format, ...)
+   void <func>_mock_once(<params>, <res>, format, ...)
+
+   Not yet implemented:
+
+   void <func>_mock_ignore_in(<params>, <res>, format)
+   void <func>_mock_ignore_in_once(<params>, <res>, format)
+
+The format string supports the following specifiers.
+
+.. code-block::
+
+   %d  - signed integer
+   %u  - unsigned integer
+   %ld - signed long integer
+   %lu - unsigned long integer
+   %p  - pointer address
+   %s  - string
+
+The variadic parameters are controlled by index instead of name.
+
 .. code-block::
 
    void <func>_mock_ignore_va_arg_in_at(uint)          - ignore on input
