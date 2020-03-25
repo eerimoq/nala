@@ -221,7 +221,10 @@ static void assert_substring_error_entry()
 TEST(assert_substring_error)
 {
     expect_error_in_subprocess(assert_substring_error_entry,
-                               "\"123\" doesn't contain \"4\"");
+                               "  Haystack:\n"
+                               "    123\n"
+                               "  Needle:\n"
+                               "    4\n");
 }
 
 static void assert_not_substring_error_entry()

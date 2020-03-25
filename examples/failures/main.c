@@ -104,3 +104,22 @@ TEST(fail)
 {
     FAIL("The failure message.");
 }
+
+TEST(strings_eq)
+{
+    ASSERT_EQ("The\n"
+              "first\n"
+              "string.\n",
+              "The\n"
+              "second\n"
+              "string.\n");
+}
+
+TEST(substring)
+{
+    ASSERT_SUBSTRING("The\n"
+                     "first\n"
+                     "string.\n",
+                     "second\n"
+                     "string.\n");
+}

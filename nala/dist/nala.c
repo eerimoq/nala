@@ -1054,6 +1054,61 @@ const char *nala_format_string(const char *format_p, ...)
     return (buf_p);
 }
 
+static void print_with_line_prefix(FILE *file_p,
+                                   const char *prefix_p,
+                                   const char *string_p)
+{
+    fprintf(file_p, "%s", prefix_p);
+
+    while (*string_p != '\0') {
+        fputc(string_p[0], file_p);
+
+        if (*string_p == '\n') {
+            fprintf(file_p, "%s", prefix_p);
+        }
+
+        string_p++;
+    }
+}
+
+const char *nala_format_substring(const char *format_p,
+                                  const char *haystack_p,
+                                  const char *needle_p)
+{
+    size_t size;
+    char *buf_p;
+    FILE *file_p;
+
+    nala_suspend_all_mocks();
+
+    file_p = open_memstream(&buf_p, &size);
+    color_start(file_p, ANSI_COLOR_RED);
+    fprintf(file_p, "%s", format_p);
+    fprintf(file_p, "             See below for details.\n");
+    color_reset(file_p);
+
+    if (haystack_p == NULL) {
+        haystack_p = "<null>";
+    }
+
+    if (needle_p == NULL) {
+        needle_p = "<null>";
+    }
+
+    fprintf(file_p, "  Haystack:\n");
+    print_with_line_prefix(file_p, "    ", haystack_p);
+    fprintf(file_p, "\n");
+    fprintf(file_p, "  Needle:\n");
+    print_with_line_prefix(file_p, "    ", needle_p);
+    fprintf(file_p, "\n");
+    fputc('\0', file_p);
+    fclose(file_p);
+
+    nala_resume_all_mocks();
+
+    return (buf_p);
+}
+
 const char *nala_format_memory(const char *prefix_p,
                                const void *left_p,
                                const void *right_p,
@@ -1307,38 +1362,7 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
 
 #define CHECK_GE(actual, expected) ((actual) >= (expected))
 
-#define CHECK_SUBSTRING(actual, expected)       \
-    nala_check_substring(actual, expected)
-
-#define CHECK_NOT_SUBSTRING(actual, expected)   \
-    (!nala_check_substring(actual, expected))
-
-#define FORMAT_EQ(format, actual, expected)                             \
-    _Generic(                                                           \
-        (actual),                                                       \
-        char *: _Generic(                                               \
-            (expected),                                                 \
-            char *: nala_format_string(                                 \
-                format,                                                 \
-                (char *)(uintptr_t)(actual),                            \
-                (char *)(uintptr_t)(expected)),                         \
-            const char *: nala_format_string(                           \
-                format,                                                 \
-                (char *)(uintptr_t)(actual),                            \
-                (char *)(uintptr_t)(expected)),                         \
-            default: nala_format(format, (actual), (expected))),        \
-        const char *: _Generic(                                         \
-            (expected),                                                 \
-            char *: nala_format_string(                                 \
-                format,                                                 \
-                (char *)(uintptr_t)(actual),                            \
-                (char *)(uintptr_t)(expected)),                         \
-            const char *: nala_format_string(                           \
-                format,                                                 \
-                (char *)(uintptr_t)(actual),                            \
-                (char *)(uintptr_t)(expected)),                         \
-            default: nala_format(format, (actual), (expected))),        \
-        default: nala_format(format, (actual), (expected)))
+#define FORMAT_EQ(format, actual, expected) nala_format(format, (actual), (expected))
 
 #define PRINT_FORMAT(value)                     \
     _Generic((value),                           \
@@ -1523,18 +1547,21 @@ void nala_assert_string(const char *actual_p, const char *expected_p, int op)
 
 void nala_assert_substring(const char *haystack_p, const char *needle_p)
 {
-    ASSERTION(haystack_p,
-              needle_p,
-              CHECK_SUBSTRING,
-              "%s doesn't contain %s\n",
-              nala_format);
+    if (!nala_check_substring(haystack_p, needle_p)) {
+        nala_reset_all_mocks();
+        nala_test_failure(
+            nala_format_substring(
+                "The haystack doesn't contain the needle.\n",
+                haystack_p,
+                needle_p));
+    }
 }
 
 void nala_assert_not_substring(const char *haystack_p, const char *needle_p)
 {
     ASSERTION(haystack_p,
               needle_p,
-              CHECK_NOT_SUBSTRING,
+              !nala_check_substring,
               "%s contains %s\n",
               nala_format);
 }
