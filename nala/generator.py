@@ -318,7 +318,9 @@ class FunctionMock:
             param.declname = name
 
     def find_check_function(self, param):
-        if isinstance(param.type.type, node.TypeDecl):
+        if self.is_char_pointer(param):
+            return 'nala_mock_assert_string'
+        elif isinstance(param.type.type, node.TypeDecl):
             if isinstance(param.type.type.type, node.Struct):
                 return f'nala_mock_assert_in_struct_{param.type.type.type.name}'
 

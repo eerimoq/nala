@@ -215,7 +215,7 @@ struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
             {{mock.real_func}}({{mock.forward_args}});
                 {% endif %}
             {% else %}
-            nala_test_failure(nala_format("Real {{mock.func_name}}() not abailable.\n"));
+            nala_test_failure(nala_format("Real {{mock.func_name}}() not available.\n"));
             {% endif %}
         }
         break;
@@ -264,7 +264,7 @@ struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
         {{mock.real_func}}({{mock.forward_args}});
             {% endif %}
         {% else %}
-        nala_test_failure(nala_format("Real {{mock.func_name}}() not abailable.\n"));
+        nala_test_failure(nala_format("Real {{mock.func_name}}() not available.\n"));
         {% endif %}
         break;
     }

@@ -660,6 +660,33 @@ void nala_mock_assert_memory(struct nala_traceback_t *traceback_p,
     }
 }
 
+void nala_mock_assert_string(struct nala_traceback_t *traceback_p,
+                             const char *func_p,
+                             const char *param_p,
+                             const char *acutal_p,
+                             const char *expected_p,
+                             size_t size)
+{
+    (void)size;
+
+    char _nala_assert_format[512];
+
+    if (!nala_check_string_equal(acutal_p, expected_p)) {
+        nala_suspend_all_mocks();
+        snprintf(&_nala_assert_format[0],
+                 sizeof(_nala_assert_format),
+                 "Mocked %s(%s):\n",
+                 func_p,
+                 param_p);
+        nala_test_failure(
+            format_mock_traceback(
+                nala_format_string(&_nala_assert_format[0],
+                                   acutal_p,
+                                   expected_p),
+                traceback_p));
+    }
+}
+
 void nala_state_suspend(struct nala_state_t *state_p)
 {
     if (state_p->suspended.count == 0) {
@@ -5368,12 +5395,12 @@ FILE *__wrap_fopen(const char *path, const char *mode)
 
             MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
                                        nala_data_p,
-                                       nala_mock_assert_memory,
+                                       nala_mock_assert_string,
                                        fopen,
                                        path);
             MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
                                        nala_data_p,
-                                       nala_mock_assert_memory,
+                                       nala_mock_assert_string,
                                        fopen,
                                        mode);
 
@@ -9532,17 +9559,17 @@ int __wrap_mount(const char *source, const char *target, const char *filesystemt
 
             MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
                                        nala_data_p,
-                                       nala_mock_assert_memory,
+                                       nala_mock_assert_string,
                                        mount,
                                        source);
             MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
                                        nala_data_p,
-                                       nala_mock_assert_memory,
+                                       nala_mock_assert_string,
                                        mount,
                                        target);
             MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
                                        nala_data_p,
-                                       nala_mock_assert_memory,
+                                       nala_mock_assert_string,
                                        mount,
                                        filesystemtype);
             MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
@@ -10179,7 +10206,7 @@ void __wrap_output_message(const char *message)
 
             MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
                                        nala_data_p,
-                                       nala_mock_assert_memory,
+                                       nala_mock_assert_string,
                                        output_message,
                                        message);
 
@@ -13103,7 +13130,7 @@ int __wrap_statvfs(const char *path, struct statvfs *buf)
 
             MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
                                        nala_data_p,
-                                       nala_mock_assert_memory,
+                                       nala_mock_assert_string,
                                        statvfs,
                                        path);
             MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,

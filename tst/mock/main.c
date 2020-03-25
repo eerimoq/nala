@@ -21,6 +21,16 @@
 #include "dummy_functions_not_mocked.h"
 #include "dummy_functions.h"
 
+#define BLD "\x1b[1m"
+#define RST "\x1b[0m"
+#define RD  "\x1b[31m"
+#define RED  RST RD
+#define GN  "\x1b[32m"
+#define MA "\x1b[35m"
+#define GRN  RST GN
+#define BRED RED BLD
+#define BGRN GRN BLD
+
 static void function_error_in_subprocess(void (*entry)(void *arg_p),
                                          const char *expected_p)
 {
@@ -210,7 +220,8 @@ TEST(output_message_function_error_call_null)
 {
     function_error_in_subprocess(
         output_message_function_error_call_null_entry,
-        "Memory mismatch. See diff for details.");
+        "     "RED"- "RST BRED"1"RST RED" |  "RST BRED"a"RST"\n"
+        "     "GRN"+ "RST BGRN"1"RST GRN" |  "RST BGRN"<null>"RST"\n");
 }
 
 static void output_message_function_error_mismatch_entry(void *arg_p)
@@ -225,7 +236,7 @@ TEST(output_message_function_error_mismatch)
 {
     function_error_in_subprocess(
         output_message_function_error_mismatch_entry,
-        "Mocked output_message(message): Memory mismatch. See diff for details.");
+        "Mocked output_message(message):\n");
 }
 
 TEST(time_function)

@@ -1,4 +1,5 @@
 #include <time.h>
+#include <sys/mount.h>
 #include "nala.h"
 #include "nala_mocks.h"
 #include "foo.h"
@@ -122,4 +123,11 @@ TEST(substring)
                      "string.\n",
                      "second\n"
                      "string.\n");
+}
+
+TEST(mock_string_param)
+{
+    mount_mock_once("fie", "foo", "bar", 0, 0);
+
+    mount("foo", "fie", "bar", 0, NULL);
 }
