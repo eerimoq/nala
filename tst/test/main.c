@@ -154,7 +154,7 @@ TEST(assert_eq_error_string)
 {
     expect_error_in_subprocess(
         assert_eq_error_string_entry,
-        "  Error: "BRED"\"123\" != \"23\"\n"
+        "  Error: "BRED"The strings are not equal.\n"
         "             See diff for details.\n"
         RST
         "  Diff:\n"

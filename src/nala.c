@@ -992,51 +992,9 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
                                   NULL));
 }
 
-#define CHECK_EQ(actual, expected)                      \
-    _Generic(                                           \
-        (actual),                                       \
-        char *: _Generic(                               \
-            (expected),                                 \
-            char *: nala_check_string_equal(            \
-                (char *)(uintptr_t)(actual),            \
-                (char *)(uintptr_t)(expected)),         \
-            const char *: nala_check_string_equal(      \
-                (char *)(uintptr_t)(actual),            \
-                (char *)(uintptr_t)(expected)),         \
-            default: false),                            \
-        const char *: _Generic(                         \
-            (expected),                                 \
-            char *: nala_check_string_equal(            \
-                (char *)(uintptr_t)(actual),            \
-                (char *)(uintptr_t)(expected)),         \
-            const char *: nala_check_string_equal(      \
-                (char *)(uintptr_t)(actual),            \
-                (char *)(uintptr_t)(expected)),         \
-            default: false),                            \
-        default: (actual) == (expected))
+#define CHECK_EQ(actual, expected) ((actual) == (expected))
 
-#define CHECK_NE(actual, expected)                              \
-    _Generic(                                                   \
-        (actual),                                               \
-        char *: _Generic(                                       \
-            (expected),                                         \
-            char *: (!nala_check_string_equal(                  \
-                         (char *)(uintptr_t)(actual),           \
-                         (char *)(uintptr_t)(expected))),       \
-            const char *: (!nala_check_string_equal(            \
-                               (char *)(uintptr_t)(actual),     \
-                               (char *)(uintptr_t)(expected))), \
-            default: true),                                     \
-        const char *: _Generic(                                 \
-            (expected),                                         \
-            char *: (!nala_check_string_equal(                  \
-                         (char *)(uintptr_t)(actual),           \
-                         (char *)(uintptr_t)(expected))),       \
-            const char *: (!nala_check_string_equal(            \
-                               (char *)(uintptr_t)(actual),     \
-                               (char *)(uintptr_t)(expected))), \
-            default: true),                                     \
-        default: (actual) != (expected))
+#define CHECK_NE(actual, expected) ((actual) != (expected))
 
 #define CHECK_LT(actual, expected) ((actual) < (expected))
 
@@ -1232,7 +1190,32 @@ void nala_assert_ptr(const void *actual_p, const void *expected_p, int op)
 
 void nala_assert_string(const char *actual_p, const char *expected_p, int op)
 {
-    BINARY_ASSERTION(actual_p, expected_p, op);
+    switch (op) {
+
+    case NALA_CHECK_EQ:
+        if (!nala_check_string_equal(actual_p, expected_p)) {
+            nala_reset_all_mocks();
+            nala_test_failure(nala_format_string("The strings are not equal.\n",
+                                                 actual_p,
+                                                 expected_p));
+        }
+
+        break;
+
+    case NALA_CHECK_NE:
+        if (nala_check_string_equal(actual_p, expected_p)) {
+            nala_reset_all_mocks();
+            nala_test_failure(nala_format("\"%s\" == \"%s\"\n",
+                                          actual_p,
+                                          expected_p));
+        }
+
+        break;
+
+    default:
+        FAIL("Internal nala error.");
+        break;
+    }
 }
 
 void nala_assert_substring(const char *haystack_p, const char *needle_p)
