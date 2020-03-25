@@ -75,6 +75,21 @@ TEST(add_function_error_wrong_x)
                                  "Mocked add(x): 1 != 3");
 }
 
+static void add_function_error_mock_with_mock_once_enqueued_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    add_mock_once(1, 2, 42);
+    add_mock(1, 2, 42);
+}
+
+TEST(add_function_error_mock_with_mock_once_enqueued)
+{
+    function_error_in_subprocess(
+        add_function_error_mock_with_mock_once_enqueued_entry,
+        "Cannot change mock mode with mock instances enqueued.");
+}
+
 static void add_function_error_none_entry(void *arg_p)
 {
     (void)arg_p;
@@ -459,7 +474,7 @@ TEST(variadic_function)
     bar_1 = 4;
     bar_2 = 4;
     io_control_mock_once(3, 0, "%p");
-    io_control_mock_set_va_arg_in_at(0, &bar_1, sizeof(bar_1), NULL);
+    io_control_mock_set_va_arg_in_at(0, &bar_1, sizeof(bar_1));
     ASSERT_EQ(io_control(3, &bar_2), 0);
 
     bar_1 = 3;
@@ -480,6 +495,67 @@ TEST(variadic_function)
     variadic_function_callback_called = false;
     ASSERT_EQ(io_control(1, 10), 2);
     ASSERT_EQ(variadic_function_callback_called, true);
+}
+
+static void variadic_function_in_assert(const void *actual_p,
+                                        const void *expected_p,
+                                        size_t size)
+{
+    const struct variadic_function_outer_t *actual_outer_p;
+    const struct variadic_function_t *actual_inner_p;
+    const struct variadic_function_outer_t *expected_outer_p;
+    const struct variadic_function_t *expected_inner_p;
+
+    ASSERT_EQ(size, sizeof(struct variadic_function_outer_t));
+
+    actual_outer_p = actual_p;
+    actual_inner_p = actual_outer_p->inner_p;
+    expected_outer_p = expected_p;
+    expected_inner_p = expected_outer_p->inner_p;
+
+    ASSERT_EQ(actual_outer_p->a, expected_outer_p->a);
+    ASSERT_EQ(actual_inner_p->a, expected_inner_p->a);
+}
+
+static void variadic_function_out_copy(void *dst_p,
+                                       const void *src_p,
+                                       size_t size)
+{
+    struct variadic_function_t *dst_inner_p;
+    struct variadic_function_t *src_inner_p;
+
+    ASSERT_EQ(size, sizeof(struct variadic_function_outer_t));
+
+    dst_inner_p = ((struct variadic_function_outer_t *)dst_p)->inner_p;
+    src_inner_p = ((struct variadic_function_outer_t *)src_p)->inner_p;
+
+    dst_inner_p->b = src_inner_p->b;
+}
+
+TEST(variadic_function_in_assert_copy_out)
+{
+    struct variadic_function_outer_t outer;
+    struct variadic_function_t inner_in;
+    struct variadic_function_t inner_out;
+
+    outer.a = 1;
+    io_control_mock_once(1, 10, "%p");
+    outer.inner_p = &inner_in;
+    inner_in.a = 2;
+    inner_in.b = 5;
+    io_control_mock_set_va_arg_in_at(0, &outer, sizeof(outer));
+    io_control_mock_set_va_arg_in_assert_at(0, variadic_function_in_assert);
+    outer.inner_p = &inner_out;
+    inner_out.a = 2;
+    inner_out.b = 6;
+    io_control_mock_set_va_arg_out_at(0, &outer, sizeof(outer));
+    io_control_mock_set_va_arg_out_copy_at(0, variadic_function_out_copy);
+
+    outer.inner_p = &inner_in;
+    ASSERT_EQ(io_control(1, &outer), 10);
+
+    ASSERT_EQ(inner_in.a, 2);
+    ASSERT_EQ(inner_in.b, 6);
 }
 
 static int va_list_ellipsis(int kind, ...)
@@ -558,39 +634,13 @@ static void variadic_function_error_va_arg_in_entry(void *arg_p)
     bar_1 = 3;
     bar_2 = 4;
     io_control_mock_once(3, 0, "%p");
-    io_control_mock_set_va_arg_in_at(0, &bar_1, sizeof(bar_1), NULL);
+    io_control_mock_set_va_arg_in_at(0, &bar_1, sizeof(bar_1));
     io_control(3, &bar_2);
 }
 
 TEST(variadic_function_error_va_arg_in)
 {
     function_error_in_subprocess(variadic_function_error_va_arg_in_entry, NULL);
-}
-
-static void variadic_function_error_va_arg_in_custom_assert_entry(void *arg_p)
-{
-    (void)arg_p;
-
-    struct variadic_function_t bar_1;
-    struct variadic_function_t bar_2;
-
-    bar_1.a = 3;
-    bar_1.b = 4;
-    bar_2.a = 3;
-    bar_2.b = 5;
-    io_control_mock_once(3, 0, "%p");
-    io_control_mock_set_va_arg_in_at(0,
-                                     &bar_1,
-                                     sizeof(bar_1),
-                                     nala_mock_assert_in_struct_variadic_function_t);
-    io_control(3, &bar_2);
-}
-
-TEST(variadic_function_error_va_arg_in_custom_assert)
-{
-    function_error_in_subprocess(
-        variadic_function_error_va_arg_in_custom_assert_entry,
-        "->b): 5 != 4");
 }
 
 static void variadic_function_error_bad_formt_string_entry(void *arg_p)
@@ -819,6 +869,7 @@ TEST(rename_parameters)
     getsockopt_mock_ignore_in(0);
     getmntent_mock_ignore_in(NULL);
     gettimeofday_mock_ignore_in(0);
+    ioctl_mock_ignore_in(0);
     mount_mock_ignore_in(0);
     /* nftw_mock(dirpath, fn, nopenfd, flags); */
     pipe_mock_ignore_in(0);

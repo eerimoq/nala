@@ -26,6 +26,7 @@ test:
 				    --no-cache \
 				    -n no_implementation \
 				    -n another \
-				    -n io_control_no_implementation
+				    -n io_control_no_implementation \
+				    -n ioctl
 	$(CC) $(CFLAGS) $$(cat nala_mocks.ld) $(SRC) -o main
 	./main

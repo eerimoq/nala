@@ -225,7 +225,6 @@ Same behaviour for every call.
    void <func>_mock_none()               - no calls allowed
    void <func>_mock_implementation(*)    - replace implementation
    void <func>_mock_real()               - call real implementation
-   void <func>_mock_reset()              - mock reset
 
 Per call control.
 
@@ -254,12 +253,12 @@ For selected function parameters
 
 .. code-block::
 
-   void <func>_mock_ignore_<param>_in()               - ignore on input
-   void <func>_mock_set_<param>_in(*, size_t)         - check on input
-   void <func>_mock_set_<param>_in_assert(*)          - custom assert function on input
-   void <func>_mock_set_<param>_in_pointer(*, size_t) - check pointer (the address) on input
-   void <func>_mock_set_<param>_out(*, size_t)        - value on return
-   void <func>_mock_set_<param>_out_copy(*)           - custom output copy function
+   void <func>_mock_ignore_<param>_in()        - ignore on input
+   void <func>_mock_set_<param>_in(*, size_t)  - check on input
+   void <func>_mock_set_<param>_in_assert(*)   - custom assert function on input
+   void <func>_mock_set_<param>_in_pointer(*)  - check pointer (the address) on input
+   void <func>_mock_set_<param>_out(*, size_t) - value on return
+   void <func>_mock_set_<param>_out_copy(*)    - custom output copy function
 
 For variadic functions
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -268,8 +267,10 @@ For variadic functions
 
    void <func>_mock_ignore_va_arg_in_at(uint)          - ignore on input
    void <func>_mock_set_va_arg_in_at(uint, *, size_t)  - check on input
+   void <func>_mock_set_va_arg_in_assert_at(uint, *)   - custom assert function on input
    void <func>_mock_set_va_arg_in_pointer_at(uint, *)  - check pointer on input
    void <func>_mock_set_va_arg_out_at(uint, *, size_t) - value on return
+   void <func>_mock_set_va_arg_out_copy_at(uint, *)    - custom output copy function
 
 Limitations
 -----------

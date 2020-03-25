@@ -100,6 +100,9 @@ def load_param_names(filename):
 
 def rename_parameters(function_declaration, param_names):
     for i, param in enumerate(function_declaration.type.args.params):
+        if isinstance(param, node.EllipsisParam):
+            continue
+
         param_type = param.type
 
         if (not param.name

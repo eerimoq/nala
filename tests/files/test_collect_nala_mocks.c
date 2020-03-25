@@ -97,6 +97,13 @@ Do not edit manually
         }                                                       \
     } while (0);
 
+#define CHECK_NO_INSTANCES(state)                                       \
+    if ((state).instances.next_p != NULL) {                             \
+        nala_test_failure(                                              \
+            nala_format(                                                \
+                "Cannot change mock mode with mock instances enqueued.\n")); \
+    }
+
 #define NALA_STATE_RESET(_state, current_p, tmp_p)                      \
     (_state).state.mode = MODE_REAL;                                    \
     (_state).state.suspended.count = 0;                                 \
@@ -153,7 +160,8 @@ struct nala_va_arg_item_t {
     };
     struct nala_set_param in;
     struct nala_set_param out;
-    nala_mock_assert_in_t assert_in;
+    nala_mock_in_assert_t in_assert;
+    nala_mock_out_copy_t out_copy;
     struct nala_va_arg_item_t *next_p;
 };
 
@@ -394,20 +402,19 @@ void nala_va_arg_list_assert_p(struct nala_va_arg_item_t *item_p,
     }
 
     if (item_p->in.buf_p != NULL) {
-        if (item_p->assert_in != NULL) {
-            item_p->assert_in(NULL,
-                              "func",
-                              "param",
-                              value_p,
-                              item_p->in.buf_p,
-                              item_p->in.size);
+        if (item_p->in_assert != NULL) {
+            item_p->in_assert(value_p, item_p->in.buf_p, item_p->in.size);
         } else {
             ASSERT_MEMORY(value_p, item_p->in.buf_p, item_p->in.size);
         }
     }
 
     if (item_p->out.buf_p != NULL) {
-        memcpy(value_p, item_p->out.buf_p, item_p->out.size);
+        if (item_p->out_copy != NULL) {
+            item_p->out_copy(value_p, item_p->out.buf_p, item_p->out.size);
+        } else {
+            memcpy(value_p, item_p->out.buf_p, item_p->out.size);
+        }
     }
 }
 
@@ -898,6 +905,7 @@ int __wrap_bar()
 
 void bar_mock(int return_value)
 {
+    CHECK_NO_INSTANCES(nala_mock_bar);
     nala_mock_bar.state.mode = MODE_MOCK;
     nala_mock_bar.data.return_value = return_value;
     nala_mock_bar.data.errno_value = 0;
@@ -922,6 +930,7 @@ int bar_mock_once(int return_value)
 
 void bar_mock_ignore_in(int return_value)
 {
+    CHECK_NO_INSTANCES(nala_mock_bar);
     nala_mock_bar.state.mode = MODE_MOCK;
     nala_mock_bar.data.return_value = return_value;
     nala_mock_bar.data.errno_value = 0;
@@ -971,12 +980,14 @@ struct nala_bar_params_t *bar_mock_get_params_in(int handle)
 
 void bar_mock_none(void)
 {
+    CHECK_NO_INSTANCES(nala_mock_bar);
     nala_mock_bar.state.mode = MODE_NONE;
     nala_traceback(&nala_mock_bar.data.traceback);
 }
 
 void bar_mock_implementation(int (*implementation)())
 {
+    CHECK_NO_INSTANCES(nala_mock_bar);
     nala_mock_bar.state.mode = MODE_IMPLEMENTATION;
     nala_mock_bar.data.implementation = implementation;
     nala_traceback(&nala_mock_bar.data.traceback);
@@ -984,6 +995,7 @@ void bar_mock_implementation(int (*implementation)())
 
 void bar_mock_real(void)
 {
+    CHECK_NO_INSTANCES(nala_mock_bar);
     nala_mock_bar.state.mode = MODE_REAL;
     nala_traceback(&nala_mock_bar.data.traceback);
 }
@@ -1161,6 +1173,7 @@ int __wrap_fie()
 
 void fie_mock(int return_value)
 {
+    CHECK_NO_INSTANCES(nala_mock_fie);
     nala_mock_fie.state.mode = MODE_MOCK;
     nala_mock_fie.data.return_value = return_value;
     nala_mock_fie.data.errno_value = 0;
@@ -1185,6 +1198,7 @@ int fie_mock_once(int return_value)
 
 void fie_mock_ignore_in(int return_value)
 {
+    CHECK_NO_INSTANCES(nala_mock_fie);
     nala_mock_fie.state.mode = MODE_MOCK;
     nala_mock_fie.data.return_value = return_value;
     nala_mock_fie.data.errno_value = 0;
@@ -1234,12 +1248,14 @@ struct nala_fie_params_t *fie_mock_get_params_in(int handle)
 
 void fie_mock_none(void)
 {
+    CHECK_NO_INSTANCES(nala_mock_fie);
     nala_mock_fie.state.mode = MODE_NONE;
     nala_traceback(&nala_mock_fie.data.traceback);
 }
 
 void fie_mock_implementation(int (*implementation)())
 {
+    CHECK_NO_INSTANCES(nala_mock_fie);
     nala_mock_fie.state.mode = MODE_IMPLEMENTATION;
     nala_mock_fie.data.implementation = implementation;
     nala_traceback(&nala_mock_fie.data.traceback);
@@ -1247,6 +1263,7 @@ void fie_mock_implementation(int (*implementation)())
 
 void fie_mock_real(void)
 {
+    CHECK_NO_INSTANCES(nala_mock_fie);
     nala_mock_fie.state.mode = MODE_REAL;
     nala_traceback(&nala_mock_fie.data.traceback);
 }
@@ -1424,6 +1441,7 @@ int __wrap_foo()
 
 void foo_mock(int return_value)
 {
+    CHECK_NO_INSTANCES(nala_mock_foo);
     nala_mock_foo.state.mode = MODE_MOCK;
     nala_mock_foo.data.return_value = return_value;
     nala_mock_foo.data.errno_value = 0;
@@ -1448,6 +1466,7 @@ int foo_mock_once(int return_value)
 
 void foo_mock_ignore_in(int return_value)
 {
+    CHECK_NO_INSTANCES(nala_mock_foo);
     nala_mock_foo.state.mode = MODE_MOCK;
     nala_mock_foo.data.return_value = return_value;
     nala_mock_foo.data.errno_value = 0;
@@ -1497,12 +1516,14 @@ struct nala_foo_params_t *foo_mock_get_params_in(int handle)
 
 void foo_mock_none(void)
 {
+    CHECK_NO_INSTANCES(nala_mock_foo);
     nala_mock_foo.state.mode = MODE_NONE;
     nala_traceback(&nala_mock_foo.data.traceback);
 }
 
 void foo_mock_implementation(int (*implementation)())
 {
+    CHECK_NO_INSTANCES(nala_mock_foo);
     nala_mock_foo.state.mode = MODE_IMPLEMENTATION;
     nala_mock_foo.data.implementation = implementation;
     nala_traceback(&nala_mock_foo.data.traceback);
@@ -1510,6 +1531,7 @@ void foo_mock_implementation(int (*implementation)())
 
 void foo_mock_real(void)
 {
+    CHECK_NO_INSTANCES(nala_mock_foo);
     nala_mock_foo.state.mode = MODE_REAL;
     nala_traceback(&nala_mock_foo.data.traceback);
 }
@@ -1687,6 +1709,7 @@ int __wrap_fum()
 
 void fum_mock(int return_value)
 {
+    CHECK_NO_INSTANCES(nala_mock_fum);
     nala_mock_fum.state.mode = MODE_MOCK;
     nala_mock_fum.data.return_value = return_value;
     nala_mock_fum.data.errno_value = 0;
@@ -1711,6 +1734,7 @@ int fum_mock_once(int return_value)
 
 void fum_mock_ignore_in(int return_value)
 {
+    CHECK_NO_INSTANCES(nala_mock_fum);
     nala_mock_fum.state.mode = MODE_MOCK;
     nala_mock_fum.data.return_value = return_value;
     nala_mock_fum.data.errno_value = 0;
@@ -1760,12 +1784,14 @@ struct nala_fum_params_t *fum_mock_get_params_in(int handle)
 
 void fum_mock_none(void)
 {
+    CHECK_NO_INSTANCES(nala_mock_fum);
     nala_mock_fum.state.mode = MODE_NONE;
     nala_traceback(&nala_mock_fum.data.traceback);
 }
 
 void fum_mock_implementation(int (*implementation)())
 {
+    CHECK_NO_INSTANCES(nala_mock_fum);
     nala_mock_fum.state.mode = MODE_IMPLEMENTATION;
     nala_mock_fum.data.implementation = implementation;
     nala_traceback(&nala_mock_fum.data.traceback);
@@ -1773,6 +1799,7 @@ void fum_mock_implementation(int (*implementation)())
 
 void fum_mock_real(void)
 {
+    CHECK_NO_INSTANCES(nala_mock_fum);
     nala_mock_fum.state.mode = MODE_REAL;
     nala_traceback(&nala_mock_fum.data.traceback);
 }
@@ -1950,6 +1977,7 @@ int __wrap_gam()
 
 void gam_mock(int return_value)
 {
+    CHECK_NO_INSTANCES(nala_mock_gam);
     nala_mock_gam.state.mode = MODE_MOCK;
     nala_mock_gam.data.return_value = return_value;
     nala_mock_gam.data.errno_value = 0;
@@ -1974,6 +2002,7 @@ int gam_mock_once(int return_value)
 
 void gam_mock_ignore_in(int return_value)
 {
+    CHECK_NO_INSTANCES(nala_mock_gam);
     nala_mock_gam.state.mode = MODE_MOCK;
     nala_mock_gam.data.return_value = return_value;
     nala_mock_gam.data.errno_value = 0;
@@ -2023,12 +2052,14 @@ struct nala_gam_params_t *gam_mock_get_params_in(int handle)
 
 void gam_mock_none(void)
 {
+    CHECK_NO_INSTANCES(nala_mock_gam);
     nala_mock_gam.state.mode = MODE_NONE;
     nala_traceback(&nala_mock_gam.data.traceback);
 }
 
 void gam_mock_implementation(int (*implementation)())
 {
+    CHECK_NO_INSTANCES(nala_mock_gam);
     nala_mock_gam.state.mode = MODE_IMPLEMENTATION;
     nala_mock_gam.data.implementation = implementation;
     nala_traceback(&nala_mock_gam.data.traceback);
@@ -2036,6 +2067,7 @@ void gam_mock_implementation(int (*implementation)())
 
 void gam_mock_real(void)
 {
+    CHECK_NO_INSTANCES(nala_mock_gam);
     nala_mock_gam.state.mode = MODE_REAL;
     nala_traceback(&nala_mock_gam.data.traceback);
 }
@@ -2213,6 +2245,7 @@ int __wrap_hit()
 
 void hit_mock(int return_value)
 {
+    CHECK_NO_INSTANCES(nala_mock_hit);
     nala_mock_hit.state.mode = MODE_MOCK;
     nala_mock_hit.data.return_value = return_value;
     nala_mock_hit.data.errno_value = 0;
@@ -2237,6 +2270,7 @@ int hit_mock_once(int return_value)
 
 void hit_mock_ignore_in(int return_value)
 {
+    CHECK_NO_INSTANCES(nala_mock_hit);
     nala_mock_hit.state.mode = MODE_MOCK;
     nala_mock_hit.data.return_value = return_value;
     nala_mock_hit.data.errno_value = 0;
@@ -2286,12 +2320,14 @@ struct nala_hit_params_t *hit_mock_get_params_in(int handle)
 
 void hit_mock_none(void)
 {
+    CHECK_NO_INSTANCES(nala_mock_hit);
     nala_mock_hit.state.mode = MODE_NONE;
     nala_traceback(&nala_mock_hit.data.traceback);
 }
 
 void hit_mock_implementation(int (*implementation)())
 {
+    CHECK_NO_INSTANCES(nala_mock_hit);
     nala_mock_hit.state.mode = MODE_IMPLEMENTATION;
     nala_mock_hit.data.implementation = implementation;
     nala_traceback(&nala_mock_hit.data.traceback);
@@ -2299,6 +2335,7 @@ void hit_mock_implementation(int (*implementation)())
 
 void hit_mock_real(void)
 {
+    CHECK_NO_INSTANCES(nala_mock_hit);
     nala_mock_hit.state.mode = MODE_REAL;
     nala_traceback(&nala_mock_hit.data.traceback);
 }

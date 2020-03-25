@@ -34,6 +34,11 @@ struct variadic_function_t {
     int b;
 };
 
+struct variadic_function_outer_t {
+    int a;
+    struct variadic_function_t *inner_p;
+};
+
 struct likely_undefined_padding_t {
     char a;
     long b;

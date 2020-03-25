@@ -31,13 +31,13 @@ struct nala_traceback_t {
     int depth;
 };
 
-typedef void (*nala_mock_assert_in_t)(
-    struct nala_traceback_t *traceback_p,
-    const char *func_p,
-    const char *param_p,
-    const void *left_p,
-    const void *right_p,
-    size_t size);
+typedef void (*nala_mock_in_assert_t)(const void *actual_p,
+                                      const void *expected_p,
+                                      size_t size);
+
+typedef void (*nala_mock_out_copy_t)(void *dst_p,
+                                     const void *src_p,
+                                     size_t size);
 
 void nala_suspend_all_mocks(void);
 void nala_resume_all_mocks(void);
@@ -652,9 +652,11 @@ void io_control_mock_set_callback(void (*callback)(int kind, va_list __nala_va_l
 struct nala_io_control_params_t *io_control_mock_get_params_in(int handle);
 void io_control_mock_ignore_kind_in(void);
 void io_control_mock_ignore_va_arg_in_at(unsigned int index);
-void io_control_mock_set_va_arg_in_at(unsigned int index, const void *buf_p, size_t size, nala_mock_assert_in_t assert_in);
+void io_control_mock_set_va_arg_in_at(unsigned int index, const void *buf_p, size_t size);
+void io_control_mock_set_va_arg_in_assert_at(unsigned int index, nala_mock_in_assert_t in_assert);
 void io_control_mock_set_va_arg_in_pointer_at(unsigned int index, const void *buf_p);
 void io_control_mock_set_va_arg_out_at(unsigned int index, const void *buf_p, size_t size);
+void io_control_mock_set_va_arg_out_copy_at(unsigned int index, nala_mock_out_copy_t out_copy);
 void io_control_mock_none(void);
 void io_control_mock_implementation(int (*implementation)(int kind, va_list __nala_va_list));
 void io_control_mock_real(void);

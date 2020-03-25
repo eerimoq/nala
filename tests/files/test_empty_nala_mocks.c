@@ -97,6 +97,13 @@ Do not edit manually
         }                                                       \
     } while (0);
 
+#define CHECK_NO_INSTANCES(state)                                       \
+    if ((state).instances.next_p != NULL) {                             \
+        nala_test_failure(                                              \
+            nala_format(                                                \
+                "Cannot change mock mode with mock instances enqueued.\n")); \
+    }
+
 #define NALA_STATE_RESET(_state, current_p, tmp_p)                      \
     (_state).state.mode = MODE_REAL;                                    \
     (_state).state.suspended.count = 0;                                 \
@@ -153,7 +160,8 @@ struct nala_va_arg_item_t {
     };
     struct nala_set_param in;
     struct nala_set_param out;
-    nala_mock_assert_in_t assert_in;
+    nala_mock_in_assert_t in_assert;
+    nala_mock_out_copy_t out_copy;
     struct nala_va_arg_item_t *next_p;
 };
 
@@ -394,20 +402,19 @@ void nala_va_arg_list_assert_p(struct nala_va_arg_item_t *item_p,
     }
 
     if (item_p->in.buf_p != NULL) {
-        if (item_p->assert_in != NULL) {
-            item_p->assert_in(NULL,
-                              "func",
-                              "param",
-                              value_p,
-                              item_p->in.buf_p,
-                              item_p->in.size);
+        if (item_p->in_assert != NULL) {
+            item_p->in_assert(value_p, item_p->in.buf_p, item_p->in.size);
         } else {
             ASSERT_MEMORY(value_p, item_p->in.buf_p, item_p->in.size);
         }
     }
 
     if (item_p->out.buf_p != NULL) {
-        memcpy(value_p, item_p->out.buf_p, item_p->out.size);
+        if (item_p->out_copy != NULL) {
+            item_p->out_copy(value_p, item_p->out.buf_p, item_p->out.size);
+        } else {
+            memcpy(value_p, item_p->out.buf_p, item_p->out.size);
+        }
     }
 }
 
