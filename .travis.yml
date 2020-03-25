@@ -10,7 +10,7 @@ install:
 
 script:
   - coverage run --source=nala setup.py test
-  - make test-c
+  - make test-c SANITIZE=yes
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -X coveragepy

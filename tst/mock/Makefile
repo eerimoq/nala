@@ -11,6 +11,10 @@ CFLAGS = \
 	-Wpedantic \
 	-fprofile-arcs \
 	-ftest-coverage
+ifeq ($(SANITIZE), yes)
+CFLAGS += -fsanitize=address
+CFLAGS += -fsanitize=undefined
+endif
 NALA ?= PYTHONPATH=../.. python3 -m nala
 SRC += main.c
 SRC += ../../nala/dist/nala.c

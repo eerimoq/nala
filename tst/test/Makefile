@@ -8,6 +8,10 @@ CFLAGS += \
 	-Og \
 	-g \
 	-no-pie
+ifeq ($(SANITIZE), yes)
+CFLAGS += -fsanitize=address
+CFLAGS += -fsanitize=undefined
+endif
 SRC += ../../src/nala.c
 SRC += ../../src/diff/diff.c
 SRC += ../../src/utils.c
