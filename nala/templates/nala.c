@@ -315,6 +315,8 @@ struct nala_va_arg_item_t *nala_parse_va_arg(const char **format_pp,
     item_p = nala_xmalloc(sizeof(*item_p));
     item_p->in.buf_p = NULL;
     item_p->out.buf_p = NULL;
+    item_p->in_assert = NULL;
+    item_p->out_copy = NULL;
 
     if (**format_pp == 'l') {
         (*format_pp)++;

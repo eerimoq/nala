@@ -542,8 +542,6 @@ void {{mock.func_name}}_mock_set_va_arg_in_at(unsigned int index, const void *bu
     va_arg_list_p = &nala_get_params_{{mock.func_name}}()->nala_va_arg_list;
     item_p = nala_va_arg_list_get(va_arg_list_p, index);
     nala_set_param_buf(&item_p->in, buf_p, size);
-    item_p->in_assert = NULL;
-    item_p->out_copy = NULL;
 }
 
 void {{mock.func_name}}_mock_set_va_arg_in_assert_at(unsigned int index, nala_mock_in_assert_t in_assert)

@@ -329,6 +329,8 @@ struct nala_va_arg_item_t *nala_parse_va_arg(const char **format_pp,
     item_p = nala_xmalloc(sizeof(*item_p));
     item_p->in.buf_p = NULL;
     item_p->out.buf_p = NULL;
+    item_p->in_assert = NULL;
+    item_p->out_copy = NULL;
 
     if (**format_pp == 'l') {
         (*format_pp)++;
@@ -8703,8 +8705,6 @@ void io_control_mock_set_va_arg_in_at(unsigned int index, const void *buf_p, siz
     va_arg_list_p = &nala_get_params_io_control()->nala_va_arg_list;
     item_p = nala_va_arg_list_get(va_arg_list_p, index);
     nala_set_param_buf(&item_p->in, buf_p, size);
-    item_p->in_assert = NULL;
-    item_p->out_copy = NULL;
 }
 
 void io_control_mock_set_va_arg_in_assert_at(unsigned int index, nala_mock_in_assert_t in_assert)
