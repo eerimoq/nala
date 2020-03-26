@@ -310,6 +310,10 @@ Limitations
   gcov. They probably can if wrapping ``__gcov_fork()`` in an
   suspend/resume-block.
 
+- Function calls internally within a source file cannot be mocked
+  because the linker option ``--wrap`` does not wrap these function
+  calls. See the `ld manual` for more details.
+
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
 
@@ -327,3 +331,5 @@ Limitations
 .. _nala.c: https://raw.githubusercontent.com/eerimoq/nala/master/nala/dist/nala.c
 
 .. _a few function parameters: https://github.com/eerimoq/nala/blob/master/nala/rename_parameters.txt
+
+.. _ld manual: https://sourceware.org/binutils/docs/ld/Options.html#Options
