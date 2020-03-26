@@ -731,7 +731,7 @@ const char *nala_format_string(const char *format_p, ...)
     file_p = open_memstream(&buf_p, &size);
     color_start(file_p, ANSI_COLOR_RED);
     fprintf(file_p, format_p, left_p, right_p);
-    fprintf(file_p, "             See diff for details.\n");
+    fprintf(file_p, " See diff for details.\n");
     color_reset(file_p);
 
     if (right_p == NULL) {
@@ -781,7 +781,7 @@ const char *nala_format_substring(const char *format_p,
     file_p = open_memstream(&buf_p, &size);
     color_start(file_p, ANSI_COLOR_RED);
     fprintf(file_p, "%s", format_p);
-    fprintf(file_p, "             See below for details.\n");
+    fprintf(file_p, " See below for details.\n");
     color_reset(file_p);
 
     if (haystack_p == NULL) {
@@ -792,10 +792,10 @@ const char *nala_format_substring(const char *format_p,
         needle_p = "<null>";
     }
 
-    fprintf(file_p, "  Haystack:\n");
+    fprintf(file_p, "  Haystack:\n\n");
     print_with_line_prefix(file_p, "    ", haystack_p);
     fprintf(file_p, "\n");
-    fprintf(file_p, "  Needle:\n");
+    fprintf(file_p, "  Needle:\n\n");
     print_with_line_prefix(file_p, "    ", needle_p);
     fprintf(file_p, "\n");
     fputc('\0', file_p);
@@ -1219,7 +1219,7 @@ void nala_assert_string(const char *actual_p, const char *expected_p, int op)
     case NALA_CHECK_EQ:
         if (!nala_check_string_equal(actual_p, expected_p)) {
             nala_reset_all_mocks();
-            nala_test_failure(nala_format_string("The strings are not equal.\n",
+            nala_test_failure(nala_format_string("The strings are not equal.",
                                                  actual_p,
                                                  expected_p));
         }
@@ -1248,7 +1248,7 @@ void nala_assert_substring(const char *haystack_p, const char *needle_p)
         nala_reset_all_mocks();
         nala_test_failure(
             nala_format_substring(
-                "The haystack doesn't contain the needle.\n",
+                "The haystack doesn't contain the needle.",
                 haystack_p,
                 needle_p));
     }

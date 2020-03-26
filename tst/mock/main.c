@@ -236,7 +236,7 @@ TEST(output_message_function_error_mismatch)
 {
     function_error_in_subprocess(
         output_message_function_error_mismatch_entry,
-        "Mocked output_message(message):\n");
+        "Mocked output_message(message): See diff for details.\n");
 }
 
 TEST(time_function)

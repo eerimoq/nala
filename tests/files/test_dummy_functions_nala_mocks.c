@@ -768,7 +768,7 @@ void nala_mock_assert_string(struct nala_traceback_t *traceback_p,
         nala_suspend_all_mocks();
         snprintf(&_nala_assert_format[0],
                  sizeof(_nala_assert_format),
-                 "Mocked %s(%s):\n",
+                 "Mocked %s(%s):",
                  func_p,
                  param_p);
         nala_test_failure(

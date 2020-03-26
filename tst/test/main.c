@@ -154,8 +154,7 @@ TEST(assert_eq_error_string)
 {
     expect_error_in_subprocess(
         assert_eq_error_string_entry,
-        "  Error: "BRED"The strings are not equal.\n"
-        "             See diff for details.\n"
+        "  Error: "BRED"The strings are not equal. See diff for details.\n"
         RST
         "  Diff:\n"
         "\n"
@@ -222,8 +221,10 @@ TEST(assert_substring_error)
 {
     expect_error_in_subprocess(assert_substring_error_entry,
                                "  Haystack:\n"
+                               "\n"
                                "    123\n"
                                "  Needle:\n"
+                               "\n"
                                "    4\n");
 }
 
