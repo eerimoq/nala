@@ -337,3 +337,37 @@ TEST(fail_segfault)
 {
     expect_error_in_subprocess(fail_segfault_entry, "");
 }
+
+static void assert_int_array_entry()
+{
+    int a[3] = { 1, 2, 3 };
+    int b[3] = { 1, 4, 3 };
+
+    ASSERT_ARRAY(a, b, sizeof(a));
+}
+
+TEST(assert_int_array)
+{
+    expect_error_in_subprocess(
+        assert_int_array_entry,
+        "The arrays differ at index 1.");
+}
+
+struct struct_array_t {
+    int a;
+};
+
+static void assert_struct_array_entry()
+{
+    struct struct_array_t a[3] = { { 1 }, { 2 }, { 3 } };
+    struct struct_array_t b[3] = { { 1 }, { 4 }, { 3 } };
+
+    ASSERT_ARRAY(a, b, sizeof(a));
+}
+
+TEST(assert_struct_array)
+{
+    expect_error_in_subprocess(
+        assert_struct_array_entry,
+        "The arrays differ at index 1. Memory mismatch. See diff for details.");
+}
