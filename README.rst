@@ -312,7 +312,7 @@ Limitations
 
 - Function calls internally within a source file cannot be mocked
   because the linker option ``--wrap`` does not wrap these function
-  calls. See the `ld manual` for more details.
+  calls. See the `ld manual`_ for more details.
 
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
