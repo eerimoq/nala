@@ -184,3 +184,11 @@ TEST(pointer_array)
 
     ASSERT_ARRAY(c, d, sizeof(c));
 }
+
+TEST(char_array)
+{
+    char a[] = "123";
+    char b[] = "134";
+
+    ASSERT_ARRAY(a, b, sizeof(a));
+}
