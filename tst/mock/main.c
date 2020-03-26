@@ -689,8 +689,49 @@ TEST(io_control_no_implementation_function)
 
 TEST(variadic_function_pointer_error_wrong_call_order)
 {
-    function_error_in_subprocess(variadic_function_pointer_error_wrong_call_order_entry,
-                                 " != 0x");
+    function_error_in_subprocess(
+        variadic_function_pointer_error_wrong_call_order_entry,
+        " != 0x");
+}
+
+static void variadic_function_error_set_in_for_integer_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    int value;
+
+    io_control_mock_once(1, 0, "%p%p%d", 5);
+    value = 0;
+    io_control_mock_set_va_arg_in_at(0, &value, sizeof(value));
+    io_control_mock_set_va_arg_in_at(1, &value, sizeof(value));
+    io_control_mock_set_va_arg_in_at(2, &value, sizeof(value));
+}
+
+TEST(variadic_function_error_set_in_for_integer)
+{
+    function_error_in_subprocess(
+        variadic_function_error_set_in_for_integer_entry,
+        "Cannot set input for '%d' at index 2. Only '%p' can be set.");
+}
+
+static void variadic_function_error_set_out_for_unsigned_long_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    unsigned long value;
+
+    io_control_mock_once(1, 0, "%p%p%lu%u", 5lu, 3);
+    value = 0;
+    io_control_mock_set_va_arg_out_at(0, &value, sizeof(value));
+    io_control_mock_set_va_arg_out_at(1, &value, sizeof(value));
+    io_control_mock_set_va_arg_out_at(2, &value, sizeof(value));
+}
+
+TEST(variadic_function_error_set_out_for_unsigned_long)
+{
+    function_error_in_subprocess(
+        variadic_function_error_set_out_for_unsigned_long_entry,
+        "Cannot set output for '%lu' at index 2. Only '%p' can be set.");
 }
 
 TEST(compose_twice_function)

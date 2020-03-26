@@ -181,6 +181,65 @@ struct nala_state_t {
     struct nala_suspended_t suspended;
 };
 
+void nala_set_param_init(struct nala_set_param *self_p)
+{
+    self_p->buf_p = NULL;
+    self_p->size = 0;
+}
+
+void nala_set_param_buf(struct nala_set_param *self_p,
+                        const void *buf_p,
+                        size_t size)
+{
+    self_p->buf_p = nala_xmalloc(size);
+    self_p->size = size;
+    memcpy(self_p->buf_p, buf_p, size);
+}
+
+void nala_set_param_string(struct nala_set_param *self_p, const char *string_p)
+{
+    nala_set_param_buf(self_p, string_p, strlen(string_p) + 1);
+}
+
+const char *va_arg_type_specifier_string(enum nala_va_arg_item_type_t type)
+{
+    const char *res_p;
+
+    switch (type) {
+
+    case nala_va_arg_item_type_d_t:
+        res_p = "d";
+        break;
+
+    case nala_va_arg_item_type_u_t:
+        res_p = "u";
+        break;
+
+    case nala_va_arg_item_type_ld_t:
+        res_p = "ld";
+        break;
+
+    case nala_va_arg_item_type_lu_t:
+        res_p = "lu";
+        break;
+
+    case nala_va_arg_item_type_p_t:
+        res_p = "p";
+        break;
+
+    case nala_va_arg_item_type_s_t:
+        res_p = "s";
+        break;
+
+    default:
+        nala_test_failure(nala_format("Nala internal failure.\n"));
+        exit(1);
+        break;
+    }
+
+    return (res_p);
+}
+
 void nala_va_arg_list_init(struct nala_va_arg_list_t *self_p)
 {
     self_p->head_p = NULL;
@@ -428,6 +487,58 @@ void nala_va_arg_list_assert_s(struct nala_va_arg_item_t *item_p,
     }
 }
 
+void nala_va_arg_list_set_param_buf_in_at(struct nala_va_arg_list_t *self_p,
+                                          unsigned int index,
+                                          const void *buf_p,
+                                          size_t size)
+{
+    struct nala_va_arg_item_t *item_p;
+
+    item_p = nala_va_arg_list_get(self_p, index);
+
+    switch (item_p->type) {
+
+    case nala_va_arg_item_type_p_t:
+        nala_set_param_buf(&item_p->in, buf_p, size);
+        break;
+
+    default:
+        nala_test_failure(
+            nala_format(
+                "Cannot set input for '%%%s' at index %u. Only '%%p' can be set.\n",
+                va_arg_type_specifier_string(item_p->type),
+                index));
+        exit(1);
+        break;
+    }
+}
+
+void nala_va_arg_list_set_param_buf_out_at(struct nala_va_arg_list_t *self_p,
+                                           unsigned int index,
+                                           const void *buf_p,
+                                           size_t size)
+{
+    struct nala_va_arg_item_t *item_p;
+
+    item_p = nala_va_arg_list_get(self_p, index);
+
+    switch (item_p->type) {
+
+    case nala_va_arg_item_type_p_t:
+        nala_set_param_buf(&item_p->out, buf_p, size);
+        break;
+
+    default:
+        nala_test_failure(
+            nala_format(
+                "Cannot set output for '%%%s' at index %u. Only '%%p' can be set.\n",
+                va_arg_type_specifier_string(item_p->type),
+                index));
+        exit(1);
+        break;
+    }
+}
+
 void nala_va_arg_list_assert(struct nala_va_arg_list_t *self_p,
                              va_list vl)
 {
@@ -471,24 +582,6 @@ void nala_va_arg_list_assert(struct nala_va_arg_list_t *self_p,
 
         item_p = item_p->next_p;
     }
-}
-
-void nala_set_param_init(struct nala_set_param *self_p)
-{
-    self_p->buf_p = NULL;
-    self_p->size = 0;
-}
-
-void nala_set_param_buf(struct nala_set_param *self_p, const void *buf_p, size_t size)
-{
-    self_p->buf_p = nala_xmalloc(size);
-    self_p->size = size;
-    memcpy(self_p->buf_p, buf_p, size);
-}
-
-void nala_set_param_string(struct nala_set_param *self_p, const char *string_p)
-{
-    nala_set_param_buf(self_p, string_p, strlen(string_p) + 1);
 }
 
 void nala_traceback(struct nala_traceback_t *traceback_p)
