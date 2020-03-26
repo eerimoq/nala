@@ -1214,22 +1214,22 @@ void nala_assert_ptr(const void *actual_p, const void *expected_p, int op)
 
 typedef void (*format_array_item_t)(FILE *file_p, const void *value_p);
 
-static char *format_array(const void *actual_p,
+static char *format_array(const void *buf_p,
                           size_t item_size,
                           size_t size,
                           int i,
                           format_array_item_t format_item)
 {
     size_t file_size;
-    char *buf_p;
+    char *string_p;
     FILE *file_p;
     int length;
     int begin;
     int end;
-    const char *c_actual_p;
+    const char *c_buf_p;
     const char *delim_p;
 
-    c_actual_p = (const char *)actual_p;
+    c_buf_p = (const char *)buf_p;
     length = (int)(size / item_size);
     begin = (i - 3);
 
@@ -1243,7 +1243,7 @@ static char *format_array(const void *actual_p,
         end = length;
     }
 
-    file_p = open_memstream(&buf_p, &file_size);
+    file_p = open_memstream(&string_p, &file_size);
     fprintf(file_p, "{ ");
 
     if (begin != 0) {
@@ -1254,7 +1254,7 @@ static char *format_array(const void *actual_p,
 
     for (i = begin; i < end; i++) {
         fprintf(file_p, "%s", delim_p);
-        format_item(file_p, &c_actual_p[i * (int)item_size]);
+        format_item(file_p, &c_buf_p[i * (int)item_size]);
         delim_p = ", ";
     }
 
@@ -1266,7 +1266,7 @@ static char *format_array(const void *actual_p,
     fputc('\0', file_p);
     fclose(file_p);
 
-    return (buf_p);
+    return (string_p);
 }
 
 static void assert_array_failure(const void *actual_p,
@@ -1298,7 +1298,7 @@ static void assert_array_failure(const void *actual_p,
                                      size,
                                      i,
                                      format_item);
-    print_string_diff(file_p, actual_string_p, expected_string_p);
+    print_string_diff(file_p, expected_string_p, actual_string_p);
     free(actual_string_p);
     free(expected_string_p);
     fputc('\0', file_p);
