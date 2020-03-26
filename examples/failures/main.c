@@ -131,3 +131,10 @@ TEST(mock_string_param)
 
     mount("foo", "fie", "bar", 0, NULL);
 }
+
+TEST(mock_integer_param)
+{
+    mount_mock_once("foo", "fie", "bar", 1, 0);
+
+    mount("foo", "fie", "bar", 0, NULL);
+}
