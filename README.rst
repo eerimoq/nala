@@ -158,7 +158,7 @@ example above.
    (gdb) c
 
 The test program takes optional arguments as below, which also can be
-helpful when debugging, especially `--print-all-calls`.
+helpful when debugging, especially ``--print-all-calls``.
 
 .. code-block::
 
