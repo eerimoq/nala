@@ -64,6 +64,8 @@ The assertions tests:
 
    TEST(assertions)
    {
+       int array[] = { 1, 5, 2 };
+
        ASSERT_EQ(NULL, NULL);
        ASSERT_NE(1, 2);
        ASSERT_LT(1.0, 2.0);
@@ -73,6 +75,7 @@ The assertions tests:
        ASSERT_SUBSTRING("12345", "34");
        ASSERT_NOT_SUBSTRING("12345", "4567");
        ASSERT_MEMORY("abcd", "abcd", 5);
+       ASSERT_ARRAY(array, array, sizeof(array));
        ASSERT(1 == 1);
 
        CAPTURE_OUTPUT(output, errput) {
