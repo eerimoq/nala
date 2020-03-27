@@ -29,7 +29,7 @@ NALA ?= PYTHONPATH=../.. python3 -m nala
 
 all:
 	[ -f nala_mocks.h ] || (touch nala_mocks.h)
-	$(CC) $(INC) -DNALA_GENERATE_MOCKS -E main.c > main.pp.c
-	cat main.pp.c | $(NALA) generate_mocks --no-cache
-	$(CC) $(INC) $(CFLAGS) $$(cat nala_mocks.ldflags) $(SRC) -o main
+	$(CC) $(INC) -DNALA_GENERATE_MOCKS -E main.c \
+	    | $(NALA) generate_mocks --no-cache
+	$(CC) $(INC) $(CFLAGS) @nala_mocks.ldflags $(SRC) -o main
 	./main

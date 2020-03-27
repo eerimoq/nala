@@ -8,7 +8,6 @@ SRC += $(BUILD)/nala_mocks.c
 SRC += nala.c
 SRC += $(TESTS)
 OBJ = $(SRC:%.c=%.o)
-TESTS_C = $(BUILD)/tests.c
 NALA = nala
 
 all:
@@ -21,7 +20,7 @@ clean:
 
 $(EXE): $(OBJ)
 	echo "LD $@"
-	$(CC) $$(cat $(BUILD)/nala_mocks.ldflags) -g -no-pie $^ -o $@
+	$(CC) @$(BUILD)/nala_mocks.ldflags -g -no-pie $^ -o $@
 
 %.o: %.c
 	echo "CC $^"
@@ -31,7 +30,6 @@ $(BUILD)/nala_mocks.ldflags: $(TESTS)
 	echo "MOCKGEN $^"
 	mkdir -p $(BUILD)
 	[ -f $(BUILD)/nala_mocks.h ] || touch $(BUILD)/nala_mocks.h
-	cat $(TESTS) > $(TESTS_C)
-	$(CC) $(INC:%=-I%) -DNALA_GENERATE_MOCKS -E $(TESTS_C) \
+	$(CC) $(INC:%=-I%) -DNALA_GENERATE_MOCKS -E $(TESTS) \
 	    | $(NALA) generate_mocks -o $(BUILD)
 	touch $@

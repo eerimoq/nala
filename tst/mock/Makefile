@@ -25,12 +25,11 @@ SRC += subprocess.c
 test:
 	$(MAKE) -C ../.. dist
 	[ -f nala_mocks.h ] || (touch nala_mocks.h)
-	$(CC) $(INC) -DNALA_GENERATE_MOCKS -E main.c > main.pp.c
-	cat main.pp.c | $(NALA) generate_mocks \
-				    --no-cache \
-				    -n no_implementation \
-				    -n another \
-				    -n io_control_no_implementation \
-				    -n ioctl
-	$(CC) $(CFLAGS) $$(cat nala_mocks.ldflags) $(SRC) -o main
+	$(CC) $(INC) -DNALA_GENERATE_MOCKS -E main.c \
+	    | $(NALA) generate_mocks --no-cache \
+				     -n no_implementation \
+				     -n another \
+				     -n io_control_no_implementation \
+				     -n ioctl
+	$(CC) $(CFLAGS) @nala_mocks.ldflags $(SRC) -o main
 	./main

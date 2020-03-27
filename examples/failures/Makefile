@@ -10,7 +10,7 @@ CFLAGS += $(ASAN_FLAGS)
 NALA ?= PYTHONPATH=../.. python3 -m nala
 
 test: nala_mocks.h
-	$(CC) $(CFLAGS) $$(cat nala_mocks.ldflags) *.c ../../nala/dist/nala.c -o main
+	$(CC) $(CFLAGS) @nala_mocks.ldflags *.c ../../nala/dist/nala.c -o main
 	./main --continue-on-failure
 
 nala_mocks.h: main.c
