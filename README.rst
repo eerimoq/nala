@@ -187,8 +187,8 @@ Generating mocks
 
 The ``nala generate_mocks`` command finds the functions mocked in your
 code and generates ``nala_mocks.h``, ``nala_mocks.c`` and
-``nala_mocks.ld``. The first two files declare and define mocks, while
-the last file contains linker flags.
+``nala_mocks.ldflags``. The first two files declare and define mocks,
+while the last file contains linker flags.
 
 Use ``--rename-parameters-file`` to rename function parameters, often
 useful when mocking standard library functions. If not given, Nala

@@ -9,10 +9,10 @@ SRC += ../../nala/dist/nala.c
 SRC += $(TESTS)
 OBJ = $(SRC:%.c=%.o)
 TESTS_C = $(BUILD)/tests.c
-NALA = nala
+NALA ?= PYTHONPATH=../.. python3 -m nala
 
 all:
-	$(MAKE) $(BUILD)/nala_mocks.ld
+	$(MAKE) $(BUILD)/nala_mocks.ldflags
 	$(MAKE) $(EXE)
 	$(EXE) $(ARGS)
 
@@ -21,13 +21,13 @@ clean:
 
 $(EXE): $(OBJ)
 	echo "LD $@"
-	$(CC) $$(cat $(BUILD)/nala_mocks.ld) -g -no-pie $^ -o $@
+	$(CC) $$(cat $(BUILD)/nala_mocks.ldflags) -g -no-pie $^ -o $@
 
 %.o: %.c
 	echo "CC $^"
 	$(CC) $(INC:%=-I%) -g -O0 -no-pie -c $^ -o $@
 
-$(BUILD)/nala_mocks.ld: $(TESTS)
+$(BUILD)/nala_mocks.ldflags: $(TESTS)
 	echo "MOCKGEN $^"
 	mkdir -p $(BUILD)
 	[ -f $(BUILD)/nala_mocks.h ] || touch $(BUILD)/nala_mocks.h

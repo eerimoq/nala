@@ -32,5 +32,5 @@ test:
 				    -n another \
 				    -n io_control_no_implementation \
 				    -n ioctl
-	$(CC) $(CFLAGS) $$(cat nala_mocks.ld) $(SRC) -o main
+	$(CC) $(CFLAGS) $$(cat nala_mocks.ldflags) $(SRC) -o main
 	./main

@@ -42,8 +42,8 @@ class CommandLineTest(unittest.TestCase):
                                 f'tests/files/test_{name}_nala_mocks.h')
         self.assert_files_equal('output/nala_mocks.c',
                                 f'tests/files/test_{name}_nala_mocks.c')
-        self.assert_files_equal('output/nala_mocks.ld',
-                                f'tests/files/test_{name}_nala_mocks.ld')
+        self.assert_files_equal('output/nala_mocks.ldflags',
+                                f'tests/files/test_{name}_nala_mocks.ldflags')
 
     def test_generate_mocks(self):
         names = [

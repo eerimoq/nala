@@ -111,7 +111,7 @@ main
 *.gcda
 nala_mocks.h
 nala_mocks.c
-nala_mocks.ld
+nala_mocks.ldflags
 /a.out
 /my-suite
 report.json

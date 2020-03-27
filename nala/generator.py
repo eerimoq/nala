@@ -17,7 +17,7 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 HEADER_FILE = "nala_mocks.h"
 SOURCE_FILE = "nala_mocks.c"
-LINKER_FILE = "nala_mocks.ld"
+LINKER_FILE = "nala_mocks.ldflags"
 
 
 def is_ellipsis(param):
