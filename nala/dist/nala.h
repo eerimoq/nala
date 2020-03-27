@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NALA_VERSION "0.112.1"
+#define NALA_VERSION "0.113.1"
 
 /**
  * Assert that given characters, numbers, pointers or strings are
