@@ -298,7 +298,7 @@ The variadic parameters are controlled by index instead of name.
    void <func>_mock_ignore_va_arg_in_at(uint)          - ignore on input
    void <func>_mock_set_va_arg_in_at(uint, *, size_t)  - check on input
    void <func>_mock_set_va_arg_in_assert_at(uint, *)   - custom assert function on input
-   void <func>_mock_set_va_arg_in_pointer_at(uint, *)  - check pointer on input
+   void <func>_mock_set_va_arg_in_pointer_at(uint, *)  - check pointer (the address) on input
    void <func>_mock_set_va_arg_out_at(uint, *, size_t) - value on return
    void <func>_mock_set_va_arg_out_copy_at(uint, *)    - custom output copy function
 
