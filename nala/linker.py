@@ -1,5 +1,4 @@
 import struct
-from dataclasses import dataclass
 
 
 ELFCLASS64 = 2
@@ -23,22 +22,35 @@ class Symbol:
     def __init__(self):
         pass
 
-@dataclass
 class Elf64Header:
 
-    e_type: int
-    e_machine: int
-    e_version: int
-    e_entry: int
-    e_phoff: int
-    e_shoff: int
-    e_flags: int
-    e_ehsize: int
-    e_phentsize: int
-    e_phnum: int
-    e_shentsize: int
-    e_shnum: int
-    e_shstrndx: int
+    def __init__(self,
+                 e_type,
+                 e_machine,
+                 e_version,
+                 e_entry,
+                 e_phoff,
+                 e_shoff,
+                 e_flags,
+                 e_ehsize,
+                 e_phentsize,
+                 e_phnum,
+                 e_shentsize,
+                 e_shnum,
+                 e_shstrndx):
+        self.e_type = e_type
+        self.e_machine = e_machine
+        self.e_version = e_version
+        self.e_entry = e_entry
+        self.e_phoff = e_phoff
+        self.e_shoff = e_shoff
+        self.e_flags = e_flags
+        self.e_ehsize = e_ehsize
+        self.e_phentsize = e_phentsize
+        self.e_phnum = e_phnum
+        self.e_shentsize = e_shentsize
+        self.e_shnum = e_shnum
+        self.e_shstrndx = e_shstrndx
 
     @classmethod
     def from_bytes(cls, data, endianness):
@@ -61,19 +73,29 @@ class Elf64Header:
                            self.e_shstrndx)
 
 
-@dataclass
 class Elf64SectionHeader:
 
-    sh_name: int
-    sh_type: int
-    sh_flags: int
-    sh_addr: int
-    sh_offset: int
-    sh_size: int
-    sh_link: int
-    sh_info: int
-    sh_addralign: int
-    sh_entsize: int
+    def __init__(self,
+                 sh_name,
+                 sh_type,
+                 sh_flags,
+                 sh_addr,
+                 sh_offset,
+                 sh_size,
+                 sh_link,
+                 sh_info,
+                 sh_addralign,
+                 sh_entsize):
+        self.sh_name = sh_name
+        self.sh_type = sh_type
+        self.sh_flags = sh_flags
+        self.sh_addr = sh_addr
+        self.sh_offset = sh_offset
+        self.sh_size = sh_size
+        self.sh_link = sh_link
+        self.sh_info = sh_info
+        self.sh_addralign = sh_addralign
+        self.sh_entsize = sh_entsize
 
     @classmethod
     def from_bytes(cls, data, endianness):
@@ -93,15 +115,21 @@ class Elf64SectionHeader:
                            self.sh_entsize)
 
 
-@dataclass
 class Elf64Symbol:
 
-    st_name: int
-    st_info: int
-    st_other: int
-    st_shndx: int
-    st_value: int
-    st_size: int
+    def __init__(self,
+                 st_name,
+                 st_info,
+                 st_other,
+                 st_shndx,
+                 st_value,
+                 st_size):
+        self.st_name = st_name
+        self.st_info = st_info
+        self.st_other = st_other
+        self.st_shndx = st_shndx
+        self.st_value = st_value
+        self.st_size = st_size
 
     @classmethod
     def from_bytes(cls, data, endianness):
