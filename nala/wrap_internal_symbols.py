@@ -220,15 +220,18 @@ class Elf64File:
         ]
         self._symtab_section = self._find_section(SHT_SYMTAB)
         self._strtab_section = self._find_section(SHT_STRTAB)
-        self._rela_text_section = self._find_section(SHT_RELA)
+        self._rela_sections = self._find_sections(SHT_RELA)
         self._strtab = {}
         self._relas = []
 
-        for i in range(len(self._rela_text_section.data) // 24):
-            offset = i * 24
-            self._relas.append(
-                Elf64Rela.from_bytes(
-                    self._rela_text_section.data[offset:offset + 24], '<'))
+        for rela_section in self._rela_sections:
+            for i in range(len(rela_section.data) // 24):
+                offset = i * 24
+                self._relas.append((
+                    i,
+                    rela_section,
+                    Elf64Rela.from_bytes(
+                        rela_section.data[offset:offset + 24], '<')))
 
         self._symbols = {}
 
@@ -296,7 +299,7 @@ class Elf64File:
         self._symtab_section.data += symbol.to_bytes('<')
 
         # Make all calls call the wrapper instead.
-        for i, rela in enumerate(self._relas):
+        for i, rela_section, rela in self._relas:
             offset = 24 * (rela.r_info >> 32)
 
             if offset not in self._symbols:
@@ -310,7 +313,7 @@ class Elf64File:
 
             rela.r_info &= 0xffffffff
             rela.r_info |= (wrapped_symbol_index << 32)
-            self._rela_text_section.data[24 * i:24 * i + 24] = rela.to_bytes('<')
+            rela_section.data[24 * i:24 * i + 24] = rela.to_bytes('<')
 
     def _find_section(self, sh_type):
         for section in self._sections:
@@ -318,6 +321,13 @@ class Elf64File:
                 return section
 
         raise Error(f'Section of type {sh_type} not found.')
+
+    def _find_sections(self, sh_type):
+        return [
+            section
+            for section in self._sections
+            if section.header.sh_type == sh_type
+        ]
 
 
 def wrap_internal_symbols(object_elf, symbol_names):
@@ -329,6 +339,9 @@ def wrap_internal_symbols(object_elf, symbol_names):
     """
 
     elffile = Elf64File(object_elf)
+
+    # Start by iterating over all relocations and replace
+    # calls. Create symbol table entries for replaced calls.
 
     for symbol_name in symbol_names:
         elffile.wrap_symbol(symbol_name)

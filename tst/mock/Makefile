@@ -20,8 +20,8 @@ CFLAGS += -no-pie
 CFLAGS += -Wpedantic
 CFLAGS += -fprofile-arcs
 CFLAGS += -ftest-coverage
-#CFLAGS += -ffunction-sections
-#CFLAGS += -fdata-sections
+CFLAGS += -ffunction-sections
+CFLAGS += -fdata-sections
 ifeq ($(SANITIZE), yes)
 CFLAGS += -fsanitize=address
 CFLAGS += -fsanitize=undefined
