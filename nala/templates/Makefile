@@ -26,6 +26,7 @@ $(EXE): $(OBJ)
 %.o: %.c
 	echo "CC $^"
 	$(CC) $(INC:%=-I%) -g -O0 -no-pie -c $^ -o $@
+	$(NALA) wrap_internal_symbols $(BUILD)/nala_mocks.ldflags $@
 
 $(BUILD)/nala_mocks.ldflags: $(TESTS)
 	echo "MOCKGEN $^"

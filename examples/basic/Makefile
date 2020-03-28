@@ -1,5 +1,6 @@
 TESTS += test_assertions.c
 TESTS += test_time.c
+TESTS += test_internal_mock.c
 BUILD = build
 EXE = $(BUILD)/app
 INC += $(BUILD)
@@ -26,6 +27,7 @@ $(EXE): $(OBJ)
 %.o: %.c
 	echo "CC $^"
 	$(CC) $(INC:%=-I%) -g -O0 -no-pie -c $^ -o $@
+	$(NALA) wrap_internal_symbols $(BUILD)/nala_mocks.ldflags $@
 
 $(BUILD)/nala_mocks.ldflags: $(TESTS)
 	echo "MOCKGEN $^"
