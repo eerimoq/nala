@@ -301,10 +301,9 @@ class Elf64File:
 
 def wrap_internal_symbols(object_elf, symbol_names):
     """Wrap given symbols when called internally within an object file, as
-    GNU ld only wraps calls between objects. This allows mocking
-    function calls within a C source file. However, this is only done
-    for global symbols, as local symbols likely will introduce name
-    conflicts when in the same global namespace.
+    GNU ld only wraps calls between objects (for good reasons). This
+    allows mocking function calls within a C source file, given that
+    the compiler do not inlide those.
 
     """
 
