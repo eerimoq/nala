@@ -141,24 +141,24 @@ TEST(mock_integer_param)
 
 TEST(int_array)
 {
-    int a[] = { 1, 2, 3 };
-    int b[] = { 1, 4, 3 };
+    int a[] = { 1, 4, 3 };
+    int b[] = { 1, 2, 3 };
 
     ASSERT_ARRAY(a, b, sizeof(a));
 }
 
 TEST(int_array_long)
 {
-    int a[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    int b[] = { 1, 2, 3, 4, 16, 16, 17, 8, 9 };
+    int a[] = { 1, 2, 3, 4, 16, 16, 17, 8, 9 };
+    int b[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
     ASSERT_ARRAY(a, b, sizeof(a));
 }
 
 TEST(float_array)
 {
-    float a[] = { 1.1, 2.2, 3.3 };
-    float b[] = { 1.1, 4.4, 3.3 };
+    float a[] = { 1.1, 4.4, 3.3 };
+    float b[] = { 1.1, 2.2, 3.3 };
 
     ASSERT_ARRAY(a, b, sizeof(a));
 }
@@ -169,8 +169,8 @@ struct struct_array_t {
 
 TEST(struct_array)
 {
-    struct struct_array_t a[3] = { { 1 }, { 2 }, { 3 } };
-    struct struct_array_t b[3] = { { 1 }, { 4 }, { 3 } };
+    struct struct_array_t a[3] = { { 1 }, { 4 }, { 3 } };
+    struct struct_array_t b[3] = { { 1 }, { 2 }, { 3 } };
 
     ASSERT_ARRAY(a, b, sizeof(a));
 }
@@ -187,8 +187,8 @@ TEST(pointer_array)
 
 TEST(char_array)
 {
-    char a[] = "123";
-    char b[] = "134";
+    char a[] = "134";
+    char b[] = "123";
 
     ASSERT_ARRAY(a, b, sizeof(a));
 }
