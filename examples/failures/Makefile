@@ -1,18 +1,38 @@
-ASAN_FLAGS = -fsanitize=address
-INC += -I../../nala/dist
+TESTS += main.c
+BUILD = build
+EXE = $(BUILD)/app
+INC += $(BUILD)
+INC += ../../nala/dist
+SRC += $(BUILD)/nala_mocks.c
+SRC += ../../nala/dist/nala.c
 SRC += foo.c
-CFLAGS += $(INC)
-CFLAGS += -Wextra
-CFLAGS += -g
-CFLAGS += -O0
-CFLAGS += -no-pie
-CFLAGS += $(ASAN_FLAGS)
+SRC += $(TESTS)
+OBJ = $(SRC:%.c=%.o)
+TESTS_C = tests.c
 NALA ?= PYTHONPATH=../.. python3 -m nala
 
-test: nala_mocks.h
-	$(CC) $(CFLAGS) @nala_mocks.ldflags *.c ../../nala/dist/nala.c -o main
-	./main --continue-on-failure
+all:
+	$(MAKE) $(BUILD)/nala_mocks.ldflags
+	$(MAKE) $(EXE)
+	$(EXE) $(ARGS) --continue-on-failure
 
-nala_mocks.h: main.c
-	[ -f nala_mocks.h ] || touch nala_mocks.h
-	$(CC) $(INC) -DNALA_GENERATE_MOCKS -E main.c | $(NALA) generate_mocks
+clean:
+	rm -rf $(BUILD) $(OBJ)
+
+$(EXE): $(OBJ)
+	echo "LD $@"
+	$(CC) @$(BUILD)/nala_mocks.ldflags -g -no-pie $^ -o $@
+
+%.o: %.c
+	echo "CC $^"
+	$(CC) $(INC:%=-I%) -g -O0 -no-pie -c $^ -o $@
+	$(NALA) wrap_internal_symbols $(BUILD)/nala_mocks.ldflags $@
+
+$(BUILD)/nala_mocks.ldflags: $(TESTS)
+	echo "MOCKGEN $^"
+	mkdir -p $(BUILD)
+	[ -f $(BUILD)/nala_mocks.h ] || touch $(BUILD)/nala_mocks.h
+	cat $(TESTS) > $(TESTS_C)
+	$(CC) $(INC:%=-I%) -DNALA_GENERATE_MOCKS -E $(TESTS_C) \
+	    | $(NALA) generate_mocks -o $(BUILD)
+	touch $@

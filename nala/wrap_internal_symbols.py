@@ -221,6 +221,15 @@ class Elf64File:
         self._symtab_section = self._find_section(SHT_SYMTAB)
         self._strtab_section = self._find_section(SHT_STRTAB)
         self._rela_text_section = self._find_section(SHT_RELA)
+        self._strtab = {}
+
+    def _find_string_in_strtab(self, offset):
+        if offset not in self._strtab:
+            end = self._strtab_section.data.find(b'\x00', offset)
+            name = self._strtab_section.data[offset:end]
+            self._strtab[offset] = name.decode('ascii')
+
+        return self._strtab[offset]
 
     def to_bytes(self):
         """ELF header first, then sections and last section table header.
@@ -281,8 +290,7 @@ class Elf64File:
             offset = 24 * (rela.r_info >> 32)
             symbol_data = self._symtab_section.data[offset:offset + 24]
             symbol = Elf64Symbol.from_bytes(symbol_data, '<')
-            name = self._strtab_section.data[symbol.st_name:].split(b'\x00')[0]
-            name = name.decode('ascii')
+            name = self._find_string_in_strtab(symbol.st_name)
 
             if name != symbol_name:
                 continue

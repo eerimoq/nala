@@ -9,7 +9,7 @@ SRC += $(BUILD)/nala_mocks.c
 SRC += ../../nala/dist/nala.c
 SRC += $(TESTS)
 OBJ = $(SRC:%.c=%.o)
-TESTS_C = $(BUILD)/tests.c
+TESTS_C = tests.c
 NALA ?= PYTHONPATH=../.. python3 -m nala
 
 all:
