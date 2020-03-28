@@ -3,8 +3,10 @@ import sys
 import argparse
 import shutil
 import subprocess
+import re
 
 from .api import generate_mocks
+from .wrap_internal_symbols import wrap_internal_symbols
 from .version import __version__
 
 
@@ -62,6 +64,25 @@ def do_generate_mocks(args):
                    args.no_implementation)
 
 
+def do_wrap_internal_symbols(args):
+    with open(args.ldflagsfile, 'r') as fin:
+        flags = fin.read().split(' ')
+
+    symbols_to_wrap = []
+
+    for flag in flags:
+        mo = re.match(r'-Wl,--wrap=(.*)', flag)
+
+        if mo:
+           symbols_to_wrap.append(mo.group(1))
+
+    with open(args.objectfile, 'rb') as fin:
+        wrapped_data = wrap_internal_symbols(fin.read(), symbols_to_wrap)
+
+    with open(args.objectfile, 'wb') as fout:
+        fout.write(wrapped_data)
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="nala",
@@ -78,12 +99,14 @@ def main():
                                        dest='subcommand')
     subparsers.required = True
 
+    # The init subcommand.
     subparser = subparsers.add_parser(
         'init',
         description='Create a test suite in current directory.')
     subparser.add_argument('name', help='Test suite name.')
     subparser.set_defaults(func=do_init)
 
+    # The generate_mocks subparser.
     subparser = subparsers.add_parser('generate_mocks',
                                       description='Generate mocks.')
     subparser.add_argument('-o', '--outdir',
@@ -108,6 +131,16 @@ def main():
         nargs='*',
         help='Pre-processed source file(s) or - to read from stdin (default: -).')
     subparser.set_defaults(func=do_generate_mocks)
+
+    # The wrap_internal_symbols subparser.
+    subparser = subparsers.add_parser(
+        'wrap_internal_symbols',
+        description='Wrap given object-internal symbols.')
+    subparser.add_argument('ldflagsfile',
+                           help='The generated .ldflags file.')
+    subparser.add_argument('objectfile',
+                           help='An object file.')
+    subparser.set_defaults(func=do_wrap_internal_symbols)
 
     args = parser.parse_args()
 

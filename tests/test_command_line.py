@@ -1,6 +1,8 @@
 import re
 import subprocess
 import unittest
+import shutil
+import filecmp
 from unittest.mock import patch
 from io import StringIO
 import nala.cli
@@ -73,7 +75,7 @@ class CommandLineTest(unittest.TestCase):
             '-d',
             'generate_mocks',
             '-o', 'output',
-            f'tests/files/test_missing_declaration_tests.pp.c'
+            'tests/files/test_missing_declaration_tests.pp.c'
         ]
 
         pre_process_file('missing_declaration')
@@ -95,3 +97,22 @@ class CommandLineTest(unittest.TestCase):
             str(cm.exception),
             'Unable to find declarations of all mocked functions. Add '
             'missing includes to the test file.')
+
+    def test_wrap_internal_symbols(self):
+        argv = [
+            'nala',
+            'wrap_internal_symbols',
+            'tests/files/test_wrap_internal_symbols.ldflags',
+            'test_wrap_internal_symbols.o'
+        ]
+
+        # The file is modified in place, so make a copy.
+        shutil.copyfile('tests/files/test_wrap_internal_symbols.o',
+                        'test_wrap_internal_symbols.o')
+
+        with patch('sys.argv', argv):
+            nala.cli.main()
+
+        self.assertTrue(
+            filecmp.cmp('test_wrap_internal_symbols.o',
+                        'tests/files/test_wrap_internal_symbols.wrapped.o'))

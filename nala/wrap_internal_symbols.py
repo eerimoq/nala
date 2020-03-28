@@ -12,15 +12,14 @@ SHT_STRTAB = 3
 SHT_RELA = 4
 SHT_REL = 9
 
+STB_GLOBAL = 1
+
+SHN_UNDEF = 0
+
 
 class Error(Exception):
     pass
 
-
-class Symbol:
-
-    def __init__(self):
-        pass
 
 class Elf64Header:
 
@@ -145,28 +144,33 @@ class Elf64Symbol:
                            self.st_size)
 
 
+class Elf64Rela:
+
+    def __init__(self,
+                 r_offset,
+                 r_info,
+                 r_addend):
+        self.r_offset = r_offset
+        self.r_info = r_info
+        self.r_addend = r_addend
+
+    @classmethod
+    def from_bytes(cls, data, endianness):
+        return cls(*struct.unpack(endianness + 'QQQ', data))
+
+    def to_bytes(self, endianness):
+        return struct.pack(endianness + 'QQQ',
+                           self.r_offset,
+                           self.r_info,
+                           self.r_addend)
+
+
 class Section:
 
     def __init__(self, header, elf):
         self.header = header
-        self.data = elf[header.sh_offset:header.sh_offset + header.sh_size]
-
-    def to_bytes(self, offset, endianness):
-        alignment = self.header.sh_addralign
-
-        if alignment != 0:
-            padding_size = (alignment - (offset % alignment))
-
-            if padding_size == alignment:
-                padding_size = 0
-        else:
-            padding_size = 0
-
-        padding = b'\x00' * padding_size
-        offset += padding_size
-        self.header.sh_offset = offset
-
-        return padding + self.data
+        offset = header.sh_offset
+        self.data = bytearray(elf[offset:offset + header.sh_size])
 
     def __str__(self):
         return (f'Section of type {self.header.sh_type} with {len(self.data)} '
@@ -216,6 +220,7 @@ class Elf64File:
         ]
         self._symtab_section = self._find_section(SHT_SYMTAB)
         self._strtab_section = self._find_section(SHT_STRTAB)
+        self._rela_text_section = self._find_section(SHT_RELA)
 
     def to_bytes(self):
         """ELF header first, then sections and last section table header.
@@ -240,7 +245,8 @@ class Elf64File:
             section_datas.append(b'\x00' * padding_size)
             offset += padding_size
             section.header.sh_offset = offset
-            offset += len(section.data)
+            section.header.sh_size = len(section.data)
+            offset += section.header.sh_size
             section_headers.append(section.header.to_bytes('<'))
             section_datas.append(section.data)
 
@@ -250,8 +256,40 @@ class Elf64File:
                         + section_datas
                         + section_headers)
 
-    def add_undefined_symbol(self, symbol_name):
-        pass
+    def wrap_symbol(self, symbol_name):
+        wrapped_symbol_name = f'__wrap_{symbol_name}'
+
+        # Add wrapped string to .strtab.
+        name_offset = len(self._strtab_section.data)
+        self._strtab_section.data += wrapped_symbol_name.encode('ascii') + b'\x00'
+
+        # Create an undefiend symbol in .symtab.
+        symbol = Elf64Symbol(name_offset, STB_GLOBAL << 4, 0, SHN_UNDEF, 0, 0)
+        wrapped_symbol_index = len(self._symtab_section.data) // 24
+        self._symtab_section.data += symbol.to_bytes('<')
+
+        # Make all calls call the wrapper instead.
+        relas = []
+
+        for i in range(len(self._rela_text_section.data) // 24):
+            offset = i * 24
+            relas.append(
+                Elf64Rela.from_bytes(
+                    self._rela_text_section.data[offset:offset + 24], '<'))
+
+        for i, rela in enumerate(relas):
+            offset = 24 * (rela.r_info >> 32)
+            symbol_data = self._symtab_section.data[offset:offset + 24]
+            symbol = Elf64Symbol.from_bytes(symbol_data, '<')
+            name = self._strtab_section.data[symbol.st_name:].split(b'\x00')[0]
+            name = name.decode('ascii')
+
+            if name != symbol_name:
+                continue
+
+            rela.r_info &= 0xffffffff
+            rela.r_info |= (wrapped_symbol_index << 32)
+            self._rela_text_section.data[24 * i:24 * i + 24] = rela.to_bytes('<')
 
     def _find_section(self, sh_type):
         for section in self._sections:
@@ -261,7 +299,7 @@ class Elf64File:
         raise Error(f'Section of type {sh_type} not found.')
 
 
-def wrap_symbols(object_elf, symbol_names):
+def wrap_internal_symbols(object_elf, symbol_names):
     """Wrap given symbols when called internally within an object file, as
     GNU ld only wraps calls between objects. This allows mocking
     function calls within a C source file. However, this is only done
@@ -273,6 +311,6 @@ def wrap_symbols(object_elf, symbol_names):
     elffile = Elf64File(object_elf)
 
     for symbol_name in symbol_names:
-        elffile.add_undefined_symbol(symbol_name)
+        elffile.wrap_symbol(symbol_name)
 
     return elffile.to_bytes()

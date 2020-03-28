@@ -116,4 +116,6 @@ nala_mocks.ldflags
 /my-suite
 report.json
 *.pp.c
-*.o
+/*.o
+examples/*/*.o
+nala/*/*.o
