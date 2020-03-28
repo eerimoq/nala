@@ -222,6 +222,24 @@ class Elf64File:
         self._strtab_section = self._find_section(SHT_STRTAB)
         self._rela_text_section = self._find_section(SHT_RELA)
         self._strtab = {}
+        self._relas = []
+
+        for i in range(len(self._rela_text_section.data) // 24):
+            offset = i * 24
+            self._relas.append(
+                Elf64Rela.from_bytes(
+                    self._rela_text_section.data[offset:offset + 24], '<'))
+
+        self._symbols = {}
+
+        for i in range(len(self._symtab_section.data) // 24):
+            offset = 24 * i
+            symbol_data = self._symtab_section.data[offset:offset + 24]
+            symbol = Elf64Symbol.from_bytes(symbol_data, '<')
+            binding = (symbol.st_info >> 4)
+
+            if binding == STB_GLOBAL:
+                self._symbols[offset] = symbol
 
     def _find_string_in_strtab(self, offset):
         if offset not in self._strtab:
@@ -278,18 +296,13 @@ class Elf64File:
         self._symtab_section.data += symbol.to_bytes('<')
 
         # Make all calls call the wrapper instead.
-        relas = []
-
-        for i in range(len(self._rela_text_section.data) // 24):
-            offset = i * 24
-            relas.append(
-                Elf64Rela.from_bytes(
-                    self._rela_text_section.data[offset:offset + 24], '<'))
-
-        for i, rela in enumerate(relas):
+        for i, rela in enumerate(self._relas):
             offset = 24 * (rela.r_info >> 32)
-            symbol_data = self._symtab_section.data[offset:offset + 24]
-            symbol = Elf64Symbol.from_bytes(symbol_data, '<')
+
+            if offset not in self._symbols:
+                continue
+
+            symbol = self._symbols[offset]
             name = self._find_string_in_strtab(symbol.st_name)
 
             if name != symbol_name:
