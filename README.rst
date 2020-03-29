@@ -220,6 +220,9 @@ the linker. To mock these, after compilation, run ``nala
 wrap_internal_symbols ...`` for each object file, and then pass them
 to the linker.
 
+Also, local (``static``) functions can't be mocked, only global
+functions can!
+
 .. code-block:: Makefile
 
    %.o: %.c
