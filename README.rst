@@ -204,11 +204,11 @@ be given multipe times.
 
 .. code-block:: bash
 
-   $ cat *.c | gcc -DNALA_GENERATE_MOCKS -xc -E - | nala generate_mocks
+   $ cat *.c | gcc -DNALA_GENERATE_MOCKS -x c -E - | nala generate_mocks
 
 Nala requires source code to be expanded by the preprocessor. You can
-directly pipe the output of ``gcc -DNALA_GENERATE_MOCKS -E`` to the
-command-line utility.
+directly pipe the output of ``gcc -DNALA_GENERATE_MOCKS -x c -E -`` to
+the command-line utility.
 
 Mocking object-internal function calls
 --------------------------------------
