@@ -332,6 +332,8 @@ Limitations
   gcov. They probably can if wrapping ``__gcov_fork()`` in an
   suspend/resume-block.
 
+- ``static`` functions can't be mocked.
+
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
 
