@@ -21,148 +21,51 @@ class Error(Exception):
     pass
 
 
-class Elf64Header:
+class Elf64LsbHeader:
 
-    def __init__(self,
-                 e_type,
-                 e_machine,
-                 e_version,
-                 e_entry,
-                 e_phoff,
-                 e_shoff,
-                 e_flags,
-                 e_ehsize,
-                 e_phentsize,
-                 e_phnum,
-                 e_shentsize,
-                 e_shnum,
-                 e_shstrndx):
-        self.e_type = e_type
-        self.e_machine = e_machine
-        self.e_version = e_version
-        self.e_entry = e_entry
-        self.e_phoff = e_phoff
-        self.e_shoff = e_shoff
-        self.e_flags = e_flags
-        self.e_ehsize = e_ehsize
-        self.e_phentsize = e_phentsize
-        self.e_phnum = e_phnum
-        self.e_shentsize = e_shentsize
-        self.e_shnum = e_shnum
-        self.e_shstrndx = e_shstrndx
+    def __init__(self, data):
+        self._data = data
+        self.e_type = struct.unpack('<H', data[16:18])[0]
+        self.e_shnum = struct.unpack('<H', data[60:62])[0]
+        self.e_shoff = struct.unpack('<Q', data[40:48])[0]
+        self.e_shentsize = struct.unpack('<H', data[58:60])[0]
 
-    @classmethod
-    def from_bytes(cls, data, endianness):
-        return cls(*struct.unpack(endianness + 'HHIQQQIHHHHHH', data))
+    @property
+    def data(self):
+        self._data[40:48] = struct.pack('<Q', self.e_shoff)
 
-    def to_bytes(self, endianness):
-        return struct.pack(endianness + 'HHIQQQIHHHHHH',
-                           self.e_type,
-                           self.e_machine,
-                           self.e_version,
-                           self.e_entry,
-                           self.e_phoff,
-                           self.e_shoff,
-                           self.e_flags,
-                           self.e_ehsize,
-                           self.e_phentsize,
-                           self.e_phnum,
-                           self.e_shentsize,
-                           self.e_shnum,
-                           self.e_shstrndx)
+        return self._data
 
 
-class Elf64SectionHeader:
+class Elf64LsbSectionHeader:
 
-    def __init__(self,
-                 sh_name,
-                 sh_type,
-                 sh_flags,
-                 sh_addr,
-                 sh_offset,
-                 sh_size,
-                 sh_link,
-                 sh_info,
-                 sh_addralign,
-                 sh_entsize):
-        self.sh_name = sh_name
-        self.sh_type = sh_type
-        self.sh_flags = sh_flags
-        self.sh_addr = sh_addr
-        self.sh_offset = sh_offset
-        self.sh_size = sh_size
-        self.sh_link = sh_link
-        self.sh_info = sh_info
-        self.sh_addralign = sh_addralign
-        self.sh_entsize = sh_entsize
+    def __init__(self, data):
+        self._data = data
+        self.sh_type = struct.unpack('<I', data[4:8])[0]
+        self.sh_offset = struct.unpack('<Q', data[24:32])[0]
+        self.sh_size = struct.unpack('<Q', data[32:40])[0]
+        self.sh_addralign = struct.unpack('<Q', data[48:56])[0]
 
-    @classmethod
-    def from_bytes(cls, data, endianness):
-        return cls(*struct.unpack(endianness + 'IIQQQQIIQQ', data))
+    @property
+    def data(self):
+        self._data[24:40] = struct.pack('<QQ',
+                                        self.sh_offset,
+                                        self.sh_size)
 
-    def to_bytes(self, endianness):
-        return struct.pack(endianness + 'IIQQQQIIQQ',
-                           self.sh_name,
-                           self.sh_type,
-                           self.sh_flags,
-                           self.sh_addr,
-                           self.sh_offset,
-                           self.sh_size,
-                           self.sh_link,
-                           self.sh_info,
-                           self.sh_addralign,
-                           self.sh_entsize)
+        return self._data
 
 
-class Elf64Symbol:
+class Elf64LsbRela:
 
-    def __init__(self,
-                 st_name,
-                 st_info,
-                 st_other,
-                 st_shndx,
-                 st_value,
-                 st_size):
-        self.st_name = st_name
-        self.st_info = st_info
-        self.st_other = st_other
-        self.st_shndx = st_shndx
-        self.st_value = st_value
-        self.st_size = st_size
+    def __init__(self, data):
+        self._data = data
+        self.symbol_index = struct.unpack('<I', data[12:16])[0]
 
-    @classmethod
-    def from_bytes(cls, data, endianness):
-        return cls(*struct.unpack(endianness + 'IBBHQQ', data))
+    @property
+    def data(self):
+        self._data[12:16] = struct.pack('<I', self.symbol_index)
 
-    def to_bytes(self, endianness):
-        return struct.pack(endianness + 'IBBHQQ',
-                           self.st_name,
-                           self.st_info,
-                           self.st_other,
-                           self.st_shndx,
-                           self.st_value,
-                           self.st_size)
-
-
-class Elf64Rela:
-
-    def __init__(self,
-                 r_offset,
-                 r_info,
-                 r_addend):
-        self.r_offset = r_offset
-        self.r_info = r_info
-        self.r_addend = r_addend
-
-    @classmethod
-    def from_bytes(cls, data, endianness):
-        return cls(*struct.unpack(endianness + 'QQQ', data))
-
-    def to_bytes(self, endianness):
-        return struct.pack(endianness + 'QQQ',
-                           self.r_offset,
-                           self.r_info,
-                           self.r_addend)
+        return self._data
 
 
 class Section:
@@ -170,20 +73,16 @@ class Section:
     def __init__(self, header, elf):
         self.header = header
         offset = header.sh_offset
-        self.data = bytearray(elf[offset:offset + header.sh_size])
-
-    def __str__(self):
-        return (f'Section of type {self.header.sh_type} with {len(self.data)} '
-                f'bytes data.')
+        self.data = elf[offset:offset + header.sh_size]
 
 
-def load_section_headers(elf, header):
+def load_section_headers(elf, e_shnum, e_shoff, e_shentsize):
     section_headers = []
 
-    for i in range(header.e_shnum):
-        offset = header.e_shoff + i * header.e_shentsize
-        header_data = elf[offset:offset + header.e_shentsize]
-        section_header = Elf64SectionHeader.from_bytes(header_data, '<')
+    for i in range(e_shnum):
+        offset = e_shoff + i * e_shentsize
+        header_data = elf[offset:offset + e_shentsize]
+        section_header = Elf64LsbSectionHeader(header_data)
         section_headers.append(section_header)
 
     return section_headers
@@ -199,7 +98,7 @@ def load_elf_header(elf):
     data_encoding = elf[5]
 
     if file_class == ELFCLASS64 and data_encoding == ELFDATA2LSB:
-        header = Elf64Header.from_bytes(elf[16:64], '<')
+        header = Elf64LsbHeader(elf[0:64])
     else:
         raise Error('Only little-endian 64-bit files are supported.')
 
@@ -209,12 +108,18 @@ def load_elf_header(elf):
     return header
 
 
+def create_undefined_global_symbol(name_offset):
+    return struct.pack('<IBBHQQ', name_offset, STB_GLOBAL << 4, 0, SHN_UNDEF, 0, 0)
+
+
 class Elf64File:
 
-    def __init__(self, elf):
-        self._e_ident = elf[0:16]
+    def __init__(self, elf, symbol_names):
         self._header = load_elf_header(elf)
-        section_headers = load_section_headers(elf, self._header)
+        section_headers = load_section_headers(elf,
+                                               self._header.e_shnum,
+                                               self._header.e_shoff,
+                                               self._header.e_shentsize)
         self._sections = [
             Section(section_header, elf) for section_header in section_headers
         ]
@@ -222,27 +127,46 @@ class Elf64File:
         self._strtab_section = self._find_section(SHT_STRTAB)
         self._rela_sections = self._find_sections(SHT_RELA)
         self._strtab = {}
+        self._symbol_names = []
+        self._symbol_name_by_offset = {}
         self._relas = []
+        symtab_data = self._symtab_section.data
+
+        for offset in range(0, len(symtab_data), 24):
+            binding = (symtab_data[offset + 4] >> 4)
+
+            if binding != STB_GLOBAL:
+                continue
+
+            size = struct.unpack('<Q', symtab_data[offset + 16:offset + 24])[0]
+
+            if size == 0:
+                continue
+
+            name_offset = struct.unpack('<I', symtab_data[offset:offset + 4])[0]
+            name = self._find_string_in_strtab(name_offset)
+
+            if name not in symbol_names:
+                continue
+
+            self._symbol_names.append(name)
+            self._symbol_name_by_offset[offset] = name
+
+        if not self.has_symbols_to_wrap():
+            return
 
         for rela_section in self._rela_sections:
-            for i in range(len(rela_section.data) // 24):
-                offset = i * 24
-                self._relas.append((
-                    i,
-                    rela_section,
-                    Elf64Rela.from_bytes(
-                        rela_section.data[offset:offset + 24], '<')))
+            for offset in range(0, len(rela_section.data), 24):
+                rela = Elf64LsbRela(rela_section.data[offset:offset + 24])
+                symbol_offset = 24 * rela.symbol_index
 
-        self._symbols = {}
+                if symbol_offset not in self._symbol_name_by_offset:
+                    continue
 
-        for i in range(len(self._symtab_section.data) // 24):
-            offset = 24 * i
-            symbol_data = self._symtab_section.data[offset:offset + 24]
-            symbol = Elf64Symbol.from_bytes(symbol_data, '<')
-            binding = (symbol.st_info >> 4)
+                self._relas.append((offset, rela_section, rela))
 
-            if binding == STB_GLOBAL:
-                self._symbols[offset] = symbol
+    def has_symbols_to_wrap(self):
+        return bool(self._symbol_name_by_offset)
 
     def _find_string_in_strtab(self, offset):
         if offset not in self._strtab:
@@ -277,43 +201,44 @@ class Elf64File:
             section.header.sh_offset = offset
             section.header.sh_size = len(section.data)
             offset += section.header.sh_size
-            section_headers.append(section.header.to_bytes('<'))
+            section_headers.append(section.header.data)
             section_datas.append(section.data)
 
         self._header.e_shoff = offset
 
-        return b''.join([self._e_ident, self._header.to_bytes('<')]
+        return b''.join([self._header.data]
                         + section_datas
                         + section_headers)
 
-    def wrap_symbol(self, symbol_name):
-        wrapped_symbol_name = f'__wrap_{symbol_name}'
-
-        # Add wrapped string to .strtab.
-        name_offset = len(self._strtab_section.data)
-        self._strtab_section.data += wrapped_symbol_name.encode('ascii') + b'\x00'
-
-        # Create an undefiend symbol in .symtab.
-        symbol = Elf64Symbol(name_offset, STB_GLOBAL << 4, 0, SHN_UNDEF, 0, 0)
+    def wrap_symbols(self):
+        strtab = []
+        symtab = []
+        symbol_name_to_index = {}
+        strtab_offset = len(self._strtab_section.data)
         wrapped_symbol_index = len(self._symtab_section.data) // 24
-        self._symtab_section.data += symbol.to_bytes('<')
+
+        for symbol_name in self._symbol_names:
+            # Add wrapped string to .strtab.
+            strtab_entry = f'__wrap_{symbol_name}'.encode('ascii') + b'\x00'
+            strtab.append(strtab_entry)
+
+            # Create an undefiend symbol in .symtab.
+            symtab.append(create_undefined_global_symbol(strtab_offset))
+            symbol_name_to_index[symbol_name] = wrapped_symbol_index
+
+            strtab_offset += len(strtab_entry)
+            wrapped_symbol_index += 1
+
+        self._strtab_section.data += b''.join(strtab)
+        self._symtab_section.data += b''.join(symtab)
 
         # Make all calls call the wrapper instead.
-        for i, rela_section, rela in self._relas:
-            offset = 24 * (rela.r_info >> 32)
-
-            if offset not in self._symbols:
-                continue
-
-            symbol = self._symbols[offset]
-            name = self._find_string_in_strtab(symbol.st_name)
-
-            if name != symbol_name:
-                continue
-
-            rela.r_info &= 0xffffffff
-            rela.r_info |= (wrapped_symbol_index << 32)
-            rela_section.data[24 * i:24 * i + 24] = rela.to_bytes('<')
+        for offset, rela_section, rela in self._relas:
+            symbol_offset = 24 * rela.symbol_index
+            symbol_name = self._symbol_name_by_offset[symbol_offset]
+            print(symbol_name)
+            rela.symbol_index = symbol_name_to_index[symbol_name]
+            rela_section.data[offset:offset + 24] = rela.data
 
     def _find_section(self, sh_type):
         for section in self._sections:
@@ -338,12 +263,11 @@ def wrap_internal_symbols(object_elf, symbol_names):
 
     """
 
-    elffile = Elf64File(object_elf)
+    elffile = Elf64File(bytearray(object_elf), set(symbol_names))
 
-    # Start by iterating over all relocations and replace
-    # calls. Create symbol table entries for replaced calls.
+    if not elffile.has_symbols_to_wrap():
+        return object_elf
 
-    for symbol_name in symbol_names:
-        elffile.wrap_symbol(symbol_name)
+    elffile.wrap_symbols()
 
     return elffile.to_bytes()

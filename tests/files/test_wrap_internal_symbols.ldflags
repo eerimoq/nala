@@ -1,1 +1,1 @@
--Wl,--wrap=foo -Wl,--wrap=bar
+-Wl,--wrap=foo -Wl,--wrap=bar -Wl,--wrap=missing
