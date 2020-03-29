@@ -8,6 +8,9 @@ SRC += ../../nala/dist/nala.c
 SRC += foo.c
 SRC += $(TESTS)
 OBJ = $(SRC:%.c=%.o)
+CFLAGS += -g -O0 -no-pie
+CFLAGS += -fsanitize=address
+CFLAGS += $(INC:%=-I%)
 NALA ?= PYTHONPATH=../.. python3 -m nala
 
 all:
@@ -20,11 +23,11 @@ clean:
 
 $(EXE): $(OBJ)
 	echo "LD $@"
-	$(CC) @$(BUILD)/nala_mocks.ldflags -g -no-pie $^ -o $@
+	$(CC) $(CFLAGS) @$(BUILD)/nala_mocks.ldflags $^ -o $@
 
 %.o: %.c
 	echo "CC $^"
-	$(CC) $(INC:%=-I%) -g -O0 -no-pie -c $^ -o $@
+	$(CC) $(CFLAGS) -c $^ -o $@
 	$(NALA) wrap_internal_symbols $(BUILD)/nala_mocks.ldflags $@
 
 $(BUILD)/nala_mocks.ldflags: $(TESTS)

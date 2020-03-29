@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <time.h>
 #include <sys/mount.h>
 #include "nala.h"
@@ -94,6 +95,28 @@ TEST(foo_wrong_in)
 TEST(segfault)
 {
     (*((int *)0)) = 1;
+}
+
+TEST(out_of_bounds)
+{
+    int a[2];
+
+    a[2] = 1;
+}
+
+TEST(memory_leak)
+{
+    malloc(1);
+}
+
+TEST(double_free)
+{
+    void *buf_p;
+
+    buf_p = malloc(1);
+    ASSERT_NE(buf_p, NULL);
+    free(buf_p);
+    free(buf_p);
 }
 
 TEST(eq)
