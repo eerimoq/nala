@@ -2,12 +2,12 @@
 #include "nala.h"
 #include "nala_mocks.h"
 
-/* Replace implemenation of square(). */
 static int my_square(int x)
 {
     return x + 1;
 }
 
+/* Replace implemenation of square(). */
 TEST(implementation)
 {
     square_mock_implementation(my_square);
