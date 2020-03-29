@@ -3,7 +3,6 @@
 import os
 import re
 from copy import deepcopy
-import pathlib
 
 from jinja2 import Environment
 from jinja2 import PackageLoader
@@ -421,7 +420,7 @@ class FunctionMock:
         try:
             name = param.type.type.names[0]
 
-            return self.is_union(self.lookup_typedef(name));
+            return self.is_union(self.lookup_typedef(name))
         except AttributeError:
             pass
 

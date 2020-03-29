@@ -1,9 +1,9 @@
 import re
 import subprocess
 import unittest
+from unittest.mock import patch
 import shutil
 import filecmp
-from unittest.mock import patch
 from io import StringIO
 import nala.cli
 

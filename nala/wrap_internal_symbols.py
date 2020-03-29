@@ -206,9 +206,7 @@ class Elf64File:
 
         self._header.e_shoff = offset
 
-        return b''.join([self._header.data]
-                        + section_datas
-                        + section_headers)
+        return b''.join([self._header.data] + section_datas + section_headers)
 
     def wrap_symbols(self):
         strtab = []
@@ -258,7 +256,7 @@ def wrap_internal_symbols(object_elf, symbol_names):
     """Wrap given symbols when called internally within an object file, as
     GNU ld only wraps calls between objects (for good reasons). This
     allows mocking function calls within a C source file, given that
-    the compiler do not inlide those.
+    the compiler do not inline those.
 
     """
 

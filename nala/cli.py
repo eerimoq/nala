@@ -2,7 +2,6 @@ import os
 import sys
 import argparse
 import shutil
-import subprocess
 import re
 
 from .api import generate_mocks
@@ -74,7 +73,7 @@ def do_wrap_internal_symbols(args):
         mo = re.match(r'-Wl,--wrap=(.*)', flag)
 
         if mo:
-           symbols_to_wrap.append(mo.group(1))
+            symbols_to_wrap.append(mo.group(1))
 
     with open(args.objectfile, 'rb') as fin:
         wrapped_data = wrap_internal_symbols(fin.read(), symbols_to_wrap)
