@@ -3,7 +3,10 @@
 #include "nala_mocks.h"
 
 /* Replace implemenation of square(). */
-static int my_square(int x) { return x + 1; }
+static int my_square(int x)
+{
+    return x + 1;
+}
 
 TEST(implementation)
 {

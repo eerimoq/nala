@@ -1,7 +1,11 @@
 #include "foo.h"
 
-int square(int x) { return x * x; }
+int square(int x)
+{
+    return x * x;
+}
 
-int myfunction(int x, int y) {
+int myfunction(int x, int y)
+{
     return square(x) + square(y);
 }
