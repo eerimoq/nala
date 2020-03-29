@@ -78,6 +78,9 @@ def do_wrap_internal_symbols(args):
     with open(args.objectfile, 'rb') as fin:
         wrapped_data = wrap_internal_symbols(fin.read(), symbols_to_wrap)
 
+    if wrapped_data is None:
+        return
+
     with open(args.objectfile, 'wb') as fout:
         fout.write(wrapped_data)
 

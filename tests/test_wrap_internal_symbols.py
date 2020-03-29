@@ -36,9 +36,4 @@ class WrapInternalSymbolsTest(unittest.TestCase):
         with open(f'tests/files/{basename}.o', 'rb') as fin:
             elf = fin.read()
 
-        actual_wrapped = wrap_internal_symbols(elf, ['not', 'found'])
-
-        with open(f'tests/files/{basename}.o', 'rb') as fin:
-            expected_wrapped = fin.read()
-
-        self.assertEqual(actual_wrapped, expected_wrapped)
+        self.assertIsNone(wrap_internal_symbols(elf, ['not', 'found']))

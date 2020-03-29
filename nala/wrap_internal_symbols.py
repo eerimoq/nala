@@ -129,51 +129,42 @@ class Elf64File:
         self._symbol_names = []
         self._symbol_name_by_offset = {}
         self._relas = []
-        symtab_data = self._symtab_section.data
+        self._load_symbols(symbol_names)
 
-        for offset in range(0, len(symtab_data), 24):
-            binding = (symtab_data[offset + 4] >> 4)
-
-            if binding != STB_GLOBAL:
-                continue
-
-            size = struct.unpack('<Q', symtab_data[offset + 16:offset + 24])[0]
-
-            if size == 0:
-                continue
-
-            name_offset = struct.unpack('<I', symtab_data[offset:offset + 4])[0]
-            name = self._find_string_in_strtab(name_offset)
-
-            if name not in symbol_names:
-                continue
-
-            self._symbol_names.append(name)
-            self._symbol_name_by_offset[offset] = name
-
-        if not self.has_symbols_to_wrap():
-            return
-
-        for rela_section in self._rela_sections:
-            for offset in range(0, len(rela_section.data), 24):
-                rela = Elf64LsbRela(rela_section.data[offset:offset + 24])
-                symbol_offset = 24 * rela.symbol_index
-
-                if symbol_offset not in self._symbol_name_by_offset:
-                    continue
-
-                self._relas.append((offset, rela_section, rela))
+        if self.has_symbols_to_wrap():
+            self._load_rela()
 
     def has_symbols_to_wrap(self):
         return bool(self._symbol_name_by_offset)
 
-    def _find_string_in_strtab(self, offset):
-        if offset not in self._strtab:
-            end = self._strtab_section.data.find(b'\x00', offset)
-            name = self._strtab_section.data[offset:end]
-            self._strtab[offset] = name.decode('ascii')
+    def wrap_symbols(self):
+        strtab = []
+        symtab = []
+        symbol_name_to_wrapped_index = {}
+        strtab_offset = len(self._strtab_section.data)
+        wrapped_symbol_index = len(self._symtab_section.data) // 24
 
-        return self._strtab[offset]
+        for symbol_name in self._symbol_names:
+            # Add wrapped string to .strtab.
+            strtab_entry = f'__wrap_{symbol_name}'.encode('ascii') + b'\x00'
+            strtab.append(strtab_entry)
+
+            # Create an undefiend symbol in .symtab.
+            symtab.append(create_undefined_global_symbol(strtab_offset))
+            symbol_name_to_wrapped_index[symbol_name] = wrapped_symbol_index
+
+            strtab_offset += len(strtab_entry)
+            wrapped_symbol_index += 1
+
+        self._strtab_section.data += b''.join(strtab)
+        self._symtab_section.data += b''.join(symtab)
+
+        # Make all calls call the wrapper instead.
+        for offset, rela_section, rela in self._relas:
+            symbol_offset = 24 * rela.symbol_index
+            symbol_name = self._symbol_name_by_offset[symbol_offset]
+            rela.symbol_index = symbol_name_to_wrapped_index[symbol_name]
+            rela_section.data[offset:offset + 24] = rela.data
 
     def to_bytes(self):
         """ELF header first, then sections and last section table header.
@@ -207,34 +198,39 @@ class Elf64File:
 
         return b''.join([self._header.data] + section_datas + section_headers)
 
-    def wrap_symbols(self):
-        strtab = []
-        symtab = []
-        symbol_name_to_wrapped_index = {}
-        strtab_offset = len(self._strtab_section.data)
-        wrapped_symbol_index = len(self._symtab_section.data) // 24
+    def _load_symbols(self, symbol_names):
+        symtab_data = self._symtab_section.data
 
-        for symbol_name in self._symbol_names:
-            # Add wrapped string to .strtab.
-            strtab_entry = f'__wrap_{symbol_name}'.encode('ascii') + b'\x00'
-            strtab.append(strtab_entry)
+        for offset in range(0, len(symtab_data), 24):
+            binding = (symtab_data[offset + 4] >> 4)
 
-            # Create an undefiend symbol in .symtab.
-            symtab.append(create_undefined_global_symbol(strtab_offset))
-            symbol_name_to_wrapped_index[symbol_name] = wrapped_symbol_index
+            if binding != STB_GLOBAL:
+                continue
 
-            strtab_offset += len(strtab_entry)
-            wrapped_symbol_index += 1
+            size = struct.unpack('<Q', symtab_data[offset + 16:offset + 24])[0]
 
-        self._strtab_section.data += b''.join(strtab)
-        self._symtab_section.data += b''.join(symtab)
+            if size == 0:
+                continue
 
-        # Make all calls call the wrapper instead.
-        for offset, rela_section, rela in self._relas:
-            symbol_offset = 24 * rela.symbol_index
-            symbol_name = self._symbol_name_by_offset[symbol_offset]
-            rela.symbol_index = symbol_name_to_wrapped_index[symbol_name]
-            rela_section.data[offset:offset + 24] = rela.data
+            name_offset = struct.unpack('<I', symtab_data[offset:offset + 4])[0]
+            name = self._find_string_in_strtab(name_offset)
+
+            if name not in symbol_names:
+                continue
+
+            self._symbol_names.append(name)
+            self._symbol_name_by_offset[offset] = name
+
+    def _load_rela(self):
+        for rela_section in self._rela_sections:
+            for offset in range(0, len(rela_section.data), 24):
+                rela = Elf64LsbRela(rela_section.data[offset:offset + 24])
+                symbol_offset = 24 * rela.symbol_index
+
+                if symbol_offset not in self._symbol_name_by_offset:
+                    continue
+
+                self._relas.append((offset, rela_section, rela))
 
     def _find_section(self, sh_type):
         for section in self._sections:
@@ -250,6 +246,14 @@ class Elf64File:
             if section.header.sh_type == sh_type
         ]
 
+    def _find_string_in_strtab(self, offset):
+        if offset not in self._strtab:
+            end = self._strtab_section.data.find(b'\x00', offset)
+            name = self._strtab_section.data[offset:end]
+            self._strtab[offset] = name.decode('ascii')
+
+        return self._strtab[offset]
+
 
 def wrap_internal_symbols(object_elf, symbol_names):
     """Wrap given symbols when called internally within an object file, as
@@ -257,12 +261,15 @@ def wrap_internal_symbols(object_elf, symbol_names):
     allows mocking function calls within a C source file, given that
     the compiler do not inline those.
 
+    Returns the modified elf object, or None if no modifications were
+    needed.
+
     """
 
     elffile = Elf64File(bytearray(object_elf), set(symbol_names))
 
     if not elffile.has_symbols_to_wrap():
-        return object_elf
+        return None
 
     elffile.wrap_symbols()
 
