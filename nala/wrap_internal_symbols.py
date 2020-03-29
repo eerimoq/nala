@@ -236,7 +236,6 @@ class Elf64File:
         for offset, rela_section, rela in self._relas:
             symbol_offset = 24 * rela.symbol_index
             symbol_name = self._symbol_name_by_offset[symbol_offset]
-            print(symbol_name)
             rela.symbol_index = symbol_name_to_index[symbol_name]
             rela_section.data[offset:offset + 24] = rela.data
 

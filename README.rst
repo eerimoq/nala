@@ -204,11 +204,27 @@ be given multipe times.
 
 .. code-block:: bash
 
-   $ gcc -DNALA_GENERATE_MOCKS -E *.c | nala generate_mocks
+   $ cat *.c | gcc -DNALA_GENERATE_MOCKS -xc -E - | nala generate_mocks
 
 Nala requires source code to be expanded by the preprocessor. You can
 directly pipe the output of ``gcc -DNALA_GENERATE_MOCKS -E`` to the
 command-line utility.
+
+Mocking object-internal function calls
+--------------------------------------
+
+The GNU linker ``ld`` wrap feature (``--wrap=<symbol>``) does not wrap
+object-internal function calls. As Nala implements mocking by wrapping
+functions, object-internal function calls can't be mocked just using
+the linker. To mock these, after compilation, run ``nala
+wrap_internal_symbols ...`` for each object file, and then pass them
+to the linker.
+
+.. code-block:: Makefile
+
+   %.o: %.c
+           $(CC) -o $@ $<
+           nala wrap_internal_symbols nala_mocks.ldflags $@
 
 Mock API
 --------
@@ -313,10 +329,6 @@ Limitations
   gcov. They probably can if wrapping ``__gcov_fork()`` in an
   suspend/resume-block.
 
-- Function calls internally within a source file cannot be mocked
-  because the linker option ``--wrap`` does not wrap these function
-  calls. See the `ld manual`_ for more details.
-
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
 
@@ -334,5 +346,3 @@ Limitations
 .. _nala.c: https://raw.githubusercontent.com/eerimoq/nala/master/nala/dist/nala.c
 
 .. _a few function parameters: https://github.com/eerimoq/nala/blob/master/nala/rename_parameters.txt
-
-.. _ld manual: https://sourceware.org/binutils/docs/ld/Options.html#Options

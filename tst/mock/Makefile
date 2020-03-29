@@ -8,7 +8,6 @@ SRC += ../../nala/dist/nala.c
 SRC += $(TESTS)
 SRC += dummy_functions.c
 SRC += subprocess.c
-TESTS_C = tests.c
 OBJ = $(SRC:%.c=%.o)
 CFLAGS += -Werror
 CFLAGS += -Wall
@@ -55,7 +54,7 @@ $(BUILD)/nala_mocks.ldflags: $(TESTS)
 	echo "MOCKGEN $^"
 	mkdir -p $(BUILD)
 	[ -f $(BUILD)/nala_mocks.h ] || touch $(BUILD)/nala_mocks.h
-	cat $(TESTS) > $(TESTS_C)
-	$(CC) $(INC:%=-I%) -DNALA_GENERATE_MOCKS -E $(TESTS_C) \
+	cat $(TESTS) \
+	    | $(CC) $(INC:%=-I%) -DNALA_GENERATE_MOCKS -xc -E - \
 	    | $(NALA) generate_mocks $(GENFLAGS) -o $(BUILD)
 	touch $@
