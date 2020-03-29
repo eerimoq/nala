@@ -6,6 +6,8 @@ all:
 	$(CC) nala/dist/nala.c
 	$(MAKE) -C examples/basic clean
 	$(MAKE) -C examples/basic
+	$(MAKE) -C examples/mock_square clean
+	$(MAKE) -C examples/mock_square
 	$(MAKE) -C examples/failures clean
 	! $(MAKE) -C examples/failures
 	rm -rf my-suite
