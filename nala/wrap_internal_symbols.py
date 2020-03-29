@@ -10,7 +10,6 @@ ET_REL = 1
 SHT_SYMTAB = 2
 SHT_STRTAB = 3
 SHT_RELA = 4
-SHT_REL = 9
 
 STB_GLOBAL = 1
 
@@ -211,7 +210,7 @@ class Elf64File:
     def wrap_symbols(self):
         strtab = []
         symtab = []
-        symbol_name_to_index = {}
+        symbol_name_to_wrapped_index = {}
         strtab_offset = len(self._strtab_section.data)
         wrapped_symbol_index = len(self._symtab_section.data) // 24
 
@@ -222,7 +221,7 @@ class Elf64File:
 
             # Create an undefiend symbol in .symtab.
             symtab.append(create_undefined_global_symbol(strtab_offset))
-            symbol_name_to_index[symbol_name] = wrapped_symbol_index
+            symbol_name_to_wrapped_index[symbol_name] = wrapped_symbol_index
 
             strtab_offset += len(strtab_entry)
             wrapped_symbol_index += 1
@@ -234,7 +233,7 @@ class Elf64File:
         for offset, rela_section, rela in self._relas:
             symbol_offset = 24 * rela.symbol_index
             symbol_name = self._symbol_name_by_offset[symbol_offset]
-            rela.symbol_index = symbol_name_to_index[symbol_name]
+            rela.symbol_index = symbol_name_to_wrapped_index[symbol_name]
             rela_section.data[offset:offset + 24] = rela.data
 
     def _find_section(self, sh_type):
