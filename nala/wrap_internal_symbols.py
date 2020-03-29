@@ -146,7 +146,7 @@ class Elf64File:
 
         for symbol_name in self._symbol_names:
             # Add wrapped string to .strtab.
-            strtab_entry = f'__wrap_{symbol_name}'.encode('ascii') + b'\x00'
+            strtab_entry = f'__wrap_{symbol_name}\x00'.encode('utf-8')
             strtab.append(strtab_entry)
 
             # Create an undefiend symbol in .symtab.
@@ -250,7 +250,7 @@ class Elf64File:
         if offset not in self._strtab:
             end = self._strtab_section.data.find(b'\x00', offset)
             name = self._strtab_section.data[offset:end]
-            self._strtab[offset] = name.decode('ascii')
+            self._strtab[offset] = name.decode('utf-8')
 
         return self._strtab[offset]
 
