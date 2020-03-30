@@ -235,6 +235,12 @@ Mock API
 A function mock will call the real implementation by default. Use the
 functions below to control mock behaviour.
 
+Variadic functions will *not* call the real implementation by default
+because an ellipsis (``...``) can't be passed to the real function, a
+`va_list` is required, which may not be available. Give
+``--implementation`` to ``nala generate_mocks`` to generate calls to
+the real function (taking ``va_list``).
+
 For all functions
 ^^^^^^^^^^^^^^^^^
 

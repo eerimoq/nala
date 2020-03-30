@@ -12,6 +12,7 @@
 #include <poll.h>
 #include <mntent.h>
 #include <netdb.h>
+#include <fcntl.h>
 
 #include "subprocess.h"
 #include "nala.h"
@@ -924,6 +925,7 @@ TEST(rename_parameters)
     ioctl_mock_ignore_in(0);
     mount_mock_ignore_in(0);
     /* nftw_mock(dirpath, fn, nopenfd, flags); */
+    open_mock_ignore_in(0);
     pipe_mock_ignore_in(0);
     poll_mock_ignore_in(0);
     read_mock_ignore_in(0);

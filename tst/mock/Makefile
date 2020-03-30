@@ -28,9 +28,10 @@ endif
 NALA ?= PYTHONPATH=../.. python3 -m nala
 GENFLAGS += --no-cache
 GENFLAGS += -n no_implementation
-GENFLAGS += -n another
+GENFLAGS += -n another*
 GENFLAGS += -n io_control_no_implementation
 GENFLAGS += -n ioctl
+GENFLAGS += -i io_control
 
 all:
 	$(MAKE) -C ../.. dist

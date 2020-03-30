@@ -60,6 +60,7 @@ def do_generate_mocks(args):
                    args.outdir,
                    rename_parameters_file,
                    not args.no_cache,
+                   args.implementation,
                    args.no_implementation)
 
 
@@ -123,11 +124,18 @@ def main():
     subparser.add_argument('-c', '--no-cache',
                            action='store_true',
                            help='Do not use caching to speed up the generation.')
+    subparser.add_argument('-i', '--implementation',
+                           action='append',
+                           default=[],
+                           help=('Call functions matching given Unix shell-style '
+                                 'wildcards. Overrides --no-implementation. May '
+                                 'be given multiple times.'))
     subparser.add_argument('-n', '--no-implementation',
                            action='append',
                            default=[],
-                           help=('Do not call functions matching given pattern. '
-                                 'May be given multiple times.'))
+                           help=('Do not call functions matching given Unix '
+                                 'shell-style wildcards. May be given multiple '
+                                 'times.'))
     subparser.add_argument(
         'infiles',
         nargs='*',

@@ -1,5 +1,6 @@
 import os
 import re
+from fnmatch import fnmatch
 
 from .inspect import ForgivingDeclarationParser
 from .generator import FileGenerator
@@ -60,18 +61,23 @@ def find_cached_mocked_functions(nala_mocks_h):
     return functions
 
 
-def has_implementation(function_name, no_implementation):
+def has_implementation(function_name, implementation, no_implementation):
+    for pattern in implementation:
+        if fnmatch(function_name, pattern):
+            return True
+
     for pattern in no_implementation:
-        if function_name.startswith(pattern):
+        if fnmatch(function_name, pattern):
             return False
 
-    return True
+    return None
 
 
 def generate_mocks(expanded_code,
                    output_directory,
                    rename_parameters_file,
                    cache,
+                   implementation,
                    no_implementation):
     """Identify mocked functions and generate the source and header files.
 
@@ -106,6 +112,7 @@ def generate_mocks(expanded_code,
 
             generator.add_mock(function,
                                has_implementation(function.name,
+                                                  implementation,
                                                   no_implementation))
 
         generator.write_to_directory(output_directory)

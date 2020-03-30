@@ -171,7 +171,6 @@ class FunctionMock:
 
     def __init__(self, function, has_implementation):
         self.function = function
-        self.has_implementation = has_implementation
         self.func_name = function.name
 
         self.wrapped_func = f"__wrap_{self.func_name}"
@@ -183,6 +182,14 @@ class FunctionMock:
         self.func_params = self.func_decl.args.params if self.func_decl.args else []
         self.assign_names_to_unnamed_params(self.func_params)
         self.is_variadic_func = is_variadic_func(self.func_params)
+
+        if has_implementation is not None:
+            self.has_implementation = has_implementation
+        elif self.is_variadic_func:
+            self.has_implementation = False
+        else:
+            self.has_implementation = True
+
 
         self.params_struct = [
             decl(param.name, node.PtrDecl([], param.type.type))

@@ -8655,13 +8655,7 @@ int __wrap_io_control(int kind, ...)
 
             return_value = nala_data_p->return_value;
         } else {
-            {
-                va_list nala_vl;
-                va_start(nala_vl, kind);
-                return_value =
-                io_control_mock_va_arg_real(kind, nala_vl);
-                va_end(nala_vl);
-            }
+            nala_test_failure(nala_format("Real io_control() not available.\n"));
         }
         break;
 
@@ -8682,13 +8676,7 @@ int __wrap_io_control(int kind, ...)
         break;
 
     default:
-        {
-            va_list nala_vl;
-            va_start(nala_vl, kind);
-            return_value =
-            io_control_mock_va_arg_real(kind, nala_vl);
-            va_end(nala_vl);
-        }
+        nala_test_failure(nala_format("Real io_control() not available.\n"));
         break;
     }
 
