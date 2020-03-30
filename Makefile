@@ -13,6 +13,8 @@ all:
 	rm -rf my-suite
 	PYTHONPATH=. python3 -m nala init my-suite
 	$(MAKE) -C my-suite NALA="PYTHONPATH=.. python3 -m nala"
+	$(MAKE) -C my-suite clean
+	$(MAKE) -C my-suite NALA="PYTHONPATH=.. python3 -m nala" SANITIZE=yes
 
 test: test-python test-c
 

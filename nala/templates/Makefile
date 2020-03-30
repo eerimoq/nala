@@ -8,6 +8,12 @@ SRC += $(BUILD)/nala_mocks.c
 SRC += nala.c
 SRC += $(TESTS)
 OBJ = $(SRC:%.c=%.o)
+CFLAGS += $(INC:%=-I%)
+CFLAGS += -g -O0 -no-pie
+ifeq ($(SANITIZE), yes)
+CFLAGS += -fsanitize=address
+CFLAGS += -fsanitize=undefined
+endif
 NALA = nala
 
 all:
@@ -20,11 +26,11 @@ clean:
 
 $(EXE): $(OBJ)
 	echo "LD $@"
-	$(CC) @$(BUILD)/nala_mocks.ldflags -g -no-pie $^ -o $@
+	$(CC) $(CFLAGS) @$(BUILD)/nala_mocks.ldflags $^ -o $@
 
 %.o: %.c
 	echo "CC $^"
-	$(CC) $(INC:%=-I%) -g -O0 -no-pie -c $^ -o $@
+	$(CC) $(CFLAGS) -c $^ -o $@
 	$(NALA) wrap_internal_symbols $(BUILD)/nala_mocks.ldflags $@
 
 $(BUILD)/nala_mocks.ldflags: $(TESTS)
