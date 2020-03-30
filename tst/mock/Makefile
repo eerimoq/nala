@@ -25,13 +25,15 @@ ifeq ($(SANITIZE), yes)
 CFLAGS += -fsanitize=address
 CFLAGS += -fsanitize=undefined
 endif
+IMPLEMENTATION += io_control
+NO_IMPLEMENTATION += no_implementation
+NO_IMPLEMENTATION += another*
+NO_IMPLEMENTATION += io_control_no_implementation
+NO_IMPLEMENTATION += ioctl
+MOCKGENFLAGS += --no-cache
+MOCKGENFLAGS += $(IMPLEMENTATION:%=-i %)
+MOCKGENFLAGS += $(NO_IMPLEMENTATION:%=-n %)
 NALA ?= PYTHONPATH=../.. python3 -m nala
-GENFLAGS += --no-cache
-GENFLAGS += -n no_implementation
-GENFLAGS += -n another*
-GENFLAGS += -n io_control_no_implementation
-GENFLAGS += -n ioctl
-GENFLAGS += -i io_control
 
 all:
 	$(MAKE) -C ../.. dist
@@ -57,5 +59,5 @@ $(BUILD)/nala_mocks.ldflags: $(TESTS)
 	[ -f $(BUILD)/nala_mocks.h ] || touch $(BUILD)/nala_mocks.h
 	cat $(TESTS) \
 	    | $(CC) $(INC:%=-I%) -DNALA_GENERATE_MOCKS -x c -E - \
-	    | $(NALA) generate_mocks $(GENFLAGS) -o $(BUILD)
+	    | $(NALA) generate_mocks $(MOCKGENFLAGS) -o $(BUILD)
 	touch $@

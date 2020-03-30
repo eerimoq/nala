@@ -14,6 +14,8 @@ ifeq ($(SANITIZE), yes)
 CFLAGS += -fsanitize=address
 CFLAGS += -fsanitize=undefined
 endif
+MOCKGENFLAGS += $(IMPLEMENTATION=%=-i %)
+MOCKGENFLAGS += $(NO_IMPLEMENTATION=%=-n %)
 NALA = nala
 
 all:
@@ -39,5 +41,5 @@ $(BUILD)/nala_mocks.ldflags: $(TESTS)
 	[ -f $(BUILD)/nala_mocks.h ] || touch $(BUILD)/nala_mocks.h
 	cat $(TESTS) \
 	    | $(CC) $(INC:%=-I%) -DNALA_GENERATE_MOCKS -x c -E - \
-	    | $(NALA) generate_mocks -o $(BUILD)
+	    | $(NALA) generate_mocks $(MOCKGENFLAGS) -o $(BUILD)
 	touch $@
