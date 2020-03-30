@@ -11,9 +11,10 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - coverage run --source=nala setup.py test
+  - coverage run --source=nala -p setup.py test
   - make test-c SANITIZE=yes
-  - PYTHONPATH=. coverage run --source=nala -m nala init my-suite
+  - PYTHONPATH=. coverage run --source=nala -p -m nala init my-suite
+  - coverage combine .coverage.*
   - make -C my-suite NALA="PYTHONPATH=.. python3 -m nala"
 
 after_success:
