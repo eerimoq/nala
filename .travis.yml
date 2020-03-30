@@ -13,7 +13,7 @@ install:
 script:
   - coverage run --source=nala setup.py test
   - make test-c SANITIZE=yes
-  - PYTHONPATH=. python3 -m nala init my-suite
+  - PYTHONPATH=. coverage run --source=nala -m nala init my-suite
   - make -C my-suite NALA="PYTHONPATH=.. python3 -m nala"
 
 after_success:
