@@ -168,8 +168,10 @@ static void capture_output_destroy(struct capture_output_t *self_p)
         self_p->output_pp = NULL;
     }
 
-    fflush(self_p->stdout_p);
-    fclose(self_p->stdout_p);
+    if (self_p->stdout_p != NULL) {
+        fflush(self_p->stdout_p);
+        fclose(self_p->stdout_p);
+    }
 }
 
 static void capture_output_redirect(struct capture_output_t *self_p)

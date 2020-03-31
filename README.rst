@@ -338,7 +338,10 @@ Limitations
   gcov. They probably can if wrapping ``__gcov_fork()`` in an
   suspend/resume-block.
 
-- ``open()`` can't be mocked if using gcov.
+- ``open()`` can't be mocked if using gcov, and there are probably
+  other use cases with the same problem. It's highly recommended to
+  create a wrapper function for ``open()`` in you code base, and mock
+  the wrapper instead.
 
 - ``static`` functions can't be mocked.
 
