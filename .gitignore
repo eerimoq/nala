@@ -122,3 +122,4 @@ nala/*/*.o
 tst/*/*.o
 tst/mock/tests.c
 examples/*/tests.c
+*.d

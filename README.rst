@@ -338,6 +338,8 @@ Limitations
   gcov. They probably can if wrapping ``__gcov_fork()`` in an
   suspend/resume-block.
 
+- ``open()`` can't be mocked if using gcov.
+
 - ``static`` functions can't be mocked.
 
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
