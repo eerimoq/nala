@@ -15,8 +15,14 @@ NALA_C_FUNCTIONS = [
 ]
 
 MOCKED_FUNC_REGEX = re.compile(
-    r"(_mock|_mock_once|_mock_ignore_in|_mock_ignore_in_once|_mock_none"
-    r"|_mock_implementation)\s*\(")
+    r'(_mock|_mock_once|_mock_ignore_in|_mock_ignore_in_once|_mock_none'
+    r'|_mock_implementation)\s*\(')
+
+REAL_VARIADIC_FUNCTIONS_REGEX = re.compile(
+    r'// NALA_REAL_VARIADIC_FUNCTION_BEGIN (open)\n'
+    r'(.*?)\n'
+    r'// NALA_REAL_VARIADIC_FUNCTION_END',
+    re.MULTILINE | re.DOTALL)
 
 
 def find_mocked_function_name(expanded_source_code, index):
@@ -73,9 +79,21 @@ def has_implementation(function_name, implementation, no_implementation):
     return None
 
 
+def load_real_variadic_functions(filename):
+    with open(filename, 'r') as fin:
+        contents = fin.read()
+
+    return {
+        mo[0]: mo[1]
+        for mo in REAL_VARIADIC_FUNCTIONS_REGEX.findall(contents)
+    }
+
+
+
 def generate_mocks(expanded_code,
                    output_directory,
                    rename_parameters_file,
+                   real_variadic_functions_file,
                    cache,
                    implementation,
                    no_implementation):
@@ -105,6 +123,12 @@ def generate_mocks(expanded_code,
         for include in parser.includes:
             generator.add_include(include)
 
+        if real_variadic_functions_file:
+            real_variadic_functions = load_real_variadic_functions(
+                real_variadic_functions_file)
+        else:
+            real_variadic_functions = {}
+
         for function in parser.mocked_functions:
             if function.name in NALA_C_FUNCTIONS:
                 raise Exception(
@@ -113,7 +137,8 @@ def generate_mocks(expanded_code,
             generator.add_mock(function,
                                has_implementation(function.name,
                                                   implementation,
-                                                  no_implementation))
+                                                  no_implementation),
+                               real_variadic_functions.get(function.name, ''))
 
         generator.write_to_directory(output_directory)
     elif not functions:

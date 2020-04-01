@@ -202,6 +202,9 @@ starting with given pattern are not available in the binary (and
 therefore should not be called by the generated code). This option may
 be given multipe times.
 
+Use ``--no-real-variadic-functions`` not to add real variadic
+functions.
+
 .. code-block:: bash
 
    $ cat *.c | gcc -DNALA_GENERATE_MOCKS -x c -E - | nala generate_mocks
@@ -337,12 +340,6 @@ Limitations
 - ``malloc()`` and ``free()`` can't be mocked if forking and using
   gcov. They probably can if wrapping ``__gcov_fork()`` in an
   suspend/resume-block.
-
-- ``open()`` can't be mocked if using gcov, and there are probably
-  other use cases with the same problem. It's highly recommended to
-  create a wrapper function for ``open()`` in you code base, and mock
-  the wrapper instead. There are plans on automatically generate the
-  real function for ``open()``.
 
 - ``static`` functions can't be mocked.
 

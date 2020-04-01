@@ -13,6 +13,7 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 DIST_DIR = os.path.join(SCRIPT_DIR, 'dist')
 TEMPLATES_DIR = os.path.join(SCRIPT_DIR, 'templates')
 RENAME_PARAMETERS_TXT = os.path.join(SCRIPT_DIR, 'rename_parameters.txt')
+REAL_VARIADIC_FUNCTIONS_C = os.path.join(SCRIPT_DIR, 'real_variadic_functions.c')
 
 
 def generate_suites():
@@ -56,9 +57,15 @@ def do_generate_mocks(args):
     else:
         rename_parameters_file = args.rename_parameters_file
 
+    if args.no_real_variadic_functions:
+        real_variadic_functions_file = None
+    else:
+        real_variadic_functions_file = REAL_VARIADIC_FUNCTIONS_C
+
     generate_mocks(expanded_code,
                    args.outdir,
                    rename_parameters_file,
+                   real_variadic_functions_file,
                    not args.no_cache,
                    args.implementation,
                    args.no_implementation)
@@ -121,6 +128,9 @@ def main():
     subparser.add_argument('-R', '--no-rename-parameters',
                            action='store_true',
                            help='Do not rename any parameters.')
+    subparser.add_argument('-F', '--no-real-variadic-functions',
+                           action='store_true',
+                           help='Do not add any real variadic functions.')
     subparser.add_argument('-c', '--no-cache',
                            action='store_true',
                            help='Do not use caching to speed up the generation.')

@@ -119,7 +119,7 @@ struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
 {
     return (&nala_get_data_{{mock.func_name}}()->params);
 }
-
+{{mock.real_variadic_function}}
 {{mock.wrapped_decl | render}}
 {
     struct nala_instance_{{mock.func_name}}_t *nala_instance_p;

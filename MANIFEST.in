@@ -3,3 +3,4 @@ include Makefile
 include nala/dist/*
 include nala/templates/*
 include nala/*.txt
+include nala/*.c

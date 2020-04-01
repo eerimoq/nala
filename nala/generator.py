@@ -164,14 +164,22 @@ class StructAssertIn:
                 self.assert_in_members.append(member[1])
 
 
+def find_real_variadic_code(function):
+    if function.name == 'open':
+        return REAL_VARIADIC_OPEN
+    else:
+        return ''
+
+
 class FunctionMock:
 
     DECL_MARKER = "// NALA_DECLARATION"
     IMPL_MARKER = "// NALA_IMPLEMENTATION"
 
-    def __init__(self, function, has_implementation):
+    def __init__(self, function, has_implementation, real_variadic_function):
         self.function = function
         self.func_name = function.name
+        self.real_variadic_function = real_variadic_function
 
         self.wrapped_func = f"__wrap_{self.func_name}"
         self.real_func = f"__real_{self.func_name}"
@@ -186,7 +194,10 @@ class FunctionMock:
         if has_implementation is not None:
             self.has_implementation = has_implementation
         elif self.is_variadic_func:
-            self.has_implementation = False
+            if real_variadic_function:
+                self.has_implementation = True
+            else:
+                self.has_implementation = False
         else:
             self.has_implementation = True
 
@@ -490,8 +501,13 @@ class FileGenerator:
         self.struct_assert_ins = []
         self.includes = []
 
-    def add_mock(self, mocked_function, has_implementation):
-        self.mocks.append(FunctionMock(mocked_function, has_implementation))
+    def add_mock(self,
+                 mocked_function,
+                 has_implementation,
+                 real_variadic_function):
+        self.mocks.append(FunctionMock(mocked_function,
+                                       has_implementation,
+                                       real_variadic_function))
 
     def add_include(self, include):
         self.includes.append((include.path, include.system))
