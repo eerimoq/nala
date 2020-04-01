@@ -203,7 +203,8 @@ therefore should not be called by the generated code). This option may
 be given multipe times.
 
 Use ``--no-real-variadic-functions`` not to add real variadic
-functions. Nala adds `a few variadic functions`_ by default.
+functions. Nala adds `a few variadic functions`_ by default, given
+that they are mocked.
 
 .. code-block:: bash
 
