@@ -14,6 +14,7 @@ SHT_RELA = 4
 STB_GLOBAL = 1
 
 SHN_UNDEF = 0
+SHN_LORESERVE = 0xff00
 
 
 class Error(Exception):
@@ -25,9 +26,22 @@ class Elf64LsbHeader:
     def __init__(self, data):
         self._data = data
         self.e_type = struct.unpack('<H', data[16:18])[0]
-        self.e_shnum = struct.unpack('<H', data[60:62])[0]
         self.e_shoff = struct.unpack('<Q', data[40:48])[0]
         self.e_shentsize = struct.unpack('<H', data[58:60])[0]
+        self.e_shnum = struct.unpack('<H', data[60:62])[0]
+
+        if self.e_shnum == 0:
+            raise Error('ToDo: Support many sections.')
+
+        self.e_shstrndx = struct.unpack('<H', data[62:64])[0]
+
+        if self.e_shstrndx == SHN_UNDEF:
+            raise Error('Missing section header string table.')
+
+        if self.e_shstrndx >= SHN_LORESERVE:
+            raise Error('ToDo: Support many sections.')
+
+        self.shstrtab_index = self.e_shstrndx
 
     @property
     def data(self):
@@ -40,6 +54,7 @@ class Elf64LsbSectionHeader:
 
     def __init__(self, data):
         self._data = data
+        self.sh_name = struct.unpack('<I', data[0:4])[0]
         self.sh_type = struct.unpack('<I', data[4:8])[0]
         self.sh_offset = struct.unpack('<Q', data[24:32])[0]
         self.sh_size = struct.unpack('<Q', data[32:40])[0]
@@ -122,9 +137,11 @@ class Elf64File:
         self._sections = [
             Section(section_header, elf) for section_header in section_headers
         ]
-        self._symtab_section = self._find_section(SHT_SYMTAB)
-        self._strtab_section = self._find_section(SHT_STRTAB)
-        self._rela_sections = self._find_sections(SHT_RELA)
+        self._shstrtab_section = self._sections[self._header.shstrtab_index]
+        self._shstrtab = {}
+        self._symtab_section = self._find_section_by_name('.symtab')
+        self._strtab_section = self._find_section_by_name('.strtab')
+        self._rela_sections = self._find_sections_by_type(SHT_RELA)
         self._strtab = {}
         self._symbol_names = []
         self._symbol_name_by_offset = {}
@@ -232,14 +249,14 @@ class Elf64File:
 
                 self._relas.append((offset, rela_section, rela))
 
-    def _find_section(self, sh_type):
+    def _find_section_by_name(self, name):
         for section in self._sections:
-            if section.header.sh_type == sh_type:
+            if self._find_string_in_shstrtab(section.header.sh_name) == name:
                 return section
 
-        raise Error(f'Section of type {sh_type} not found.')
+        raise Error(f'Section called {name} not found.')
 
-    def _find_sections(self, sh_type):
+    def _find_sections_by_type(self, sh_type):
         return [
             section
             for section in self._sections
@@ -253,6 +270,14 @@ class Elf64File:
             self._strtab[offset] = name.decode('utf-8')
 
         return self._strtab[offset]
+
+    def _find_string_in_shstrtab(self, offset):
+        if offset not in self._shstrtab:
+            end = self._shstrtab_section.data.find(b'\x00', offset)
+            name = self._shstrtab_section.data[offset:end]
+            self._shstrtab[offset] = name.decode('utf-8')
+
+        return self._shstrtab[offset]
 
 
 def wrap_internal_symbols(object_elf, symbol_names):
