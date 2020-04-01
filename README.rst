@@ -341,7 +341,8 @@ Limitations
 - ``open()`` can't be mocked if using gcov, and there are probably
   other use cases with the same problem. It's highly recommended to
   create a wrapper function for ``open()`` in you code base, and mock
-  the wrapper instead.
+  the wrapper instead. There are plans on automatically generate the
+  real function for ``open()``.
 
 - ``static`` functions can't be mocked.
 
