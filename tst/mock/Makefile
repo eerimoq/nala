@@ -8,7 +8,7 @@ SRC += ../../nala/dist/nala.c
 SRC += $(TESTS)
 SRC += dummy_functions.c
 SRC += subprocess.c
-OBJ = $(SRC:%.c=%.o)
+OBJ = $(patsubst %,$(BUILD)%,$(abspath $(SRC:%.c=%.o)))
 OBJDEPS = $(OBJ:%=%.d)
 MOCKGENDEPS = $(BUILD)/nala_mocks.ldflags.d
 DEPS = $(OBJDEPS) $(MOCKGENDEPS)
@@ -22,6 +22,7 @@ CFLAGS += -no-pie
 CFLAGS += -Wpedantic
 CFLAGS += -fprofile-arcs
 CFLAGS += -ftest-coverage
+# To test that wrapping of internal symbols works with function sections.
 CFLAGS += -ffunction-sections
 CFLAGS += -fdata-sections
 CFLAGS +=  $(INC:%=-I%)
@@ -46,17 +47,21 @@ all:
 	$(EXE) $(ARGS)
 
 clean:
-	rm -rf $(BUILD) $(OBJ)
+	rm -rf $(BUILD)
 
 $(EXE): $(OBJ)
 	echo "LD $@"
 	$(CC) $(CFLAGS) @$(BUILD)/nala_mocks.ldflags -g -no-pie $^ -o $@
 
-%.o: %.c
-	echo "CC $<"
-	$(CC) $(CFLAGS) -c $< -o $@
-	$(NALA) wrap_internal_symbols $(BUILD)/nala_mocks.ldflags $@
-	$(CC) -MM $(CFLAGS) -o $@.d $<
+define COMPILE_template
+$(patsubst %.c,$(BUILD)%.o,$(abspath $1)): $1
+	@echo "CC $1"
+	mkdir -p $$(@D)
+	$$(CC) $$(CFLAGS) -c -o $$@ $$<
+	$(NALA) wrap_internal_symbols $(BUILD)/nala_mocks.ldflags $$@
+	$(CC) -MM -MT $$@ $(CFLAGS) -o $$@.d $$<
+endef
+$(foreach file,$(SRC),$(eval $(call COMPILE_template,$(file))))
 
 $(BUILD)/nala_mocks.ldflags: $(TESTS)
 	echo "MOCKGEN $(TESTS)"

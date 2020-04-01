@@ -7,7 +7,7 @@ INC += $(CURDIR)
 SRC += $(BUILD)/nala_mocks.c
 SRC += nala.c
 SRC += $(TESTS)
-OBJ = $(SRC:%.c=%.o)
+OBJ = $(patsubst %,$(BUILD)%,$(abspath $(SRC:%.c=%.o)))
 OBJDEPS = $(OBJ:%=%.d)
 MOCKGENDEPS = $(BUILD)/nala_mocks.ldflags.d
 DEPS = $(OBJDEPS) $(MOCKGENDEPS)
@@ -27,21 +27,25 @@ all:
 	$(EXE) $(ARGS)
 
 clean:
-	rm -rf $(BUILD) $(OBJ)
+	rm -rf $(BUILD)
 
 $(EXE): $(OBJ)
 	echo "LD $@"
 	$(CC) $(CFLAGS) @$(BUILD)/nala_mocks.ldflags $^ -o $@
 
-%.o: %.c
-	echo "CC $<"
-	$(CC) $(CFLAGS) -c $< -o $@
-	$(NALA) wrap_internal_symbols $(BUILD)/nala_mocks.ldflags $@
-	$(CC) -MM $(CFLAGS) -o $@.d $<
+define COMPILE_template
+$(patsubst %.c,$(BUILD)%.o,$(abspath $1)): $1
+	@echo "CC $1"
+	mkdir -p $$(@D)
+	$$(CC) $$(CFLAGS) -c -o $$@ $$<
+	$(NALA) wrap_internal_symbols $(BUILD)/nala_mocks.ldflags $$@
+	$(CC) -MM -MT $$@ $(CFLAGS) -o $$@.d $$<
+endef
+$(foreach file,$(SRC),$(eval $(call COMPILE_template,$(file))))
 
 $(BUILD)/nala_mocks.ldflags: $(TESTS)
 	echo "MOCKGEN $(TESTS)"
-	mkdir -p $(BUILD)
+	mkdir -p $(@D)
 	[ -f $(BUILD)/nala_mocks.h ] || touch $(BUILD)/nala_mocks.h
 	cat $(TESTS) \
 	    | $(CC) $(INC:%=-I%) -DNALA_GENERATE_MOCKS -x c -E - \
