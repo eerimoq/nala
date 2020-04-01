@@ -142,7 +142,7 @@ static void assert_eq_error_entry()
 
 TEST(assert_eq_error)
 {
-    expect_error_in_subprocess(assert_eq_error_entry, "1 != 0");
+    expect_error_in_subprocess(assert_eq_error_entry, "1 != 0 (0x1 != 0x0)");
 }
 
 static void assert_eq_error_string_entry()
@@ -169,7 +169,7 @@ static void assert_ne_error_entry()
 
 TEST(assert_ne_error)
 {
-    expect_error_in_subprocess(assert_ne_error_entry, "1 == 1");
+    expect_error_in_subprocess(assert_ne_error_entry, "1 == 1 (0x1 == 0x1)");
 }
 
 static void assert_lt_error_entry()
