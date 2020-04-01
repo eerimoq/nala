@@ -3,7 +3,6 @@
 all:
 	$(MAKE) dist
 	$(MAKE) test
-	$(CC) nala/dist/nala.c
 	$(MAKE) -C examples/basic clean
 	$(MAKE) -C examples/basic
 	$(MAKE) -C examples/mock_square clean

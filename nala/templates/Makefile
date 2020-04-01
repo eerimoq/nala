@@ -48,7 +48,7 @@ $(BUILD)/nala_mocks.ldflags: $(TESTS)
 	mkdir -p $(@D)
 	[ -f $(BUILD)/nala_mocks.h ] || touch $(BUILD)/nala_mocks.h
 	cat $(TESTS) \
-	    | $(CC) $(INC:%=-I%) -DNALA_GENERATE_MOCKS -x c -E - \
+	    | $(CC) $(CFLAGS) -DNALA_GENERATE_MOCKS -x c -E - \
 	    | $(NALA) generate_mocks $(MOCKGENFLAGS) -o $(BUILD)
 	cat $(TESTS) \
 	    | $(CC) -MM -MT $@ $(CFLAGS) -x c -o $@.d -
