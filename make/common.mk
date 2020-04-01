@@ -1,11 +1,8 @@
-TESTS += test_assertions.c
-TESTS += test_time.c
 BUILD = build
 EXE = $(BUILD)/app
 INC += $(BUILD)
 INC += $(CURDIR)
 SRC += $(BUILD)/nala_mocks.c
-SRC += nala.c
 SRC += $(TESTS)
 OBJ = $(patsubst %,$(BUILD)%,$(abspath $(SRC:%.c=%.o)))
 OBJDEPS = $(OBJ:%=%.d)
@@ -19,7 +16,7 @@ CFLAGS += -fsanitize=undefined
 endif
 MOCKGENFLAGS += $(IMPLEMENTATION:%=-i %)
 MOCKGENFLAGS += $(NO_IMPLEMENTATION:%=-n %)
-NALA = nala
+NALA ?= PYTHONPATH=$(NALA_ROOT) python3 -m nala
 
 all:
 	$(MAKE) $(BUILD)/nala_mocks.ldflags

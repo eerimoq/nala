@@ -11,6 +11,7 @@ install:
   - pip install -r requirements.txt
 
 script:
+  - source setup.sh
   - coverage run --source=nala -p setup.py test
   - make test-c SANITIZE=yes
   - PYTHONPATH=. coverage run --source=nala -p -m nala init my-suite

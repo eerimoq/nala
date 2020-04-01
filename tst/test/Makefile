@@ -1,17 +1,5 @@
-CFLAGS += \
-	-fprofile-arcs \
-	-ftest-coverage \
-	-Wall \
-	-Wextra \
-	-Wpedantic \
-	-Werror \
-	-Og \
-	-g \
-	-no-pie
-ifeq ($(SANITIZE), yes)
-CFLAGS += -fsanitize=address
-CFLAGS += -fsanitize=undefined
-endif
+TESTS += main.c
+INC += ../../include
 SRC += ../../src/nala.c
 SRC += ../../src/diff/diff.c
 SRC += ../../src/utils.c
@@ -20,16 +8,15 @@ SRC += ../../src/subprocess.c
 SRC += ../../src/traceback.c
 SRC += ../../src/hf.c
 SRC += subprocess.c
-SRC += main.c
 # Tests that nala_mocks.c compiles without errors when no functions
 # are mocked.
-SRC += nala_mocks.c
-INC +=  -I../../include
-NALA ?= PYTHONPATH=../.. python3 -m nala
+CFLAGS += -Werror
+CFLAGS += -Wall
+CFLAGS += -Wextra
+CFLAGS += -Wconversion
+CFLAGS += -Wpedantic
+CFLAGS += -fprofile-arcs
+CFLAGS += -ftest-coverage
+MOCKGENFLAGS += --no-cache
 
-all:
-	[ -f nala_mocks.h ] || (touch nala_mocks.h)
-	$(CC) $(INC) -DNALA_GENERATE_MOCKS -E main.c \
-	    | $(NALA) generate_mocks --no-cache
-	$(CC) $(INC) $(CFLAGS) @nala_mocks.ldflags $(SRC) -o main
-	./main
+include ../../make/common.mk
