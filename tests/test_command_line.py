@@ -1,3 +1,4 @@
+import os
 import re
 import subprocess
 import unittest
@@ -19,6 +20,11 @@ def remove_assert_in(string):
 def read_file(filename):
     with open(filename, 'r') as fin:
         return remove_assert_in(remove_date_time(fin.read()))
+
+    
+def remove_optput():
+    if os.path.exists('output'):
+        shutil.rmtree('output')
 
 
 def pre_process_file(name):
@@ -46,7 +52,7 @@ class CommandLineTest(unittest.TestCase):
                                 f'tests/files/test_{name}_nala_mocks.c')
         self.assert_files_equal('output/nala_mocks.ldflags',
                                 f'tests/files/test_{name}_nala_mocks.ldflags')
-
+            
     def test_generate_mocks(self):
         names = [
             'empty',
@@ -62,6 +68,7 @@ class CommandLineTest(unittest.TestCase):
                 f'tests/files/test_{name}_tests.pp.c'
             ]
 
+            remove_optput()
             pre_process_file(name)
 
             with patch('sys.argv', argv):
@@ -78,6 +85,7 @@ class CommandLineTest(unittest.TestCase):
             'tests/files/test_missing_declaration_tests.pp.c'
         ]
 
+        remove_optput()
         pre_process_file('missing_declaration')
         stderr = StringIO()
 
@@ -97,6 +105,23 @@ class CommandLineTest(unittest.TestCase):
             str(cm.exception),
             'Unable to find declarations of all mocked functions. Add '
             'missing includes to the test file.')
+
+    def test_generate_mocks_open_no_real_variadic(self):
+        argv = [
+            'nala',
+            'generate_mocks',
+            '-o', 'output',
+            '--no-real-variadic-functions',
+            'tests/files/test_open_tests.pp.c'
+        ]
+
+        remove_optput()
+        pre_process_file('open')
+
+        with patch('sys.argv', argv):
+            nala.cli.main()
+
+        self.assert_generated_files('open')
 
     def test_wrap_internal_symbols(self):
         argv = [
