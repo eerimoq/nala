@@ -203,7 +203,7 @@ therefore should not be called by the generated code). This option may
 be given multipe times.
 
 Use ``--no-real-variadic-functions`` not to add real variadic
-functions.
+functions. Nala adds `a few variadic functions`_ by default.
 
 .. code-block:: bash
 
@@ -360,3 +360,5 @@ Limitations
 .. _nala.c: https://raw.githubusercontent.com/eerimoq/nala/master/nala/dist/nala.c
 
 .. _a few function parameters: https://github.com/eerimoq/nala/blob/master/nala/rename_parameters.txt
+
+.. _a few variadic functions: https://github.com/eerimoq/nala/blob/master/nala/real_variadic_functions.c
