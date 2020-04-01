@@ -24,8 +24,6 @@ Do not edit manually
 #include "../nala/dist/nala.h"
 #include "../tests/files/test_dummy_functions.h"
 
-#endif
-
 struct nala_traceback_t {
     void *addresses[32];
     int depth;

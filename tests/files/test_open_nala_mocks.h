@@ -13,8 +13,6 @@ Do not edit manually
 #include <stdarg.h>
 #include <fcntl.h>
 
-#endif
-
 struct nala_traceback_t {
     void *addresses[32];
     int depth;

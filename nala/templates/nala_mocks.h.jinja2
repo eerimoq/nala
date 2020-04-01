@@ -13,8 +13,6 @@ Do not edit manually
 #include <stdarg.h>
 {{ includes }}
 
-#endif
-
 struct nala_traceback_t {
     void *addresses[32];
     int depth;
@@ -91,5 +89,7 @@ void nala_mock_assert_in_struct_{{assert_in.name}}(
     const void *right_p,
     size_t size);
 {% endfor %}
+
+#endif
 
 #endif
