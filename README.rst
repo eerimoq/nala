@@ -129,6 +129,14 @@ Build and run all tests.
 
 .. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run-assert-eq-fail.png
 
+Create a code coverage report and open it with firefox.
+
+.. code-block::
+
+   $ make -s -C foo coverage
+   Code coverage report: /home/erik/workspace/nala/foo/build/coverage/index.html
+   $ firefox /home/erik/workspace/nala/foo/build/coverage/index.html
+
 Compiler flags
 ==============
 

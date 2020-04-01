@@ -12,7 +12,10 @@ OBJDEPS = $(OBJ:%=%.d)
 MOCKGENDEPS = $(BUILD)/nala_mocks.ldflags.d
 DEPS = $(OBJDEPS) $(MOCKGENDEPS)
 CFLAGS += $(INC:%=-I%)
-CFLAGS += -g -O0 -no-pie
+CFLAGS += -g
+CFLAGS += -O0
+CFLAGS += -no-pie
+CFLAGS += -coverage
 ifeq ($(SANITIZE), yes)
 CFLAGS += -fsanitize=address
 CFLAGS += -fsanitize=undefined
@@ -28,6 +31,19 @@ all:
 
 clean:
 	rm -rf $(BUILD)
+
+coverage:
+	gcovr $(GCOVR_ARGS) --html-details --output index.html $(BUILD)
+	mkdir -p $(BUILD)/coverage
+	mv index.* $(BUILD)/coverage
+	@echo "Code coverage report: $$(readlink -f $(BUILD)/coverage/index.html)"
+
+help:
+	@echo "TARGET        DESCRIPTION"
+	@echo "---------------------------------------------------------"
+	@echo "all           Build and run tests."
+	@echo "clean         Remove build output."
+	@echo "coverage      Create the code coverage report."
 
 $(EXE): $(OBJ)
 	echo "LD $@"
