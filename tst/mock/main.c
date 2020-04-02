@@ -221,8 +221,8 @@ TEST(output_message_function_error_call_null)
 {
     function_error_in_subprocess(
         output_message_function_error_call_null_entry,
-        "     "RED"- "RST BRED"1"RST RED" |  "RST BRED"a"RST"\n"
-        "     "GRN"+ "RST BGRN"1"RST GRN" |  "RST BGRN"<null>"RST"\n");
+        "     - "RST BLD"1"RST" |  "RST BLD"a"RST"\n"
+        "     "RED"+ "RST BRED"1"RST RED" |  "RST BRED"<null>"RST"\n");
 }
 
 static void output_message_function_error_mismatch_entry(void *arg_p)

@@ -862,15 +862,15 @@ static const char *display_inline_diff(FILE *file_p,
         if (use_original) {
             snprintf(line_prefix,
                      sizeof(line_prefix),
-                     COLOR(RED, "- ") COLOR_BOLD(RED, "%ld"),
+                     "- " BOLD("%ld"),
                      *line_number);
-            fprintf(file_p, " %37s" COLOR(RED, " |  "), line_prefix);
+            fprintf(file_p, " %19s" " |  ", line_prefix);
         } else {
             snprintf(line_prefix,
                      sizeof(line_prefix),
-                     COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"),
+                     COLOR(RED, "+ ") COLOR_BOLD(RED, "%ld"),
                      *line_number);
-            fprintf(file_p, " %37s" COLOR(GREEN, " |  "), line_prefix);
+            fprintf(file_p, " %37s" COLOR(RED, " |  "), line_prefix);
         }
 
         while (index - line_index < line_length) {
@@ -887,12 +887,12 @@ static const char *display_inline_diff(FILE *file_p,
             } else if (characters > 0) {
                 if (use_original) {
                     fprintf(file_p,
-                            COLOR_BOLD(RED, "%.*s"),
+                            BOLD("%.*s"),
                             (int)characters,
                             string + index - line_index);
                 } else {
                     fprintf(file_p,
-                            COLOR_BOLD(GREEN, "%.*s"),
+                            COLOR_BOLD(RED, "%.*s"),
                             (int)characters,
                             string + index - line_index);
                 }
@@ -1004,11 +1004,11 @@ static void print_string_diff(FILE *file_p,
                 char line_prefix[64];
                 snprintf(line_prefix,
                          sizeof(line_prefix),
-                         COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"),
+                         "+ " BOLD("%ld"),
                          line_number);
 
-                fprintf(file_p, " %37s", line_prefix);
-                fprintf(file_p, COLOR(GREEN, " |  ") COLOR_BOLD(GREEN, "%.*s\n"),
+                fprintf(file_p, " %19s", line_prefix);
+                fprintf(file_p, COLOR(RED, " |  ") COLOR_BOLD(RED, "%.*s\n"),
                         (int)(modified_next - modified),
                         modified);
 
