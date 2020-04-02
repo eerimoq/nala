@@ -186,6 +186,7 @@ helpful when debugging, especially ``--print-all-calls``.
      -v, --version                 Print version information.
      -c, --continue-on-failure     Always run all tests.
      -a, --print-all-calls         Print all calls to ease debugging.
+     -r, --report-json-file        JSON test report file (default: report.json).
 
 Mocking
 =======
