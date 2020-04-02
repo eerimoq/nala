@@ -693,7 +693,7 @@ static void write_report_json(struct nala_test_t *test_p)
 
     if (file_p == NULL) {
         fprintf(stderr,
-                "error: Failed to open JSON report '%s' with '%s'.",
+                "error: Failed to open JSON report '%s' with '%s'.\n",
                 report_json_file_p,
                 strerror(errno));
         exit(1);
