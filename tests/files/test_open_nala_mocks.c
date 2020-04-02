@@ -650,13 +650,13 @@ char *format_mock_traceback(const char *message_p,
             snprintf(&_nala_assert_format[0],                           \
                      sizeof(_nala_assert_format),                       \
                      "Mocked " #func "(" #param "): %s != %s\n\n",      \
-                     PRINT_FORMAT((data_p)->params.param),              \
-                     PRINT_FORMAT(param));                              \
+                     PRINT_FORMAT(param),                               \
+                     PRINT_FORMAT((data_p)->params.param));             \
             nala_test_failure(                                          \
                 format_mock_traceback(                                  \
                     nala_format(&_nala_assert_format[0],                \
-                                (data_p)->params.param,                 \
-                                param),                                 \
+                                param,                                  \
+                                (data_p)->params.param),                \
                     &(data_p)->traceback));                             \
         }                                                               \
     }

@@ -83,7 +83,7 @@ static void add_function_error_wrong_x_entry(void *arg_p)
 TEST(add_function_error_wrong_x)
 {
     function_error_in_subprocess(add_function_error_wrong_x_entry,
-                                 "Mocked add(x): 1 != 3");
+                                 "Mocked add(x): 3 != 1");
 }
 
 static void add_function_error_mock_with_mock_once_enqueued_entry(void *arg_p)
@@ -156,7 +156,7 @@ TEST(output_message_function_error_mock_null)
 {
     function_error_in_subprocess(
         output_message_function_error_mock_null_entry,
-        "Mocked output_message(message): (nil) != 0x");
+        "Mocked output_message(message): 0x");
 }
 
 TEST(output_message_function_ignore_in_set_out)
