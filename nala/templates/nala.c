@@ -393,6 +393,12 @@ void nala_parse_va_list(struct nala_va_arg_list_t *list_p,
 {
     struct nala_va_arg_item_t *item_p;
 
+    if (format_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "Mocked variadic function format must be a string, not NULL.\n"));
+    }
+
     nala_va_arg_list_init(list_p);
 
     while (true) {
@@ -602,9 +608,6 @@ char *format_mock_traceback(const char *message_p,
 
     return (buf_p);
 }
-
-#define FORMAT_EQ(format, actual, expected)     \
-    nala_format(format, (actual), (expected))
 
 #define PRINT_FORMAT(value)                             \
     _Generic((value),                                   \

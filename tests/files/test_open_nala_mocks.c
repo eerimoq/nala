@@ -407,6 +407,12 @@ void nala_parse_va_list(struct nala_va_arg_list_t *list_p,
 {
     struct nala_va_arg_item_t *item_p;
 
+    if (format_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "Mocked variadic function format must be a string, not NULL.\n"));
+    }
+
     nala_va_arg_list_init(list_p);
 
     while (true) {
@@ -616,9 +622,6 @@ char *format_mock_traceback(const char *message_p,
 
     return (buf_p);
 }
-
-#define FORMAT_EQ(format, actual, expected)     \
-    nala_format(format, (actual), (expected))
 
 #define PRINT_FORMAT(value)                             \
     _Generic((value),                                   \
@@ -1039,11 +1042,6 @@ void open_mock(const char *pathname, int flags, int return_value, const char *va
 {
     CHECK_NO_INSTANCES(nala_mock_open);
     nala_mock_open.state.mode = MODE_MOCK;
-
-    if (vafmt_p == NULL) {
-        nala_test_failure(nala_format("Variadic format cannot be NULL.\n"));
-    }
-
     nala_mock_open.data.params.vafmt_p = vafmt_p;
     nala_va_arg_list_init(&nala_mock_open.data.params.nala_va_arg_list);
     va_list nala_vl;
@@ -1080,11 +1078,6 @@ int open_mock_once(const char *pathname, int flags, int return_value, const char
     nala_set_param_init(&nala_instance_p->data.params.pathname_in);
     nala_instance_p->data.params.pathname_in_assert = NULL;
     nala_instance_p->data.params.pathname_out_copy = NULL;
-
-    if (vafmt_p == NULL) {
-        nala_test_failure(nala_format("Variadic format cannot be NULL.\n"));
-    }
-
     nala_instance_p->data.params.vafmt_p = vafmt_p;
     nala_va_arg_list_init(&nala_instance_p->data.params.nala_va_arg_list);
     va_list nala_vl;

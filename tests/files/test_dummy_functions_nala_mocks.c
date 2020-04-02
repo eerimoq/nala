@@ -407,6 +407,12 @@ void nala_parse_va_list(struct nala_va_arg_list_t *list_p,
 {
     struct nala_va_arg_item_t *item_p;
 
+    if (format_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "Mocked variadic function format must be a string, not NULL.\n"));
+    }
+
     nala_va_arg_list_init(list_p);
 
     while (true) {
@@ -616,9 +622,6 @@ char *format_mock_traceback(const char *message_p,
 
     return (buf_p);
 }
-
-#define FORMAT_EQ(format, actual, expected)     \
-    nala_format(format, (actual), (expected))
 
 #define PRINT_FORMAT(value)                             \
     _Generic((value),                                   \
@@ -8687,11 +8690,6 @@ void io_control_mock(int kind, int return_value, const char *vafmt_p, ...)
 {
     CHECK_NO_INSTANCES(nala_mock_io_control);
     nala_mock_io_control.state.mode = MODE_MOCK;
-
-    if (vafmt_p == NULL) {
-        nala_test_failure(nala_format("Variadic format cannot be NULL.\n"));
-    }
-
     nala_mock_io_control.data.params.vafmt_p = vafmt_p;
     nala_va_arg_list_init(&nala_mock_io_control.data.params.nala_va_arg_list);
     va_list nala_vl;
@@ -8714,11 +8712,6 @@ int io_control_mock_once(int kind, int return_value, const char *vafmt_p, ...)
 
     nala_mock_io_control.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
-
-    if (vafmt_p == NULL) {
-        nala_test_failure(nala_format("Variadic format cannot be NULL.\n"));
-    }
-
     nala_instance_p->data.params.vafmt_p = vafmt_p;
     nala_va_arg_list_init(&nala_instance_p->data.params.nala_va_arg_list);
     va_list nala_vl;

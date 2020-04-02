@@ -735,6 +735,20 @@ TEST(variadic_function_error_set_out_for_unsigned_long)
         "Cannot set output for '%lu' at index 2. Only '%p' can be set.");
 }
 
+static void variadic_function_error_format_null_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    io_control_mock_once(1, 0, NULL);
+}
+
+TEST(variadic_function_error_format_null)
+{
+    function_error_in_subprocess(
+        variadic_function_error_format_null_entry,
+        "Mocked variadic function format must be a string, not NULL.");
+}
+
 TEST(compose_twice_function)
 {
     DummyStruct dummy_struct = { .number = 1 };

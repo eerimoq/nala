@@ -277,11 +277,6 @@ struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
     CHECK_NO_INSTANCES({{mock.state_name}});
     {{mock.state_name}}.state.mode = MODE_MOCK;
     {% if mock.is_variadic_func %}
-
-    if (vafmt_p == NULL) {
-        nala_test_failure(nala_format("Variadic format cannot be NULL.\n"));
-    }
-
     {{mock.state_name}}.data.params.vafmt_p = vafmt_p;
     nala_va_arg_list_init(&{{mock.state_name}}.data.params.nala_va_arg_list);
     va_list nala_vl;
@@ -332,11 +327,6 @@ struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
     nala_instance_p->data.params.{{param.name}}_out_copy = NULL;
     {% endfor %}
     {% if mock.is_variadic_func %}
-
-    if (vafmt_p == NULL) {
-        nala_test_failure(nala_format("Variadic format cannot be NULL.\n"));
-    }
-
     nala_instance_p->data.params.vafmt_p = vafmt_p;
     nala_va_arg_list_init(&nala_instance_p->data.params.nala_va_arg_list);
     va_list nala_vl;

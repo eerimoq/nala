@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/mount.h>
+#include <fcntl.h>
 #include "nala.h"
 #include "nala_mocks.h"
 #include "foo.h"
@@ -214,4 +215,9 @@ TEST(char_array)
     char b[] = "123";
 
     ASSERT_ARRAY(a, b, sizeof(a));
+}
+
+TEST(variadic_function_open_null_format)
+{
+    open_mock("hello", 0, 0, NULL);
 }

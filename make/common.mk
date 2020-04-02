@@ -19,6 +19,7 @@ MOCKGENFLAGS += $(NO_IMPLEMENTATION:%=-n %)
 NALA ?= PYTHONPATH=$(NALA_ROOT) python3 -m nala
 
 all:
+	$(MAKE) -C $(NALA_ROOT) dist
 	$(MAKE) $(BUILD)/nala_mocks.ldflags
 	$(MAKE) $(EXE)
 	$(EXE) $(ARGS)
