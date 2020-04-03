@@ -1,4 +1,6 @@
-import struct
+from struct import pack
+from struct import pack_into
+from struct import unpack_from
 
 
 ELFCLASS64 = 2
@@ -25,15 +27,14 @@ class Elf64LsbHeader:
 
     def __init__(self, data):
         self._data = data
-        self.e_type = struct.unpack('<H', data[16:18])[0]
-        self.e_shoff = struct.unpack('<Q', data[40:48])[0]
-        self.e_shentsize = struct.unpack('<H', data[58:60])[0]
-        self.e_shnum = struct.unpack('<H', data[60:62])[0]
+        (self.e_type,
+         self.e_shoff,
+         self.e_shentsize,
+         self.e_shnum,
+         self.e_shstrndx) = unpack_from('<H22xQ10xHHH', data, 16)
 
         if self.e_shnum == 0:
             raise Error('ToDo: Support many sections.')
-
-        self.e_shstrndx = struct.unpack('<H', data[62:64])[0]
 
         if self.e_shstrndx == SHN_UNDEF:
             raise Error('Missing section header string table.')
@@ -45,7 +46,7 @@ class Elf64LsbHeader:
 
     @property
     def data(self):
-        self._data[40:48] = struct.pack('<Q', self.e_shoff)
+        pack_into('<Q', self._data, 40, self.e_shoff)
 
         return self._data
 
@@ -54,17 +55,15 @@ class Elf64LsbSectionHeader:
 
     def __init__(self, data):
         self._data = data
-        self.sh_name = struct.unpack('<I', data[0:4])[0]
-        self.sh_type = struct.unpack('<I', data[4:8])[0]
-        self.sh_offset = struct.unpack('<Q', data[24:32])[0]
-        self.sh_size = struct.unpack('<Q', data[32:40])[0]
-        self.sh_addralign = struct.unpack('<Q', data[48:56])[0]
+        (self.sh_name,
+         self.sh_type,
+         self.sh_offset,
+         self.sh_size,
+         self.sh_addralign) = unpack_from('<II16xQQ8xQ8x', data)
 
     @property
     def data(self):
-        self._data[24:40] = struct.pack('<QQ',
-                                        self.sh_offset,
-                                        self.sh_size)
+        pack_into('<QQ', self._data, 24, self.sh_offset, self.sh_size)
 
         return self._data
 
@@ -73,11 +72,11 @@ class Elf64LsbRela:
 
     def __init__(self, data):
         self._data = data
-        self.symbol_index = struct.unpack('<I', data[12:16])[0]
+        self.symbol_index = unpack_from('<I', data, 12)[0]
 
     @property
     def data(self):
-        self._data[12:16] = struct.pack('<I', self.symbol_index)
+        pack_into('<I', self._data, 12, self.symbol_index)
 
         return self._data
 
@@ -123,7 +122,7 @@ def load_elf_header(elf):
 
 
 def create_undefined_global_symbol(name_offset):
-    return struct.pack('<IBBHQQ', name_offset, STB_GLOBAL << 4, 0, SHN_UNDEF, 0, 0)
+    return pack('<IBBHQQ', name_offset, STB_GLOBAL << 4, 0, SHN_UNDEF, 0, 0)
 
 
 class Elf64File:
@@ -224,12 +223,11 @@ class Elf64File:
             if binding != STB_GLOBAL:
                 continue
 
-            size = struct.unpack('<Q', symtab_data[offset + 16:offset + 24])[0]
+            name_offset, size = unpack_from('<I12xQ', symtab_data, offset)
 
             if size == 0:
                 continue
 
-            name_offset = struct.unpack('<I', symtab_data[offset:offset + 4])[0]
             name = self._find_string_in_strtab(name_offset)
 
             if name not in symbol_names:
