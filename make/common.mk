@@ -27,6 +27,14 @@ all:
 clean:
 	rm -rf $(BUILD)
 
+gdb:
+	gdb \
+	    -ex "b $(TEST)_before_fork" \
+	    -ex r \
+	    -ex "set follow-fork-mode child" \
+	    -ex c \
+	    $(EXE)
+
 $(EXE): $(OBJ)
 	echo "LD $@"
 	$(CC) $(CFLAGS) @$(BUILD)/nala_mocks.ldflags $^ -o $@

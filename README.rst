@@ -179,8 +179,8 @@ helpful when debugging, especially ``--print-all-calls``.
 
 .. code-block::
 
-   $ build/app --help
-   usage: build/app [-h] [-v] [-c] [-a] [<test-pattern>]
+   $ foo/build/app --help
+   usage: foo/build/app [-h] [-v] [-c] [-a] [<test-pattern>]
 
    Run tests.
 
