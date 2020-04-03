@@ -39,7 +39,7 @@ def do_init(args):
     generate_makefile()
     copy_nala()
 
-    print(f"Run 'make -C {args.name}' to build and run the test suite!")
+    print(f"Run 'make -C {args.name}' to build and run all tests!")
 
 
 def do_generate_mocks(args):

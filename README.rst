@@ -120,7 +120,7 @@ Now, make the time test fail to see what an error report looks like.
 
    TEST(mock_time)
    {
-       time_mock_once(-1);
+       time_mock_once(41);
 
        ASSERT_EQ(time(NULL), 42);
    }
