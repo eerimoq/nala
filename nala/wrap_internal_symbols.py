@@ -1,6 +1,4 @@
-from struct import pack
-from struct import pack_into
-from struct import unpack_from
+import struct
 
 
 ELFCLASS64 = 2
@@ -18,6 +16,8 @@ STB_GLOBAL = 1
 SHN_UNDEF = 0
 SHN_LORESERVE = 0xff00
 
+ST_UDEF_GLOB = struct.Struct('<IBBHQQ')
+
 
 class Error(Exception):
     pass
@@ -25,13 +25,16 @@ class Error(Exception):
 
 class Elf64LsbHeader:
 
+    ST_HEADER_1 = struct.Struct('<H22xQ10xHHH')
+    ST_HEADER_2 = struct.Struct('<Q')
+
     def __init__(self, data):
         self._data = data
         (self.e_type,
          self.e_shoff,
          self.e_shentsize,
          self.e_shnum,
-         self.e_shstrndx) = unpack_from('<H22xQ10xHHH', data, 16)
+         self.e_shstrndx) = self.ST_HEADER_1.unpack_from(data, 16)
 
         if self.e_shnum == 0:
             raise Error('ToDo: Support many sections.')
@@ -46,12 +49,15 @@ class Elf64LsbHeader:
 
     @property
     def data(self):
-        pack_into('<Q', self._data, 40, self.e_shoff)
+        self.ST_HEADER_2.pack_into(self._data, 40, self.e_shoff)
 
         return self._data
 
 
 class Elf64LsbSectionHeader:
+
+    ST_HEADER_1 = struct.Struct('<II16xQQ8xQ8x')
+    ST_HEADER_2 = struct.Struct('<QQ')
 
     def __init__(self, data):
         self._data = data
@@ -59,24 +65,26 @@ class Elf64LsbSectionHeader:
          self.sh_type,
          self.sh_offset,
          self.sh_size,
-         self.sh_addralign) = unpack_from('<II16xQQ8xQ8x', data)
+         self.sh_addralign) = self.ST_HEADER_1.unpack_from(data)
 
     @property
     def data(self):
-        pack_into('<QQ', self._data, 24, self.sh_offset, self.sh_size)
+        self.ST_HEADER_2.pack_into(self._data, 24, self.sh_offset, self.sh_size)
 
         return self._data
 
 
 class Elf64LsbRela:
 
+    ST_HEADER = struct.Struct('<I')
+
     def __init__(self, data):
         self._data = data
-        self.symbol_index = unpack_from('<I', data, 12)[0]
+        self.symbol_index = self.ST_HEADER.unpack_from(data, 12)[0]
 
     @property
     def data(self):
-        pack_into('<I', self._data, 12, self.symbol_index)
+        self.ST_HEADER.pack_into(self._data, 12, self.symbol_index)
 
         return self._data
 
@@ -122,10 +130,12 @@ def load_elf_header(elf):
 
 
 def create_undefined_global_symbol(name_offset):
-    return pack('<IBBHQQ', name_offset, STB_GLOBAL << 4, 0, SHN_UNDEF, 0, 0)
+    return ST_UDEF_GLOB.pack(name_offset, STB_GLOBAL << 4, 0, SHN_UNDEF, 0, 0)
 
 
 class Elf64File:
+
+    ST_SYMTAB = struct.Struct('<I12xQ')
 
     def __init__(self, elf, symbol_names):
         self._header = load_elf_header(elf)
@@ -223,7 +233,7 @@ class Elf64File:
             if binding != STB_GLOBAL:
                 continue
 
-            name_offset, size = unpack_from('<I12xQ', symtab_data, offset)
+            name_offset, size = self.ST_SYMTAB.unpack_from(symtab_data, offset)
 
             if size == 0:
                 continue
