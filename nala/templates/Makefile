@@ -41,7 +41,7 @@ coverage:
 gdb:
 	gdb \
 	    -ex "b $(TEST)_before_fork" \
-	    -ex r \
+	    -ex "r $(TEST)" \
 	    -ex "set follow-fork-mode child" \
 	    -ex c \
 	    $(EXE)
