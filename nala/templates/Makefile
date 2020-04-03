@@ -40,7 +40,7 @@ coverage:
 
 gdb:
 	gdb \
-	    -ex "b $(TEST)_before_fork" \
+	    -ex "b $(subst ::,.c:,$(TEST))_before_fork" \
 	    -ex "r $(lastword $(subst :, ,$(TEST)))" \
 	    -ex "set follow-fork-mode child" \
 	    -ex c \

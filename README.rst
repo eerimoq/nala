@@ -168,7 +168,9 @@ example above.
    (gdb) set follow-fork-mode child
    (gdb) c
 
-Or using the make target ``gdb``.
+Or using the make target ``gdb``. Set the ``TEST`` make variable to
+the test to debug. Both ``TEST=test_assertions::assertions`` and
+``TEST=assertions`` are accepted.
 
 .. code-block::
 
