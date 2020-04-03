@@ -632,8 +632,24 @@ static void variadic_function_error_integer_entry(void *arg_p)
 
 TEST(variadic_function_error_integer)
 {
-    function_error_in_subprocess(variadic_function_error_integer_entry,
-                                 "5 != 6 (0x5 != 0x6)");
+    function_error_in_subprocess(
+        variadic_function_error_integer_entry,
+        "Mocked io_control(...): 6 != 5 (0x6 != 0x5)");
+}
+
+static void variadic_function_error_string_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    io_control_mock_once(1, 0, "%s", "kalle");
+    io_control(1, "billy");
+}
+
+TEST(variadic_function_error_string)
+{
+    function_error_in_subprocess(
+        variadic_function_error_string_entry,
+        "Mocked io_control(...): See diff for details.");
 }
 
 static void variadic_function_error_va_arg_in_entry(void *arg_p)

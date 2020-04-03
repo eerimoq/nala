@@ -217,6 +217,12 @@ TEST(char_array)
     ASSERT_ARRAY(a, b, sizeof(a));
 }
 
+TEST(variadic_function_open)
+{
+    open_mock("hello", 0, 0, "%d", 1);
+    open("hello", 0, 2);
+}
+
 TEST(variadic_function_open_null_format)
 {
     open_mock("hello", 0, 0, NULL);

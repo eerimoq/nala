@@ -138,463 +138,6 @@ static void nala_free(void *buf_p)
     nala_resume_all_mocks();
 }
 
-enum nala_va_arg_item_type_t {
-    nala_va_arg_item_type_d_t = 0,
-    nala_va_arg_item_type_u_t,
-    nala_va_arg_item_type_ld_t,
-    nala_va_arg_item_type_lu_t,
-    nala_va_arg_item_type_p_t,
-    nala_va_arg_item_type_s_t
-};
-
-struct nala_va_arg_item_t {
-    enum nala_va_arg_item_type_t type;
-    bool ignore_in;
-    union {
-        int d;
-        unsigned int u;
-        long ld;
-        unsigned long lu;
-        const void *p_p;
-        const char *s_p;
-    };
-    struct nala_set_param in;
-    struct nala_set_param out;
-    nala_mock_in_assert_t in_assert;
-    nala_mock_out_copy_t out_copy;
-    struct nala_va_arg_item_t *next_p;
-};
-
-struct nala_va_arg_list_t {
-    struct nala_va_arg_item_t *head_p;
-    struct nala_va_arg_item_t *tail_p;
-    unsigned int length;
-};
-
-struct nala_suspended_t {
-    int count;
-    int mode;
-};
-
-struct nala_state_t {
-    int mode;
-    struct nala_suspended_t suspended;
-};
-
-void nala_set_param_init(struct nala_set_param *self_p)
-{
-    self_p->buf_p = NULL;
-    self_p->size = 0;
-}
-
-void nala_set_param_buf(struct nala_set_param *self_p,
-                        const void *buf_p,
-                        size_t size)
-{
-    self_p->buf_p = nala_xmalloc(size);
-    self_p->size = size;
-    memcpy(self_p->buf_p, buf_p, size);
-}
-
-void nala_set_param_string(struct nala_set_param *self_p, const char *string_p)
-{
-    nala_set_param_buf(self_p, string_p, strlen(string_p) + 1);
-}
-
-const char *va_arg_type_specifier_string(enum nala_va_arg_item_type_t type)
-{
-    const char *res_p;
-
-    switch (type) {
-
-    case nala_va_arg_item_type_d_t:
-        res_p = "d";
-        break;
-
-    case nala_va_arg_item_type_u_t:
-        res_p = "u";
-        break;
-
-    case nala_va_arg_item_type_ld_t:
-        res_p = "ld";
-        break;
-
-    case nala_va_arg_item_type_lu_t:
-        res_p = "lu";
-        break;
-
-    case nala_va_arg_item_type_p_t:
-        res_p = "p";
-        break;
-
-    case nala_va_arg_item_type_s_t:
-        res_p = "s";
-        break;
-
-    default:
-        nala_test_failure(nala_format("Nala internal failure.\n"));
-        exit(1);
-        break;
-    }
-
-    return (res_p);
-}
-
-void nala_va_arg_list_init(struct nala_va_arg_list_t *self_p)
-{
-    self_p->head_p = NULL;
-    self_p->tail_p = NULL;
-    self_p->length = 0;
-}
-
-void nala_va_arg_list_destroy(struct nala_va_arg_list_t *self_p)
-{
-    struct nala_va_arg_item_t *item_p;
-    struct nala_va_arg_item_t *tmp_p;
-
-    item_p = self_p->head_p;
-
-    while (item_p != NULL) {
-        if (item_p->in.buf_p != NULL) {
-            nala_free(item_p->in.buf_p);
-        }
-
-        if (item_p->out.buf_p) {
-            nala_free(item_p->out.buf_p);
-        }
-
-        tmp_p = item_p;
-        item_p = tmp_p->next_p;
-        nala_free(tmp_p);
-    }
-}
-
-void nala_va_arg_list_append(struct nala_va_arg_list_t *self_p,
-                             struct nala_va_arg_item_t *item_p)
-{
-    self_p->length++;
-
-    if (self_p->head_p == NULL) {
-        self_p->head_p = item_p;
-    } else {
-        self_p->tail_p->next_p = item_p;
-    }
-
-    item_p->next_p = NULL;
-    self_p->tail_p = item_p;
-}
-
-struct nala_va_arg_item_t *nala_va_arg_list_get(
-    struct nala_va_arg_list_t *self_p,
-    unsigned int index)
-{
-    unsigned int i;
-    struct nala_va_arg_item_t *item_p;
-
-    if (index >= self_p->length) {
-        nala_test_failure(
-            nala_format(
-                "Trying to access variable argument at index %u when only %u "
-                "exists.\n",
-                index,
-                self_p->length));
-    }
-
-    item_p = self_p->head_p;
-
-    for (i = 0; (i < index) && (item_p != NULL); i++) {
-        item_p = item_p->next_p;
-    }
-
-    return (item_p);
-}
-
-void nala_parse_va_arg_long(const char **format_pp,
-                            va_list vl,
-                            struct nala_va_arg_item_t *item_p)
-{
-    switch (**format_pp) {
-
-    case 'd':
-        item_p->type = nala_va_arg_item_type_ld_t;
-        item_p->ignore_in = false;
-        item_p->ld = va_arg(vl, long);
-        break;
-
-    case 'u':
-        item_p->type = nala_va_arg_item_type_lu_t;
-        item_p->ignore_in = false;
-        item_p->lu = va_arg(vl, unsigned long);
-        break;
-
-    default:
-        nala_free(item_p);
-        nala_test_failure(
-            nala_format("Unsupported type specifier %%l%c.\n", **format_pp));
-        exit(1);
-        break;
-    }
-
-    (*format_pp)++;
-}
-
-void nala_parse_va_arg_non_long(const char **format_pp,
-                                va_list vl,
-                                struct nala_va_arg_item_t *item_p)
-{
-    switch (**format_pp) {
-
-    case 'd':
-        item_p->type = nala_va_arg_item_type_d_t;
-        item_p->ignore_in = false;
-        item_p->d = va_arg(vl, int);
-        break;
-
-    case 'u':
-        item_p->type = nala_va_arg_item_type_u_t;
-        item_p->ignore_in = false;
-        item_p->u = va_arg(vl, unsigned int);
-        break;
-
-    case 'p':
-        item_p->type = nala_va_arg_item_type_p_t;
-        item_p->ignore_in = true;
-        item_p->p_p = NULL;
-        break;
-
-    case 's':
-        /* ToDo: Should save in buffer. */
-        item_p->type = nala_va_arg_item_type_s_t;
-        item_p->ignore_in = false;
-        item_p->s_p = va_arg(vl, char *);
-        break;
-
-    default:
-        nala_free(item_p);
-        nala_test_failure(
-            nala_format("Unsupported type specifier %%%c.\n", **format_pp));
-        exit(1);
-        break;
-    }
-
-    (*format_pp)++;
-}
-
-struct nala_va_arg_item_t *nala_parse_va_arg(const char **format_pp,
-                                             va_list vl)
-{
-    struct nala_va_arg_item_t *item_p;
-
-    item_p = nala_xmalloc(sizeof(*item_p));
-    item_p->in.buf_p = NULL;
-    item_p->out.buf_p = NULL;
-    item_p->in_assert = NULL;
-    item_p->out_copy = NULL;
-
-    if (**format_pp == 'l') {
-        (*format_pp)++;
-        nala_parse_va_arg_long(format_pp, vl, item_p);
-    } else {
-        nala_parse_va_arg_non_long(format_pp, vl, item_p);
-    }
-
-    return (item_p);
-}
-
-void nala_parse_va_list(struct nala_va_arg_list_t *list_p,
-                        const char *format_p,
-                        va_list vl)
-{
-    struct nala_va_arg_item_t *item_p;
-
-    if (format_p == NULL) {
-        nala_test_failure(
-            nala_format(
-                "Mocked variadic function format must be a string, not NULL.\n"));
-    }
-
-    nala_va_arg_list_init(list_p);
-
-    while (true) {
-        if (*format_p == '\0') {
-            break;
-        } else if (*format_p == '%') {
-            format_p++;
-            item_p = nala_parse_va_arg(&format_p, vl);
-            nala_va_arg_list_append(list_p, item_p);
-        } else {
-            nala_test_failure(
-                nala_format("Bad format string '%s'.\n", format_p));
-        }
-    }
-}
-
-void nala_va_arg_list_assert_d(struct nala_va_arg_item_t *item_p,
-                               int value)
-{
-    if (!item_p->ignore_in) {
-        ASSERT_EQ(item_p->d, value);
-    }
-}
-
-void nala_va_arg_list_assert_u(struct nala_va_arg_item_t *item_p,
-                               unsigned int value)
-{
-    if (!item_p->ignore_in) {
-        ASSERT_EQ(item_p->u, value);
-    }
-}
-
-void nala_va_arg_list_assert_ld(struct nala_va_arg_item_t *item_p,
-                                long value)
-{
-    if (!item_p->ignore_in) {
-        ASSERT_EQ(item_p->ld, value);
-    }
-}
-
-void nala_va_arg_list_assert_lu(struct nala_va_arg_item_t *item_p,
-                                unsigned long value)
-{
-    if (!item_p->ignore_in) {
-        ASSERT_EQ(item_p->lu, value);
-    }
-}
-
-void nala_va_arg_list_assert_p(struct nala_va_arg_item_t *item_p,
-                               void *value_p)
-{
-    if (!item_p->ignore_in) {
-        ASSERT_EQ(item_p->p_p, value_p);
-    }
-
-    if (item_p->in.buf_p != NULL) {
-        if (item_p->in_assert != NULL) {
-            item_p->in_assert(value_p, item_p->in.buf_p, item_p->in.size);
-        } else {
-            ASSERT_MEMORY(value_p, item_p->in.buf_p, item_p->in.size);
-        }
-    }
-
-    if (item_p->out.buf_p != NULL) {
-        if (item_p->out_copy != NULL) {
-            item_p->out_copy(value_p, item_p->out.buf_p, item_p->out.size);
-        } else {
-            memcpy(value_p, item_p->out.buf_p, item_p->out.size);
-        }
-    }
-}
-
-void nala_va_arg_list_assert_s(struct nala_va_arg_item_t *item_p,
-                               char *value_p)
-{
-    if (!item_p->ignore_in) {
-        ASSERT_EQ(item_p->s_p, value_p);
-    }
-}
-
-void nala_va_arg_list_set_param_buf_in_at(struct nala_va_arg_list_t *self_p,
-                                          unsigned int index,
-                                          const void *buf_p,
-                                          size_t size)
-{
-    struct nala_va_arg_item_t *item_p;
-
-    item_p = nala_va_arg_list_get(self_p, index);
-
-    switch (item_p->type) {
-
-    case nala_va_arg_item_type_p_t:
-        nala_set_param_buf(&item_p->in, buf_p, size);
-        break;
-
-    default:
-        nala_test_failure(
-            nala_format(
-                "Cannot set input for '%%%s' at index %u. Only '%%p' can be set.\n",
-                va_arg_type_specifier_string(item_p->type),
-                index));
-        exit(1);
-        break;
-    }
-}
-
-void nala_va_arg_list_set_param_buf_out_at(struct nala_va_arg_list_t *self_p,
-                                           unsigned int index,
-                                           const void *buf_p,
-                                           size_t size)
-{
-    struct nala_va_arg_item_t *item_p;
-
-    item_p = nala_va_arg_list_get(self_p, index);
-
-    switch (item_p->type) {
-
-    case nala_va_arg_item_type_p_t:
-        nala_set_param_buf(&item_p->out, buf_p, size);
-        break;
-
-    default:
-        nala_test_failure(
-            nala_format(
-                "Cannot set output for '%%%s' at index %u. Only '%%p' can be set.\n",
-                va_arg_type_specifier_string(item_p->type),
-                index));
-        exit(1);
-        break;
-    }
-}
-
-void nala_va_arg_list_assert(struct nala_va_arg_list_t *self_p,
-                             va_list vl)
-{
-    unsigned int i;
-    struct nala_va_arg_item_t *item_p;
-
-    item_p = self_p->head_p;
-
-    for (i = 0; i < self_p->length; i++) {
-        switch (item_p->type) {
-
-        case nala_va_arg_item_type_d_t:
-            nala_va_arg_list_assert_d(item_p, va_arg(vl, int));
-            break;
-
-        case nala_va_arg_item_type_u_t:
-            nala_va_arg_list_assert_u(item_p, va_arg(vl, unsigned int));
-            break;
-
-        case nala_va_arg_item_type_ld_t:
-            nala_va_arg_list_assert_ld(item_p, va_arg(vl, long));
-            break;
-
-        case nala_va_arg_item_type_lu_t:
-            nala_va_arg_list_assert_lu(item_p, va_arg(vl, unsigned long));
-            break;
-
-        case nala_va_arg_item_type_p_t:
-            nala_va_arg_list_assert_p(item_p, va_arg(vl, void *));
-            break;
-
-        case nala_va_arg_item_type_s_t:
-            nala_va_arg_list_assert_s(item_p, va_arg(vl, char *));
-            break;
-
-        default:
-            nala_test_failure(nala_format("Nala internal failure.\n"));
-            exit(1);
-            break;
-        }
-
-        item_p = item_p->next_p;
-    }
-}
-
-void nala_traceback(struct nala_traceback_t *traceback_p)
-{
-    traceback_p->depth = backtrace(&traceback_p->addresses[0], 32);
-}
-
 char *format_mock_traceback(const char *message_p,
                             struct nala_traceback_t *traceback_p)
 {
@@ -622,6 +165,25 @@ char *format_mock_traceback(const char *message_p,
 
     return (buf_p);
 }
+
+#define NALA_MOCK_ASSERT_IN_EQ_FUNC(value)                      \
+    _Generic((value),                                           \
+             char: nala_mock_assert_in_eq_char,                 \
+             signed char: nala_mock_assert_in_eq_schar,         \
+             unsigned char: nala_mock_assert_in_eq_uchar,       \
+             short: nala_mock_assert_in_eq_short,               \
+             unsigned short: nala_mock_assert_in_eq_ushort,     \
+             int: nala_mock_assert_in_eq_int,                   \
+             unsigned int: nala_mock_assert_in_eq_uint,         \
+             long: nala_mock_assert_in_eq_long,                 \
+             unsigned long: nala_mock_assert_in_eq_ulong,       \
+             long long: nala_mock_assert_in_eq_llong,           \
+             unsigned long long: nala_mock_assert_in_eq_ullong, \
+             float: nala_mock_assert_in_eq_float,               \
+             double: nala_mock_assert_in_eq_double,             \
+             long double: nala_mock_assert_in_eq_ldouble,       \
+             bool: nala_mock_assert_in_eq_bool,                 \
+             default: nala_mock_assert_in_eq_ptr)
 
 #define PRINT_FORMAT(value)                             \
     _Generic((value),                                   \
@@ -654,25 +216,6 @@ char *format_mock_traceback(const char *message_p,
              unsigned long int: "%lx",          \
              long long int: "%llx",             \
              unsigned long long int: "%llx")
-
-#define NALA_MOCK_ASSERT_IN_EQ_FUNC(value)                      \
-    _Generic((value),                                           \
-             char: nala_mock_assert_in_eq_char,                 \
-             signed char: nala_mock_assert_in_eq_schar,         \
-             unsigned char: nala_mock_assert_in_eq_uchar,       \
-             short: nala_mock_assert_in_eq_short,               \
-             unsigned short: nala_mock_assert_in_eq_ushort,     \
-             int: nala_mock_assert_in_eq_int,                   \
-             unsigned int: nala_mock_assert_in_eq_uint,         \
-             long: nala_mock_assert_in_eq_long,                 \
-             unsigned long: nala_mock_assert_in_eq_ulong,       \
-             long long: nala_mock_assert_in_eq_llong,           \
-             unsigned long long: nala_mock_assert_in_eq_ullong, \
-             float: nala_mock_assert_in_eq_float,               \
-             double: nala_mock_assert_in_eq_double,             \
-             long double: nala_mock_assert_in_eq_ldouble,       \
-             bool: nala_mock_assert_in_eq_bool,                 \
-             default: nala_mock_assert_in_eq_ptr)
 
 #define MOCK_BINARY_ASSERTION(traceback_p,                              \
                               func_p,                                   \
@@ -988,6 +531,552 @@ void nala_mock_assert_in_eq_ptr(struct nala_traceback_t *traceback_p,
                           expected_p);
 }
 
+void nala_mock_assert_memory(struct nala_traceback_t *traceback_p,
+                             const char *func_p,
+                             const char *param_p,
+                             const void *left_p,
+                             const void *right_p,
+                             size_t size)
+{
+    char _nala_assert_format[512];
+
+    if (!nala_check_memory(left_p, right_p, size)) {
+        nala_suspend_all_mocks();
+        snprintf(&_nala_assert_format[0],
+                 sizeof(_nala_assert_format),
+                 "Mocked %s(%s): ",
+                 func_p,
+                 param_p);
+        nala_test_failure(
+            format_mock_traceback(
+                nala_format_memory(
+                    &_nala_assert_format[0],
+                    left_p,
+                    right_p,
+                    size),
+                traceback_p));
+    }
+}
+
+void nala_mock_assert_string(struct nala_traceback_t *traceback_p,
+                             const char *func_p,
+                             const char *param_p,
+                             const char *acutal_p,
+                             const char *expected_p,
+                             size_t size)
+{
+    (void)size;
+
+    char _nala_assert_format[512];
+
+    if (!nala_check_string_equal(acutal_p, expected_p)) {
+        nala_suspend_all_mocks();
+        snprintf(&_nala_assert_format[0],
+                 sizeof(_nala_assert_format),
+                 "Mocked %s(%s):",
+                 func_p,
+                 param_p);
+        nala_test_failure(
+            format_mock_traceback(
+                nala_format_string(&_nala_assert_format[0],
+                                   acutal_p,
+                                   expected_p),
+                traceback_p));
+    }
+}
+
+enum nala_va_arg_item_type_t {
+    nala_va_arg_item_type_d_t = 0,
+    nala_va_arg_item_type_u_t,
+    nala_va_arg_item_type_ld_t,
+    nala_va_arg_item_type_lu_t,
+    nala_va_arg_item_type_p_t,
+    nala_va_arg_item_type_s_t
+};
+
+struct nala_va_arg_item_t {
+    enum nala_va_arg_item_type_t type;
+    bool ignore_in;
+    union {
+        int d;
+        unsigned int u;
+        long ld;
+        unsigned long lu;
+        const void *p_p;
+        const char *s_p;
+    };
+    struct nala_set_param in;
+    struct nala_set_param out;
+    nala_mock_in_assert_t in_assert;
+    nala_mock_out_copy_t out_copy;
+    struct nala_va_arg_item_t *next_p;
+};
+
+struct nala_va_arg_list_t {
+    struct nala_va_arg_item_t *head_p;
+    struct nala_va_arg_item_t *tail_p;
+    unsigned int length;
+    struct nala_traceback_t *traceback_p;
+    const char *func_p;
+};
+
+struct nala_suspended_t {
+    int count;
+    int mode;
+};
+
+struct nala_state_t {
+    int mode;
+    struct nala_suspended_t suspended;
+};
+
+void nala_set_param_init(struct nala_set_param *self_p)
+{
+    self_p->buf_p = NULL;
+    self_p->size = 0;
+}
+
+void nala_set_param_buf(struct nala_set_param *self_p,
+                        const void *buf_p,
+                        size_t size)
+{
+    self_p->buf_p = nala_xmalloc(size);
+    self_p->size = size;
+    memcpy(self_p->buf_p, buf_p, size);
+}
+
+void nala_set_param_string(struct nala_set_param *self_p, const char *string_p)
+{
+    nala_set_param_buf(self_p, string_p, strlen(string_p) + 1);
+}
+
+const char *va_arg_type_specifier_string(enum nala_va_arg_item_type_t type)
+{
+    const char *res_p;
+
+    switch (type) {
+
+    case nala_va_arg_item_type_d_t:
+        res_p = "d";
+        break;
+
+    case nala_va_arg_item_type_u_t:
+        res_p = "u";
+        break;
+
+    case nala_va_arg_item_type_ld_t:
+        res_p = "ld";
+        break;
+
+    case nala_va_arg_item_type_lu_t:
+        res_p = "lu";
+        break;
+
+    case nala_va_arg_item_type_p_t:
+        res_p = "p";
+        break;
+
+    case nala_va_arg_item_type_s_t:
+        res_p = "s";
+        break;
+
+    default:
+        nala_test_failure(nala_format("Nala internal failure.\n"));
+        exit(1);
+        break;
+    }
+
+    return (res_p);
+}
+
+void nala_va_arg_list_init(struct nala_va_arg_list_t *self_p,
+                           struct nala_traceback_t *traceback_p,
+                           const char *func_p)
+{
+    self_p->head_p = NULL;
+    self_p->tail_p = NULL;
+    self_p->length = 0;
+    self_p->traceback_p = traceback_p;
+    self_p->func_p = func_p;
+}
+
+void nala_va_arg_list_destroy(struct nala_va_arg_list_t *self_p)
+{
+    struct nala_va_arg_item_t *item_p;
+    struct nala_va_arg_item_t *tmp_p;
+
+    item_p = self_p->head_p;
+
+    while (item_p != NULL) {
+        if (item_p->in.buf_p != NULL) {
+            nala_free(item_p->in.buf_p);
+        }
+
+        if (item_p->out.buf_p) {
+            nala_free(item_p->out.buf_p);
+        }
+
+        tmp_p = item_p;
+        item_p = tmp_p->next_p;
+        nala_free(tmp_p);
+    }
+}
+
+void nala_va_arg_list_append(struct nala_va_arg_list_t *self_p,
+                             struct nala_va_arg_item_t *item_p)
+{
+    self_p->length++;
+
+    if (self_p->head_p == NULL) {
+        self_p->head_p = item_p;
+    } else {
+        self_p->tail_p->next_p = item_p;
+    }
+
+    item_p->next_p = NULL;
+    self_p->tail_p = item_p;
+}
+
+struct nala_va_arg_item_t *nala_va_arg_list_get(
+    struct nala_va_arg_list_t *self_p,
+    unsigned int index)
+{
+    unsigned int i;
+    struct nala_va_arg_item_t *item_p;
+
+    if (index >= self_p->length) {
+        nala_test_failure(
+            nala_format(
+                "Trying to access variable argument at index %u when only %u "
+                "exists.\n",
+                index,
+                self_p->length));
+    }
+
+    item_p = self_p->head_p;
+
+    for (i = 0; (i < index) && (item_p != NULL); i++) {
+        item_p = item_p->next_p;
+    }
+
+    return (item_p);
+}
+
+void nala_parse_va_arg_long(const char **format_pp,
+                            va_list vl,
+                            struct nala_va_arg_item_t *item_p)
+{
+    switch (**format_pp) {
+
+    case 'd':
+        item_p->type = nala_va_arg_item_type_ld_t;
+        item_p->ignore_in = false;
+        item_p->ld = va_arg(vl, long);
+        break;
+
+    case 'u':
+        item_p->type = nala_va_arg_item_type_lu_t;
+        item_p->ignore_in = false;
+        item_p->lu = va_arg(vl, unsigned long);
+        break;
+
+    default:
+        nala_free(item_p);
+        nala_test_failure(
+            nala_format("Unsupported type specifier %%l%c.\n", **format_pp));
+        exit(1);
+        break;
+    }
+
+    (*format_pp)++;
+}
+
+void nala_parse_va_arg_non_long(const char **format_pp,
+                                va_list vl,
+                                struct nala_va_arg_item_t *item_p)
+{
+    switch (**format_pp) {
+
+    case 'd':
+        item_p->type = nala_va_arg_item_type_d_t;
+        item_p->ignore_in = false;
+        item_p->d = va_arg(vl, int);
+        break;
+
+    case 'u':
+        item_p->type = nala_va_arg_item_type_u_t;
+        item_p->ignore_in = false;
+        item_p->u = va_arg(vl, unsigned int);
+        break;
+
+    case 'p':
+        item_p->type = nala_va_arg_item_type_p_t;
+        item_p->ignore_in = true;
+        item_p->p_p = NULL;
+        break;
+
+    case 's':
+        /* ToDo: Should save in buffer. */
+        item_p->type = nala_va_arg_item_type_s_t;
+        item_p->ignore_in = false;
+        item_p->s_p = va_arg(vl, char *);
+        break;
+
+    default:
+        nala_free(item_p);
+        nala_test_failure(
+            nala_format("Unsupported type specifier %%%c.\n", **format_pp));
+        exit(1);
+        break;
+    }
+
+    (*format_pp)++;
+}
+
+struct nala_va_arg_item_t *nala_parse_va_arg(const char **format_pp,
+                                             va_list vl)
+{
+    struct nala_va_arg_item_t *item_p;
+
+    item_p = nala_xmalloc(sizeof(*item_p));
+    item_p->in.buf_p = NULL;
+    item_p->out.buf_p = NULL;
+    item_p->in_assert = NULL;
+    item_p->out_copy = NULL;
+
+    if (**format_pp == 'l') {
+        (*format_pp)++;
+        nala_parse_va_arg_long(format_pp, vl, item_p);
+    } else {
+        nala_parse_va_arg_non_long(format_pp, vl, item_p);
+    }
+
+    return (item_p);
+}
+
+void nala_parse_va_list(struct nala_va_arg_list_t *list_p,
+                        const char *format_p,
+                        va_list vl)
+{
+    struct nala_va_arg_item_t *item_p;
+
+    if (format_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "Mocked variadic function format must be a string, not NULL.\n"));
+    }
+
+    while (true) {
+        if (*format_p == '\0') {
+            break;
+        } else if (*format_p == '%') {
+            format_p++;
+            item_p = nala_parse_va_arg(&format_p, vl);
+            nala_va_arg_list_append(list_p, item_p);
+        } else {
+            nala_test_failure(
+                nala_format("Bad format string '%s'.\n", format_p));
+        }
+    }
+}
+
+void nala_va_arg_list_assert_d(struct nala_va_arg_list_t *self_p,
+                               struct nala_va_arg_item_t *item_p,
+                               int value)
+{
+    nala_mock_assert_in_eq_int(self_p->traceback_p,
+                               self_p->func_p,
+                               "...",
+                               item_p->ignore_in,
+                               value,
+                               item_p->d);
+}
+
+void nala_va_arg_list_assert_u(struct nala_va_arg_list_t *self_p,
+                               struct nala_va_arg_item_t *item_p,
+                               unsigned int value)
+{
+    nala_mock_assert_in_eq_ulong(self_p->traceback_p,
+                                 self_p->func_p,
+                                 "...",
+                                 item_p->ignore_in,
+                                 value,
+                                 item_p->u);
+}
+
+void nala_va_arg_list_assert_ld(struct nala_va_arg_list_t *self_p,
+                                struct nala_va_arg_item_t *item_p,
+                                long value)
+{
+    nala_mock_assert_in_eq_long(self_p->traceback_p,
+                                self_p->func_p,
+                                "...",
+                                item_p->ignore_in,
+                                value,
+                                item_p->ld);
+}
+
+void nala_va_arg_list_assert_lu(struct nala_va_arg_list_t *self_p,
+                                struct nala_va_arg_item_t *item_p,
+                                unsigned long value)
+{
+    nala_mock_assert_in_eq_ulong(self_p->traceback_p,
+                                 self_p->func_p,
+                                 "...",
+                                 item_p->ignore_in,
+                                 value,
+                                 item_p->lu);
+}
+
+void nala_va_arg_list_assert_p(struct nala_va_arg_list_t *self_p,
+                               struct nala_va_arg_item_t *item_p,
+                               void *value_p)
+{
+    nala_mock_assert_in_eq_ptr(self_p->traceback_p,
+                               self_p->func_p,
+                               "...",
+                               item_p->ignore_in,
+                               value_p,
+                               item_p->p_p);
+
+    if (item_p->in.buf_p != NULL) {
+        if (item_p->in_assert != NULL) {
+            item_p->in_assert(value_p, item_p->in.buf_p, item_p->in.size);
+        } else {
+            nala_mock_assert_memory(self_p->traceback_p,
+                                    self_p->func_p,
+                                    "...",
+                                    value_p,
+                                    item_p->in.buf_p,
+                                    item_p->in.size);
+        }
+    }
+
+    if (item_p->out.buf_p != NULL) {
+        if (item_p->out_copy != NULL) {
+            item_p->out_copy(value_p, item_p->out.buf_p, item_p->out.size);
+        } else {
+            memcpy(value_p, item_p->out.buf_p, item_p->out.size);
+        }
+    }
+}
+
+void nala_va_arg_list_assert_s(struct nala_va_arg_list_t *self_p,
+                               struct nala_va_arg_item_t *item_p,
+                               char *value_p)
+{
+    if (!item_p->ignore_in) {
+        nala_mock_assert_string(self_p->traceback_p,
+                                self_p->func_p,
+                                "...",
+                                value_p,
+                                item_p->s_p,
+                                strlen(item_p->s_p) + 1);
+    }
+}
+
+void nala_va_arg_list_set_param_buf_in_at(struct nala_va_arg_list_t *self_p,
+                                          unsigned int index,
+                                          const void *buf_p,
+                                          size_t size)
+{
+    struct nala_va_arg_item_t *item_p;
+
+    item_p = nala_va_arg_list_get(self_p, index);
+
+    switch (item_p->type) {
+
+    case nala_va_arg_item_type_p_t:
+        nala_set_param_buf(&item_p->in, buf_p, size);
+        break;
+
+    default:
+        nala_test_failure(
+            nala_format(
+                "Cannot set input for '%%%s' at index %u. Only '%%p' can be set.\n",
+                va_arg_type_specifier_string(item_p->type),
+                index));
+        exit(1);
+        break;
+    }
+}
+
+void nala_va_arg_list_set_param_buf_out_at(struct nala_va_arg_list_t *self_p,
+                                           unsigned int index,
+                                           const void *buf_p,
+                                           size_t size)
+{
+    struct nala_va_arg_item_t *item_p;
+
+    item_p = nala_va_arg_list_get(self_p, index);
+
+    switch (item_p->type) {
+
+    case nala_va_arg_item_type_p_t:
+        nala_set_param_buf(&item_p->out, buf_p, size);
+        break;
+
+    default:
+        nala_test_failure(
+            nala_format(
+                "Cannot set output for '%%%s' at index %u. Only '%%p' can be set.\n",
+                va_arg_type_specifier_string(item_p->type),
+                index));
+        exit(1);
+        break;
+    }
+}
+
+void nala_va_arg_list_assert(struct nala_va_arg_list_t *self_p,
+                             va_list vl)
+{
+    unsigned int i;
+    struct nala_va_arg_item_t *item_p;
+
+    item_p = self_p->head_p;
+
+    for (i = 0; i < self_p->length; i++) {
+        switch (item_p->type) {
+
+        case nala_va_arg_item_type_d_t:
+            nala_va_arg_list_assert_d(self_p, item_p, va_arg(vl, int));
+            break;
+
+        case nala_va_arg_item_type_u_t:
+            nala_va_arg_list_assert_u(self_p, item_p, va_arg(vl, unsigned int));
+            break;
+
+        case nala_va_arg_item_type_ld_t:
+            nala_va_arg_list_assert_ld(self_p, item_p, va_arg(vl, long));
+            break;
+
+        case nala_va_arg_item_type_lu_t:
+            nala_va_arg_list_assert_lu(self_p, item_p, va_arg(vl, unsigned long));
+            break;
+
+        case nala_va_arg_item_type_p_t:
+            nala_va_arg_list_assert_p(self_p, item_p, va_arg(vl, void *));
+            break;
+
+        case nala_va_arg_item_type_s_t:
+            nala_va_arg_list_assert_s(self_p, item_p, va_arg(vl, char *));
+            break;
+
+        default:
+            nala_test_failure(nala_format("Nala internal failure.\n"));
+            exit(1);
+            break;
+        }
+
+        item_p = item_p->next_p;
+    }
+}
+
+void nala_traceback(struct nala_traceback_t *traceback_p)
+{
+    traceback_p->depth = backtrace(&traceback_p->addresses[0], 32);
+}
+
 #define MOCK_ASSERT_PARAM_IN_EQ(traceback_p,            \
                                 format_p,               \
                                 member_p,               \
@@ -1055,60 +1144,6 @@ void nala_mock_assert_in_eq_ptr(struct nala_traceback_t *traceback_p,
             nala_free((data_p)->params.name ## _out.buf_p);     \
         }                                                       \
     }
-
-void nala_mock_assert_memory(struct nala_traceback_t *traceback_p,
-                             const char *func_p,
-                             const char *param_p,
-                             const void *left_p,
-                             const void *right_p,
-                             size_t size)
-{
-    char _nala_assert_format[512];
-
-    if (!nala_check_memory(left_p, right_p, size)) {
-        nala_suspend_all_mocks();
-        snprintf(&_nala_assert_format[0],
-                 sizeof(_nala_assert_format),
-                 "Mocked %s(%s): ",
-                 func_p,
-                 param_p);
-        nala_test_failure(
-            format_mock_traceback(
-                nala_format_memory(
-                    &_nala_assert_format[0],
-                    left_p,
-                    right_p,
-                    size),
-                traceback_p));
-    }
-}
-
-void nala_mock_assert_string(struct nala_traceback_t *traceback_p,
-                             const char *func_p,
-                             const char *param_p,
-                             const char *acutal_p,
-                             const char *expected_p,
-                             size_t size)
-{
-    (void)size;
-
-    char _nala_assert_format[512];
-
-    if (!nala_check_string_equal(acutal_p, expected_p)) {
-        nala_suspend_all_mocks();
-        snprintf(&_nala_assert_format[0],
-                 sizeof(_nala_assert_format),
-                 "Mocked %s(%s):",
-                 func_p,
-                 param_p);
-        nala_test_failure(
-            format_mock_traceback(
-                nala_format_string(&_nala_assert_format[0],
-                                   acutal_p,
-                                   expected_p),
-                traceback_p));
-    }
-}
 
 void nala_state_suspend(struct nala_state_t *state_p)
 {
@@ -9018,7 +9053,9 @@ void io_control_mock(int kind, int return_value, const char *vafmt_p, ...)
     CHECK_NO_INSTANCES(nala_mock_io_control);
     nala_mock_io_control.state.mode = MODE_MOCK;
     nala_mock_io_control.data.params.vafmt_p = vafmt_p;
-    nala_va_arg_list_init(&nala_mock_io_control.data.params.nala_va_arg_list);
+    nala_va_arg_list_init(&nala_mock_io_control.data.params.nala_va_arg_list,
+                          &nala_mock_io_control.data.traceback,
+                          "io_control");
     va_list nala_vl;
     va_start(nala_vl, vafmt_p);
     nala_parse_va_list(&nala_mock_io_control.data.params.nala_va_arg_list,
@@ -9040,7 +9077,9 @@ int io_control_mock_once(int kind, int return_value, const char *vafmt_p, ...)
     nala_mock_io_control.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
     nala_instance_p->data.params.vafmt_p = vafmt_p;
-    nala_va_arg_list_init(&nala_instance_p->data.params.nala_va_arg_list);
+    nala_va_arg_list_init(&nala_instance_p->data.params.nala_va_arg_list,
+                          &nala_instance_p->data.traceback,
+                          "io_control");
     va_list nala_vl;
     va_start(nala_vl, vafmt_p);
     nala_parse_va_list(&nala_instance_p->data.params.nala_va_arg_list,
@@ -9075,7 +9114,9 @@ int io_control_mock_ignore_in_once(int return_value)
     nala_mock_io_control.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
     instance_p->data.params.vafmt_p = "";
-    nala_va_arg_list_init(&instance_p->data.params.nala_va_arg_list);
+    nala_va_arg_list_init(&instance_p->data.params.nala_va_arg_list,
+                          &instance_p->data.traceback,
+                          "io_control");
     instance_p->data.params.ignore_kind_in = true;
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
