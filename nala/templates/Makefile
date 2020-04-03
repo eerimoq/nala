@@ -38,12 +38,21 @@ coverage:
 	mv index.* $(BUILD)/coverage
 	@echo "Code coverage report: $$(readlink -f $(BUILD)/coverage/index.html)"
 
+gdb:
+	gdb \
+	    -ex "b $(TEST)_before_fork" \
+	    -ex r \
+	    -ex "set follow-fork-mode child" \
+	    -ex c \
+	    $(EXE)
+
 help:
 	@echo "TARGET        DESCRIPTION"
 	@echo "---------------------------------------------------------"
-	@echo "all           Build and run tests."
+	@echo "all           Build and run with given ARGS."
 	@echo "clean         Remove build output."
 	@echo "coverage      Create the code coverage report."
+	@echo "gdb           Debug given test TEST with gdb."
 
 $(EXE): $(OBJ)
 	echo "LD $@"

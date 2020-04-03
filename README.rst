@@ -162,19 +162,25 @@ example above.
 
 .. code-block::
 
-   $ gdb ./a.out
+   $ gdb foo/build/app
    (gdb) b assertions_before_fork
    (gdb) r
    (gdb) set follow-fork-mode child
    (gdb) c
+
+Or using the make target ``gdb``.
+
+.. code-block::
+
+   $ make -s -C foo gdb TEST=assertions
 
 The test program takes optional arguments as below, which also can be
 helpful when debugging, especially ``--print-all-calls``.
 
 .. code-block::
 
-   $ ./a.out
-   usage: ./a.out [-h] [-v] [-c] [-a] [<test-pattern>]
+   $ build/app --help
+   usage: build/app [-h] [-v] [-c] [-a] [<test-pattern>]
 
    Run tests.
 
