@@ -11,6 +11,7 @@ Do not edit manually
 #ifndef NALA_GENERATE_MOCKS
 
 #include <stdarg.h>
+#include <stddef.h>
 #include "../nala/dist/nala.h"
 #include "../tests/files/test_collect.h"
 

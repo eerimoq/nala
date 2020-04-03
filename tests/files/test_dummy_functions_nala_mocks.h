@@ -11,6 +11,7 @@ Do not edit manually
 #ifndef NALA_GENERATE_MOCKS
 
 #include <stdarg.h>
+#include <stddef.h>
 #include <err.h>
 #include <stdlib.h>
 #include <errno.h>

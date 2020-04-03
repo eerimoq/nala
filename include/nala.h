@@ -2,10 +2,11 @@
 #define NALA_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 
-#define NALA_VERSION "0.127.0"
+#define NALA_VERSION "0.127.1"
 
 /**
  * Assert that given characters, numbers, pointers or strings are

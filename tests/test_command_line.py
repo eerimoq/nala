@@ -21,7 +21,7 @@ def read_file(filename):
     with open(filename, 'r') as fin:
         return remove_assert_in(remove_date_time(fin.read()))
 
-    
+
 def remove_optput():
     if os.path.exists('output'):
         shutil.rmtree('output')
@@ -52,7 +52,7 @@ class CommandLineTest(unittest.TestCase):
                                 f'tests/files/test_{name}_nala_mocks.c')
         self.assert_files_equal('output/nala_mocks.ldflags',
                                 f'tests/files/test_{name}_nala_mocks.ldflags')
-            
+
     def test_generate_mocks(self):
         names = [
             'empty',

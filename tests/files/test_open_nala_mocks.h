@@ -11,6 +11,7 @@ Do not edit manually
 #ifndef NALA_GENERATE_MOCKS
 
 #include <stdarg.h>
+#include <stddef.h>
 #include <fcntl.h>
 
 struct nala_traceback_t {
