@@ -154,7 +154,7 @@ struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
             nala_data_p->params_in.{{param.name}} = {{param.name}};
             {% endfor %}
             {% for param in mock.pointer_params %}
-            MOCK_ASSERT_IN_EQ(nala_data_p, {{mock.func_name}}, {{param.name}});
+            MOCK_ASSERT_POINTERS_IN_EQ(nala_data_p, {{mock.func_name}}, {{param.name}});
             nala_data_p->params_in.{{param.name}} = {{param.name}};
             {% endfor %}
             {% for param in mock.non_pointer_params %}

@@ -83,7 +83,7 @@ static void add_function_error_wrong_x_entry(void *arg_p)
 TEST(add_function_error_wrong_x)
 {
     function_error_in_subprocess(add_function_error_wrong_x_entry,
-                                 "Mocked add(x): 3 != 1");
+                                 "Mocked add(x): 3 != 1 (0x3 != 0x1)");
 }
 
 static void add_function_error_mock_with_mock_once_enqueued_entry(void *arg_p)
@@ -633,7 +633,7 @@ static void variadic_function_error_integer_entry(void *arg_p)
 TEST(variadic_function_error_integer)
 {
     function_error_in_subprocess(variadic_function_error_integer_entry,
-                                 "5 != 6");
+                                 "5 != 6 (0x5 != 0x6)");
 }
 
 static void variadic_function_error_va_arg_in_entry(void *arg_p)

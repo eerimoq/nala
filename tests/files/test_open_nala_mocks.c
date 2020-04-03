@@ -642,24 +642,351 @@ char *format_mock_traceback(const char *message_p,
              bool: "%d",                                \
              default: "%p")
 
-#define MOCK_ASSERT_IN_EQ(data_p, func, param)                          \
-    if (!(data_p)->params.ignore_ ## param ## _in) {                    \
-        if ((data_p)->params.param != param) {                          \
+#define PRINT_FORMAT_HEX(value)                 \
+    _Generic((value),                           \
+             signed char: "%hhx",               \
+             unsigned char: "%hhx",             \
+             signed short: "%hx",               \
+             unsigned short: "%hx",             \
+             signed int: "%x",                  \
+             unsigned int: "%x",                \
+             long int: "%lx",                   \
+             unsigned long int: "%lx",          \
+             long long int: "%llx",             \
+             unsigned long long int: "%llx")
+
+#define NALA_MOCK_ASSERT_IN_EQ_FUNC(value)                      \
+    _Generic((value),                                           \
+             char: nala_mock_assert_in_eq_char,                 \
+             signed char: nala_mock_assert_in_eq_schar,         \
+             unsigned char: nala_mock_assert_in_eq_uchar,       \
+             short: nala_mock_assert_in_eq_short,               \
+             unsigned short: nala_mock_assert_in_eq_ushort,     \
+             int: nala_mock_assert_in_eq_int,                   \
+             unsigned int: nala_mock_assert_in_eq_uint,         \
+             long: nala_mock_assert_in_eq_long,                 \
+             unsigned long: nala_mock_assert_in_eq_ulong,       \
+             long long: nala_mock_assert_in_eq_llong,           \
+             unsigned long long: nala_mock_assert_in_eq_ullong, \
+             float: nala_mock_assert_in_eq_float,               \
+             double: nala_mock_assert_in_eq_double,             \
+             long double: nala_mock_assert_in_eq_ldouble,       \
+             bool: nala_mock_assert_in_eq_bool,                 \
+             default: nala_mock_assert_in_eq_ptr)
+
+#define MOCK_BINARY_ASSERTION(traceback_p,                              \
+                              func_p,                                   \
+                              param_p,                                  \
+                              ignore_in,                                \
+                              actual,                                   \
+                              expecetd)                                 \
+    if (!(ignore_in)) {                                                 \
+        if ((actual) != (expecetd)) {                                   \
             nala_suspend_all_mocks();                                   \
             char _nala_assert_format[512];                              \
             snprintf(&_nala_assert_format[0],                           \
                      sizeof(_nala_assert_format),                       \
-                     "Mocked " #func "(" #param "): %s != %s\n\n",      \
-                     PRINT_FORMAT(param),                               \
-                     PRINT_FORMAT((data_p)->params.param));             \
+                     "Mocked %s(%s): %s != %s\n\n",                     \
+                     func_p,                                            \
+                     param_p,                                           \
+                     PRINT_FORMAT(actual),                              \
+                     PRINT_FORMAT(expecetd));                           \
             nala_test_failure(                                          \
                 format_mock_traceback(                                  \
                     nala_format(&_nala_assert_format[0],                \
-                                param,                                  \
-                                (data_p)->params.param),                \
-                    &(data_p)->traceback));                             \
+                                (actual),                               \
+                                (expecetd)),                            \
+                    traceback_p));                                      \
         }                                                               \
     }
+
+#define MOCK_BINARY_ASSERTION_HEX(traceback_p,                          \
+                                  func_p,                               \
+                                  param_p,                              \
+                                  ignore_in,                            \
+                                  actual,                               \
+                                  expecetd)                             \
+    if (!(ignore_in)) {                                                 \
+        if ((actual) != (expecetd)) {                                   \
+            nala_suspend_all_mocks();                                   \
+            char _nala_assert_format[512];                              \
+            snprintf(&_nala_assert_format[0],                           \
+                     sizeof(_nala_assert_format),                       \
+                     "Mocked %s(%s): %s != %s (0x%s != 0x%s)\n\n",      \
+                     func_p,                                            \
+                     param_p,                                           \
+                     PRINT_FORMAT(actual),                              \
+                     PRINT_FORMAT(expecetd),                            \
+                     PRINT_FORMAT_HEX(actual),                          \
+                     PRINT_FORMAT_HEX(expecetd));                       \
+            nala_test_failure(                                          \
+                format_mock_traceback(                                  \
+                    nala_format(&_nala_assert_format[0],                \
+                                (actual),                               \
+                                (expecetd),                             \
+                                (actual),                               \
+                                (expecetd)),                            \
+                    traceback_p));                                      \
+        }                                                               \
+    }
+
+#define MOCK_ASSERT_IN_EQ(data_p, func, param)          \
+    NALA_MOCK_ASSERT_IN_EQ_FUNC(param)(                 \
+        &(data_p)->traceback,                           \
+        #func,                                          \
+        #param,                                         \
+        (data_p)->params.ignore_ ## param ## _in,       \
+        param,                                          \
+        (data_p)->params.param)
+
+#define MOCK_ASSERT_POINTERS_IN_EQ(data_p, func, param)         \
+    nala_mock_assert_in_eq_ptr(                                 \
+        &(data_p)->traceback,                                   \
+        #func,                                                  \
+        #param,                                                 \
+        (data_p)->params.ignore_ ## param ## _in,               \
+        (const void *)(uintptr_t)param,                         \
+        (const void *)(uintptr_t)(data_p)->params.param)
+
+void nala_mock_assert_in_eq_char(struct nala_traceback_t *traceback_p,
+                                 const char *func_p,
+                                 const char *param_p,
+                                 bool ignore_in,
+                                 char actual,
+                                 char expected)
+{
+    MOCK_BINARY_ASSERTION(traceback_p,
+                          func_p,
+                          param_p,
+                          ignore_in,
+                          actual,
+                          expected);
+}
+
+void nala_mock_assert_in_eq_schar(struct nala_traceback_t *traceback_p,
+                                  const char *func_p,
+                                  const char *param_p,
+                                  bool ignore_in,
+                                  signed char actual,
+                                  signed char expected)
+{
+    MOCK_BINARY_ASSERTION(traceback_p,
+                          func_p,
+                          param_p,
+                          ignore_in,
+                          actual,
+                          expected);
+}
+
+void nala_mock_assert_in_eq_uchar(struct nala_traceback_t *traceback_p,
+                                  const char *func_p,
+                                  const char *param_p,
+                                  bool ignore_in,
+                                  unsigned char actual,
+                                  unsigned char expected)
+{
+    MOCK_BINARY_ASSERTION(traceback_p,
+                          func_p,
+                          param_p,
+                          ignore_in,
+                          actual,
+                          expected);
+}
+
+void nala_mock_assert_in_eq_short(struct nala_traceback_t *traceback_p,
+                                  const char *func_p,
+                                  const char *param_p,
+                                  bool ignore_in,
+                                  short actual,
+                                  short expected)
+{
+    MOCK_BINARY_ASSERTION_HEX(traceback_p,
+                              func_p,
+                              param_p,
+                              ignore_in,
+                              actual,
+                              expected);
+}
+
+void nala_mock_assert_in_eq_ushort(struct nala_traceback_t *traceback_p,
+                                   const char *func_p,
+                                   const char *param_p,
+                                   bool ignore_in,
+                                   unsigned short actual,
+                                   unsigned short expected)
+{
+    MOCK_BINARY_ASSERTION_HEX(traceback_p,
+                              func_p,
+                              param_p,
+                              ignore_in,
+                              actual,
+                              expected);
+}
+
+void nala_mock_assert_in_eq_int(struct nala_traceback_t *traceback_p,
+                                const char *func_p,
+                                const char *param_p,
+                                bool ignore_in,
+                                int actual,
+                                int expected)
+{
+    MOCK_BINARY_ASSERTION_HEX(traceback_p,
+                              func_p,
+                              param_p,
+                              ignore_in,
+                              actual,
+                              expected);
+}
+
+void nala_mock_assert_in_eq_uint(struct nala_traceback_t *traceback_p,
+                                 const char *func_p,
+                                 const char *param_p,
+                                 bool ignore_in,
+                                 unsigned int actual,
+                                 unsigned int expected)
+{
+    MOCK_BINARY_ASSERTION_HEX(traceback_p,
+                              func_p,
+                              param_p,
+                              ignore_in,
+                              actual,
+                              expected);
+}
+
+void nala_mock_assert_in_eq_long(struct nala_traceback_t *traceback_p,
+                                 const char *func_p,
+                                 const char *param_p,
+                                 bool ignore_in,
+                                 long actual,
+                                 long expected)
+{
+    MOCK_BINARY_ASSERTION_HEX(traceback_p,
+                              func_p,
+                              param_p,
+                              ignore_in,
+                              actual,
+                              expected);
+}
+
+void nala_mock_assert_in_eq_ulong(struct nala_traceback_t *traceback_p,
+                                  const char *func_p,
+                                  const char *param_p,
+                                  bool ignore_in,
+                                  unsigned long actual,
+                                  unsigned long expected)
+{
+    MOCK_BINARY_ASSERTION_HEX(traceback_p,
+                              func_p,
+                              param_p,
+                              ignore_in,
+                              actual,
+                              expected);
+}
+
+void nala_mock_assert_in_eq_llong(struct nala_traceback_t *traceback_p,
+                                  const char *func_p,
+                                  const char *param_p,
+                                  bool ignore_in,
+                                  long long actual,
+                                  long long expected)
+{
+    MOCK_BINARY_ASSERTION_HEX(traceback_p,
+                              func_p,
+                              param_p,
+                              ignore_in,
+                              actual,
+                              expected);
+}
+
+void nala_mock_assert_in_eq_ullong(struct nala_traceback_t *traceback_p,
+                                   const char *func_p,
+                                   const char *param_p,
+                                   bool ignore_in,
+                                   unsigned long long actual,
+                                   unsigned long long expected)
+{
+    MOCK_BINARY_ASSERTION_HEX(traceback_p,
+                              func_p,
+                              param_p,
+                              ignore_in,
+                              actual,
+                              expected);
+}
+
+void nala_mock_assert_in_eq_float(struct nala_traceback_t *traceback_p,
+                                  const char *func_p,
+                                  const char *param_p,
+                                  bool ignore_in,
+                                  float actual,
+                                  float expected)
+{
+    MOCK_BINARY_ASSERTION(traceback_p,
+                          func_p,
+                          param_p,
+                          ignore_in,
+                          actual,
+                          expected);
+}
+
+void nala_mock_assert_in_eq_double(struct nala_traceback_t *traceback_p,
+                                   const char *func_p,
+                                   const char *param_p,
+                                   bool ignore_in,
+                                   double actual,
+                                   double expected)
+{
+    MOCK_BINARY_ASSERTION(traceback_p,
+                          func_p,
+                          param_p,
+                          ignore_in,
+                          actual,
+                          expected);
+}
+
+void nala_mock_assert_in_eq_ldouble(struct nala_traceback_t *traceback_p,
+                                    const char *func_p,
+                                    const char *param_p,
+                                    bool ignore_in,
+                                    long double actual,
+                                    long double expected)
+{
+    MOCK_BINARY_ASSERTION(traceback_p,
+                          func_p,
+                          param_p,
+                          ignore_in,
+                          actual,
+                          expected);
+}
+
+void nala_mock_assert_in_eq_bool(struct nala_traceback_t *traceback_p,
+                                 const char *func_p,
+                                 const char *param_p,
+                                 bool ignore_in,
+                                 bool actual,
+                                 bool expected)
+{
+    MOCK_BINARY_ASSERTION(traceback_p,
+                          func_p,
+                          param_p,
+                          ignore_in,
+                          actual,
+                          expected);
+}
+
+void nala_mock_assert_in_eq_ptr(struct nala_traceback_t *traceback_p,
+                                const char *func_p,
+                                const char *param_p,
+                                bool ignore_in,
+                                const void *actual_p,
+                                const void *expected_p)
+{
+    MOCK_BINARY_ASSERTION(traceback_p,
+                          func_p,
+                          param_p,
+                          ignore_in,
+                          actual_p,
+                          expected_p);
+}
 
 #define MOCK_ASSERT_PARAM_IN_EQ(traceback_p,            \
                                 format_p,               \
