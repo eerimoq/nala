@@ -18,7 +18,7 @@ MOCKGENFLAGS += $(IMPLEMENTATION:%=-i %)
 MOCKGENFLAGS += $(NO_IMPLEMENTATION:%=-n %)
 NALA ?= PYTHONPATH=$(NALA_ROOT) python3 -m nala
 
-.PHONY: all build generate clean coverage gdb gdb-run help
+.PHONY: all build generate clean coverage gdb gdb-run
 
 all:
 	$(MAKE) build
