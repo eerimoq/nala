@@ -468,17 +468,53 @@ TEST(argument_print_full_test_name_error_many_matches)
     ASSERT_EQ(errput, "error: 'argument' matches more than one test.\n");
 }
 
-TEST(argument_filter_tests)
+TEST(subtest_run_all_tests_continue_on_failure)
 {
     struct subprocess_result_t *result_p;
 
     CAPTURE_OUTPUT(output, errput) {
-        result_p = subprocess_exec("build/app argument_version");
+        result_p = subprocess_exec("subtest/build/app --continue-on-failure");
+    }
+
+    ASSERT_EQ(result_p->exit_code, 1);
+    subprocess_result_free(result_p);
+
+    ASSERT_SUBSTRING(output, "Terminated by signal 11.");
+    ASSERT_SUBSTRING(output, "2 failed");
+    ASSERT_SUBSTRING(output, "1 passed");
+    ASSERT_SUBSTRING(output, "3 total");
+    ASSERT_EQ(errput, "");
+}
+
+TEST(subtest_run_all_tests_skipped)
+{
+    struct subprocess_result_t *result_p;
+
+    CAPTURE_OUTPUT(output, errput) {
+        result_p = subprocess_exec("subtest/build/app");
+    }
+
+    ASSERT_EQ(result_p->exit_code, 1);
+    subprocess_result_free(result_p);
+
+    ASSERT_SUBSTRING(output, "1 failed");
+    ASSERT_SUBSTRING(output, "2 skipped");
+    ASSERT_SUBSTRING(output, "3 total");
+    ASSERT_EQ(errput, "");
+}
+
+TEST(subprocess_run_passed)
+{
+    struct subprocess_result_t *result_p;
+
+    CAPTURE_OUTPUT(output, errput) {
+        result_p = subprocess_exec("subtest/build/app test_ok::empty");
     }
 
     ASSERT_EQ(result_p->exit_code, 0);
     subprocess_result_free(result_p);
 
     ASSERT_SUBSTRING(output, "1 passed");
+    ASSERT_SUBSTRING(output, "1 total");
     ASSERT_EQ(errput, "");
 }

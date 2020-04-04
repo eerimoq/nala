@@ -24,10 +24,15 @@ MOCKGENFLAGS += $(IMPLEMENTATION:%=-i %)
 MOCKGENFLAGS += $(NO_IMPLEMENTATION:%=-n %)
 NALA = nala
 
+.PHONY: all build generate clean coverage gdb gdb-run help
+
 all:
+	$(MAKE) build
+	$(EXE) $(ARGS)
+
+build:
 	$(MAKE) generate
 	$(MAKE) $(EXE)
-	$(EXE) $(ARGS)
 
 generate: $(BUILD)/nala_mocks.ldflags
 
