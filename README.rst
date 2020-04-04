@@ -224,13 +224,18 @@ Use ``--no-real-variadic-functions`` not to add any real variadic
 functions. Nala adds `a few variadic functions`_ by default, given
 that they are mocked.
 
+Here is an example of how to generate mocks:
+
 .. code-block:: bash
 
    $ cat *.c | gcc -DNALA_GENERATE_MOCKS -x c -E - | nala generate_mocks
 
-Nala requires source code to be expanded by the preprocessor. You can
-directly pipe the output of ``gcc -DNALA_GENERATE_MOCKS -x c -E -`` to
-the command-line utility.
+``cat *.c`` should only concatenate test source files, not any other
+source files in your project.
+
+Nala requires test source code to be expanded by the preprocessor. You
+can directly pipe the output of ``gcc -DNALA_GENERATE_MOCKS -x c -E
+-`` to the command-line utility.
 
 Mocking object-internal function calls
 --------------------------------------
