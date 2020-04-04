@@ -20,9 +20,11 @@ NALA ?= PYTHONPATH=$(NALA_ROOT) python3 -m nala
 
 all:
 	$(MAKE) -C $(NALA_ROOT) dist
-	$(MAKE) $(BUILD)/nala_mocks.ldflags
+	$(MAKE) generate
 	$(MAKE) $(EXE)
 	$(EXE) $(ARGS)
+
+generate: $(BUILD)/nala_mocks.ldflags
 
 clean:
 	rm -rf $(BUILD)

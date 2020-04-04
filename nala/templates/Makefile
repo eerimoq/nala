@@ -25,9 +25,11 @@ MOCKGENFLAGS += $(NO_IMPLEMENTATION:%=-n %)
 NALA = nala
 
 all:
-	$(MAKE) $(BUILD)/nala_mocks.ldflags
+	$(MAKE) generate
 	$(MAKE) $(EXE)
 	$(EXE) $(ARGS)
+
+generate: $(BUILD)/nala_mocks.ldflags
 
 clean:
 	rm -rf $(BUILD)
