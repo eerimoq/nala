@@ -105,8 +105,8 @@ Build and run all tests with ``make -s -C foo``.
 
 .. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run.png
 
-Build all tests but only run those whose name contains ``time`` with
-``make -s -C foo ARGS=time``.
+Build all tests but only run those whose name contains ``time``. This
+is done by giving ``ARGS=time``.
 
 .. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run-one-test.png
 
