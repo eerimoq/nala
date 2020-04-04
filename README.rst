@@ -218,8 +218,20 @@ parameters. Overrides ``--rename-parameters-file``.
 
 Use ``--no-implementation`` when the implementation of functions
 starting with given pattern are not available in the binary (and
-therefore should not be called by the generated code). This option may
-be given multipe times.
+therefore should not be called by the generated code, as the linker
+would give an error). This option may be given multipe times. An
+alternative to using this option is to manually implement the missing
+functions. Here is an example implementation of ``foo()`` that will
+fail the test if called.
+
+.. code-block:: c
+
+   int foo()
+   {
+       FAIL("No real implementation available!\n");
+
+       return (0);
+   }
 
 Use ``--no-real-variadic-functions`` not to add any real variadic
 functions. Nala adds `a few variadic functions`_ by default, given
