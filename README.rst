@@ -221,8 +221,8 @@ starting with given pattern are not available in the binary (and
 therefore should not be called by the generated code, as the linker
 would give an error). This option may be given multipe times. An
 alternative to using this option is to manually implement the missing
-functions. Here is an example implementation of ``foo()`` that will
-fail the test if called.
+functions. Here is an example implementation of ``foo()`` that makes
+the test fail if called.
 
 .. code-block:: c
 
