@@ -42,21 +42,20 @@ Drop the two files in your project, make sure ``nala.c`` is compiled
 and linked just like the other source files of your test program and
 you should be good to go.
 
-Example
-=======
+Getting started
+===============
 
-Use ``nala init foo`` to create a test folder called ``foo``.
+Use ``nala init foo`` to create a folder ``foo`` with two test files,
+``test_assertions.c`` and ``test_time.c``. The first uses all
+assertions and captures output, and the second mocks the time
+function.  .
 
 .. code-block:: bash
 
    $ nala init foo
    Run 'make -C foo' to build and run all tests!
 
-Two test files are created, ``foo/test_assertions.c`` and
-``foo/test_time.c``. The first uses all assertions and captures
-output, and the second mocks the time function.
-
-The assertions tests:
+The assertions tests looks like this:
 
 .. code-block:: c
 
@@ -87,7 +86,7 @@ The assertions tests:
        ASSERT_EQ(errput, "err!\n");
    }
 
-The time tests:
+And the time tests:
 
 .. code-block:: c
 
@@ -129,7 +128,7 @@ Build and run all tests.
 
 .. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run-assert-eq-fail.png
 
-Create a code coverage report and open it with firefox.
+Create a code coverage report and open it with Firefox.
 
 .. code-block::
 
