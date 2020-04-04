@@ -20,7 +20,7 @@ CFLAGS += -ftest-coverage
 MOCKGENFLAGS += --no-cache
 
 default:
-	$(MAKE) -C subtest build
+	$(MAKE) -C subtest SANITIZE=no build
 	$(MAKE) all
 
 include ../../make/common.mk
