@@ -371,3 +371,99 @@ TEST(assert_struct_array)
         assert_struct_array_entry,
         "The arrays differ at index 1. Memory mismatch. See diff for details.");
 }
+
+TEST(argument_help)
+{
+    struct subprocess_result_t *result_p;
+
+    CAPTURE_OUTPUT(output, errput) {
+        result_p = subprocess_exec("build/app --help");
+    }
+
+    ASSERT_EQ(result_p->exit_code, 0);
+    subprocess_result_free(result_p);
+
+    ASSERT_EQ(
+        output,
+        "usage: build/app [-h] [-v] [-c] [-a] [<test-pattern>]\n"
+        "\n"
+        "Run tests.\n"
+        "\n"
+        "positional arguments:\n"
+        "  test-pattern                  Only run tests containing given "
+        "pattern.\n"
+        "\n"
+        "optional arguments:\n"
+        "  -h, --help                    Show this help message and exit.\n"
+        "  -v, --version                 Print version information.\n"
+        "  -c, --continue-on-failure     Always run all tests.\n"
+        "  -a, --print-all-calls         Print all calls to ease debugging.\n"
+        "  -r, --report-json-file        JSON test report file (default: "
+        "report.json).\n"
+        "  -f, --print-test-file-func    Print file:function for exactly one "
+        "test.\n");
+    ASSERT_EQ(errput, "");
+}
+
+TEST(argument_version)
+{
+    struct subprocess_result_t *result_p;
+
+    CAPTURE_OUTPUT(output, errput) {
+        result_p = subprocess_exec("build/app --version");
+    }
+
+    ASSERT_EQ(result_p->exit_code, 0);
+    subprocess_result_free(result_p);
+
+    ASSERT_EQ(output, NALA_VERSION "\n");
+    ASSERT_EQ(errput, "");
+}
+
+TEST(argument_print_full_test_name)
+{
+    struct subprocess_result_t *result_p;
+
+    CAPTURE_OUTPUT(output, errput) {
+        result_p = subprocess_exec(
+            "build/app --print-test-file-func argument_version");
+    }
+
+    ASSERT_EQ(result_p->exit_code, 0);
+    subprocess_result_free(result_p);
+
+    ASSERT_EQ(output, "main.c:argument_version\n");
+    ASSERT_EQ(errput, "");
+}
+
+TEST(argument_print_full_test_name_error_no_match)
+{
+    struct subprocess_result_t *result_p;
+
+    CAPTURE_OUTPUT(output, errput) {
+        result_p = subprocess_exec(
+            "build/app --print-test-file-func not_a_test");
+    }
+
+    ASSERT_EQ(result_p->exit_code, 1);
+    subprocess_result_free(result_p);
+
+    ASSERT_EQ(output, "");
+    ASSERT_EQ(errput, "error: 'not_a_test' does not match any test.\n");
+}
+
+TEST(argument_print_full_test_name_error_many_matches)
+{
+    struct subprocess_result_t *result_p;
+
+    CAPTURE_OUTPUT(output, errput) {
+        result_p = subprocess_exec(
+            "build/app --print-test-file-func argument");
+    }
+
+    ASSERT_EQ(result_p->exit_code, 1);
+    subprocess_result_free(result_p);
+
+    ASSERT_EQ(output, "");
+    ASSERT_EQ(errput, "error: 'argument' matches more than one test.\n");
+}

@@ -1,6 +1,12 @@
 TESTS += main.c
-INC += ../../nala/dist
-SRC += ../../nala/dist/nala.c
+INC += ../../include
+SRC += ../../src/nala.c
+SRC += ../../src/diff/diff.c
+SRC += ../../src/utils.c
+SRC += ../../src/hexdump/hexdump.c
+SRC += ../../src/subprocess.c
+SRC += ../../src/traceback.c
+SRC += ../../src/hf.c
 SRC += dummy_functions.c
 SRC += subprocess.c
 CFLAGS += -Werror

@@ -948,8 +948,6 @@ static void print_usage_and_exit(const char *program_name_p, int exit_code)
            "  -r, --report-json-file        JSON test report file (default: "
            "report.json).\n"
            "  -f, --print-test-file-func    Print file:function for exactly "
-           "one test.\n"
-           "  -n, --print-full-test-name    Print full test name for exactly "
            "one test.\n",
            program_name_p);
     exit(exit_code);
