@@ -1,15 +1,25 @@
 #include "nala.h"
 #include "subprocess.h"
 
-#define BLD "\x1b[1m"
-#define RST "\x1b[0m"
-#define RD  "\x1b[31m"
-#define RED  RST RD
-#define GN  "\x1b[32m"
-#define MA "\x1b[35m"
-#define GRN  RST GN
-#define BRED RED BLD
-#define BGRN GRN BLD
+#define ANSI_COLOR_RED "\x1b[31m"
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_YELLOW "\x1b[33m"
+#define ANSI_COLOR_BLUE "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN "\x1b[36m"
+
+#define ANSI_BOLD "\x1b[1m"
+#define ANSI_RESET "\x1b[0m"
+
+#define B(...) ANSI_RESET ANSI_BOLD __VA_ARGS__ ANSI_RESET
+
+#define C(color, ...) ANSI_RESET ANSI_COLOR_##color __VA_ARGS__ ANSI_RESET
+#define CR(...) C(RED, __VA_ARGS__)
+#define CM(...) C(MAGENTA, __VA_ARGS__)
+
+#define CB(color, ...)                                                  \
+    ANSI_RESET ANSI_COLOR_##color ANSI_BOLD __VA_ARGS__ ANSI_RESET
+#define CBR(...) CB(RED, __VA_ARGS__)
 
 TEST(assert_eq)
 {
@@ -154,12 +164,11 @@ TEST(assert_eq_error_string)
 {
     expect_error_in_subprocess(
         assert_eq_error_string_entry,
-        "  Error: "BRED"The strings are not equal. See diff for details.\n"
-        RST
+        "  Error: "CBR("The strings are not equal. See diff for details.\n")
         "  Diff:\n"
         "\n"
-        "     - "RST BLD"1"RST" |  23\n"
-        "     "RED"+ "RST BRED"1"RST RED" |  "RST BRED"1"RST"23\n");
+        "     - "B("1")" |  23\n"
+        "     "CR("+ ") CBR("1") CR(" |  ") CBR("1")"23\n");
 }
 
 static void assert_ne_error_entry()
@@ -254,22 +263,21 @@ TEST(assert_memory_error)
 {
     expect_error_in_subprocess(
         assert_memory_error_entry,
-        "  Error: "BRED"Memory mismatch. See diff for details.\n"
-        RST
+        "  Error: "CBR("Memory mismatch. See diff for details.\n")
         "  Diff:\n"
         "\n"
-        "     - "RST BLD"1"RST" |  000000  "RST BLD"58"RST" 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36  "RST BLD"X"RST"234567890123456\n"
-        "     "RST RD"+ "RST BRED"1"RST RST RD" |  "RST"000000  "BRED"31"RST" 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36  "BRED"1"RST"234567890123456\n"
-        RST MA"       2"RST" |  000010  37 38 39 30 31 32 33 34 35 36 37 38 39 30 31 32  7890123456789012\n"
-        RST MA"       3"RST" |  000020  33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38  3456789012345678\n"
-        RST MA"       4"RST" |  000030  39 30 31 32 33 34 35 36 37 38 39 30 31 32 33 34  9012345678901234\n"
-        RST MA"       5"RST" |  000040  35 36 37 38 39 30 31 32 33 34 35 36 37 38 39 30  5678901234567890\n"
-        "     - "RST BLD"6"RST" |  000050  31 32 33 34 35 36 37 38 39 30 31 32 33 34 "RST BLD"58"RST" "RST BLD"58"RST"  12345678901234"RST BLD"XX"RST"\n"
-        "     "RST RD"+ "RST BRED"6"RST RST RD" |  "RST"000050  31 32 33 34 35 36 37 38 39 30 31 32 33 34 "BRED"35"RST" "BRED"36"RST"  12345678901234"BRED"56"RST"\n"
-        RST MA"       7"RST" |  000060  37 38 39 30 31 32 33 34 35 36 37 38 39 30 31 32  7890123456789012\n"
-        RST MA"       8"RST" |  000070  33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38  3456789012345678\n"
-        RST MA"       9"RST" |  000080  39 30 31 32 33 34 35 36 37 38 39 30 31 32 33 34  9012345678901234\n"
-        RST MA"      10"RST" |  000090  35 36 37 38 39 30 -- -- -- -- -- -- -- -- -- --  567890          \n");
+        "     - "B("1")" |  000000  "B("58")" 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36  "B("X")"234567890123456\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"000000  "CBR("31")" 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36  "CBR("1")"234567890123456\n"
+        CM("       2")" |  000010  37 38 39 30 31 32 33 34 35 36 37 38 39 30 31 32  7890123456789012\n"
+        CM("       3")" |  000020  33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38  3456789012345678\n"
+        CM("       4")" |  000030  39 30 31 32 33 34 35 36 37 38 39 30 31 32 33 34  9012345678901234\n"
+        CM("       5")" |  000040  35 36 37 38 39 30 31 32 33 34 35 36 37 38 39 30  5678901234567890\n"
+        "     - "B("6")" |  000050  31 32 33 34 35 36 37 38 39 30 31 32 33 34 "B("58")" "B("58")"  12345678901234"B("XX")"\n"
+        "     "CR("+ ") CBR("6") CR(" |  ")"000050  31 32 33 34 35 36 37 38 39 30 31 32 33 34 "CBR("35")" "CBR("36")"  12345678901234"CBR("56")"\n"
+        CM("       7")" |  000060  37 38 39 30 31 32 33 34 35 36 37 38 39 30 31 32  7890123456789012\n"
+        CM("       8")" |  000070  33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38  3456789012345678\n"
+        CM("       9")" |  000080  39 30 31 32 33 34 35 36 37 38 39 30 31 32 33 34  9012345678901234\n"
+        CM("      10")" |  000090  35 36 37 38 39 30 -- -- -- -- -- -- -- -- -- --  567890          \n");
 }
 
 static void assert_function_pointers_eq_entry()
@@ -350,7 +358,144 @@ TEST(assert_int_array)
 {
     expect_error_in_subprocess(
         assert_int_array_entry,
-        "The arrays differ at index 1.");
+        "  Error: "CBR("The arrays differ at index 1. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { 1, "B("4")", 3 }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ 1, "CBR("2")", 3 }\n");
+}
+
+static void assert_int_array_long_entry()
+{
+    int a[15] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+    int b[15] = { 1, 2, 3, 4, 5, 6, 7, 8, 8, 10, 11, 12, 13, 14, 15 };
+
+    ASSERT_ARRAY(a, b, sizeof(a));
+}
+
+TEST(assert_int_array_long)
+{
+    expect_error_in_subprocess(
+        assert_int_array_long_entry,
+        "  Error: "CBR("The arrays differ at index 8. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { ..., 6, 7, 8, "B("8")", 10, 11, 12, ... }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ ..., 6, 7, 8, "CBR("9")", 10, 11, 12, ... }\n");
+}
+
+static void assert_int_array_index_0_entry()
+{
+    int a[15] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+    int b[15] = { 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    ASSERT_ARRAY(a, b, sizeof(a));
+}
+
+TEST(assert_int_array_index_0)
+{
+    expect_error_in_subprocess(
+        assert_int_array_index_0_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("2")", 2, 3, 4, ... }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("1")", 2, 3, 4, ... }\n");
+}
+
+static void assert_int_array_index_13_entry()
+{
+    int a[15] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 24, 15 };
+    int b[15] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 15 };
+
+    ASSERT_ARRAY(a, b, sizeof(a));
+}
+
+TEST(assert_int_array_index_13)
+{
+    expect_error_in_subprocess(
+        assert_int_array_index_13_entry,
+        "  Error: "CBR("The arrays differ at index 13. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { ..., 11, 12, 13, "B("15")", 15 }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ ..., 11, 12, 13, "CBR("24")", 15 }\n");
+}
+
+static void assert_char_array_entry()
+{
+    char a[1] = { 'a' };
+    char b[1] = { 'A' };
+
+    ASSERT_ARRAY(a, b, sizeof(a));
+}
+
+TEST(assert_char_array)
+{
+    expect_error_in_subprocess(
+        assert_char_array_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("65")" }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("97")" }\n");
+}
+
+static void assert_long_array_entry()
+{
+    long a[1] = { 3 };
+    long b[1] = { 4 };
+
+    ASSERT_ARRAY(a, b, sizeof(a));
+}
+
+TEST(assert_long_array)
+{
+    expect_error_in_subprocess(
+        assert_long_array_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("4")" }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("3")" }\n");
+}
+
+static void assert_float_array_entry()
+{
+    float a[1] = { 3.0 };
+    float b[1] = { 4.0 };
+
+    ASSERT_ARRAY(a, b, sizeof(a));
+}
+
+TEST(assert_float_array)
+{
+    expect_error_in_subprocess(
+        assert_float_array_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("4")".000000 }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("3")".000000 }\n");
+}
+
+static void assert_bool_array_entry()
+{
+    bool a[1] = { true };
+    bool b[1] = { false };
+
+    ASSERT_ARRAY(a, b, sizeof(a));
+}
+
+TEST(assert_bool_array)
+{
+    expect_error_in_subprocess(
+        assert_bool_array_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("0")" }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("1")" }\n");
 }
 
 struct struct_array_t {
