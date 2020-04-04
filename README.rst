@@ -101,11 +101,12 @@ And the time tests:
        ASSERT_EQ(time(NULL), 42);
    }
 
-Build and run all tests.
+Build and run all tests with ``make -s -C foo``.
 
 .. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run.png
 
-Build all tests but only run those whose name contains ``time``.
+Build all tests but only run those whose name contains ``time`` with
+``make -s -C foo ARGS=time``.
 
 .. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run-one-test.png
 
@@ -124,7 +125,8 @@ Now, make the time test fail to see what an error report looks like.
        ASSERT_EQ(time(NULL), 42);
    }
 
-Build and run all tests.
+Build and run all tests. Just as expected, the time test fails since
+41 is not equal to 42.
 
 .. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run-assert-eq-fail.png
 
