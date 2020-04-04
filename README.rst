@@ -203,8 +203,8 @@ Mocking
 Generating mocks
 ----------------
 
-The ``nala generate_mocks`` command finds the functions mocked in your
-code and generates ``nala_mocks.h``, ``nala_mocks.c`` and
+The ``nala generate_mocks`` command finds mocked functions in your
+test code and generates ``nala_mocks.h``, ``nala_mocks.c`` and
 ``nala_mocks.ldflags``. The first two files declare and define mocks,
 while the last file contains linker flags.
 
@@ -220,7 +220,7 @@ starting with given pattern are not available in the binary (and
 therefore should not be called by the generated code). This option may
 be given multipe times.
 
-Use ``--no-real-variadic-functions`` not to add real variadic
+Use ``--no-real-variadic-functions`` not to add any real variadic
 functions. Nala adds `a few variadic functions`_ by default, given
 that they are mocked.
 
