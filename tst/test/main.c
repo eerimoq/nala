@@ -467,3 +467,18 @@ TEST(argument_print_full_test_name_error_many_matches)
     ASSERT_EQ(output, "");
     ASSERT_EQ(errput, "error: 'argument' matches more than one test.\n");
 }
+
+TEST(argument_filter_tests)
+{
+    struct subprocess_result_t *result_p;
+
+    CAPTURE_OUTPUT(output, errput) {
+        result_p = subprocess_exec("build/app argument_version");
+    }
+
+    ASSERT_EQ(result_p->exit_code, 0);
+    subprocess_result_free(result_p);
+
+    ASSERT_SUBSTRING(output, "1 passed");
+    ASSERT_EQ(errput, "");
+}
