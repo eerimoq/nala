@@ -1249,7 +1249,11 @@ static void print_usage_and_exit(const char *program_name_p, int exit_code)
            "  -c, --continue-on-failure     Always run all tests.\n"
            "  -a, --print-all-calls         Print all calls to ease debugging.\n"
            "  -r, --report-json-file        JSON test report file (default: "
-           "report.json).\n",
+           "report.json).\n"
+           "  -f, --print-test-file-func    Print file:function for exactly "
+           "one test.\n"
+           "  -n, --print-full-test-name    Print full test name for exactly "
+           "one test.\n",
            program_name_p);
     exit(exit_code);
 }
@@ -1281,15 +1285,66 @@ static void filter_tests(const char *test_pattern_p)
     }
 }
 
+static struct nala_test_t *find_test(const char *test_pattern_p)
+{
+    struct nala_test_t *test_p;
+    struct nala_test_t *found_p;
+
+    test_p = tests.head_p;
+    found_p = NULL;
+
+    while (test_p != NULL) {
+        if (strstr(full_test_name(test_p), test_pattern_p) != NULL) {
+            if (found_p == NULL) {
+                found_p = test_p;
+            } else {
+                fprintf(stderr,
+                        "error: '%s' matches more than one test.\n",
+                        test_pattern_p);
+
+                return (NULL);
+            }
+        }
+
+        test_p = test_p->next_p;
+    }
+
+    if (found_p == NULL) {
+        fprintf(stderr,
+                "error: '%s' does not match any test.\n",
+                test_pattern_p);
+
+        return (NULL);
+    }
+
+    return (found_p);
+}
+
+static int print_test_file_func(const char *test_pattern_p)
+{
+    struct nala_test_t *test_p;
+
+    test_p = find_test(test_pattern_p);
+
+    if (test_p == NULL) {
+        return (1);
+    }
+
+    printf("%s:%s\n", test_p->file_p, test_p->name_p);
+
+    return (0);
+}
+
 __attribute__((weak)) int main(int argc, char *argv[])
 {
     static struct option long_options[] = {
-        { "help",                no_argument,       NULL, 'h' },
-        { "version",             no_argument,       NULL, 'v' },
-        { "continue-on-failure", no_argument,       NULL, 'c' },
-        { "print-all-calls",     no_argument,       NULL, 'a' },
-        { "report-json-file",    required_argument, NULL, 'r' },
-        { NULL,                  no_argument,       NULL, 0 }
+        { "help",                 no_argument,       NULL, 'h' },
+        { "version",              no_argument,       NULL, 'v' },
+        { "continue-on-failure",  no_argument,       NULL, 'c' },
+        { "print-all-calls",      no_argument,       NULL, 'a' },
+        { "report-json-file",     required_argument, NULL, 'r' },
+        { "print-test-file-func", required_argument, NULL, 'f' },
+        { NULL,                   no_argument,       NULL, 0 }
     };
     int option;
 
@@ -1297,7 +1352,7 @@ __attribute__((weak)) int main(int argc, char *argv[])
     nala_suspend_all_mocks();
 
     while (1) {
-        option = getopt_long(argc, argv, "hvcar:", &long_options[0], NULL);
+        option = getopt_long(argc, argv, "hvcar:f:", &long_options[0], NULL);
 
         if (option == -1) {
             break;
@@ -1324,6 +1379,9 @@ __attribute__((weak)) int main(int argc, char *argv[])
         case 'r':
             report_json_file_p = optarg;
             break;
+
+        case 'f':
+            return (print_test_file_func(optarg));
 
         default:
             print_usage_and_exit(argv[0], 1);

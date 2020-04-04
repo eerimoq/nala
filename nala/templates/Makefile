@@ -38,10 +38,15 @@ coverage:
 	mv index.* $(BUILD)/coverage
 	@echo "Code coverage report: $$(readlink -f $(BUILD)/coverage/index.html)"
 
+# Recursive make for helpful output.
 gdb:
+	test_file_func=$$($(EXE) --print-test-file-func $(TEST)) && \
+	$(MAKE) gdb-run TEST_FILE_FUNC=$$test_file_func
+
+gdb-run:
 	gdb \
-	    -ex "b $(subst ::,.c:,$(TEST))_before_fork" \
-	    -ex "r $(lastword $(subst :, ,$(TEST)))" \
+	    -ex "b $(TEST_FILE_FUNC)_before_fork" \
+	    -ex "r $(TEST)" \
 	    -ex "set follow-fork-mode child" \
 	    -ex c \
 	    $(EXE)

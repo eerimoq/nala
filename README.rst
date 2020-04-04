@@ -195,6 +195,7 @@ helpful when debugging, especially ``--print-all-calls``.
      -c, --continue-on-failure     Always run all tests.
      -a, --print-all-calls         Print all calls to ease debugging.
      -r, --report-json-file        JSON test report file (default: report.json).
+     -f, --print-test-file-func    Print file:function for exactly one test.
 
 Mocking
 =======
