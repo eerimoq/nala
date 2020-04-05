@@ -747,16 +747,51 @@ static void test_entry(void *arg_p)
     exit(0);
 }
 
-static int run_tests(struct nala_test_t *tests_p)
+static int run_test(struct nala_test_t *test_p)
 {
     int res;
     struct timeval start_time;
     struct timeval end_time;
-    struct timeval test_start_time;
-    struct timeval test_end_time;
+    struct timeval elapsed_time;
+    struct nala_subprocess_result_t *result_p;
+
+    res = 0;
+    gettimeofday(&start_time, NULL);
+    current_test_p = test_p;
+    test_p->before_fork_func();
+
+    result_p = nala_subprocess_call(test_entry, test_p);
+
+    test_p->executed = true;
+    test_p->exit_code = result_p->exit_code;
+    test_p->signal_number = result_p->signal_number;
+    nala_subprocess_result_free(result_p);
+
+    if (test_p->exit_code != 0) {
+        res = 1;
+    }
+
+    gettimeofday(&end_time, NULL);
+    timersub(&end_time, &start_time, &elapsed_time);
+    test_p->elapsed_time_ms = timeval_to_ms(&elapsed_time);
+
+    if (test_p->signal_number != -1) {
+        print_signal_failure(test_p);
+    }
+
+    print_test_result(test_p);
+
+    return (res);
+}
+
+static int run_tests(struct nala_test_t *tests_p)
+{
+    int res;
+    int exit_code;
+    struct timeval start_time;
+    struct timeval end_time;
     struct timeval elapsed_time;
     struct nala_test_t *test_p;
-    struct nala_subprocess_result_t *result_p;
 
     test_p = tests_p;
 
@@ -767,34 +802,15 @@ static int run_tests(struct nala_test_t *tests_p)
 
     test_p = tests_p;
     gettimeofday(&start_time, NULL);
-    res = 0;
-
+    exit_code = 0;
+    
     while (test_p != NULL) {
-        gettimeofday(&test_start_time, NULL);
-        current_test_p = test_p;
-        test_p->before_fork_func();
+        res = run_test(test_p);
 
-        result_p = nala_subprocess_call(test_entry, test_p);
-
-        test_p->executed = true;
-        test_p->exit_code = result_p->exit_code;
-        test_p->signal_number = result_p->signal_number;
-        nala_subprocess_result_free(result_p);
-
-        if (test_p->exit_code != 0) {
-            res = 1;
+        if (res != 0) {
+            exit_code = res;
         }
-
-        gettimeofday(&test_end_time, NULL);
-        timersub(&test_end_time, &test_start_time, &elapsed_time);
-        test_p->elapsed_time_ms = timeval_to_ms(&elapsed_time);
-
-        if (test_p->signal_number != -1) {
-            print_signal_failure(test_p);
-        }
-
-        print_test_result(test_p);
-
+        
         if ((res != 0) && !continue_on_failure) {
             break;
         }
@@ -807,7 +823,7 @@ static int run_tests(struct nala_test_t *tests_p)
     print_summary(tests_p, timeval_to_ms(&elapsed_time));
     write_report_json(tests_p);
 
-    return (res);
+    return (exit_code);
 }
 
 bool nala_check_string_equal(const char *actual_p, const char *expected_p)
