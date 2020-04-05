@@ -138,14 +138,14 @@ def main():
                            action='append',
                            default=[],
                            help=('Call functions matching given Unix shell-style '
-                                 'wildcards. Overrides --no-implementation. May '
-                                 'be given multiple times.'))
+                                 'wildcards pattern. Overrides --no-implementation. '
+                                 'May be given multiple times.'))
     subparser.add_argument('-n', '--no-implementation',
                            action='append',
                            default=[],
                            help=('Do not call functions matching given Unix '
-                                 'shell-style wildcards. May be given multiple '
-                                 'times.'))
+                                 'shell-style wildcards pattern. May be given '
+                                 'multiple times.'))
     subparser.add_argument(
         'infiles',
         nargs='*',
