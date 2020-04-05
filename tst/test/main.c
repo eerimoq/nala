@@ -580,15 +580,14 @@ TEST(argument_help)
         "optional arguments:\n"
         "  -h, --help                    Show this help message and exit.\n"
         "  -v, --version                 Print version information.\n"
-        "  -c, --continue-on-failure     Always run all tests.\n"
+        "  -c, --continue-on-failure     Continue on test failure.\n"
         "  -a, --print-all-calls         Print all calls to ease debugging.\n"
         "  -r, --report-json-file        JSON test report file (default: "
         "report.json).\n"
         "  -f, --print-test-file-func    Print file:function for exactly one "
         "test.\n"
         "  -j, --jobs                    Run given number of tests in "
-        "parallel. Always\n"
-        "                                runs all tests.\n");
+        "parallel.\n");
     ASSERT_EQ(result_p->stderr.buf_p, "");
 
     subprocess_result_free(result_p);
@@ -711,16 +710,32 @@ TEST(subtest_run_all_tests_continue_on_failure)
     subprocess_result_free(result_p);
 }
 
-TEST(subtest_run_all_tests_parallel_with_failure)
+TEST(subtest_parallel_continue_on_with_failure)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_exec_output(
+        "subtest/build/app --jobs 2 --continue-on-failure");
+
+    ASSERT_EQ(result_p->exit_code, 1);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Terminated by signal 11.");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "2 failed");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "4 passed");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "6 total");
+    ASSERT_EQ(result_p->stderr.buf_p, "");
+
+    subprocess_result_free(result_p);
+}
+
+TEST(subtest_parallel_stop_on_failure)
 {
     struct subprocess_result_t *result_p;
 
     result_p = subprocess_exec_output("subtest/build/app --jobs 2");
 
     ASSERT_EQ(result_p->exit_code, 1);
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Terminated by signal 11.");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "2 failed");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "4 passed");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Just fail!");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "failed");
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "6 total");
     ASSERT_EQ(result_p->stderr.buf_p, "");
 
@@ -735,7 +750,7 @@ TEST(subtest_zero_jobs_failure)
 
     ASSERT_EQ(result_p->exit_code, 1);
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "error: More than zero jobs required, 0 given.\n");
+                     "error: At least one job is required, 0 given.\n");
     ASSERT_EQ(result_p->stderr.buf_p, "");
 
     subprocess_result_free(result_p);
