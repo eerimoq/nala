@@ -676,6 +676,39 @@ TEST(subtest_run_all_tests_continue_on_failure)
     ASSERT_EQ(errput, "");
 }
 
+TEST(subtest_run_all_tests_parallel_with_failure)
+{
+    struct subprocess_result_t *result_p;
+
+    CAPTURE_OUTPUT(output, errput) {
+        result_p = subprocess_exec("subtest/build/app --jobs 2");
+    }
+
+    ASSERT_EQ(result_p->exit_code, 1);
+    subprocess_result_free(result_p);
+
+    ASSERT_SUBSTRING(output, "Terminated by signal 11.");
+    ASSERT_SUBSTRING(output, "2 failed");
+    ASSERT_SUBSTRING(output, "1 passed");
+    ASSERT_SUBSTRING(output, "3 total");
+    ASSERT_EQ(errput, "");
+}
+
+TEST(subtest_zero_jobs_failure)
+{
+    struct subprocess_result_t *result_p;
+
+    CAPTURE_OUTPUT(output, errput) {
+        result_p = subprocess_exec("subtest/build/app --jobs 0");
+    }
+
+    ASSERT_EQ(result_p->exit_code, 1);
+    subprocess_result_free(result_p);
+
+    ASSERT_SUBSTRING(output, "error: More than zero jobs required, 0 given.\n");
+    ASSERT_EQ(errput, "");
+}
+
 TEST(subtest_run_all_tests_skipped)
 {
     struct subprocess_result_t *result_p;

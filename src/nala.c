@@ -1289,7 +1289,8 @@ __attribute__((weak)) int main(int argc, char *argv[])
             number_of_jobs = atoi(optarg);
 
             if (number_of_jobs <= 0) {
-                printf("More than zero jobs required.\n");
+                printf("error: More than zero jobs required, %d given.\n",
+                       number_of_jobs);
                 exit(1);
             }
 
