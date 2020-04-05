@@ -23,8 +23,9 @@ def generate_suites():
                     'test_time.c')
 
 
-def generate_makefile():
+def generate_makefiles():
     shutil.copyfile(os.path.join(TEMPLATES_DIR, 'Makefile'), 'Makefile')
+    shutil.copyfile(os.path.join(TEMPLATES_DIR, 'test.mk'), 'test.mk')
 
 
 def copy_nala():
@@ -36,7 +37,7 @@ def do_init(args):
     os.mkdir(args.name)
     os.chdir(args.name)
     generate_suites()
-    generate_makefile()
+    generate_makefiles()
     copy_nala()
 
     print(f"Run 'make -C {args.name}' to build and run all tests!")
