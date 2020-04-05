@@ -16,6 +16,7 @@ CFLAGS += -fsanitize=undefined
 endif
 MOCKGENFLAGS += $(IMPLEMENTATION:%=-i %)
 MOCKGENFLAGS += $(NO_IMPLEMENTATION:%=-n %)
+ARGS += $(JOBS:%=-j %)
 NALA ?= PYTHONPATH=$(NALA_ROOT) python3 -m nala
 
 .PHONY: all build generate clean coverage gdb gdb-run

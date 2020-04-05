@@ -337,6 +337,16 @@ char *nala_hf_format_timespan(char *buf_p,
 #define COLOR_BOLD(color, ...)                                          \
     ANSI_RESET ANSI_COLOR_##color ANSI_BOLD __VA_ARGS__ ANSI_RESET
 
+struct job_request_t {
+    struct nala_test_t *test_p;
+    int number;
+};
+
+struct job_response_t {
+    struct nala_test_t *test_p;
+    struct nala_test_t test;
+};
+
 struct tests_t {
     struct nala_test_t *head_p;
     struct nala_test_t *tail_p;
@@ -381,8 +391,8 @@ __attribute__ ((weak)) void nala_resume_all_mocks(void)
 __attribute__ ((weak)) int nala_print_call_mask = 0;
 
 static bool continue_on_failure = false;
-
 static const char *report_json_file_p = "report.json";
+static int number_of_jobs = -1;
 
 static const char *get_node(void)
 {
@@ -568,7 +578,7 @@ static float timeval_to_ms(struct timeval *timeval_p)
     return (res);
 }
 
-static void print_test_failure_report_begin()
+static void print_test_failure_report_begin(void)
 {
     printf("-------------------------- "
            "TEST FAILURE REPORT BEGIN "
@@ -576,7 +586,7 @@ static void print_test_failure_report_begin()
     printf("\n");
 }
 
-static void print_test_failure_report_end()
+static void print_test_failure_report_end(void)
 {
     printf("\n");
     printf("--------------------------- "
@@ -784,9 +794,195 @@ static int run_test(struct nala_test_t *test_p)
     return (res);
 }
 
-static int run_tests(struct nala_test_t *tests_p)
+static int run_tests_sequentially(struct nala_test_t *test_p)
 {
     int res;
+    int exit_code;
+
+    exit_code = 0;
+
+    while (test_p != NULL) {
+        res = run_test(test_p);
+
+        if (res != 0) {
+            exit_code = res;
+
+            if (!continue_on_failure) {
+                break;
+            }
+        }
+
+        test_p = test_p->next_p;
+    }
+
+    return (exit_code);
+}
+
+static int run_tests_in_parallel_child(struct nala_test_t *test_p,
+                                       int request_fds[2],
+                                       int response_fds[2])
+{
+    int previous_number;
+    ssize_t size;
+    int exit_code;
+    struct job_request_t request;
+    struct job_response_t response;
+    int res;
+
+    close(request_fds[1]);
+    close(response_fds[0]);
+
+    exit_code = 0;
+    previous_number = 0;
+
+    while (true) {
+        size = read(request_fds[0], &request, sizeof(request));
+
+        if (size == 0) {
+            break;
+        }
+
+        if (size != sizeof(request)) {
+            perror("request read");
+            exit(1);
+        }
+
+        while (previous_number < request.number) {
+            previous_number++;
+            test_p = test_p->next_p;
+        }
+
+        res = run_test(test_p);
+
+        if (res != 0) {
+            exit_code = res;
+        }
+
+        response.test_p = request.test_p;
+        response.test = *test_p;
+
+        size = write(response_fds[1], &response, sizeof(response));
+
+        if (size != sizeof(response)) {
+            perror("response write");
+            exit(1);
+        }
+    }
+
+    close(request_fds[0]);
+    close(response_fds[1]);
+
+    return (exit_code);
+}
+
+static int run_tests_in_parallel(struct nala_test_t *test_p)
+{
+    int res;
+    int request_fds[2];
+    int response_fds[2];
+    int i;
+    pid_t *pids_p;
+    ssize_t size;
+    int status;
+    int exit_code;
+    struct job_request_t request;
+    struct job_response_t response;
+
+    res = pipe(&request_fds[0]);
+
+    if (res != 0) {
+        fprintf(stderr, "error: request pipe open\n");
+        exit(1);
+    }
+
+    res = pipe(&response_fds[0]);
+
+    if (res != 0) {
+        fprintf(stderr, "error: response pipe open\n");
+        exit(1);
+    }
+
+    /* Create workers. */
+    pids_p = alloca((size_t)number_of_jobs * sizeof(*pids_p));
+
+    for (i = 0; i < number_of_jobs; i++) {
+        pids_p[i] = fork();
+
+        if (pids_p[i] < 0) {
+            fprintf(stderr, "error: Failed to create worker process\n");
+            exit(1);
+        } else if (pids_p[i] == 0) {
+            exit(run_tests_in_parallel_child(test_p,
+                                             request_fds,
+                                             response_fds));
+        }
+    }
+
+    /* Write tests to workers. */
+    request.test_p = test_p;
+    request.number = 0;
+
+    while (request.test_p != NULL) {
+        size = write(request_fds[1], &request, sizeof(request));
+
+        if (size != sizeof(request)) {
+            perror("request write");
+            exit(1);
+        }
+
+        request.number++;
+        request.test_p = request.test_p->next_p;
+    }
+
+    close(request_fds[1]);
+    close(response_fds[1]);
+
+    /* Read all responses. */
+    while (true) {
+        size = read(response_fds[0], &response, sizeof(response));
+
+        if (size == 0) {
+            break;
+        }
+
+        if (size != sizeof(response)) {
+            perror("response read");
+            exit(1);
+        }
+
+        /* Copy test result to this process's list. */
+        test_p = response.test_p;
+        test_p->executed = response.test.executed;
+        test_p->exit_code = response.test.exit_code;
+        test_p->signal_number = response.test.signal_number;
+        test_p->elapsed_time_ms = response.test.elapsed_time_ms;
+    }
+
+    /* Wait for all workers to exit. */
+    exit_code = 0;
+
+    for (i = 0; i < number_of_jobs; i++) {
+        waitpid(pids_p[i], &status, 0);
+
+        if (WIFEXITED(status)) {
+            if (WEXITSTATUS(status) != 0) {
+                exit_code = 1;
+            }
+        }
+
+        if (WIFSIGNALED(status)) {
+            exit_code = 1;
+        }
+    }
+
+    close(request_fds[0]);
+    close(response_fds[0]);
+
+    return (exit_code);
+}
+
+static int run_tests(struct nala_test_t *tests_p)
+{
     int exit_code;
     struct timeval start_time;
     struct timeval end_time;
@@ -802,20 +998,11 @@ static int run_tests(struct nala_test_t *tests_p)
 
     test_p = tests_p;
     gettimeofday(&start_time, NULL);
-    exit_code = 0;
 
-    while (test_p != NULL) {
-        res = run_test(test_p);
-
-        if (res != 0) {
-            exit_code = res;
-
-            if (!continue_on_failure) {
-                break;
-            }
-        }
-
-        test_p = test_p->next_p;
+    if (number_of_jobs == -1) {
+        exit_code = run_tests_sequentially(test_p);
+    } else {
+        exit_code = run_tests_in_parallel(test_p);
     }
 
     gettimeofday(&end_time, NULL);
@@ -1225,7 +1412,7 @@ void nala_capture_output_start(char **output_pp, char **errput_pp)
     nala_resume_all_mocks();
 }
 
-void nala_capture_output_stop()
+void nala_capture_output_stop(void)
 {
     nala_suspend_all_mocks();
     capture_output_stop(&capture_stdout);
@@ -1244,14 +1431,14 @@ void nala_register_test(struct nala_test_t *test_p)
     tests.tail_p = test_p;
 }
 
-int nala_run_tests()
+int nala_run_tests(void)
 {
     return (run_tests(tests.head_p));
 }
 
 static void print_usage_and_exit(const char *program_name_p, int exit_code)
 {
-    printf("usage: %s [-h] [-v] [-c] [-a] [<test-pattern>]\n"
+    printf("usage: %s [-h] [-v] [-c] [-a] [-r] [-f] [-j] [<test-pattern>]\n"
            "\n"
            "Run tests.\n"
            "\n"
@@ -1267,12 +1454,15 @@ static void print_usage_and_exit(const char *program_name_p, int exit_code)
            "  -r, --report-json-file        JSON test report file (default: "
            "report.json).\n"
            "  -f, --print-test-file-func    Print file:function for exactly "
-           "one test.\n",
+           "one test.\n"
+           "  -j, --jobs                    Run given number of tests in "
+           "parallel. Always\n"
+           "                                runs all tests.\n",
            program_name_p);
     exit(exit_code);
 }
 
-static void print_version_and_exit()
+static void print_version_and_exit(void)
 {
     printf("%s\n", NALA_VERSION);
     exit(0);
@@ -1358,6 +1548,7 @@ __attribute__((weak)) int main(int argc, char *argv[])
         { "print-all-calls",      no_argument,       NULL, 'a' },
         { "report-json-file",     required_argument, NULL, 'r' },
         { "print-test-file-func", required_argument, NULL, 'f' },
+        { "jobs",                 required_argument, NULL, 'j' },
         { NULL,                   no_argument,       NULL, 0 }
     };
     int option;
@@ -1366,7 +1557,7 @@ __attribute__((weak)) int main(int argc, char *argv[])
     nala_suspend_all_mocks();
 
     while (1) {
-        option = getopt_long(argc, argv, "hvcar:f:", &long_options[0], NULL);
+        option = getopt_long(argc, argv, "hvcar:f:j:", &long_options[0], NULL);
 
         if (option == -1) {
             break;
@@ -1396,6 +1587,16 @@ __attribute__((weak)) int main(int argc, char *argv[])
 
         case 'f':
             return (print_test_file_func(optarg));
+
+        case 'j':
+            number_of_jobs = atoi(optarg);
+
+            if (number_of_jobs <= 0) {
+                printf("More than zero jobs required.\n");
+                exit(1);
+            }
+
+            break;
 
         default:
             print_usage_and_exit(argv[0], 1);

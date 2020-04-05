@@ -572,7 +572,7 @@ TEST(argument_help)
 
     ASSERT_EQ(
         output,
-        "usage: build/app [-h] [-v] [-c] [-a] [<test-pattern>]\n"
+        "usage: build/app [-h] [-v] [-c] [-a] [-r] [-f] [-j] [<test-pattern>]\n"
         "\n"
         "Run tests.\n"
         "\n"
@@ -588,7 +588,10 @@ TEST(argument_help)
         "  -r, --report-json-file        JSON test report file (default: "
         "report.json).\n"
         "  -f, --print-test-file-func    Print file:function for exactly one "
-        "test.\n");
+        "test.\n"
+        "  -j, --jobs                    Run given number of tests in "
+        "parallel. Always\n"
+        "                                runs all tests.\n");
     ASSERT_EQ(errput, "");
 }
 
