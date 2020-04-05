@@ -587,7 +587,8 @@ TEST(argument_help)
         "  -f, --print-test-file-func    Print file:function for exactly one "
         "test.\n"
         "  -j, --jobs                    Run given number of tests in "
-        "parallel.\n");
+        "parallel\n"
+        "                                (default: 1).\n");
     ASSERT_EQ(result_p->stderr.buf_p, "");
 
     subprocess_result_free(result_p);

@@ -200,7 +200,8 @@ helpful when debugging, especially ``--print-all-calls``.
      -a, --print-all-calls         Print all calls to ease debugging.
      -r, --report-json-file        JSON test report file (default: report.json).
      -f, --print-test-file-func    Print file:function for exactly one test.
-     -j, --jobs                    Run given number of tests in parallel.
+     -j, --jobs                    Run given number of tests in parallel
+                                   (default: 1).
 
 Mocking
 =======
