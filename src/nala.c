@@ -506,10 +506,10 @@ static int run_tests(struct nala_test_t *tests_p)
 
         if (res != 0) {
             exit_code = res;
-        }
 
-        if ((res != 0) && !continue_on_failure) {
-            break;
+            if (!continue_on_failure) {
+                break;
+            }
         }
 
         test_p = test_p->next_p;
