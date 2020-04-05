@@ -563,15 +563,11 @@ TEST(argument_help)
 {
     struct subprocess_result_t *result_p;
 
-    CAPTURE_OUTPUT(output, errput) {
-        result_p = subprocess_exec("build/app --help");
-    }
+    result_p = subprocess_exec_output("build/app --help");
 
     ASSERT_EQ(result_p->exit_code, 0);
-    subprocess_result_free(result_p);
-
     ASSERT_EQ(
-        output,
+        result_p->stdout.buf_p,
         "usage: build/app [-h] [-v] [-c] [-a] [-r] [-f] [-j] [<test-pattern>]\n"
         "\n"
         "Run tests.\n"
@@ -593,202 +589,183 @@ TEST(argument_help)
         "  -j, --jobs                    Run given number of tests in "
         "parallel. Always\n"
         "                                runs all tests.\n");
-    ASSERT_EQ(errput, "");
+    ASSERT_EQ(result_p->stderr.buf_p, "");
+
+    subprocess_result_free(result_p);
 }
 
 TEST(argument_version)
 {
     struct subprocess_result_t *result_p;
 
-    CAPTURE_OUTPUT(output, errput) {
-        result_p = subprocess_exec("build/app --version");
-    }
+    result_p = subprocess_exec_output("build/app --version");
 
     ASSERT_EQ(result_p->exit_code, 0);
-    subprocess_result_free(result_p);
+    ASSERT_EQ(result_p->stdout.buf_p, NALA_VERSION "\n");
+    ASSERT_EQ(result_p->stderr.buf_p, "");
 
-    ASSERT_EQ(output, NALA_VERSION "\n");
-    ASSERT_EQ(errput, "");
+    subprocess_result_free(result_p);
 }
 
 TEST(argument_print_full_test_name)
 {
     struct subprocess_result_t *result_p;
 
-    CAPTURE_OUTPUT(output, errput) {
-        result_p = subprocess_exec(
-            "build/app --print-test-file-func argument_version");
-    }
+    result_p = subprocess_exec_output(
+        "build/app --print-test-file-func argument_version");
 
     ASSERT_EQ(result_p->exit_code, 0);
-    subprocess_result_free(result_p);
+    ASSERT_EQ(result_p->stdout.buf_p, "main.c:argument_version\n");
+    ASSERT_EQ(result_p->stderr.buf_p, "");
 
-    ASSERT_EQ(output, "main.c:argument_version\n");
-    ASSERT_EQ(errput, "");
+    subprocess_result_free(result_p);
 }
 
 TEST(argument_print_full_test_name_error_no_match)
 {
     struct subprocess_result_t *result_p;
 
-    CAPTURE_OUTPUT(output, errput) {
-        result_p = subprocess_exec(
-            "build/app --print-test-file-func not_a_test");
-    }
+    result_p = subprocess_exec_output(
+        "build/app --print-test-file-func not_a_test");
 
     ASSERT_EQ(result_p->exit_code, 1);
-    subprocess_result_free(result_p);
+    ASSERT_EQ(result_p->stdout.buf_p, "");
+    ASSERT_EQ(result_p->stderr.buf_p,
+              "error: 'not_a_test' does not match any test.\n");
 
-    ASSERT_EQ(output, "");
-    ASSERT_EQ(errput, "error: 'not_a_test' does not match any test.\n");
+    subprocess_result_free(result_p);
 }
 
 TEST(argument_print_full_test_name_error_many_matches)
 {
     struct subprocess_result_t *result_p;
 
-    CAPTURE_OUTPUT(output, errput) {
-        result_p = subprocess_exec(
-            "build/app --print-test-file-func argument_print_full_test_name");
-    }
+    result_p = subprocess_exec_output(
+        "build/app --print-test-file-func argument_print_full_test_name");
 
     ASSERT_EQ(result_p->exit_code, 1);
-    subprocess_result_free(result_p);
-
-    ASSERT_EQ(output, "");
+    ASSERT_EQ(result_p->stdout.buf_p, "");
     ASSERT_EQ(
-        errput,
+        result_p->stderr.buf_p,
         "error: 'argument_print_full_test_name' matches more than one test.\n");
+
+    subprocess_result_free(result_p);
 }
 
 TEST(pattern_match_test_end)
 {
     struct subprocess_result_t *result_p;
 
-    CAPTURE_OUTPUT(output, errput) {
-        result_p = subprocess_exec("subtest/build/app foo$");
-    }
+    result_p = subprocess_exec_output("subtest/build/app foo$");
 
     ASSERT_EQ(result_p->exit_code, 0);
-    subprocess_result_free(result_p);
+    ASSERT_NOT_SUBSTRING(result_p->stdout.buf_p, "test_ok::foo_extra");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "test_fail::foo");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "test_ok::foo");
 
-    ASSERT_NOT_SUBSTRING(output, "test_ok::foo_extra");
-    ASSERT_SUBSTRING(output, "test_fail::foo");
-    ASSERT_SUBSTRING(output, "test_ok::foo");
+    subprocess_result_free(result_p);
 }
 
 TEST(pattern_match_test_only_end_match_all)
 {
     struct subprocess_result_t *result_p;
 
-    CAPTURE_OUTPUT(output, errput) {
-        result_p = subprocess_exec("subtest/build/app --continue-on-failure $");
-    }
+    result_p = subprocess_exec_output("subtest/build/app --continue-on-failure $");
 
     ASSERT_EQ(result_p->exit_code, 1);
-    subprocess_result_free(result_p);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "test_ok::foo_extra");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "test_fail::foo");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "test_ok::foo");
 
-    ASSERT_SUBSTRING(output, "test_ok::foo_extra");
-    ASSERT_SUBSTRING(output, "test_fail::foo");
-    ASSERT_SUBSTRING(output, "test_ok::foo");
+    subprocess_result_free(result_p);
 }
 
 TEST(pattern_match_test_empty_string)
 {
     struct subprocess_result_t *result_p;
 
-    CAPTURE_OUTPUT(output, errput) {
-        result_p = subprocess_exec("subtest/build/app --continue-on-failure \"\"");
-    }
+    result_p = subprocess_exec_output(
+        "subtest/build/app --continue-on-failure \"\"");
 
     ASSERT_EQ(result_p->exit_code, 1);
-    subprocess_result_free(result_p);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "test_ok::foo_extra");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "test_fail::foo");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "test_ok::foo");
 
-    ASSERT_SUBSTRING(output, "test_ok::foo_extra");
-    ASSERT_SUBSTRING(output, "test_fail::foo");
-    ASSERT_SUBSTRING(output, "test_ok::foo");
+    subprocess_result_free(result_p);
 }
 
 TEST(subtest_run_all_tests_continue_on_failure)
 {
     struct subprocess_result_t *result_p;
 
-    CAPTURE_OUTPUT(output, errput) {
-        result_p = subprocess_exec("subtest/build/app --continue-on-failure");
-    }
+    result_p = subprocess_exec_output("subtest/build/app --continue-on-failure");
 
     ASSERT_EQ(result_p->exit_code, 1);
-    subprocess_result_free(result_p);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Terminated by signal 11.");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "2 failed");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "4 passed");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "6 total");
+    ASSERT_EQ(result_p->stderr.buf_p, "");
 
-    ASSERT_SUBSTRING(output, "Terminated by signal 11.");
-    ASSERT_SUBSTRING(output, "2 failed");
-    ASSERT_SUBSTRING(output, "4 passed");
-    ASSERT_SUBSTRING(output, "6 total");
-    ASSERT_EQ(errput, "");
+    subprocess_result_free(result_p);
 }
 
 TEST(subtest_run_all_tests_parallel_with_failure)
 {
     struct subprocess_result_t *result_p;
 
-    CAPTURE_OUTPUT(output, errput) {
-        result_p = subprocess_exec("subtest/build/app --jobs 2");
-    }
+    result_p = subprocess_exec_output("subtest/build/app --jobs 2");
 
     ASSERT_EQ(result_p->exit_code, 1);
-    subprocess_result_free(result_p);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Terminated by signal 11.");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "2 failed");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "4 passed");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "6 total");
+    ASSERT_EQ(result_p->stderr.buf_p, "");
 
-    ASSERT_SUBSTRING(output, "Terminated by signal 11.");
-    ASSERT_SUBSTRING(output, "2 failed");
-    ASSERT_SUBSTRING(output, "4 passed");
-    ASSERT_SUBSTRING(output, "6 total");
-    ASSERT_EQ(errput, "");
+    subprocess_result_free(result_p);
 }
 
 TEST(subtest_zero_jobs_failure)
 {
     struct subprocess_result_t *result_p;
 
-    CAPTURE_OUTPUT(output, errput) {
-        result_p = subprocess_exec("subtest/build/app --jobs 0");
-    }
+    result_p = subprocess_exec_output("subtest/build/app --jobs 0");
 
     ASSERT_EQ(result_p->exit_code, 1);
-    subprocess_result_free(result_p);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "error: More than zero jobs required, 0 given.\n");
+    ASSERT_EQ(result_p->stderr.buf_p, "");
 
-    ASSERT_SUBSTRING(output, "error: More than zero jobs required, 0 given.\n");
-    ASSERT_EQ(errput, "");
+    subprocess_result_free(result_p);
 }
 
 TEST(subtest_run_all_tests_skipped)
 {
     struct subprocess_result_t *result_p;
 
-    CAPTURE_OUTPUT(output, errput) {
-        result_p = subprocess_exec("subtest/build/app");
-    }
+    result_p = subprocess_exec_output("subtest/build/app");
 
     ASSERT_EQ(result_p->exit_code, 1);
-    subprocess_result_free(result_p);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 failed");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "5 skipped");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "6 total");
+    ASSERT_EQ(result_p->stderr.buf_p, "");
 
-    ASSERT_SUBSTRING(output, "1 failed");
-    ASSERT_SUBSTRING(output, "5 skipped");
-    ASSERT_SUBSTRING(output, "6 total");
-    ASSERT_EQ(errput, "");
+    subprocess_result_free(result_p);
 }
 
 TEST(subprocess_run_passed)
 {
     struct subprocess_result_t *result_p;
 
-    CAPTURE_OUTPUT(output, errput) {
-        result_p = subprocess_exec("subtest/build/app test_ok::empty");
-    }
+    result_p = subprocess_exec_output("subtest/build/app test_ok::empty");
 
     ASSERT_EQ(result_p->exit_code, 0);
-    subprocess_result_free(result_p);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 passed");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 total");
+    ASSERT_EQ(result_p->stderr.buf_p, "");
 
-    ASSERT_SUBSTRING(output, "1 passed");
-    ASSERT_SUBSTRING(output, "1 total");
-    ASSERT_EQ(errput, "");
+    subprocess_result_free(result_p);
 }
