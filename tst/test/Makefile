@@ -18,7 +18,6 @@ CFLAGS += -Wpedantic
 CFLAGS += -fprofile-arcs
 CFLAGS += -ftest-coverage
 MOCKGENFLAGS += --no-cache
-JOBS = $(shell nproc)
 
 default:
 	$(MAKE) -C subtest SANITIZE=no build

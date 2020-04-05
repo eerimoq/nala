@@ -3,3 +3,11 @@
 TEST(empty)
 {
 }
+
+TEST(foo)
+{
+}
+
+TEST(foo_extra)
+{
+}

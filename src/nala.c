@@ -1142,6 +1142,9 @@ static void print_usage_and_exit(const char *program_name_p, int exit_code)
            "positional arguments:\n"
            "  test-pattern                  Only run tests containing given "
            "pattern.\n"
+           "                                '$' matches the end of the name, "
+           "similar to\n"
+           "                                regular expressions.\n"
            "\n"
            "optional arguments:\n"
            "  -h, --help                    Show this help message and exit.\n"
@@ -1165,6 +1168,39 @@ static void print_version_and_exit(void)
     exit(0);
 }
 
+static bool is_test_match(struct nala_test_t *test_p, const char *pattern_p)
+{
+    const char *full_test_name_p;
+    int full_test_name_length;
+    int pattern_length;
+    int offset;
+
+    pattern_length = (int)strlen(pattern_p);
+
+    if (pattern_length == 0) {
+        return (true);
+    }
+
+    full_test_name_p = full_test_name(test_p);
+    full_test_name_length = (int)strlen(full_test_name_p);
+
+    if (pattern_p[pattern_length - 1] == '$') {
+        offset = (full_test_name_length - pattern_length + 1);
+
+        if (offset < 0) {
+            return (false);
+        }
+
+        return (strncmp(&full_test_name_p[offset],
+                        pattern_p,
+                        (size_t)pattern_length - 1) == 0);
+    } else if (strstr(full_test_name_p, pattern_p) != NULL) {
+        return (true);
+    }
+
+    return (false);
+}
+
 static void filter_tests(const char *test_pattern_p)
 {
     struct nala_test_t *test_p;
@@ -1174,7 +1210,7 @@ static void filter_tests(const char *test_pattern_p)
     tests.tail_p = NULL;
 
     while (test_p != NULL) {
-        if (strstr(full_test_name(test_p), test_pattern_p) != NULL) {
+        if (is_test_match(test_p, test_pattern_p)) {
             nala_register_test(test_p);
         }
 
@@ -1195,7 +1231,7 @@ static struct nala_test_t *find_test(const char *test_pattern_p)
     found_p = NULL;
 
     while (test_p != NULL) {
-        if (strstr(full_test_name(test_p), test_pattern_p) != NULL) {
+        if (is_test_match(test_p, test_pattern_p)) {
             if (found_p == NULL) {
                 found_p = test_p;
             } else {

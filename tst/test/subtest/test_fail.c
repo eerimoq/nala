@@ -9,3 +9,7 @@ TEST(segfault)
 {
     *(int *)NULL = 0;
 }
+
+TEST(foo)
+{
+}

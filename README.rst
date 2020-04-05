@@ -191,6 +191,8 @@ helpful when debugging, especially ``--print-all-calls``.
 
    positional arguments:
      test-pattern                  Only run tests containing given pattern.
+                                   '$' matches the end of the name, similar to
+                                   regular expressions.
 
    optional arguments:
      -h, --help                    Show this help message and exit.

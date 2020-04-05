@@ -579,6 +579,9 @@ TEST(argument_help)
         "positional arguments:\n"
         "  test-pattern                  Only run tests containing given "
         "pattern.\n"
+        "                                '$' matches the end of the name, "
+        "similar to\n"
+        "                                regular expressions.\n"
         "\n"
         "optional arguments:\n"
         "  -h, --help                    Show this help message and exit.\n"
@@ -648,14 +651,64 @@ TEST(argument_print_full_test_name_error_many_matches)
 
     CAPTURE_OUTPUT(output, errput) {
         result_p = subprocess_exec(
-            "build/app --print-test-file-func argument");
+            "build/app --print-test-file-func argument_print_full_test_name");
     }
 
     ASSERT_EQ(result_p->exit_code, 1);
     subprocess_result_free(result_p);
 
     ASSERT_EQ(output, "");
-    ASSERT_EQ(errput, "error: 'argument' matches more than one test.\n");
+    ASSERT_EQ(
+        errput,
+        "error: 'argument_print_full_test_name' matches more than one test.\n");
+}
+
+TEST(pattern_match_test_end)
+{
+    struct subprocess_result_t *result_p;
+
+    CAPTURE_OUTPUT(output, errput) {
+        result_p = subprocess_exec("subtest/build/app foo$");
+    }
+
+    ASSERT_EQ(result_p->exit_code, 0);
+    subprocess_result_free(result_p);
+
+    ASSERT_NOT_SUBSTRING(output, "test_ok::foo_extra");
+    ASSERT_SUBSTRING(output, "test_fail::foo");
+    ASSERT_SUBSTRING(output, "test_ok::foo");
+}
+
+TEST(pattern_match_test_only_end_match_all)
+{
+    struct subprocess_result_t *result_p;
+
+    CAPTURE_OUTPUT(output, errput) {
+        result_p = subprocess_exec("subtest/build/app --continue-on-failure $");
+    }
+
+    ASSERT_EQ(result_p->exit_code, 1);
+    subprocess_result_free(result_p);
+
+    ASSERT_SUBSTRING(output, "test_ok::foo_extra");
+    ASSERT_SUBSTRING(output, "test_fail::foo");
+    ASSERT_SUBSTRING(output, "test_ok::foo");
+}
+
+TEST(pattern_match_test_empty_string)
+{
+    struct subprocess_result_t *result_p;
+
+    CAPTURE_OUTPUT(output, errput) {
+        result_p = subprocess_exec("subtest/build/app --continue-on-failure \"\"");
+    }
+
+    ASSERT_EQ(result_p->exit_code, 1);
+    subprocess_result_free(result_p);
+
+    ASSERT_SUBSTRING(output, "test_ok::foo_extra");
+    ASSERT_SUBSTRING(output, "test_fail::foo");
+    ASSERT_SUBSTRING(output, "test_ok::foo");
 }
 
 TEST(subtest_run_all_tests_continue_on_failure)
@@ -671,8 +724,8 @@ TEST(subtest_run_all_tests_continue_on_failure)
 
     ASSERT_SUBSTRING(output, "Terminated by signal 11.");
     ASSERT_SUBSTRING(output, "2 failed");
-    ASSERT_SUBSTRING(output, "1 passed");
-    ASSERT_SUBSTRING(output, "3 total");
+    ASSERT_SUBSTRING(output, "4 passed");
+    ASSERT_SUBSTRING(output, "6 total");
     ASSERT_EQ(errput, "");
 }
 
@@ -689,8 +742,8 @@ TEST(subtest_run_all_tests_parallel_with_failure)
 
     ASSERT_SUBSTRING(output, "Terminated by signal 11.");
     ASSERT_SUBSTRING(output, "2 failed");
-    ASSERT_SUBSTRING(output, "1 passed");
-    ASSERT_SUBSTRING(output, "3 total");
+    ASSERT_SUBSTRING(output, "4 passed");
+    ASSERT_SUBSTRING(output, "6 total");
     ASSERT_EQ(errput, "");
 }
 
@@ -721,8 +774,8 @@ TEST(subtest_run_all_tests_skipped)
     subprocess_result_free(result_p);
 
     ASSERT_SUBSTRING(output, "1 failed");
-    ASSERT_SUBSTRING(output, "2 skipped");
-    ASSERT_SUBSTRING(output, "3 total");
+    ASSERT_SUBSTRING(output, "5 skipped");
+    ASSERT_SUBSTRING(output, "6 total");
     ASSERT_EQ(errput, "");
 }
 
