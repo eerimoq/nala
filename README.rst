@@ -15,12 +15,12 @@ Features
 - Automatic test discovery
 - Use the same generic assertions everywhere
 - Assertion failures reported as diffs
+- Powerful mocking
 - Easy-to-use output capturing utilities
 - Traceback(s) on failure
-- Amalgamated source and header files ready to drop in your project
-- Mocking support
 - Works well with errors reported by sanitizers
 - Test isolation with fork()
+- Amalgamated source and header files ready to drop in your project
 - JSON test report
 
 Installation
