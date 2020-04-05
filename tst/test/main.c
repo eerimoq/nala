@@ -168,7 +168,49 @@ TEST(assert_eq_error_string)
         "  Diff:\n"
         "\n"
         "     - "B("1")" |  23\n"
-        "     "CR("+ ") CBR("1") CR(" |  ") CBR("1")"23\n");
+        "     "CR("+ ")CBR("1") CR(" |  ")CBR("1")"23\n");
+}
+
+static void assert_eq_error_string_added_line_entry()
+{
+    ASSERT_EQ("1\n"
+              "2\n"
+              "3\n",
+              "1\n"
+              "3\n");
+}
+
+TEST(assert_eq_error_string_added_line)
+{
+    expect_error_in_subprocess(
+        assert_eq_error_string_added_line_entry,
+        "  Error: "CBR("The strings are not equal. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        CM("       1")" |  1\n"
+        "     "CR("+ ")CBR("2")CR(" |  ")CBR("2\n")
+        CM("       3")" |  3\n");
+}
+
+static void assert_eq_error_string_deleted_line_entry()
+{
+    ASSERT_EQ("1\n"
+              "3\n",
+              "1\n"
+              "2\n"
+              "3\n");
+}
+
+TEST(assert_eq_error_string_deleted_line)
+{
+    expect_error_in_subprocess(
+        assert_eq_error_string_deleted_line_entry,
+        "  Error: "CBR("The strings are not equal. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        CM("       1")" |  1\n"
+        "     "CR("- ")CBR("2")CR(" |  ")CBR("2\n")
+        CM("       2")" |  3\n");
 }
 
 static void assert_ne_error_entry()
