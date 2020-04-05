@@ -20,7 +20,8 @@ Features
 - Traceback(s) on failure
 - Works well with errors reported by sanitizers
 - Test isolation with fork()
-- Parallel test execution to save time
+- Only run test(s) matching given pattern
+- Optional parallel test execution to save time
 - Amalgamated source and header files ready to drop in your project
 - JSON test report
 
