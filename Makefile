@@ -7,6 +7,8 @@ all:
 	$(MAKE) -C examples/basic
 	$(MAKE) -C examples/mock_square clean
 	$(MAKE) -C examples/mock_square
+	$(MAKE) -C examples/no_implementation clean
+	$(MAKE) -C examples/no_implementation
 	$(MAKE) -C examples/failures clean
 	! $(MAKE) -C examples/failures
 	rm -rf my-suite
