@@ -25,7 +25,6 @@ all:
 	$(EXE) $(ARGS)
 
 build:
-	$(MAKE) -C $(NALA_ROOT) dist
 	$(MAKE) generate
 	$(MAKE) $(EXE)
 
