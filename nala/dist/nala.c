@@ -355,8 +355,8 @@ struct capture_output_t {
 static struct nala_test_t *current_test_p = NULL;
 
 static struct tests_t tests = {
-                               .head_p = NULL,
-                               .tail_p = NULL
+    .head_p = NULL,
+    .tail_p = NULL
 };
 
 static struct capture_output_t capture_stdout;
@@ -1004,10 +1004,10 @@ static void print_string_diff(FILE *file_p,
                 char line_prefix[64];
                 snprintf(line_prefix,
                          sizeof(line_prefix),
-                         "+ " BOLD("%ld"),
+                         COLOR(RED, "+ ") COLOR_BOLD(RED, "%ld"),
                          line_number);
 
-                fprintf(file_p, " %19s", line_prefix);
+                fprintf(file_p, " %37s", line_prefix);
                 fprintf(file_p, COLOR(RED, " |  ") COLOR_BOLD(RED, "%.*s\n"),
                         (int)(modified_next - modified),
                         modified);
