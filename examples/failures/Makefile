@@ -4,4 +4,4 @@ SRC += ../../nala/dist/nala.c
 SRC += foo.c
 ARGS = --continue-on-failure
 
-include ../../make/common.mk
+include ../../make/test.mk

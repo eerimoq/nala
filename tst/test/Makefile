@@ -23,4 +23,4 @@ default:
 	$(MAKE) -C subtest SANITIZE=no build
 	$(MAKE) all
 
-include ../../make/common.mk
+include ../../make/test.mk

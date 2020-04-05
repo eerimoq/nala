@@ -4,4 +4,4 @@ TESTS += test_internal_mock.c
 INC += ../../nala/dist
 SRC += ../../nala/dist/nala.c
 
-include ../../make/common.mk
+include ../../make/test.mk

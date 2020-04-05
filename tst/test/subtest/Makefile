@@ -21,4 +21,4 @@ CFLAGS += -fprofile-arcs
 CFLAGS += -ftest-coverage
 MOCKGENFLAGS += --no-cache
 
-include ../../../make/common.mk
+include ../../../make/test.mk

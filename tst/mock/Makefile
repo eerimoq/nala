@@ -26,4 +26,4 @@ NO_IMPLEMENTATION += io_control_no_implementation
 NO_IMPLEMENTATION += ioctl
 MOCKGENFLAGS += --no-cache
 
-include ../../make/common.mk
+include ../../make/test.mk
