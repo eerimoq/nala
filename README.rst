@@ -20,7 +20,7 @@ Features
 - Traceback(s) on failure
 - Works well with errors reported by sanitizers
 - Test isolation with fork()
-- Only run test(s) matching given pattern
+- Only run tests matching given pattern
 - Optional parallel test execution to save time
 - Amalgamated source and header files ready to drop in your project
 - JSON test report
@@ -190,9 +190,8 @@ helpful when debugging, especially ``--print-all-calls``.
    Run tests.
 
    positional arguments:
-     test-pattern                  Only run tests containing given pattern.
-                                   '$' matches the end of the name, similar to
-                                   regular expressions.
+     test-pattern                  Only run tests matching given pattern. '$' matches
+                                   the end of the test name.
 
    optional arguments:
      -h, --help                    Show this help message and exit.
