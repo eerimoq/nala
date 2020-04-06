@@ -9,6 +9,8 @@ all:
 	$(MAKE) -C examples/mock_square
 	$(MAKE) -C examples/no_implementation clean
 	$(MAKE) -C examples/no_implementation
+	$(MAKE) -C examples/mock_exit clean
+	$(MAKE) -C examples/mock_exit
 	$(MAKE) -C examples/failures clean
 	! $(MAKE) -C examples/failures
 	rm -rf my-suite
