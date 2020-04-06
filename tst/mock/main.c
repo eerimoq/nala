@@ -13,6 +13,7 @@
 #include <mntent.h>
 #include <netdb.h>
 #include <fcntl.h>
+#include <sys/epoll.h>
 
 #include "subprocess.h"
 #include "nala.h"
@@ -979,6 +980,9 @@ TEST(rename_parameters)
     close_mock_ignore_in(0);
     connect_mock_ignore_in(0);
     endmntent_mock_ignore_in(0);
+    epoll_create_mock_ignore_in(0);
+    epoll_ctl_mock_ignore_in(0);
+    epoll_wait_mock_ignore_in(0);
     fclose_mock(0);
     fgets_mock_ignore_in(NULL);
     fopen_mock_ignore_in(NULL);
