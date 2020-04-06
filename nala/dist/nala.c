@@ -142,7 +142,7 @@ void nala_subprocess_result_free(struct nala_subprocess_result_t *self_p);
 
 #include <stdbool.h>
 
-#define NALA_TRACEBACK_VERSION "0.7.0"
+#define NALA_TRACEBACK_VERSION "0.8.0"
 
 typedef bool (*nala_traceback_skip_filter_t)(void *arg_p, const char *line_p);
 
@@ -153,20 +153,23 @@ typedef bool (*nala_traceback_skip_filter_t)(void *arg_p, const char *line_p);
 char *nala_traceback_format(void **buffer_pp,
                        int depth,
                        const char *prefix_p,
+                       const char *header_p,
                        nala_traceback_skip_filter_t skip_filter,
                        void *arg_p);
 
 /**
  * Create a traceback string.
  */
-char *nala_traceback_string(const char *prefix_pp,
+char *nala_traceback_string(const char *prefix_p,
+                       const char *header_p,
                        nala_traceback_skip_filter_t skip_filter,
                        void *arg_p);
 
 /**
  * Print a traceback.
  */
-void nala_traceback_print(const char *prefix_pp,
+void nala_traceback_print(const char *prefix_p,
+                     const char *header_p,
                      nala_traceback_skip_filter_t skip_filter,
                      void *arg_p);
 
@@ -1432,7 +1435,10 @@ void nala_test_failure(const char *message_p)
     printf("  Test:  " COLOR_BOLD(CYAN, "%s\n"), full_test_name(current_test_p));
     printf("  Error: %s", message_p);
     printf("\n");
-    nala_traceback_print("  ", traceback_skip_filter, NULL);
+    nala_traceback_print("  ",
+                         "Assert traceback (most recent call last):",
+                         traceback_skip_filter,
+                         NULL);
     print_test_failure_report_end();
     free((void *)message_p);
     exit(1);
@@ -1703,6 +1709,7 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
     return (nala_traceback_format(buffer_pp,
                                   depth,
                                   "  ",
+                                  "Mock traceback (most recent call last):",
                                   mock_traceback_skip_filter,
                                   NULL));
 }
@@ -2753,13 +2760,13 @@ static void *fixaddr(void *address_p)
     return ((void *)(((uintptr_t)address_p) - 1));
 }
 
-static bool is_nala_traceback_line(const char *line_p)
+static bool is_traceback_line(const char *line_p)
 {
-    if (strncmp(line_p, "nala_traceback_print at ", 19) == 0) {
+    if (strncmp(line_p, "traceback_print at ", 19) == 0) {
         return (true);
     }
 
-    if (strncmp(line_p, "nala_traceback_string at ", 20) == 0) {
+    if (strncmp(line_p, "traceback_string at ", 20) == 0) {
         return (true);
     }
 
@@ -2807,6 +2814,7 @@ static void print_line(FILE *stream_p, const char *prefix_p, char *line_p)
 char *nala_traceback_format(void **buffer_pp,
                        int depth,
                        const char *prefix_p,
+                       const char *header_p,
                        nala_traceback_skip_filter_t skip_filter,
                        void *arg_p)
 {
@@ -2823,6 +2831,10 @@ char *nala_traceback_format(void **buffer_pp,
         prefix_p = "";
     }
 
+    if (header_p == NULL) {
+        header_p = "Traceback (most recent call last):";
+    }
+
     size = readlink("/proc/self/exe", &exe[0], sizeof(exe) - 1);
 
     if (size == -1) {
@@ -2837,7 +2849,7 @@ char *nala_traceback_format(void **buffer_pp,
         return (NULL);
     }
 
-    fprintf(stream_p, "%sTraceback (most recent call last):\n", prefix_p);
+    fprintf(stream_p, "%s%s\n", prefix_p, header_p);
 
     for (i = (depth - 1); i >= 0; i--) {
         snprintf(&command[0],
@@ -2853,7 +2865,7 @@ char *nala_traceback_format(void **buffer_pp,
             continue;
         }
 
-        if (is_nala_traceback_line(result_p->stdout.buf_p)) {
+        if (is_traceback_line(result_p->stdout.buf_p)) {
             nala_subprocess_result_free(result_p);
             continue;
         }
@@ -2877,6 +2889,7 @@ char *nala_traceback_format(void **buffer_pp,
 }
 
 char *nala_traceback_string(const char *prefix_p,
+                       const char *header_p,
                        nala_traceback_skip_filter_t skip_filter,
                        void *arg_p)
 {
@@ -2888,17 +2901,19 @@ char *nala_traceback_string(const char *prefix_p,
     return (nala_traceback_format(addresses,
                              depth,
                              prefix_p,
+                             header_p,
                              skip_filter,
                              arg_p));
 }
 
 void nala_traceback_print(const char *prefix_p,
+                       const char *header_p,
                      nala_traceback_skip_filter_t skip_filter,
                      void *arg_p)
 {
     char *string_p;
 
-    string_p = nala_traceback_string(prefix_p, skip_filter, arg_p);
+    string_p = nala_traceback_string(prefix_p, header_p, skip_filter, arg_p);
     printf("%s", string_p);
     free(string_p);
 }

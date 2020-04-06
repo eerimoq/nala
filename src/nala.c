@@ -1129,7 +1129,10 @@ void nala_test_failure(const char *message_p)
     printf("  Test:  " COLOR_BOLD(CYAN, "%s\n"), full_test_name(current_test_p));
     printf("  Error: %s", message_p);
     printf("\n");
-    nala_traceback_print("  ", traceback_skip_filter, NULL);
+    nala_traceback_print("  ",
+                         "Assert traceback (most recent call last):",
+                         traceback_skip_filter,
+                         NULL);
     print_test_failure_report_end();
     free((void *)message_p);
     exit(1);
@@ -1400,6 +1403,7 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
     return (nala_traceback_format(buffer_pp,
                                   depth,
                                   "  ",
+                                  "Mock traceback (most recent call last):",
                                   mock_traceback_skip_filter,
                                   NULL));
 }

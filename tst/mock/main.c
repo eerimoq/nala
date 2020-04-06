@@ -72,7 +72,7 @@ TEST(add_function)
     ASSERT_EQ(add(5, -1), 41);
 }
 
-static void add_function_error_wrong_x_entry(void *arg_p)
+static void add_function_error_wrong_x_two_tracebacks_entry(void *arg_p)
 {
     (void)arg_p;
 
@@ -80,10 +80,49 @@ static void add_function_error_wrong_x_entry(void *arg_p)
     add(3, 2);
 }
 
-TEST(add_function_error_wrong_x)
+TEST(add_function_error_wrong_x_two_tracebacks)
 {
-    function_error_in_subprocess(add_function_error_wrong_x_entry,
-                                 "Mocked add(x): 3 != 1 (0x3 != 0x1)");
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(
+        add_function_error_wrong_x_two_tracebacks_entry,
+        NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "Mocked add(x): 3 != 1 (0x3 != 0x1)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "Mock traceback (most recent call last):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "Assert traceback (most recent call last):");
+
+    subprocess_result_free(result_p);
+}
+
+static void add_function_error_wrong_result_one_traceback_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    add_mock_once(3, 2, 42);
+    ASSERT_EQ(add(3, 2), 41);
+}
+
+TEST(add_function_error_wrong_result_one_traceback)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(
+        add_function_error_wrong_result_one_traceback_entry,
+        NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "42 != 41 (0x2a != 0x29)");
+    ASSERT_NOT_SUBSTRING(result_p->stdout.buf_p,
+                     "Mock traceback (most recent call last):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "Assert traceback (most recent call last):");
+
+    subprocess_result_free(result_p);
 }
 
 static void add_function_error_mock_with_mock_once_enqueued_entry(void *arg_p)
