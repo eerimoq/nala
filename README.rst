@@ -140,6 +140,12 @@ Create a code coverage report and open it with Firefox.
    Code coverage report: /home/erik/workspace/nala/foo/build/coverage/index.html
    $ firefox /home/erik/workspace/nala/foo/build/coverage/index.html
 
+Assertions
+==========
+
+All assertion macros and their documentation can be found in
+`include/nala.h`_.
+
 Compiler flags
 ==============
 
@@ -202,7 +208,7 @@ helpful when debugging, especially ``--print-all-calls``.
      -f, --print-test-file-func    Print file:function for exactly one test.
      -j, --jobs                    Run given number of tests in parallel
                                    (default: 1).
-
+                                   
 Mocking
 =======
 
@@ -404,3 +410,5 @@ Limitations
 .. _a few function parameters: https://github.com/eerimoq/nala/blob/master/nala/rename_parameters.txt
 
 .. _a few variadic functions: https://github.com/eerimoq/nala/blob/master/nala/real_variadic_functions.c
+
+.. _include/nala.h: https://github.com/eerimoq/nala/blob/master/nala/include/nala.h
