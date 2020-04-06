@@ -1491,7 +1491,8 @@ static void print_usage_and_exit(const char *program_name_p, int exit_code)
            "  -f, --print-test-file-func    Print file:function for exactly "
            "one test.\n"
            "  -j, --jobs                    Run given number of tests in "
-           "parallel.\n",
+           "parallel\n"
+           "                                (default: 1).\n",
            program_name_p);
     exit(exit_code);
 }
