@@ -411,4 +411,4 @@ Limitations
 
 .. _a few variadic functions: https://github.com/eerimoq/nala/blob/master/nala/real_variadic_functions.c
 
-.. _include/nala.h: https://github.com/eerimoq/nala/blob/master/nala/include/nala.h
+.. _include/nala.h: https://github.com/eerimoq/nala/blob/master/include/nala.h
