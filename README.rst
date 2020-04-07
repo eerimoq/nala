@@ -223,8 +223,8 @@ while the last file contains linker flags.
 
 Use ``--rename-parameters-file`` to rename function parameters, often
 useful when mocking standard library functions. If not given, Nala
-renames `a few function parameters`_ by default. Also, any prefix
-``__`` is removed from all parameters.
+renames `a few function parameters`_ by default. Also, any
+``__``-prefix is removed from all parameters.
 
 Use ``--no-rename-parameters`` not to rename any function
 parameters. Overrides ``--rename-parameters-file``.
