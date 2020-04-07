@@ -5,7 +5,7 @@ INC += $(CURDIR)
 SRC += $(BUILD)/nala_mocks.c
 SRC += $(TESTS)
 OBJ = $(patsubst %,$(BUILD)%,$(abspath $(SRC:%.c=%.o)))
-OBJDEPS = $(OBJ:%=%.d)
+OBJDEPS = $(OBJ:%.o=%.d)
 MOCKGENDEPS = $(BUILD)/nala_mocks.ldflags.d
 DEPS = $(OBJDEPS) $(MOCKGENDEPS)
 CFLAGS += $(INC:%=-I%)
@@ -55,9 +55,8 @@ define COMPILE_template
 $(patsubst %.c,$(BUILD)%.o,$(abspath $1)): $1
 	@echo "CC $1"
 	mkdir -p $$(@D)
-	$$(CC) $$(CFLAGS) -c -o $$@ $$<
+	$$(CC) -MMD $$(CFLAGS) -c -o $$@ $$<
 	$(NALA) wrap_internal_symbols $(BUILD)/nala_mocks.ldflags $$@
-	$(CC) -MM -MT $$@ $(CFLAGS) -o $$@.d $$<
 endef
 $(foreach file,$(SRC),$(eval $(call COMPILE_template,$(file))))
 
