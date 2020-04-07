@@ -752,12 +752,7 @@ static void test_entry(void *arg_p)
     capture_output_init(&capture_stderr, stderr);
     nala_reset_all_mocks();
     test_p->func();
-    nala_assert_all_mocks_completed();
-    nala_reset_all_mocks();
-    nala_suspend_all_mocks();
-    capture_output_destroy(&capture_stdout);
-    capture_output_destroy(&capture_stderr);
-    exit(0);
+    nala_exit(0);
 }
 
 static int run_test(struct nala_test_t *test_p)
@@ -2375,6 +2370,18 @@ void nala_fail(const char *message_p)
     strcpy(&message[0], message_p);
     strcat(&message[0], "\n");
     nala_test_failure(nala_format(&message[0]));
+}
+
+void nala_exit(int status)
+{
+    (void)status;
+
+    nala_assert_all_mocks_completed();
+    nala_reset_all_mocks();
+    nala_suspend_all_mocks();
+    capture_output_destroy(&capture_stdout);
+    capture_output_destroy(&capture_stderr);
+    exit(0);
 }
 /*
  * The MIT License (MIT)
