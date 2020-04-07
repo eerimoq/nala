@@ -734,6 +734,7 @@ static int run_tests(struct nala_test_t *tests_p)
     gettimeofday(&end_time, NULL);
     timersub(&end_time, &start_time, &elapsed_time);
     print_summary(tests_p, timeval_to_ms(&elapsed_time));
+    fflush(stdout);
     write_report_json(tests_p);
 
     return (exit_code);
