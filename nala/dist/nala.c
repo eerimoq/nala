@@ -583,18 +583,16 @@ static float timeval_to_ms(struct timeval *timeval_p)
 
 static void print_test_failure_report_begin(void)
 {
-    printf("-------------------------- "
-           "TEST FAILURE REPORT BEGIN "
-           "--------------------------\n");
+    printf("\n"
+           "------------------------------"
+           "--------------------"
+           "-----------------------------\n");
     printf("\n");
 }
 
 static void print_test_failure_report_end(void)
 {
     printf("\n");
-    printf("--------------------------- "
-           "TEST FAILURE REPORT END "
-           "---------------------------\n");
 }
 
 static void print_signal_failure(struct nala_test_t *test_p)
