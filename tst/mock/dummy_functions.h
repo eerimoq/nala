@@ -89,5 +89,6 @@ int struct_typedef_2(struct_typedef_2_t value);
 int parameter_name_omitted(int, int *);
 int no_implementation(void);
 int another_missing_implementation(void);
+int underscore_prefixed_params(int __a, int __b);
 
 #endif

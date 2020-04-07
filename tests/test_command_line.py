@@ -123,6 +123,39 @@ class CommandLineTest(unittest.TestCase):
 
         self.assert_generated_files('open')
 
+    def test_generate_mocks_rename_underscores_tests(self):
+        argv = [
+            'nala',
+            'generate_mocks',
+            '-o', 'output',
+            'tests/files/test_rename_underscores_tests.pp.c'
+        ]
+
+        remove_optput()
+        pre_process_file('rename_underscores')
+
+        with patch('sys.argv', argv):
+            nala.cli.main()
+
+        self.assert_generated_files('rename_underscores')
+
+    def test_generate_mocks_no_rename_underscores_tests(self):
+        argv = [
+            'nala',
+            'generate_mocks',
+            '-o', 'output',
+            '--no-rename-parameters',
+            'tests/files/test_no_rename_underscores_tests.pp.c'
+        ]
+
+        remove_optput()
+        pre_process_file('no_rename_underscores')
+
+        with patch('sys.argv', argv):
+            nala.cli.main()
+
+        self.assert_generated_files('no_rename_underscores')
+
     def test_wrap_internal_symbols(self):
         argv = [
             'nala',

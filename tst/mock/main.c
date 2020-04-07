@@ -1261,3 +1261,11 @@ TEST(another_missing_implementation_function)
 
     ASSERT_EQ(another_missing_implementation(), 2);
 }
+
+/* Tests that "__"-prefix is removed from parameter names. */
+TEST(underscore_prefixed_params_function)
+{
+    underscore_prefixed_params_mock(1, 1, 2);
+    underscore_prefixed_params_mock_ignore_a_in();
+    underscore_prefixed_params_mock_ignore_b_in();
+}

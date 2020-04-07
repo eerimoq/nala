@@ -162,3 +162,8 @@ int parameter_name_omitted(int a, int *b)
 {
     return (a + *b);
 }
+
+int underscore_prefixed_params(int __a, int __b)
+{
+    return (__a + __b);
+}

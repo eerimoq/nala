@@ -99,6 +99,9 @@ def load_param_names(filename):
 
 
 def rename_parameters(function_declaration, param_names):
+    if function_declaration.type.args is None:
+        return function_declaration
+
     for i, param in enumerate(function_declaration.type.args.params):
         if isinstance(param, node.EllipsisParam):
             continue
@@ -110,7 +113,11 @@ def rename_parameters(function_declaration, param_names):
             and param_type.type.names == ["void"]):
             continue
 
-        param.name = param_names[i]
+        if param_names is not None:
+            param.name = param_names[i]
+        elif param.name is not None:
+            if len(param.name) > 2 and param.name.startswith('__'):
+                param.name = param.name[2:]
 
         while not isinstance(param_type, node.TypeDecl):
             param_type = param_type.type
@@ -204,7 +211,7 @@ class ForgivingDeclarationParser:
         self.filename = None
 
         self.cparser = CParser()
-        self.param_names = {}
+        self.param_names = None
 
         if rename_parameters_file is not None:
             self.param_names = load_param_names(rename_parameters_file)
@@ -259,13 +266,12 @@ class ForgivingDeclarationParser:
         func_offset = len(self.typedefs + self.structs_code)
 
         for i, (func_name, _) in enumerate(items, func_offset):
-            param_names = self.param_names.get(func_name)
-
-            if param_names:
-                func_declaration = rename_parameters(self.file_ast.ext[i],
-                                                     param_names)
-            else:
+            if self.param_names is None:
                 func_declaration = self.file_ast.ext[i]
+            else:
+                func_declaration = rename_parameters(
+                    self.file_ast.ext[i],
+                    self.param_names.get(func_name))
 
             self.mocked_functions.append(MockedFunction(
                 func_name,
