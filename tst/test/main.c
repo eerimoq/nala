@@ -574,8 +574,10 @@ TEST(argument_help)
         "\n"
         "positional arguments:\n"
         "  test-pattern                  Only run tests matching given pattern. "
-        "'$' matches\n"
-        "                                the end of the test name.\n"
+        "'^' matches\n"
+        "                                the beginning and '$' matches the end "
+        "of the test\n"
+        "                                name.\n"
         "\n"
         "optional arguments:\n"
         "  -h, --help                    Show this help message and exit.\n"
@@ -691,6 +693,40 @@ TEST(pattern_match_test_empty_string)
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "test_ok::foo_extra");
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "test_fail::foo");
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "test_ok::foo");
+
+    subprocess_result_free(result_p);
+}
+
+/* Tests used to test beginning of test match. */
+TEST(beginning_1)
+{
+}
+
+TEST(another_beginning_2)
+{
+}
+
+TEST(pattern_match_test_only_beginning)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_exec_output("build/app ^beginning");
+
+    ASSERT_EQ(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "beginning_1");
+    ASSERT_NOT_SUBSTRING(result_p->stdout.buf_p, "beginning_2");
+
+    subprocess_result_free(result_p);
+}
+
+TEST(pattern_match_test_no_name)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_exec_output("build/app ^$");
+
+    ASSERT_EQ(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "0 total");
 
     subprocess_result_free(result_p);
 }

@@ -196,8 +196,9 @@ helpful when debugging, especially ``--print-all-calls``.
    Run tests.
 
    positional arguments:
-     test-pattern                  Only run tests matching given pattern. '$' matches
-                                   the end of the test name.
+     test-pattern                  Only run tests matching given pattern. '^' matches
+                                   the beginning and '$' matches the end of the test
+                                   name.
 
    optional arguments:
      -h, --help                    Show this help message and exit.
@@ -208,7 +209,7 @@ helpful when debugging, especially ``--print-all-calls``.
      -f, --print-test-file-func    Print file:function for exactly one test.
      -j, --jobs                    Run given number of tests in parallel
                                    (default: 1).
-                                   
+
 Mocking
 =======
 

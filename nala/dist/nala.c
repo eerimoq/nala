@@ -1484,8 +1484,10 @@ static void print_usage_and_exit(const char *program_name_p, int exit_code)
            "\n"
            "positional arguments:\n"
            "  test-pattern                  Only run tests matching given pattern. "
-           "'$' matches\n"
-           "                                the end of the test name.\n"
+           "'^' matches\n"
+           "                                the beginning and '$' matches the end "
+           "of the test\n"
+           "                                name.\n"
            "\n"
            "optional arguments:\n"
            "  -h, --help                    Show this help message and exit.\n"
@@ -1509,37 +1511,68 @@ static void print_version_and_exit(void)
     exit(0);
 }
 
-static bool is_test_match(struct nala_test_t *test_p, const char *pattern_p)
+static bool is_test_match(struct nala_test_t *test_p, const char *full_pattern_p)
 {
     const char *full_test_name_p;
-    int full_test_name_length;
-    int pattern_length;
-    int offset;
+    size_t full_test_name_length;
+    size_t pattern_length;
+    size_t offset;
+    bool match_beginning;
+    bool match_end;
+    char *pattern_p;
 
-    pattern_length = (int)strlen(pattern_p);
+    pattern_length = strlen(full_pattern_p);
 
     if (pattern_length == 0) {
         return (true);
     }
 
+    match_beginning = (full_pattern_p[0] == '^');
+    match_end = (full_pattern_p[pattern_length - 1] == '$');
+    pattern_p = alloca(pattern_length + 1);
+    strcpy(pattern_p, full_pattern_p);
+
+    if (match_beginning) {
+        pattern_p++;
+        pattern_length--;
+    }
+
+    if (match_end) {
+        pattern_length--;
+    }
+
     full_test_name_p = full_test_name(test_p);
-    full_test_name_length = (int)strlen(full_test_name_p);
+    full_test_name_length = strlen(full_test_name_p);
 
-    if (pattern_p[pattern_length - 1] == '$') {
-        offset = (full_test_name_length - pattern_length + 1);
+    if (pattern_length > full_test_name_length) {
+        return (false);
+    }
 
-        if (offset < 0) {
+    if (match_beginning || match_end) {
+        if ((pattern_length == 0) && match_beginning && match_end) {
             return (false);
         }
 
-        return (strncmp(&full_test_name_p[offset],
+        if (match_beginning) {
+            if (strncmp(full_test_name_p, pattern_p, pattern_length) != 0) {
+                return (false);
+            }
+        }
+
+        if (match_end) {
+            offset = (full_test_name_length - pattern_length);
+
+            if (strncmp(&full_test_name_p[offset],
                         pattern_p,
-                        (size_t)pattern_length - 1) == 0);
-    } else if (strstr(full_test_name_p, pattern_p) != NULL) {
-        return (true);
+                        pattern_length) != 0) {
+                return (false);
+            }
+        }
+    } else if (strstr(full_test_name_p, pattern_p) == NULL) {
+        return (false);
     }
 
-    return (false);
+    return (true);
 }
 
 static void filter_tests(const char *test_pattern_p)
