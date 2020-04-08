@@ -7,7 +7,7 @@
 
 A test framework for `C` projects.
 
-Based on `narwhal`_ and `narmock`_.
+Based on `Narwhal`_ and `Narmock`_.
 
 Features
 ========
@@ -402,8 +402,8 @@ Limitations
 .. |codecov| image:: https://codecov.io/gh/eerimoq/nala/branch/master/graph/badge.svg
 .. _codecov: https://codecov.io/gh/eerimoq/nala
 
-.. _narwhal: https://github.com/vberlier/narwhal
-.. _narmock: https://github.com/vberlier/narmock
+.. _Narwhal: https://github.com/vberlier/narwhal
+.. _Narmock: https://github.com/vberlier/narmock
 
 .. _amalgamated: https://sqlite.org/amalgamation.html
 .. _nala.h: https://raw.githubusercontent.com/eerimoq/nala/master/nala/dist/nala.h
