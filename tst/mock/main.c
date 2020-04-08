@@ -23,15 +23,25 @@
 #include "dummy_functions_not_mocked.h"
 #include "dummy_functions.h"
 
-#define BLD "\x1b[1m"
-#define RST "\x1b[0m"
-#define RD  "\x1b[31m"
-#define RED  RST RD
-#define GN  "\x1b[32m"
-#define MA "\x1b[35m"
-#define GRN  RST GN
-#define BRED RED BLD
-#define BGRN GRN BLD
+#define ANSI_COLOR_RED "\x1b[31m"
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_YELLOW "\x1b[33m"
+#define ANSI_COLOR_BLUE "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN "\x1b[36m"
+
+#define ANSI_BOLD "\x1b[1m"
+#define ANSI_RESET "\x1b[0m"
+
+#define B(...) ANSI_RESET ANSI_BOLD __VA_ARGS__ ANSI_RESET
+
+#define C(color, ...) ANSI_RESET ANSI_COLOR_##color __VA_ARGS__ ANSI_RESET
+#define CR(...) C(RED, __VA_ARGS__)
+#define CM(...) C(MAGENTA, __VA_ARGS__)
+
+#define CB(color, ...)                                                  \
+    ANSI_RESET ANSI_COLOR_##color ANSI_BOLD __VA_ARGS__ ANSI_RESET
+#define CBR(...) CB(RED, __VA_ARGS__)
 
 static void function_error_in_subprocess(void (*entry)(void *arg_p),
                                          const char *expected_p)
@@ -261,8 +271,8 @@ TEST(output_message_function_error_call_null)
 {
     function_error_in_subprocess(
         output_message_function_error_call_null_entry,
-        "     - "RST BLD"1"RST" |  "RST BLD"a"RST"\n"
-        "     "RED"+ "RST BRED"1"RST RED" |  "RST BRED"<null>"RST"\n");
+        "     - "B("1")" |  "B("a")"\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")CBR("<null>")"\n");
 }
 
 static void output_message_function_error_mismatch_entry(void *arg_p)
@@ -492,6 +502,7 @@ TEST(variadic_function)
 {
     int bar_1;
     int bar_2;
+    char string[8];
 
     io_control_mock_once(1, 0, "%d", 5);
     ASSERT_EQ(io_control(1, 5), 0);
@@ -512,7 +523,10 @@ TEST(variadic_function)
     io_control_mock_once(3, 0, "%p");
     ASSERT_EQ(io_control(3, NULL), 0);
 
-    io_control_mock_once(1, 6, "%s", "foo");
+    /* The mock should make a copy of foo. */
+    strcpy(&string[0], "foo");
+    io_control_mock_once(1, 6, "%s", &string[0]);
+    strcpy(&string[0], "bar");
     ASSERT_EQ(io_control(1, "foo"), 6);
 
     io_control_mock_once(3, 0, "%p");
@@ -687,9 +701,30 @@ static void variadic_function_error_string_entry(void *arg_p)
 
 TEST(variadic_function_error_string)
 {
-    function_error_in_subprocess(
-        variadic_function_error_string_entry,
-        "Mocked io_control(...): See diff for details.");
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(variadic_function_error_string_entry,
+                                      NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "Mocked io_control(...): See diff for details.");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, B("ka")"ll"B("e"));
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, CBR("bi")"ll"CBR("y"));
+
+    subprocess_result_free(result_p);
+}
+
+TEST(variadic_function_string_out)
+{
+    char name[16];
+
+    io_control_mock_once(1, 0, "%s", NULL);
+    io_control_mock_ignore_va_arg_in_at(0);
+    io_control_mock_set_va_arg_out_at(0, "fia", 4);
+
+    ASSERT_EQ(io_control(1, &name[0]), 0);
+    ASSERT_EQ(name, "fia");
 }
 
 static void variadic_function_error_va_arg_in_entry(void *arg_p)
@@ -711,7 +746,7 @@ TEST(variadic_function_error_va_arg_in)
     function_error_in_subprocess(variadic_function_error_va_arg_in_entry, NULL);
 }
 
-static void variadic_function_error_bad_formt_string_entry(void *arg_p)
+static void variadic_function_error_bad_format_string_entry(void *arg_p)
 {
     (void)arg_p;
 
@@ -720,7 +755,7 @@ static void variadic_function_error_bad_formt_string_entry(void *arg_p)
 
 TEST(variadic_function_error_bad_format_string)
 {
-    function_error_in_subprocess(variadic_function_error_bad_formt_string_entry,
+    function_error_in_subprocess(variadic_function_error_bad_format_string_entry,
                                  "Bad format string 'foo'.");
 }
 
@@ -788,7 +823,7 @@ TEST(variadic_function_error_set_out_for_unsigned_long)
 {
     function_error_in_subprocess(
         variadic_function_error_set_out_for_unsigned_long_entry,
-        "Cannot set output for '%lu' at index 2. Only '%p' can be set.");
+        "Cannot set output for '%lu' at index 2. Only '%p' and '%s' can be set.");
 }
 
 static void variadic_function_error_format_null_entry(void *arg_p)

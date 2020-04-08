@@ -1,7 +1,7 @@
 /*
 Mocks source file
 
-Generated with Nala version 0.137.0 (https://github.com/eerimoq/nala)
+
 Do not edit manually
 */
 #include <stdlib.h>
@@ -291,6 +291,60 @@ char *format_mock_traceback(const char *message_p,
         (const void *)(uintptr_t)param,                         \
         (const void *)(uintptr_t)(data_p)->params.param)
 
+void nala_mock_assert_memory(struct nala_traceback_t *traceback_p,
+                             const char *func_p,
+                             const char *param_p,
+                             const void *left_p,
+                             const void *right_p,
+                             size_t size)
+{
+    char _nala_assert_format[512];
+
+    if (!nala_check_memory(left_p, right_p, size)) {
+        nala_suspend_all_mocks();
+        snprintf(&_nala_assert_format[0],
+                 sizeof(_nala_assert_format),
+                 "Mocked %s(%s): ",
+                 func_p,
+                 param_p);
+        nala_test_failure(
+            format_mock_traceback(
+                nala_format_memory(
+                    &_nala_assert_format[0],
+                    left_p,
+                    right_p,
+                    size),
+                traceback_p));
+    }
+}
+
+void nala_mock_assert_string(struct nala_traceback_t *traceback_p,
+                             const char *func_p,
+                             const char *param_p,
+                             const char *acutal_p,
+                             const char *expected_p,
+                             size_t size)
+{
+    (void)size;
+
+    char _nala_assert_format[512];
+
+    if (!nala_check_string_equal(acutal_p, expected_p)) {
+        nala_suspend_all_mocks();
+        snprintf(&_nala_assert_format[0],
+                 sizeof(_nala_assert_format),
+                 "Mocked %s(%s):",
+                 func_p,
+                 param_p);
+        nala_test_failure(
+            format_mock_traceback(
+                nala_format_string(&_nala_assert_format[0],
+                                   acutal_p,
+                                   expected_p),
+                traceback_p));
+    }
+}
+
 void nala_mock_assert_in_eq_char(struct nala_traceback_t *traceback_p,
                                  const char *func_p,
                                  const char *param_p,
@@ -531,57 +585,20 @@ void nala_mock_assert_in_eq_ptr(struct nala_traceback_t *traceback_p,
                           expected_p);
 }
 
-void nala_mock_assert_memory(struct nala_traceback_t *traceback_p,
-                             const char *func_p,
-                             const char *param_p,
-                             const void *left_p,
-                             const void *right_p,
-                             size_t size)
+void nala_mock_assert_in_eq_string(struct nala_traceback_t *traceback_p,
+                                   const char *func_p,
+                                   const char *param_p,
+                                   bool ignore_in,
+                                   const char *acutal_p,
+                                   const char *expected_p)
 {
-    char _nala_assert_format[512];
-
-    if (!nala_check_memory(left_p, right_p, size)) {
-        nala_suspend_all_mocks();
-        snprintf(&_nala_assert_format[0],
-                 sizeof(_nala_assert_format),
-                 "Mocked %s(%s): ",
-                 func_p,
-                 param_p);
-        nala_test_failure(
-            format_mock_traceback(
-                nala_format_memory(
-                    &_nala_assert_format[0],
-                    left_p,
-                    right_p,
-                    size),
-                traceback_p));
-    }
-}
-
-void nala_mock_assert_string(struct nala_traceback_t *traceback_p,
-                             const char *func_p,
-                             const char *param_p,
-                             const char *acutal_p,
-                             const char *expected_p,
-                             size_t size)
-{
-    (void)size;
-
-    char _nala_assert_format[512];
-
-    if (!nala_check_string_equal(acutal_p, expected_p)) {
-        nala_suspend_all_mocks();
-        snprintf(&_nala_assert_format[0],
-                 sizeof(_nala_assert_format),
-                 "Mocked %s(%s):",
-                 func_p,
-                 param_p);
-        nala_test_failure(
-            format_mock_traceback(
-                nala_format_string(&_nala_assert_format[0],
-                                   acutal_p,
-                                   expected_p),
-                traceback_p));
+    if (!ignore_in) {
+        nala_mock_assert_string(traceback_p,
+                                func_p,
+                                param_p,
+                                acutal_p,
+                                expected_p,
+                                0);
     }
 }
 
@@ -795,6 +812,8 @@ void nala_parse_va_arg_non_long(const char **format_pp,
                                 va_list vl,
                                 struct nala_va_arg_item_t *item_p)
 {
+    const char *string_p;
+
     switch (**format_pp) {
 
     case 'd':
@@ -816,10 +835,17 @@ void nala_parse_va_arg_non_long(const char **format_pp,
         break;
 
     case 's':
-        /* ToDo: Should save in buffer. */
         item_p->type = nala_va_arg_item_type_s_t;
-        item_p->ignore_in = false;
-        item_p->s_p = va_arg(vl, char *);
+        string_p = va_arg(vl, char *);
+        item_p->s_p = NULL;
+
+        if (string_p != NULL) {
+            item_p->ignore_in = true;
+            nala_set_param_string(&item_p->in, string_p);
+        } else {
+            item_p->ignore_in = false;
+        }
+
         break;
 
     default:
@@ -852,6 +878,17 @@ struct nala_va_arg_item_t *nala_parse_va_arg(const char **format_pp,
     }
 
     return (item_p);
+}
+
+void nala_va_arg_copy_out(void *dst_p, struct nala_va_arg_item_t *self_p)
+{
+    if (self_p->out.buf_p != NULL) {
+        if (self_p->out_copy != NULL) {
+            self_p->out_copy(dst_p, self_p->out.buf_p, self_p->out.size);
+        } else {
+            memcpy(dst_p, self_p->out.buf_p, self_p->out.size);
+        }
+    }
 }
 
 void nala_parse_va_list(struct nala_va_arg_list_t *list_p,
@@ -952,27 +989,34 @@ void nala_va_arg_list_assert_p(struct nala_va_arg_list_t *self_p,
         }
     }
 
-    if (item_p->out.buf_p != NULL) {
-        if (item_p->out_copy != NULL) {
-            item_p->out_copy(value_p, item_p->out.buf_p, item_p->out.size);
-        } else {
-            memcpy(value_p, item_p->out.buf_p, item_p->out.size);
-        }
-    }
+    nala_va_arg_copy_out(value_p, item_p);
 }
 
 void nala_va_arg_list_assert_s(struct nala_va_arg_list_t *self_p,
                                struct nala_va_arg_item_t *item_p,
                                char *value_p)
 {
-    if (!item_p->ignore_in) {
-        nala_mock_assert_string(self_p->traceback_p,
-                                self_p->func_p,
-                                "...",
-                                value_p,
-                                item_p->s_p,
-                                strlen(item_p->s_p) + 1);
+    nala_mock_assert_in_eq_ptr(self_p->traceback_p,
+                               self_p->func_p,
+                               "...",
+                               item_p->ignore_in,
+                               value_p,
+                               item_p->s_p);
+
+    if (item_p->in.buf_p != NULL) {
+        if (item_p->in_assert != NULL) {
+            item_p->in_assert(value_p, item_p->in.buf_p, item_p->in.size);
+        } else {
+            nala_mock_assert_string(self_p->traceback_p,
+                                    self_p->func_p,
+                                    "...",
+                                    value_p,
+                                    item_p->in.buf_p,
+                                    0);
+        }
     }
+
+    nala_va_arg_copy_out(value_p, item_p);
 }
 
 void nala_va_arg_list_set_param_buf_in_at(struct nala_va_arg_list_t *self_p,
@@ -1013,13 +1057,15 @@ void nala_va_arg_list_set_param_buf_out_at(struct nala_va_arg_list_t *self_p,
     switch (item_p->type) {
 
     case nala_va_arg_item_type_p_t:
+    case nala_va_arg_item_type_s_t:
         nala_set_param_buf(&item_p->out, buf_p, size);
         break;
 
     default:
         nala_test_failure(
             nala_format(
-                "Cannot set output for '%%%s' at index %u. Only '%%p' can be set.\n",
+                "Cannot set output for '%%%s' at index %u. Only '%%p' and '%%s' "
+                "can be set.\n",
                 va_arg_type_specifier_string(item_p->type),
                 index));
         exit(1);
@@ -1537,26 +1583,3 @@ void foo_mock_assert_completed(void)
     }
 }
 
-// Struct assertions
-
-void nala_mock_assert_in_struct__IO_FILE(
-    struct nala_traceback_t *traceback_p,
-    const char *func_p,
-    const char *param_p,
-    const void *left_p,
-    const void *right_p,
-    size_t size)
-{
-    nala_mock_assert_memory(traceback_p, func_p, param_p, left_p, right_p, size);
-}
-
-void nala_mock_assert_in_struct_nala_test_t(
-    struct nala_traceback_t *traceback_p,
-    const char *func_p,
-    const char *param_p,
-    const void *left_p,
-    const void *right_p,
-    size_t size)
-{
-    nala_mock_assert_memory(traceback_p, func_p, param_p, left_p, right_p, size);
-}

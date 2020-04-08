@@ -1,7 +1,7 @@
 /*
 Mocks header file
 
-Generated with Nala version 0.137.0 (https://github.com/eerimoq/nala)
+
 Do not edit manually
 */
 
@@ -55,23 +55,3 @@ void foo_mock_resume(void);
 void foo_mock_reset(void);
 void foo_mock_assert_completed(void);
 
-// Struct assertions
-
-void nala_mock_assert_in_struct__IO_FILE(
-    struct nala_traceback_t *traceback_p,
-    const char *func_p,
-    const char *param_p,
-    const void *left_p,
-    const void *right_p,
-    size_t size);
-void nala_mock_assert_in_struct_nala_test_t(
-    struct nala_traceback_t *traceback_p,
-    const char *func_p,
-    const char *param_p,
-    const void *left_p,
-    const void *right_p,
-    size_t size);
-
-#endif
-
-#endif
