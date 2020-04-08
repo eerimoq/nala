@@ -375,7 +375,7 @@ list. Instead, set pointers after the mock call.
 
 .. code-block:: c
 
-   foo_mock(1, "%d%p%s", 1, "the-string");
+   foo_mock(3, "%d%p%s", 5, "the-string");
    foo_mock_set_va_arg_in_pointer_at(1, NULL);
 
 The variadic parameters are controlled by index instead of name.
