@@ -12,8 +12,8 @@ TEST(assertions)
     ASSERT_GE(1, 1);
     ASSERT_SUBSTRING("12345", "34");
     ASSERT_NOT_SUBSTRING("12345", "4567");
-    ASSERT_MEMORY("abcd", "abcd", 5);
-    ASSERT_ARRAY(array, array, sizeof(array));
+    ASSERT_MEMORY_EQ("abcd", "abcd", 5);
+    ASSERT_ARRAYS_EQ(array, array, sizeof(array));
     ASSERT(1 == 1);
 
     CAPTURE_OUTPUT(output, errput) {

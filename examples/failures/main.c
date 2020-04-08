@@ -163,58 +163,58 @@ TEST(mock_integer_param)
     mount("foo", "fie", "bar", 0, NULL);
 }
 
-TEST(int_array)
+TEST(int_arrays_eq)
 {
     int a[] = { 1, 4, 3 };
     int b[] = { 1, 2, 3 };
 
-    ASSERT_ARRAY(a, b, sizeof(a));
+    ASSERT_ARRAYS_EQ(a, b, sizeof(a));
 }
 
-TEST(int_array_long)
+TEST(int_arrays_eq_long)
 {
     int a[] = { 1, 2, 3, 4, 16, 16, 17, 8, 9 };
     int b[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-    ASSERT_ARRAY(a, b, sizeof(a));
+    ASSERT_ARRAYS_EQ(a, b, sizeof(a));
 }
 
-TEST(float_array)
+TEST(float_arrays_eq)
 {
     float a[] = { 1.1, 4.4, 3.3 };
     float b[] = { 1.1, 2.2, 3.3 };
 
-    ASSERT_ARRAY(a, b, sizeof(a));
+    ASSERT_ARRAYS_EQ(a, b, sizeof(a));
 }
 
 struct struct_array_t {
     int a;
 };
 
-TEST(struct_array)
+TEST(struct_arrays_eq)
 {
     struct struct_array_t a[3] = { { 1 }, { 4 }, { 3 } };
     struct struct_array_t b[3] = { { 1 }, { 2 }, { 3 } };
 
-    ASSERT_ARRAY(a, b, sizeof(a));
+    ASSERT_ARRAYS_EQ(a, b, sizeof(a));
 }
 
-TEST(pointer_array)
+TEST(pointer_arrays_eq)
 {
     int a;
     int b;
     void *c[3] = { &a, &b, &a };
     void *d[3] = { &a, &b, &b };
 
-    ASSERT_ARRAY(c, d, sizeof(c));
+    ASSERT_ARRAYS_EQ(c, d, sizeof(c));
 }
 
-TEST(char_array)
+TEST(char_arrays_eq)
 {
     char a[] = "134";
     char b[] = "123";
 
-    ASSERT_ARRAY(a, b, sizeof(a));
+    ASSERT_ARRAYS_EQ(a, b, sizeof(a));
 }
 
 TEST(variadic_function_open)
