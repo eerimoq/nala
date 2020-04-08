@@ -166,70 +166,6 @@ Assertions and other macros
    FAIL(message);                                // Fail current test with given message.
    CAPTURE_OUTPUT(stdout_name, stderr_name);     // A capture output block.
 
-Compiler flags
-==============
-
-Pass ``-no-pie -g -O0 -fsanitize=address`` to the compiler for better
-error reporting.
-
-Read more about sanitizers here: https://en.wikipedia.org/wiki/AddressSanitizer
-
-Debugging tips
-==============
-
-Nala executes each test in its own process. This means that
-following the execution of a test with a debugger can be a bit tricky
-because debuggers like GDB can only follow a single process at a time.
-
-If you're using GDB, set a breakpoint at ``<test>_before_fork`` and
-then run the program until it stops at the breakpoint. Before
-continuing the program execution, tell GDB to follow the forked test
-process by setting ``follow-fork-mode`` to ``child``.
-
-All commands are shown below for the ``assertions`` test in the
-example above.
-
-.. code-block::
-
-   $ gdb foo/build/app
-   (gdb) b assertions_before_fork
-   (gdb) r
-   (gdb) set follow-fork-mode child
-   (gdb) c
-
-Or using the make target ``gdb``. Set the ``TEST`` make variable to
-the test to debug. Both ``TEST=test_assertions::assertions`` and
-``TEST=assertions`` are accepted.
-
-.. code-block::
-
-   $ make -s -C foo gdb TEST=assertions
-
-The test program takes optional arguments as below, which also can be
-helpful when debugging, especially ``--print-all-calls``.
-
-.. code-block::
-
-   $ foo/build/app --help
-   usage: foo/build/app [-h] [-v] [-c] [-a] [-r] [-f] [-j] [<test-pattern>]
-
-   Run tests.
-
-   positional arguments:
-     test-pattern                  Only run tests matching given pattern. '^' matches
-                                   the beginning and '$' matches the end of the test
-                                   name.
-
-   optional arguments:
-     -h, --help                    Show this help message and exit.
-     -v, --version                 Print version information.
-     -c, --continue-on-failure     Continue on test failure.
-     -a, --print-all-calls         Print all calls to ease debugging.
-     -r, --report-json-file        JSON test report file (default: report.json).
-     -f, --print-test-file-func    Print file:function for exactly one test.
-     -j, --jobs                    Run given number of tests in parallel
-                                   (default: 1).
-
 Mocking
 =======
 
@@ -421,6 +357,70 @@ Limitations
   suspend/resume-block.
 
 - ``static`` functions can't be mocked.
+
+Debugging tips
+==============
+
+Nala executes each test in its own process. This means that
+following the execution of a test with a debugger can be a bit tricky
+because debuggers like GDB can only follow a single process at a time.
+
+If you're using GDB, set a breakpoint at ``<test>_before_fork`` and
+then run the program until it stops at the breakpoint. Before
+continuing the program execution, tell GDB to follow the forked test
+process by setting ``follow-fork-mode`` to ``child``.
+
+All commands are shown below for the ``assertions`` test in the
+example above.
+
+.. code-block::
+
+   $ gdb foo/build/app
+   (gdb) b assertions_before_fork
+   (gdb) r
+   (gdb) set follow-fork-mode child
+   (gdb) c
+
+Or using the make target ``gdb``. Set the ``TEST`` make variable to
+the test to debug. Both ``TEST=test_assertions::assertions`` and
+``TEST=assertions`` are accepted.
+
+.. code-block::
+
+   $ make -s -C foo gdb TEST=assertions
+
+The test program takes optional arguments as below, which also can be
+helpful when debugging, especially ``--print-all-calls``.
+
+.. code-block::
+
+   $ foo/build/app --help
+   usage: foo/build/app [-h] [-v] [-c] [-a] [-r] [-f] [-j] [<test-pattern>]
+
+   Run tests.
+
+   positional arguments:
+     test-pattern                  Only run tests matching given pattern. '^' matches
+                                   the beginning and '$' matches the end of the test
+                                   name.
+
+   optional arguments:
+     -h, --help                    Show this help message and exit.
+     -v, --version                 Print version information.
+     -c, --continue-on-failure     Continue on test failure.
+     -a, --print-all-calls         Print all calls to ease debugging.
+     -r, --report-json-file        JSON test report file (default: report.json).
+     -f, --print-test-file-func    Print file:function for exactly one test.
+     -j, --jobs                    Run given number of tests in parallel
+                                   (default: 1).
+
+Compiler flags
+==============
+
+Pass ``-no-pie -g -O0 -fsanitize=address`` to the compiler for better
+error reporting.
+
+Read more about sanitizers here: https://en.wikipedia.org/wiki/AddressSanitizer
 
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
