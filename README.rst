@@ -19,7 +19,7 @@ Features
 - Easy-to-use output capturing utilities
 - Traceback(s) on failure
 - Works well with errors reported by sanitizers
-- Test isolation with fork()
+- Test isolation with ``fork()``
 - Only run tests matching given pattern
 - Optional parallel test execution to save time
 - Amalgamated source and header files ready to drop in your project
