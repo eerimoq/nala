@@ -140,11 +140,31 @@ Create a code coverage report and open it with Firefox.
    Code coverage report: /home/erik/workspace/nala/foo/build/coverage/index.html
    $ firefox /home/erik/workspace/nala/foo/build/coverage/index.html
 
-Assertions
-==========
+Assertions and other macros
+===========================
 
-All assertion macros and their documentation can be found in
-`include/nala.h`_.
+.. code-block:: c
+              
+   ASSERT_EQ(actual, expected);                   // Assert that given characters, numbers, pointers or    
+                                                  // strings are equal.                                    
+   ASSERT_NE(actual, expected);                   // Assert that given characters, numbers, pointers or    
+                                                  // strings are not equal.                                
+   ASSERT_LT(actual, expected);                   // Assert that actual is less than expected.             
+   ASSERT_LE(actual, expected);                   // Assert that actual is less than or equal to expected. 
+   ASSERT_GT(actual, expected);                   // Assert that actual is greater than expected.          
+   ASSERT_GE(actual, expected);                   // Assert that actual is greater than or equal to        
+                                                  // expected.                                             
+   ASSERT_SUBSTRING(haystack, needle);            // Assert that given haystack string contains given      
+                                                  // needle string.                                        
+   ASSERT_NOT_SUBSTRING(haystack, needle);        // Assert that given haystack string does not contain    
+                                                  // given needle string.                                  
+   ASSERT_MEMORY_EQ(actual, expected, size);      // Assert that given memory regions are equal.           
+   ASSERT_ARRAYS_EQ(actual, expected, size);      // Assert that given arrays are equal.                   
+   ASSERT_FUNCTION_POINTERS_EQ(actual, expected); // Assert that given function pointes are equal.         
+   ASSERT_FUNCTION_POINTERS_NE(actual, expected); // Assert that given function pointes are not equal.     
+   ASSERT(cond);                                  // Assert that given condition is true.                  
+   FAIL(message);                                 // Fail current test with given message.                 
+   CAPTURE_OUTPUT(stdout_name, stderr_name);      // A capture output block.                               
 
 Compiler flags
 ==============
