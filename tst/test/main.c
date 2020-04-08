@@ -388,7 +388,7 @@ TEST(fail_segfault)
     expect_error_in_subprocess(fail_segfault_entry, "");
 }
 
-static void assert_int_array_entry()
+static void assert_int_array_eq_entry()
 {
     int a[3] = { 1, 2, 3 };
     int b[3] = { 1, 4, 3 };
@@ -399,7 +399,7 @@ static void assert_int_array_entry()
 TEST(assert_int_array)
 {
     expect_error_in_subprocess(
-        assert_int_array_entry,
+        assert_int_array_eq_entry,
         "  Error: "CBR("The arrays differ at index 1. See diff for details.\n")
         "  Diff:\n"
         "\n"
@@ -407,7 +407,7 @@ TEST(assert_int_array)
         "     "CR("+ ")CBR("1")CR(" |  ")"{ 1, "CBR("2")", 3 }\n");
 }
 
-static void assert_int_array_long_entry()
+static void assert_int_array_eq_long_entry()
 {
     int a[15] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
     int b[15] = { 1, 2, 3, 4, 5, 6, 7, 8, 8, 10, 11, 12, 13, 14, 15 };
@@ -415,10 +415,10 @@ static void assert_int_array_long_entry()
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
-TEST(assert_int_array_long)
+TEST(assert_int_array_eq_long)
 {
     expect_error_in_subprocess(
-        assert_int_array_long_entry,
+        assert_int_array_eq_long_entry,
         "  Error: "CBR("The arrays differ at index 8. See diff for details.\n")
         "  Diff:\n"
         "\n"
@@ -426,7 +426,7 @@ TEST(assert_int_array_long)
         "     "CR("+ ")CBR("1")CR(" |  ")"{ ..., 6, 7, 8, "CBR("9")", 10, 11, 12, ... }\n");
 }
 
-static void assert_int_array_index_0_entry()
+static void assert_int_array_eq_index_0_entry()
 {
     int a[15] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
     int b[15] = { 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
@@ -434,10 +434,10 @@ static void assert_int_array_index_0_entry()
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
-TEST(assert_int_array_index_0)
+TEST(assert_int_array_eq_index_0)
 {
     expect_error_in_subprocess(
-        assert_int_array_index_0_entry,
+        assert_int_array_eq_index_0_entry,
         "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
         "  Diff:\n"
         "\n"
@@ -445,7 +445,7 @@ TEST(assert_int_array_index_0)
         "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("1")", 2, 3, 4, ... }\n");
 }
 
-static void assert_int_array_index_13_entry()
+static void assert_int_array_eq_index_13_entry()
 {
     int a[15] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 24, 15 };
     int b[15] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 15 };
@@ -453,10 +453,10 @@ static void assert_int_array_index_13_entry()
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
-TEST(assert_int_array_index_13)
+TEST(assert_int_array_eq_index_13)
 {
     expect_error_in_subprocess(
-        assert_int_array_index_13_entry,
+        assert_int_array_eq_index_13_entry,
         "  Error: "CBR("The arrays differ at index 13. See diff for details.\n")
         "  Diff:\n"
         "\n"
@@ -464,7 +464,7 @@ TEST(assert_int_array_index_13)
         "     "CR("+ ")CBR("1")CR(" |  ")"{ ..., 11, 12, 13, "CBR("24")", 15 }\n");
 }
 
-static void assert_char_array_entry()
+static void assert_char_array_eq_entry()
 {
     char a[1] = { 'a' };
     char b[1] = { 'A' };
@@ -475,7 +475,7 @@ static void assert_char_array_entry()
 TEST(assert_char_array)
 {
     expect_error_in_subprocess(
-        assert_char_array_entry,
+        assert_char_array_eq_entry,
         "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
         "  Diff:\n"
         "\n"
@@ -483,7 +483,102 @@ TEST(assert_char_array)
         "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("97")" }\n");
 }
 
-static void assert_long_array_entry()
+static void assert_schar_array_eq_entry()
+{
+    signed char a[1] = { 'a' };
+    signed char b[1] = { 'A' };
+
+    ASSERT_ARRAY_EQ(a, b, sizeof(a));
+}
+
+TEST(assert_schar_array)
+{
+    expect_error_in_subprocess(
+        assert_schar_array_eq_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("65")" }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("97")" }\n");
+}
+
+static void assert_uchar_array_eq_entry()
+{
+    unsigned char a[1] = { 'a' };
+    unsigned char b[1] = { 'A' };
+
+    ASSERT_ARRAY_EQ(a, b, sizeof(a));
+}
+
+TEST(assert_uchar_array)
+{
+    expect_error_in_subprocess(
+        assert_uchar_array_eq_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("65")" }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("97")" }\n");
+}
+
+static void assert_short_array_eq_entry()
+{
+    short a[1] = { -5 };
+    short b[1] = { 1 };
+
+    ASSERT_ARRAY_EQ(a, b, sizeof(a));
+}
+
+TEST(assert_short_array)
+{
+    expect_error_in_subprocess(
+        assert_short_array_eq_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("1")" }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("-5")" }\n");
+}
+
+static void assert_ushort_array_eq_entry()
+{
+    unsigned short a[1] = { 5 };
+    unsigned short b[1] = { 1 };
+
+    ASSERT_ARRAY_EQ(a, b, sizeof(a));
+}
+
+TEST(assert_ushort_array)
+{
+    expect_error_in_subprocess(
+        assert_ushort_array_eq_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("1")" }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("5")" }\n");
+}
+
+static void assert_uint_array_eq_entry()
+{
+    unsigned int a[1] = { 5 };
+    unsigned int b[1] = { 1 };
+
+    ASSERT_ARRAY_EQ(a, b, sizeof(a));
+}
+
+TEST(assert_uint_array)
+{
+    expect_error_in_subprocess(
+        assert_uint_array_eq_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("1")" }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("5")" }\n");
+}
+
+static void assert_long_array_eq_entry()
 {
     long a[1] = { 3 };
     long b[1] = { 4 };
@@ -494,7 +589,7 @@ static void assert_long_array_entry()
 TEST(assert_long_array)
 {
     expect_error_in_subprocess(
-        assert_long_array_entry,
+        assert_long_array_eq_entry,
         "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
         "  Diff:\n"
         "\n"
@@ -502,7 +597,64 @@ TEST(assert_long_array)
         "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("3")" }\n");
 }
 
-static void assert_float_array_entry()
+static void assert_ulong_array_eq_entry()
+{
+    unsigned long a[1] = { 3 };
+    unsigned long b[1] = { 4 };
+
+    ASSERT_ARRAY_EQ(a, b, sizeof(a));
+}
+
+TEST(assert_ulong_array)
+{
+    expect_error_in_subprocess(
+        assert_ulong_array_eq_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("4")" }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("3")" }\n");
+}
+
+static void assert_llong_array_eq_entry()
+{
+    long long a[1] = { 3 };
+    long long b[1] = { 4 };
+
+    ASSERT_ARRAY_EQ(a, b, sizeof(a));
+}
+
+TEST(assert_llong_array)
+{
+    expect_error_in_subprocess(
+        assert_llong_array_eq_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("4")" }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("3")" }\n");
+}
+
+static void assert_ullong_array_eq_entry()
+{
+    unsigned long long a[1] = { 3 };
+    unsigned long long b[1] = { 4 };
+
+    ASSERT_ARRAY_EQ(a, b, sizeof(a));
+}
+
+TEST(assert_ullong_array)
+{
+    expect_error_in_subprocess(
+        assert_ullong_array_eq_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("4")" }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("3")" }\n");
+}
+
+static void assert_float_array_eq_entry()
 {
     float a[1] = { 3.0 };
     float b[1] = { 4.0 };
@@ -513,7 +665,7 @@ static void assert_float_array_entry()
 TEST(assert_float_array)
 {
     expect_error_in_subprocess(
-        assert_float_array_entry,
+        assert_float_array_eq_entry,
         "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
         "  Diff:\n"
         "\n"
@@ -521,7 +673,45 @@ TEST(assert_float_array)
         "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("3")".000000 }\n");
 }
 
-static void assert_bool_array_entry()
+static void assert_double_array_eq_entry()
+{
+    double a[1] = { 3.0 };
+    double b[1] = { 4.0 };
+
+    ASSERT_ARRAY_EQ(a, b, sizeof(a));
+}
+
+TEST(assert_double_array)
+{
+    expect_error_in_subprocess(
+        assert_double_array_eq_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("4")".000000 }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("3")".000000 }\n");
+}
+
+static void assert_ldouble_array_eq_entry()
+{
+    long double a[1] = { 3.0 };
+    long double b[1] = { 4.0 };
+
+    ASSERT_ARRAY_EQ(a, b, sizeof(a));
+}
+
+TEST(assert_ldouble_array)
+{
+    expect_error_in_subprocess(
+        assert_ldouble_array_eq_entry,
+        "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
+        "  Diff:\n"
+        "\n"
+        "     - "B("1")" |  { "B("4")".000000 }\n"
+        "     "CR("+ ")CBR("1")CR(" |  ")"{ "CBR("3")".000000 }\n");
+}
+
+static void assert_bool_array_eq_entry()
 {
     bool a[1] = { true };
     bool b[1] = { false };
@@ -532,7 +722,7 @@ static void assert_bool_array_entry()
 TEST(assert_bool_array)
 {
     expect_error_in_subprocess(
-        assert_bool_array_entry,
+        assert_bool_array_eq_entry,
         "  Error: "CBR("The arrays differ at index 0. See diff for details.\n")
         "  Diff:\n"
         "\n"
@@ -544,7 +734,7 @@ struct struct_array_t {
     int a;
 };
 
-static void assert_struct_array_entry()
+static void assert_struct_array_eq_entry()
 {
     struct struct_array_t a[3] = { { 1 }, { 2 }, { 3 } };
     struct struct_array_t b[3] = { { 1 }, { 4 }, { 3 } };
@@ -555,7 +745,7 @@ static void assert_struct_array_entry()
 TEST(assert_struct_array)
 {
     expect_error_in_subprocess(
-        assert_struct_array_entry,
+        assert_struct_array_eq_entry,
         "The arrays differ at index 1. Memory mismatch. See diff for details.");
 }
 
