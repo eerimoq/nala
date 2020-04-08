@@ -320,7 +320,7 @@ call functions above.
 
 .. code-block:: c
 
-   void FUNC_mock_set_errno(int);       // errno on return
+   void FUNC_mock_set_errno(int);       // errno on return, 0 by default
    void FUNC_mock_set_callback(*);      // additional checks and/or actions
 
 Get per call input parameters.
