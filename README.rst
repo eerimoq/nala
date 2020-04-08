@@ -369,6 +369,15 @@ The format string supports the following specifiers.
    %p  - pointer address
    %s  - string
 
+The ``%p`` specifier takes no value when calling the mock function,
+just like pointers are not part of non-variadic function mock
+functions. Instead, set pointers after the mock call.
+
+.. code-block:: c
+
+   foo_mock(1, "%d%p%s, 1, "the-string");
+   foo_mock_set_va_arg_in_pointer_at(1, NULL);
+
 The variadic parameters are controlled by index instead of name.
 
 .. code-block:: c
