@@ -393,6 +393,7 @@ static void assert_int_array_eq_entry()
     int a[3] = { 1, 2, 3 };
     int b[3] = { 1, 4, 3 };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -469,6 +470,7 @@ static void assert_char_array_eq_entry()
     char a[1] = { 'a' };
     char b[1] = { 'A' };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -488,6 +490,7 @@ static void assert_schar_array_eq_entry()
     signed char a[1] = { 'a' };
     signed char b[1] = { 'A' };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -507,6 +510,7 @@ static void assert_uchar_array_eq_entry()
     unsigned char a[1] = { 'a' };
     unsigned char b[1] = { 'A' };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -526,6 +530,7 @@ static void assert_short_array_eq_entry()
     short a[1] = { -5 };
     short b[1] = { 1 };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -545,6 +550,7 @@ static void assert_ushort_array_eq_entry()
     unsigned short a[1] = { 5 };
     unsigned short b[1] = { 1 };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -564,6 +570,7 @@ static void assert_uint_array_eq_entry()
     unsigned int a[1] = { 5 };
     unsigned int b[1] = { 1 };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -583,6 +590,7 @@ static void assert_long_array_eq_entry()
     long a[1] = { 3 };
     long b[1] = { 4 };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -602,6 +610,7 @@ static void assert_ulong_array_eq_entry()
     unsigned long a[1] = { 3 };
     unsigned long b[1] = { 4 };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -621,6 +630,7 @@ static void assert_llong_array_eq_entry()
     long long a[1] = { 3 };
     long long b[1] = { 4 };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -640,6 +650,7 @@ static void assert_ullong_array_eq_entry()
     unsigned long long a[1] = { 3 };
     unsigned long long b[1] = { 4 };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -659,6 +670,7 @@ static void assert_float_array_eq_entry()
     float a[1] = { 3.0 };
     float b[1] = { 4.0 };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -678,6 +690,7 @@ static void assert_double_array_eq_entry()
     double a[1] = { 3.0 };
     double b[1] = { 4.0 };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -697,6 +710,7 @@ static void assert_ldouble_array_eq_entry()
     long double a[1] = { 3.0 };
     long double b[1] = { 4.0 };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -716,6 +730,7 @@ static void assert_bool_array_eq_entry()
     bool a[1] = { true };
     bool b[1] = { false };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
@@ -739,6 +754,7 @@ static void assert_struct_array_eq_entry()
     struct struct_array_t a[3] = { { 1 }, { 2 }, { 3 } };
     struct struct_array_t b[3] = { { 1 }, { 4 }, { 3 } };
 
+    ASSERT_ARRAY_EQ(a, a, sizeof(a));
     ASSERT_ARRAY_EQ(a, b, sizeof(a));
 }
 
