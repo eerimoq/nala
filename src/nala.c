@@ -1713,7 +1713,7 @@ static char *format_array(const void *buf_p,
     return (string_p);
 }
 
-static void assert_arrays_failure(const void *actual_p,
+static void assert_array_failure(const void *actual_p,
                                  const void *expected_p,
                                  size_t item_size,
                                  size_t size,
@@ -1828,12 +1828,12 @@ static void format_array_item_bool(FILE *file_p, const void *value_p)
     fprintf(file_p, "%d", *(bool *)value_p);
 }
 
-#define ASSERT_ARRAYS_TYPE(type, actual_p, expected_p, item_size, size) \
+#define ASSERT_ARRAY_TYPE(type, actual_p, expected_p, item_size, size) \
     size_t i;                                                           \
                                                                         \
     for (i = 0; i < size / item_size; i++) {                            \
         if (actual_p[i] != expected_p[i]) {                             \
-            assert_arrays_failure(actual_p,                             \
+            assert_array_failure(actual_p,                             \
                                   expected_p,                           \
                                   item_size,                            \
                                   size,                                 \
@@ -1842,130 +1842,130 @@ static void format_array_item_bool(FILE *file_p, const void *value_p)
         }                                                               \
     }                                                                   \
 
-void nala_assert_arrays_char(const char *actual_p,
+void nala_assert_array_char(const char *actual_p,
                              const char *expected_p,
                              size_t item_size,
                              size_t size)
 {
-    ASSERT_ARRAYS_TYPE(char, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(char, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays_schar(const signed char *actual_p,
+void nala_assert_array_schar(const signed char *actual_p,
                               const signed char *expected_p,
                               size_t item_size,
                               size_t size)
 {
-    ASSERT_ARRAYS_TYPE(schar, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(schar, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays_uchar(const unsigned char *actual_p,
+void nala_assert_array_uchar(const unsigned char *actual_p,
                               const unsigned char *expected_p,
                               size_t item_size,
                               size_t size)
 {
-    ASSERT_ARRAYS_TYPE(uchar, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(uchar, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays_short(const short *actual_p,
+void nala_assert_array_short(const short *actual_p,
                               const short *expected_p,
                               size_t item_size,
                               size_t size)
 {
-    ASSERT_ARRAYS_TYPE(short, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(short, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays_ushort(const unsigned short *actual_p,
+void nala_assert_array_ushort(const unsigned short *actual_p,
                                const unsigned short *expected_p,
                                size_t item_size,
                                size_t size)
 {
-    ASSERT_ARRAYS_TYPE(ushort, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(ushort, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays_int(const int *actual_p,
+void nala_assert_array_int(const int *actual_p,
                             const int *expected_p,
                             size_t item_size,
                             size_t size)
 {
-    ASSERT_ARRAYS_TYPE(int, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(int, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays_uint(const unsigned int *actual_p,
+void nala_assert_array_uint(const unsigned int *actual_p,
                              const unsigned int *expected_p,
                              size_t item_size,
                              size_t size)
 {
-    ASSERT_ARRAYS_TYPE(uint, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(uint, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays_long(const long *actual_p,
+void nala_assert_array_long(const long *actual_p,
                              const long *expected_p,
                              size_t item_size,
                              size_t size)
 {
-    ASSERT_ARRAYS_TYPE(long, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(long, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays_ulong(const unsigned long *actual_p,
+void nala_assert_array_ulong(const unsigned long *actual_p,
                               const unsigned long *expected_p,
                               size_t item_size,
                               size_t size)
 {
-    ASSERT_ARRAYS_TYPE(ulong, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(ulong, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays_llong(const long long *actual_p,
+void nala_assert_array_llong(const long long *actual_p,
                               const long long *expected_p,
                               size_t item_size,
                               size_t size)
 {
-    ASSERT_ARRAYS_TYPE(llong, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(llong, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays_ullong(const unsigned long long *actual_p,
+void nala_assert_array_ullong(const unsigned long long *actual_p,
                                const unsigned long long *expected_p,
                                size_t item_size,
                                size_t size)
 {
-    ASSERT_ARRAYS_TYPE(ullong, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(ullong, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays_float(const float *actual_p,
+void nala_assert_array_float(const float *actual_p,
                               const float *expected_p,
                               size_t item_size,
                               size_t size)
 {
-    ASSERT_ARRAYS_TYPE(float, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(float, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays_double(const double *actual_p,
+void nala_assert_array_double(const double *actual_p,
                                const double *expected_p,
                                size_t item_size,
                                size_t size)
 {
-    ASSERT_ARRAYS_TYPE(double, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(double, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays_ldouble(const long double *actual_p,
+void nala_assert_array_ldouble(const long double *actual_p,
                                 const long double *expected_p,
                                 size_t item_size,
                                 size_t size)
 {
-    ASSERT_ARRAYS_TYPE(ldouble, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(ldouble, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays_bool(const bool *actual_p,
+void nala_assert_array_bool(const bool *actual_p,
                              const bool *expected_p,
                              size_t item_size,
                              size_t size)
 {
-    ASSERT_ARRAYS_TYPE(bool, actual_p, expected_p, item_size, size);
+    ASSERT_ARRAY_TYPE(bool, actual_p, expected_p, item_size, size);
 }
 
-void nala_assert_arrays(const void *actual_p,
-                        const void *expected_p,
-                        size_t item_size,
-                        size_t size)
+void nala_assert_array(const void *actual_p,
+                       const void *expected_p,
+                       size_t item_size,
+                       size_t size)
 {
     const char *c_actual_p;
     const char *c_expected_p;
