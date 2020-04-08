@@ -312,9 +312,9 @@ Per call control.
 .. code-block:: c
 
    int FUNC_mock_once(<params>, <res>); // check parameters and return once (per call)
-                                        // returns a handle
+                                        // returns a mock instance handle
    int FUNC_mock_ignore_in_once(<res>); // ignore parameters and return once (per call)
-                                        // returns a handle
+                                        // returns a mock instance handle
    void FUNC_mock_real_once();          // call real implementation once (per call)
 
 Change behaviour of currect mock. Works for both per call and every
@@ -329,7 +329,8 @@ Get per call input parameters.
 
 .. code-block:: c
 
-   *FUNC_mock_get_params_in(int);       // get input parameters for given handle
+   *FUNC_mock_get_params_in(int);       // get input parameters for given mock instance
+                                        // handle
 
 For selected function parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
