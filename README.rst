@@ -370,8 +370,8 @@ The format string supports the following specifiers.
    %s  - string
 
 The ``%p`` specifier takes no value when calling the mock function,
-just like pointers are not part of non-variadic function mock
-functions. Instead, set pointers after the mock call.
+just like pointers are not part of the mock function parameters
+list. Instead, set pointers after the mock call.
 
 .. code-block:: c
 
