@@ -347,9 +347,9 @@ For selected function parameters
 For variadic functions
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Variadic functions mocks are slightly different from the above. They
-also have a format string and an ellipsis in some "every call" and
-"per call" functions.
+Variadic function mocks are slightly different from the above. Their
+parameter list is extended with a format string and an ellipsis
+(``...``) in some "every call" and "per call" functions.
 
 .. code-block:: c
 
