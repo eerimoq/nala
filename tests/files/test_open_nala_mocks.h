@@ -43,8 +43,8 @@ struct nala_open_params_t {
 int open_mock_va_arg_real(const char *pathname, int flags, va_list __nala_va_list);
 void open_mock(const char *pathname, int flags, int return_value, const char *vafmt_p, ...);
 int open_mock_once(const char *pathname, int flags, int return_value, const char *vafmt_p, ...);
-void open_mock_ignore_in(int return_value);
-int open_mock_ignore_in_once(int return_value);
+void open_mock_ignore_in(int return_value, const char *vafmt_p);
+int open_mock_ignore_in_once(int return_value, const char *vafmt_p);
 void open_mock_set_errno(int errno_value);
 void open_mock_set_callback(void (*callback)(const char *pathname, int flags, va_list __nala_va_list));
 struct nala_open_params_t *open_mock_get_params_in(int handle);

@@ -727,6 +727,13 @@ TEST(variadic_function_string_out)
     ASSERT_EQ(name, "fia");
 }
 
+TEST(variadic_function_ignore_in)
+{
+    io_control_mock_ignore_in(0, "%s");
+
+    ASSERT_EQ(io_control(1, NULL), 0);
+}
+
 static void variadic_function_error_va_arg_in_entry(void *arg_p)
 {
     (void)arg_p;
@@ -775,7 +782,7 @@ static void variadic_function_pointer_error_wrong_call_order_entry(void *arg_p)
 
 TEST(io_control_no_implementation_function)
 {
-    io_control_no_implementation_mock_ignore_in_once(2);
+    io_control_no_implementation_mock_ignore_in_once(2, "");
     ASSERT_EQ(io_control_no_implementation(1), 2);
 }
 
@@ -1030,10 +1037,10 @@ TEST(rename_parameters)
     getsockopt_mock_ignore_in(0);
     getmntent_mock_ignore_in(NULL);
     gettimeofday_mock_ignore_in(0);
-    ioctl_mock_ignore_in(0);
+    ioctl_mock_ignore_in(0, "");
     mount_mock_ignore_in(0);
     /* nftw_mock(dirpath, fn, nopenfd, flags); */
-    open_mock_ignore_in(0);
+    open_mock_ignore_in(0, "");
     pipe_mock_ignore_in(0);
     poll_mock_ignore_in(0);
     read_mock_ignore_in(0);

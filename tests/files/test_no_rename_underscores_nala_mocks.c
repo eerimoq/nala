@@ -780,21 +780,35 @@ struct nala_va_arg_item_t *nala_va_arg_list_get(
 }
 
 void nala_parse_va_arg_long(const char **format_pp,
-                            va_list vl,
+                            va_list *vl_p,
                             struct nala_va_arg_item_t *item_p)
 {
     switch (**format_pp) {
 
     case 'd':
         item_p->type = nala_va_arg_item_type_ld_t;
-        item_p->ignore_in = false;
-        item_p->ld = va_arg(vl, long);
+
+        if (vl_p != NULL) {
+            item_p->ignore_in = false;
+            item_p->ld = va_arg(*vl_p, long);
+        } else {
+            item_p->ignore_in = true;
+            item_p->ld = 0;
+        }
+
         break;
 
     case 'u':
         item_p->type = nala_va_arg_item_type_lu_t;
-        item_p->ignore_in = false;
-        item_p->lu = va_arg(vl, unsigned long);
+
+        if (vl_p != NULL) {
+            item_p->ignore_in = false;
+            item_p->lu = va_arg(*vl_p, unsigned long);
+        } else {
+            item_p->ignore_in = true;
+            item_p->lu = 0;
+        }
+
         break;
 
     default:
@@ -809,7 +823,7 @@ void nala_parse_va_arg_long(const char **format_pp,
 }
 
 void nala_parse_va_arg_non_long(const char **format_pp,
-                                va_list vl,
+                                va_list *vl_p,
                                 struct nala_va_arg_item_t *item_p)
 {
     const char *string_p;
@@ -818,14 +832,28 @@ void nala_parse_va_arg_non_long(const char **format_pp,
 
     case 'd':
         item_p->type = nala_va_arg_item_type_d_t;
-        item_p->ignore_in = false;
-        item_p->d = va_arg(vl, int);
+
+        if (vl_p != NULL) {
+            item_p->ignore_in = false;
+            item_p->d = va_arg(*vl_p, int);
+        } else {
+            item_p->ignore_in = true;
+            item_p->d = 0;
+        }
+
         break;
 
     case 'u':
         item_p->type = nala_va_arg_item_type_u_t;
-        item_p->ignore_in = false;
-        item_p->u = va_arg(vl, unsigned int);
+
+        if (vl_p != NULL) {
+            item_p->ignore_in = false;
+            item_p->u = va_arg(*vl_p, unsigned int);
+        } else {
+            item_p->ignore_in = true;
+            item_p->u = 0;
+        }
+
         break;
 
     case 'p':
@@ -836,14 +864,19 @@ void nala_parse_va_arg_non_long(const char **format_pp,
 
     case 's':
         item_p->type = nala_va_arg_item_type_s_t;
-        string_p = va_arg(vl, char *);
         item_p->s_p = NULL;
 
-        if (string_p != NULL) {
-            item_p->ignore_in = true;
-            nala_set_param_string(&item_p->in, string_p);
+        if (vl_p != NULL) {
+            string_p = va_arg(*vl_p, char *);
+
+            if (string_p != NULL) {
+                item_p->ignore_in = true;
+                nala_set_param_string(&item_p->in, string_p);
+            } else {
+                item_p->ignore_in = false;
+            }
         } else {
-            item_p->ignore_in = false;
+            item_p->ignore_in = true;
         }
 
         break;
@@ -860,7 +893,7 @@ void nala_parse_va_arg_non_long(const char **format_pp,
 }
 
 struct nala_va_arg_item_t *nala_parse_va_arg(const char **format_pp,
-                                             va_list vl)
+                                             va_list *vl_p)
 {
     struct nala_va_arg_item_t *item_p;
 
@@ -872,9 +905,9 @@ struct nala_va_arg_item_t *nala_parse_va_arg(const char **format_pp,
 
     if (**format_pp == 'l') {
         (*format_pp)++;
-        nala_parse_va_arg_long(format_pp, vl, item_p);
+        nala_parse_va_arg_long(format_pp, vl_p, item_p);
     } else {
-        nala_parse_va_arg_non_long(format_pp, vl, item_p);
+        nala_parse_va_arg_non_long(format_pp, vl_p, item_p);
     }
 
     return (item_p);
@@ -893,7 +926,7 @@ void nala_va_arg_copy_out(void *dst_p, struct nala_va_arg_item_t *self_p)
 
 void nala_parse_va_list(struct nala_va_arg_list_t *list_p,
                         const char *format_p,
-                        va_list vl)
+                        va_list *vl_p)
 {
     struct nala_va_arg_item_t *item_p;
 
@@ -908,7 +941,7 @@ void nala_parse_va_list(struct nala_va_arg_list_t *list_p,
             break;
         } else if (*format_p == '%') {
             format_p++;
-            item_p = nala_parse_va_arg(&format_p, vl);
+            item_p = nala_parse_va_arg(&format_p, vl_p);
             nala_va_arg_list_append(list_p, item_p);
         } else {
             nala_test_failure(

@@ -644,8 +644,8 @@ struct nala_io_control_params_t {
 int io_control_mock_va_arg_real(int kind, va_list __nala_va_list);
 void io_control_mock(int kind, int return_value, const char *vafmt_p, ...);
 int io_control_mock_once(int kind, int return_value, const char *vafmt_p, ...);
-void io_control_mock_ignore_in(int return_value);
-int io_control_mock_ignore_in_once(int return_value);
+void io_control_mock_ignore_in(int return_value, const char *vafmt_p);
+int io_control_mock_ignore_in_once(int return_value, const char *vafmt_p);
 void io_control_mock_set_errno(int errno_value);
 void io_control_mock_set_callback(void (*callback)(int kind, va_list __nala_va_list));
 struct nala_io_control_params_t *io_control_mock_get_params_in(int handle);

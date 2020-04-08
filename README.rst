@@ -352,9 +352,6 @@ also have a format string and an ellipsis in some "every call" and
 
    void <func>_mock(<params>, <res>, format, ...)
    void <func>_mock_once(<params>, <res>, format, ...)
-
-   Not yet implemented:
-
    void <func>_mock_ignore_in(<params>, <res>, format)
    void <func>_mock_ignore_in_once(<params>, <res>, format)
 
