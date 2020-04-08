@@ -299,47 +299,47 @@ For all functions
 
 Same behaviour for every call.
 
-.. code-block::
+.. code-block:: c
 
-   void <func>_mock(<params>, <res>)     - check parameters and return
-   void <func>_mock_ignore_in(<res>)     - ignore parameters and return
-   void <func>_mock_none()               - no calls allowed
-   void <func>_mock_implementation(*)    - replace implementation
-   void <func>_mock_real()               - call real implementation
+   void FUNC_mock(<params>, <res>);     // check parameters and return
+   void FUNC_mock_ignore_in(<res>);     // ignore parameters and return
+   void FUNC_mock_none();               // no calls allowed
+   void FUNC_mock_implementation(*);    // replace implementation
+   void FUNC_mock_real();               // call real implementation
 
 Per call control.
 
-.. code-block::
+.. code-block:: c
 
-   int <func>_mock_once(<params>, <res>) - check parameters and return once (per call)
-   int <func>_mock_ignore_in_once(<res>) - ignore parameters and return once (per call)
-   void <func>_mock_real_once()          - call real implementation once (per call)
+   int FUNC_mock_once(<params>, <res>); // check parameters and return once (per call)
+   int FUNC_mock_ignore_in_once(<res>); // ignore parameters and return once (per call)
+   void FUNC_mock_real_once();          // call real implementation once (per call)
 
 Change behaviour of currect mock. Works for both per call and every
 call functions above.
 
-.. code-block::
+.. code-block:: c
 
-   void <func>_mock_set_errno(int)       - errno on return
-   void <func>_mock_set_callback(*)      - additional checks and/or actions
+   void FUNC_mock_set_errno(int);       // errno on return
+   void FUNC_mock_set_callback(*);      // additional checks and/or actions
 
 Get per call input parameters.
 
-.. code-block::
+.. code-block:: c
 
-   *<func>_mock_get_params_in(int)       - get input parameters for given handle
+   *FUNC_mock_get_params_in(int);       // get input parameters for given handle
 
 For selected function parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block::
+.. code-block:: c
 
-   void <func>_mock_ignore_<param>_in()        - ignore on input
-   void <func>_mock_set_<param>_in(*, size_t)  - check on input
-   void <func>_mock_set_<param>_in_assert(*)   - custom assert function on input
-   void <func>_mock_set_<param>_in_pointer(*)  - check pointer (the address) on input
-   void <func>_mock_set_<param>_out(*, size_t) - value on return
-   void <func>_mock_set_<param>_out_copy(*)    - custom output copy function
+   void FUNC_mock_ignore_PARAM_in();        // ignore on input
+   void FUNC_mock_set_PARAM_in(*, size_t);  // check on input
+   void FUNC_mock_set_PARAM_in_assert(*);   // custom assert function on input
+   void FUNC_mock_set_PARAM_in_pointer(*);  // check pointer (the address) on input
+   void FUNC_mock_set_PARAM_out(*, size_t); // value on return
+   void FUNC_mock_set_PARAM_out_copy(*);    // custom output copy function
 
 For variadic functions
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -348,12 +348,12 @@ Variadic functions mocks are slightly different from the above. They
 also have a format string and an ellipsis in some "every call" and
 "per call" functions.
 
-.. code-block::
+.. code-block:: c
 
-   void <func>_mock(<params>, <res>, format, ...)
-   void <func>_mock_once(<params>, <res>, format, ...)
-   void <func>_mock_ignore_in(<params>, <res>, format)
-   void <func>_mock_ignore_in_once(<params>, <res>, format)
+   void FUNC_mock(<params>, <res>, format, ...);
+   void FUNC_mock_once(<params>, <res>, format, ...);
+   void FUNC_mock_ignore_in(<params>, <res>, format);
+   void FUNC_mock_ignore_in_once(<params>, <res>, format);
 
 The format string supports the following specifiers.
 
@@ -368,14 +368,14 @@ The format string supports the following specifiers.
 
 The variadic parameters are controlled by index instead of name.
 
-.. code-block::
+.. code-block:: c
 
-   void <func>_mock_ignore_va_arg_in_at(uint)          - ignore on input
-   void <func>_mock_set_va_arg_in_at(uint, *, size_t)  - check on input
-   void <func>_mock_set_va_arg_in_assert_at(uint, *)   - custom assert function on input
-   void <func>_mock_set_va_arg_in_pointer_at(uint, *)  - check pointer (the address) on input
-   void <func>_mock_set_va_arg_out_at(uint, *, size_t) - value on return
-   void <func>_mock_set_va_arg_out_copy_at(uint, *)    - custom output copy function
+   void FUNC_mock_ignore_va_arg_in_at(uint);          // ignore on input
+   void FUNC_mock_set_va_arg_in_at(uint, *, size_t);  // check on input
+   void FUNC_mock_set_va_arg_in_assert_at(uint, *);   // custom assert function on input
+   void FUNC_mock_set_va_arg_in_pointer_at(uint, *);  // check pointer (the address) on input
+   void FUNC_mock_set_va_arg_out_at(uint, *, size_t); // value on return
+   void FUNC_mock_set_va_arg_out_copy_at(uint, *);    // custom output copy function
 
 Limitations
 -----------
