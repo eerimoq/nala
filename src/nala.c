@@ -294,7 +294,7 @@ static void print_signal_failure(struct nala_test_t *test_p)
     print_test_failure_report_begin();
     printf("  Test:  " COLOR_BOLD(CYAN, "%s\n"), full_test_name(current_test_p));
     printf("  Error: " COLOR_BOLD(RED, "Terminated by signal %d.\n"),
-           test_p->signal_number);
+           test_p->run.signal_number);
     print_test_failure_report_end();
 }
 
@@ -302,8 +302,8 @@ static const char *test_result(struct nala_test_t *test_p, bool color)
 {
     const char *result_p;
 
-    if (test_p->executed) {
-        if (test_p->exit_code == 0) {
+    if (test_p->run.executed) {
+        if (test_p->run.exit_code == 0) {
             if (color) {
                 result_p = COLOR_BOLD(GREEN, "PASSED");
             } else {
@@ -332,10 +332,10 @@ static void print_test_result(struct nala_test_t *test_p)
     printf("%s %s (" COLOR_BOLD(YELLOW, "%s") ")",
            test_result(test_p, true),
            full_test_name(test_p),
-           format_timespan(test_p->elapsed_time_ms));
+           format_timespan(test_p->run.elapsed_time_ms));
 
-    if (test_p->signal_number != -1) {
-        printf(" (signal: %d)", test_p->signal_number);
+    if (test_p->run.signal_number != -1) {
+        printf(" (signal: %d)", test_p->run.signal_number);
     }
 
     printf("\n");
@@ -358,8 +358,8 @@ static void print_summary(struct nala_test_t *test_p,
     while (test_p != NULL) {
         total++;
 
-        if (test_p->executed) {
-            if (test_p->exit_code == 0) {
+        if (test_p->run.executed) {
+            if (test_p->run.exit_code == 0) {
                 passed++;
             } else {
                 failed++;
@@ -424,7 +424,7 @@ static void write_report_json(struct nala_test_t *test_p)
                 "        }%s\n",
                 full_test_name(test_p),
                 test_result(test_p, false),
-                format_timespan(test_p->elapsed_time_ms),
+                format_timespan(test_p->run.elapsed_time_ms),
                 (test_p->next_p != NULL ? "," : ""));
         test_p = test_p->next_p;
     }
@@ -462,20 +462,20 @@ static int run_test(struct nala_test_t *test_p)
 
     result_p = nala_subprocess_call(test_entry, test_p);
 
-    test_p->executed = true;
-    test_p->exit_code = result_p->exit_code;
-    test_p->signal_number = result_p->signal_number;
+    test_p->run.executed = true;
+    test_p->run.exit_code = result_p->exit_code;
+    test_p->run.signal_number = result_p->signal_number;
     nala_subprocess_result_free(result_p);
 
-    if (test_p->exit_code != 0) {
+    if (test_p->run.exit_code != 0) {
         res = 1;
     }
 
     gettimeofday(&end_time, NULL);
     timersub(&end_time, &start_time, &elapsed_time);
-    test_p->elapsed_time_ms = timeval_to_ms(&elapsed_time);
+    test_p->run.elapsed_time_ms = timeval_to_ms(&elapsed_time);
 
-    if (test_p->signal_number != -1) {
+    if (test_p->run.signal_number != -1) {
         print_signal_failure(test_p);
     }
 
@@ -602,12 +602,9 @@ static int read_job_response(int fd)
 
     /* Copy test result to this process's list. */
     test_p = response.test_p;
-    test_p->executed = response.test.executed;
-    test_p->exit_code = response.test.exit_code;
-    test_p->signal_number = response.test.signal_number;
-    test_p->elapsed_time_ms = response.test.elapsed_time_ms;
+    test_p->run = response.test.run;
 
-    return (test_p->exit_code);
+    return (test_p->run.exit_code);
 }
 
 static int run_tests_in_parallel(struct nala_test_t *test_p)
@@ -716,7 +713,7 @@ static int run_tests(struct nala_test_t *tests_p)
     test_p = tests_p;
 
     while (test_p != NULL) {
-        test_p->executed = false;
+        test_p->run.executed = false;
         test_p = test_p->next_p;
     }
 

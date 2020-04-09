@@ -209,10 +209,12 @@ struct nala_test_t {
     int line;
     void (*func)(void);
     void (*before_fork_func)(void);
-    bool executed;
-    int exit_code;
-    int signal_number;
-    float elapsed_time_ms;
+    struct {
+        bool executed;
+        int exit_code;
+        int signal_number;
+        float elapsed_time_ms;
+    } run;
     struct nala_test_t *next_p;
 };
 
