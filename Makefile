@@ -11,6 +11,8 @@ all:
 	$(MAKE) -C examples/no_implementation
 	$(MAKE) -C examples/mock_exit clean
 	$(MAKE) -C examples/mock_exit
+	$(MAKE) -C examples/mock_assert_struct_member clean
+	$(MAKE) -C examples/mock_assert_struct_member
 	$(MAKE) -C examples/failures clean
 	! $(MAKE) -C examples/failures
 	rm -rf my-suite
