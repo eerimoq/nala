@@ -1,6 +1,7 @@
 include LICENSE
 include Makefile
 include nala/dist/*
+include nala/subcommands/init/*
 include nala/templates/*
 include nala/*.txt
 include nala/*.c

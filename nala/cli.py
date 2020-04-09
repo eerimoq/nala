@@ -11,34 +11,16 @@ from .version import __version__
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 DIST_DIR = os.path.join(SCRIPT_DIR, 'dist')
-TEMPLATES_DIR = os.path.join(SCRIPT_DIR, 'templates')
+SUBCOMMANDS_INIT_DIR = os.path.join(SCRIPT_DIR, 'subcommands', 'init')
 RENAME_PARAMETERS_TXT = os.path.join(SCRIPT_DIR, 'rename_parameters.txt')
 REAL_VARIADIC_FUNCTIONS_C = os.path.join(SCRIPT_DIR, 'real_variadic_functions.c')
 
 
-def generate_suites():
-    shutil.copyfile(os.path.join(TEMPLATES_DIR, 'test_assertions.c'),
-                    'test_assertions.c')
-    shutil.copyfile(os.path.join(TEMPLATES_DIR, 'test_time.c'),
-                    'test_time.c')
-
-
-def generate_makefiles():
-    shutil.copyfile(os.path.join(TEMPLATES_DIR, 'Makefile'), 'Makefile')
-    shutil.copyfile(os.path.join(TEMPLATES_DIR, 'test.mk'), 'test.mk')
-
-
-def copy_nala():
+def do_init(args):
+    shutil.copytree(SUBCOMMANDS_INIT_DIR, args.name)
+    os.chdir(args.name)
     shutil.copyfile(os.path.join(DIST_DIR, 'nala.h'), 'nala.h')
     shutil.copyfile(os.path.join(DIST_DIR, 'nala.c'), 'nala.c')
-
-
-def do_init(args):
-    os.mkdir(args.name)
-    os.chdir(args.name)
-    generate_suites()
-    generate_makefiles()
-    copy_nala()
 
     print(f"Run 'make -C {args.name}' to build and run all tests!")
 
