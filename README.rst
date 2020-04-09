@@ -50,7 +50,7 @@ Getting started
 Use ``nala init foo`` to create a folder ``foo`` with two test files,
 ``test_assertions.c`` and ``test_time.c``. The first uses all
 assertions and captures output, and the second mocks the time
-function.  .
+function.
 
 .. code-block:: bash
 
