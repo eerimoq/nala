@@ -1216,8 +1216,8 @@ TEST(call_with_arg_get_params_in)
 
     handle = call_with_arg_mock_ignore_in_once(9);
     ASSERT_EQ(call_with_arg(call_with_arg_callback, &arg), 9);
-    ASSERT_FUNCTION_POINTERS_EQ(call_with_arg_mock_get_params_in(handle)->func,
-                                call_with_arg_callback);
+    ASSERT_FUNCTION_POINTER_EQ(call_with_arg_mock_get_params_in(handle)->func,
+                               call_with_arg_callback);
     ASSERT_EQ(call_with_arg_mock_get_params_in(handle)->arg_p, &arg);
 }
 

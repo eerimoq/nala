@@ -103,8 +103,8 @@ static void bar()
 
 TEST(assert_function_pointers)
 {
-    ASSERT_FUNCTION_POINTERS_EQ(foo, foo);
-    ASSERT_FUNCTION_POINTERS_NE(foo, bar);
+    ASSERT_FUNCTION_POINTER_EQ(foo, foo);
+    ASSERT_FUNCTION_POINTER_NE(foo, bar);
 }
 
 TEST(assert)
@@ -324,7 +324,7 @@ TEST(assert_memory_eq_error)
 
 static void assert_function_pointers_eq_entry()
 {
-    ASSERT_FUNCTION_POINTERS_EQ(foo, bar);
+    ASSERT_FUNCTION_POINTER_EQ(foo, bar);
 }
 
 TEST(assert_function_pointers_eq_error)
@@ -336,7 +336,7 @@ TEST(assert_function_pointers_eq_error)
 
 static void assert_function_pointers_ne_entry()
 {
-    ASSERT_FUNCTION_POINTERS_NE(foo, foo);
+    ASSERT_FUNCTION_POINTER_NE(foo, foo);
 }
 
 TEST(assert_function_pointers_ne_error)

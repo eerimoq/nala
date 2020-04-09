@@ -74,7 +74,7 @@
 /**
  * Assert that given function pointes are equal.
  */
-#define ASSERT_FUNCTION_POINTERS_EQ(actual, expected)                   \
+#define ASSERT_FUNCTION_POINTER_EQ(actual, expected)                    \
     if (actual != expected) {                                           \
         nala_test_failure(nala_format("%p != %p", actual, expected));   \
     }
@@ -82,7 +82,7 @@
 /**
  * Assert that given function pointes are not equal.
  */
-#define ASSERT_FUNCTION_POINTERS_NE(actual, expected)                   \
+#define ASSERT_FUNCTION_POINTER_NE(actual, expected)                    \
     if (actual == expected) {                                           \
         nala_test_failure(nala_format("%p == %p", actual, expected));   \
     }
