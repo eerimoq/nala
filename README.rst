@@ -141,7 +141,7 @@ Create a code coverage report and open it with Firefox.
    $ firefox /home/erik/workspace/nala/foo/build/coverage/index.html
 
 Assertions and other macros
-==========================
+===========================
 
 Below is a list of all assertions and other useful macros. They are
 all defined in `include/nala.h`_.
