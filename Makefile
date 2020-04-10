@@ -3,18 +3,8 @@
 all:
 	$(MAKE) dist
 	$(MAKE) test
-	$(MAKE) -C examples/basic clean
-	$(MAKE) -C examples/basic
-	$(MAKE) -C examples/mock_square clean
-	$(MAKE) -C examples/mock_square
-	$(MAKE) -C examples/no_implementation clean
-	$(MAKE) -C examples/no_implementation
-	$(MAKE) -C examples/mock_exit clean
-	$(MAKE) -C examples/mock_exit
-	$(MAKE) -C examples/mock_assert_struct_member clean
-	$(MAKE) -C examples/mock_assert_struct_member
-	$(MAKE) -C examples/failures clean
-	! $(MAKE) -C examples/failures
+	$(MAKE) -C examples clean
+	$(MAKE) -C examples
 	rm -rf my-suite
 	PYTHONPATH=. python3 -m nala init my-suite
 	$(MAKE) -C my-suite NALA="PYTHONPATH=.. python3 -m nala"
