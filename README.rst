@@ -163,8 +163,8 @@ all defined in `include/nala.h`_.
                                                  // given needle string.
    ASSERT_MEMORY_EQ(actual, expected, size);     // Assert that given memory regions are equal.
    ASSERT_ARRAY_EQ(actual, expected, size);      // Assert that given arrays are equal.
-   ASSERT_FUNCTION_POINTER_EQ(actual, expected); // Assert that given function pointes are equal.
-   ASSERT_FUNCTION_POINTER_NE(actual, expected); // Assert that given function pointes are not equal.
+   ASSERT_FUNCTION_POINTER_EQ(actual, expected); // Assert that given function pointers are equal.
+   ASSERT_FUNCTION_POINTER_NE(actual, expected); // Assert that given function pointers are not equal.
    ASSERT(cond);                                 // Assert that given condition is true.
    FAIL(message);                                // Fail current test with given message.
    CAPTURE_OUTPUT(stdout_name, stderr_name);     // A capture output block.
