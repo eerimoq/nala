@@ -2022,10 +2022,10 @@ struct nala_call_params_t *call_mock_get_params_in(int handle)
     return (&instance_p->data.params_in);
 }
 
-void call_mock_set_callback_in(const void *buf_p, size_t size)
+void call_mock_set_callback_in(int (*buf_p)(int value), size_t size)
 {
     nala_set_param_buf(&nala_get_params_call()->callback_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -2054,10 +2054,10 @@ void call_mock_set_callback_in_pointer(int (*callback)(int value))
     nala_params_p->callback = callback;
 }
 
-void call_mock_set_callback_out(const void *buf_p, size_t size)
+void call_mock_set_callback_out(int (*buf_p)(int value), size_t size)
 {
     nala_set_param_buf(&nala_get_params_call()->callback_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -2682,10 +2682,10 @@ struct nala_compose_twice_params_t *compose_twice_mock_get_params_in(int handle)
     return (&instance_p->data.params_in);
 }
 
-void compose_twice_mock_set_dummy_struct_in(const void *buf_p, size_t size)
+void compose_twice_mock_set_dummy_struct_in(DummyStruct *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_compose_twice()->dummy_struct_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -2714,10 +2714,10 @@ void compose_twice_mock_set_dummy_struct_in_pointer(DummyStruct *dummy_struct)
     nala_params_p->dummy_struct = dummy_struct;
 }
 
-void compose_twice_mock_set_dummy_struct_out(const void *buf_p, size_t size)
+void compose_twice_mock_set_dummy_struct_out(DummyStruct *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_compose_twice()->dummy_struct_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -2737,10 +2737,10 @@ void compose_twice_mock_set_dummy_struct_out_copy(void (*callback)(DummyStruct *
     nala_params_p->dummy_struct_out_copy = callback;
 }
 
-void compose_twice_mock_set_dummy_struct_modifier_in(const void *buf_p, size_t size)
+void compose_twice_mock_set_dummy_struct_modifier_in(DummyStruct *(*buf_p)(DummyStruct *dummy_struct), size_t size)
 {
     nala_set_param_buf(&nala_get_params_compose_twice()->dummy_struct_modifier_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -2769,10 +2769,10 @@ void compose_twice_mock_set_dummy_struct_modifier_in_pointer(DummyStruct *(*dumm
     nala_params_p->dummy_struct_modifier = dummy_struct_modifier;
 }
 
-void compose_twice_mock_set_dummy_struct_modifier_out(const void *buf_p, size_t size)
+void compose_twice_mock_set_dummy_struct_modifier_out(DummyStruct *(*buf_p)(DummyStruct *dummy_struct), size_t size)
 {
     nala_set_param_buf(&nala_get_params_compose_twice()->dummy_struct_modifier_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -3087,10 +3087,10 @@ struct nala_double_pointer_params_t *double_pointer_mock_get_params_in(int handl
     return (&instance_p->data.params_in);
 }
 
-void double_pointer_mock_set_value_pp_in(const void *buf_p, size_t size)
+void double_pointer_mock_set_value_pp_in(int **buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_double_pointer()->value_pp_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -3119,10 +3119,10 @@ void double_pointer_mock_set_value_pp_in_pointer(int **value_pp)
     nala_params_p->value_pp = value_pp;
 }
 
-void double_pointer_mock_set_value_pp_out(const void *buf_p, size_t size)
+void double_pointer_mock_set_value_pp_out(int **buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_double_pointer()->value_pp_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -4031,10 +4031,10 @@ void edit_number_mock_ignore_number_in(void)
     nala_get_params_edit_number()->ignore_number_in = true;
 }
 
-void edit_number_mock_set_dummy_struct_in(const void *buf_p, size_t size)
+void edit_number_mock_set_dummy_struct_in(DummyStruct *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_edit_number()->dummy_struct_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -4063,10 +4063,10 @@ void edit_number_mock_set_dummy_struct_in_pointer(DummyStruct *dummy_struct)
     nala_params_p->dummy_struct = dummy_struct;
 }
 
-void edit_number_mock_set_dummy_struct_out(const void *buf_p, size_t size)
+void edit_number_mock_set_dummy_struct_out(DummyStruct *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_edit_number()->dummy_struct_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -4381,10 +4381,10 @@ struct nala_endmntent_params_t *endmntent_mock_get_params_in(int handle)
     return (&instance_p->data.params_in);
 }
 
-void endmntent_mock_set_streamp_in(const void *buf_p, size_t size)
+void endmntent_mock_set_streamp_in(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_endmntent()->streamp_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -4413,10 +4413,10 @@ void endmntent_mock_set_streamp_in_pointer(FILE *streamp)
     nala_params_p->streamp = streamp;
 }
 
-void endmntent_mock_set_streamp_out(const void *buf_p, size_t size)
+void endmntent_mock_set_streamp_out(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_endmntent()->streamp_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -5003,10 +5003,10 @@ struct nala_fclose_params_t *fclose_mock_get_params_in(int handle)
     return (&instance_p->data.params_in);
 }
 
-void fclose_mock_set_stream_in(const void *buf_p, size_t size)
+void fclose_mock_set_stream_in(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fclose()->stream_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -5035,10 +5035,10 @@ void fclose_mock_set_stream_in_pointer(FILE *stream)
     nala_params_p->stream = stream;
 }
 
-void fclose_mock_set_stream_out(const void *buf_p, size_t size)
+void fclose_mock_set_stream_out(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fclose()->stream_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -5353,10 +5353,10 @@ struct nala_fflush_params_t *fflush_mock_get_params_in(int handle)
     return (&instance_p->data.params_in);
 }
 
-void fflush_mock_set_stream_in(const void *buf_p, size_t size)
+void fflush_mock_set_stream_in(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fflush()->stream_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -5385,10 +5385,10 @@ void fflush_mock_set_stream_in_pointer(FILE *stream)
     nala_params_p->stream = stream;
 }
 
-void fflush_mock_set_stream_out(const void *buf_p, size_t size)
+void fflush_mock_set_stream_out(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fflush()->stream_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -5703,10 +5703,10 @@ struct nala_fileno_params_t *fileno_mock_get_params_in(int handle)
     return (&instance_p->data.params_in);
 }
 
-void fileno_mock_set_stream_in(const void *buf_p, size_t size)
+void fileno_mock_set_stream_in(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fileno()->stream_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -5735,10 +5735,10 @@ void fileno_mock_set_stream_in_pointer(FILE *stream)
     nala_params_p->stream = stream;
 }
 
-void fileno_mock_set_stream_out(const void *buf_p, size_t size)
+void fileno_mock_set_stream_out(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fileno()->stream_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -6123,10 +6123,10 @@ void fopen_mock_ignore_mode_in(void)
     nala_get_params_fopen()->ignore_mode_in = true;
 }
 
-void fopen_mock_set_path_in(const void *buf_p, size_t size)
+void fopen_mock_set_path_in(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fopen()->path_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -6155,10 +6155,10 @@ void fopen_mock_set_path_in_pointer(const char *path)
     nala_params_p->path = path;
 }
 
-void fopen_mock_set_path_out(const void *buf_p, size_t size)
+void fopen_mock_set_path_out(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fopen()->path_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -6178,10 +6178,10 @@ void fopen_mock_set_path_out_copy(void (*callback)(const char *dst_p, const char
     nala_params_p->path_out_copy = callback;
 }
 
-void fopen_mock_set_mode_in(const void *buf_p, size_t size)
+void fopen_mock_set_mode_in(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fopen()->mode_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -6210,10 +6210,10 @@ void fopen_mock_set_mode_in_pointer(const char *mode)
     nala_params_p->mode = mode;
 }
 
-void fopen_mock_set_mode_out(const void *buf_p, size_t size)
+void fopen_mock_set_mode_out(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fopen()->mode_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -6586,10 +6586,10 @@ void fread_mock_ignore_nmemb_in(void)
     nala_get_params_fread()->ignore_nmemb_in = true;
 }
 
-void fread_mock_set_ptr_in(const void *buf_p, size_t size)
+void fread_mock_set_ptr_in(void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fread()->ptr_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -6618,10 +6618,10 @@ void fread_mock_set_ptr_in_pointer(void *ptr)
     nala_params_p->ptr = ptr;
 }
 
-void fread_mock_set_ptr_out(const void *buf_p, size_t size)
+void fread_mock_set_ptr_out(void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fread()->ptr_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -6641,10 +6641,10 @@ void fread_mock_set_ptr_out_copy(void (*callback)(void *dst_p, void *src_p, size
     nala_params_p->ptr_out_copy = callback;
 }
 
-void fread_mock_set_stream_in(const void *buf_p, size_t size)
+void fread_mock_set_stream_in(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fread()->stream_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -6673,10 +6673,10 @@ void fread_mock_set_stream_in_pointer(FILE *stream)
     nala_params_p->stream = stream;
 }
 
-void fread_mock_set_stream_out(const void *buf_p, size_t size)
+void fread_mock_set_stream_out(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fread()->stream_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -6981,10 +6981,10 @@ struct nala_free_params_t *free_mock_get_params_in(int handle)
     return (&instance_p->data.params_in);
 }
 
-void free_mock_set_ptr_in(const void *buf_p, size_t size)
+void free_mock_set_ptr_in(void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_free()->ptr_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -7013,10 +7013,10 @@ void free_mock_set_ptr_in_pointer(void *ptr)
     nala_params_p->ptr = ptr;
 }
 
-void free_mock_set_ptr_out(const void *buf_p, size_t size)
+void free_mock_set_ptr_out(void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_free()->ptr_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -7361,10 +7361,10 @@ void fseek_mock_ignore_whence_in(void)
     nala_get_params_fseek()->ignore_whence_in = true;
 }
 
-void fseek_mock_set_stream_in(const void *buf_p, size_t size)
+void fseek_mock_set_stream_in(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fseek()->stream_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -7393,10 +7393,10 @@ void fseek_mock_set_stream_in_pointer(FILE *stream)
     nala_params_p->stream = stream;
 }
 
-void fseek_mock_set_stream_out(const void *buf_p, size_t size)
+void fseek_mock_set_stream_out(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fseek()->stream_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -7711,10 +7711,10 @@ struct nala_ftell_params_t *ftell_mock_get_params_in(int handle)
     return (&instance_p->data.params_in);
 }
 
-void ftell_mock_set_stream_in(const void *buf_p, size_t size)
+void ftell_mock_set_stream_in(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_ftell()->stream_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -7743,10 +7743,10 @@ void ftell_mock_set_stream_in_pointer(FILE *stream)
     nala_params_p->stream = stream;
 }
 
-void ftell_mock_set_stream_out(const void *buf_p, size_t size)
+void ftell_mock_set_stream_out(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_ftell()->stream_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -8122,7 +8122,7 @@ void fwrite_mock_ignore_nmemb_in(void)
 void fwrite_mock_set_ptr_in(const void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fwrite()->ptr_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -8154,7 +8154,7 @@ void fwrite_mock_set_ptr_in_pointer(const void *ptr)
 void fwrite_mock_set_ptr_out(const void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fwrite()->ptr_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -8174,10 +8174,10 @@ void fwrite_mock_set_ptr_out_copy(void (*callback)(const void *dst_p, const void
     nala_params_p->ptr_out_copy = callback;
 }
 
-void fwrite_mock_set_stream_in(const void *buf_p, size_t size)
+void fwrite_mock_set_stream_in(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fwrite()->stream_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -8206,10 +8206,10 @@ void fwrite_mock_set_stream_in_pointer(FILE *stream)
     nala_params_p->stream = stream;
 }
 
-void fwrite_mock_set_stream_out(const void *buf_p, size_t size)
+void fwrite_mock_set_stream_out(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_fwrite()->stream_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -8524,10 +8524,10 @@ struct nala_getmntent_params_t *getmntent_mock_get_params_in(int handle)
     return (&instance_p->data.params_in);
 }
 
-void getmntent_mock_set_stream_in(const void *buf_p, size_t size)
+void getmntent_mock_set_stream_in(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_getmntent()->stream_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -8556,10 +8556,10 @@ void getmntent_mock_set_stream_in_pointer(FILE *stream)
     nala_params_p->stream = stream;
 }
 
-void getmntent_mock_set_stream_out(const void *buf_p, size_t size)
+void getmntent_mock_set_stream_out(FILE *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_getmntent()->stream_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -8864,10 +8864,10 @@ struct nala_in_out_params_t *in_out_mock_get_params_in(int handle)
     return (&instance_p->data.params_in);
 }
 
-void in_out_mock_set_buf_p_in(const void *buf_p, size_t size)
+void in_out_mock_set_buf_p_in(int *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_in_out()->buf_p_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -8896,10 +8896,10 @@ void in_out_mock_set_buf_p_in_pointer(int *buf_p)
     nala_params_p->buf_p = buf_p;
 }
 
-void in_out_mock_set_buf_p_out(const void *buf_p, size_t size)
+void in_out_mock_set_buf_p_out(int *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_in_out()->buf_p_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -10349,10 +10349,10 @@ void mount_mock_ignore_mountflags_in(void)
     nala_get_params_mount()->ignore_mountflags_in = true;
 }
 
-void mount_mock_set_source_in(const void *buf_p, size_t size)
+void mount_mock_set_source_in(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_mount()->source_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -10381,10 +10381,10 @@ void mount_mock_set_source_in_pointer(const char *source)
     nala_params_p->source = source;
 }
 
-void mount_mock_set_source_out(const void *buf_p, size_t size)
+void mount_mock_set_source_out(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_mount()->source_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -10404,10 +10404,10 @@ void mount_mock_set_source_out_copy(void (*callback)(const char *dst_p, const ch
     nala_params_p->source_out_copy = callback;
 }
 
-void mount_mock_set_target_in(const void *buf_p, size_t size)
+void mount_mock_set_target_in(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_mount()->target_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -10436,10 +10436,10 @@ void mount_mock_set_target_in_pointer(const char *target)
     nala_params_p->target = target;
 }
 
-void mount_mock_set_target_out(const void *buf_p, size_t size)
+void mount_mock_set_target_out(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_mount()->target_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -10459,10 +10459,10 @@ void mount_mock_set_target_out_copy(void (*callback)(const char *dst_p, const ch
     nala_params_p->target_out_copy = callback;
 }
 
-void mount_mock_set_filesystemtype_in(const void *buf_p, size_t size)
+void mount_mock_set_filesystemtype_in(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_mount()->filesystemtype_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -10491,10 +10491,10 @@ void mount_mock_set_filesystemtype_in_pointer(const char *filesystemtype)
     nala_params_p->filesystemtype = filesystemtype;
 }
 
-void mount_mock_set_filesystemtype_out(const void *buf_p, size_t size)
+void mount_mock_set_filesystemtype_out(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_mount()->filesystemtype_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -10517,7 +10517,7 @@ void mount_mock_set_filesystemtype_out_copy(void (*callback)(const char *dst_p, 
 void mount_mock_set_data_in(const void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_mount()->data_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -10549,7 +10549,7 @@ void mount_mock_set_data_in_pointer(const void *data)
 void mount_mock_set_data_out(const void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_mount()->data_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -10875,10 +10875,10 @@ void output_message_mock_ignore_message_in(void)
     nala_get_params_output_message()->ignore_message_in = true;
 }
 
-void output_message_mock_set_message_in(const void *buf_p, size_t size)
+void output_message_mock_set_message_in(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_output_message()->message_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -10907,10 +10907,10 @@ void output_message_mock_set_message_in_pointer(const char *message)
     nala_params_p->message = message;
 }
 
-void output_message_mock_set_message_out(const void *buf_p, size_t size)
+void output_message_mock_set_message_out(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_output_message()->message_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -11225,10 +11225,10 @@ struct nala_pipe_params_t *pipe_mock_get_params_in(int handle)
     return (&instance_p->data.params_in);
 }
 
-void pipe_mock_set_pipefd_in(const void *buf_p, size_t size)
+void pipe_mock_set_pipefd_in(int buf_p[2], size_t size)
 {
     nala_set_param_buf(&nala_get_params_pipe()->pipefd_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -11257,10 +11257,10 @@ void pipe_mock_set_pipefd_in_pointer(int pipefd[2])
     nala_params_p->pipefd = pipefd;
 }
 
-void pipe_mock_set_pipefd_out(const void *buf_p, size_t size)
+void pipe_mock_set_pipefd_out(int buf_p[2], size_t size)
 {
     nala_set_param_buf(&nala_get_params_pipe()->pipefd_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -11605,10 +11605,10 @@ void poll_mock_ignore_timeout_in(void)
     nala_get_params_poll()->ignore_timeout_in = true;
 }
 
-void poll_mock_set_fds_in(const void *buf_p, size_t size)
+void poll_mock_set_fds_in(struct pollfd *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_poll()->fds_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -11637,10 +11637,10 @@ void poll_mock_set_fds_in_pointer(struct pollfd *fds)
     nala_params_p->fds = fds;
 }
 
-void poll_mock_set_fds_out(const void *buf_p, size_t size)
+void poll_mock_set_fds_out(struct pollfd *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_poll()->fds_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -12243,10 +12243,10 @@ void read_mock_ignore_count_in(void)
     nala_get_params_read()->ignore_count_in = true;
 }
 
-void read_mock_set_buf_in(const void *buf_p, size_t size)
+void read_mock_set_buf_in(void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_read()->buf_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -12275,10 +12275,10 @@ void read_mock_set_buf_in_pointer(void *buf)
     nala_params_p->buf = buf;
 }
 
-void read_mock_set_buf_out(const void *buf_p, size_t size)
+void read_mock_set_buf_out(void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_read()->buf_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -12684,7 +12684,7 @@ void sendto_mock_ignore_addrlen_in(void)
 void sendto_mock_set_buf_in(const void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_sendto()->buf_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -12716,7 +12716,7 @@ void sendto_mock_set_buf_in_pointer(const void *buf)
 void sendto_mock_set_buf_out(const void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_sendto()->buf_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -12736,10 +12736,10 @@ void sendto_mock_set_buf_out_copy(void (*callback)(const void *dst_p, const void
     nala_params_p->buf_out_copy = callback;
 }
 
-void sendto_mock_set_dest_addr_in(const void *buf_p, size_t size)
+void sendto_mock_set_dest_addr_in(const struct sockaddr *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_sendto()->dest_addr_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -12768,10 +12768,10 @@ void sendto_mock_set_dest_addr_in_pointer(const struct sockaddr *dest_addr)
     nala_params_p->dest_addr = dest_addr;
 }
 
-void sendto_mock_set_dest_addr_out(const void *buf_p, size_t size)
+void sendto_mock_set_dest_addr_out(const struct sockaddr *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_sendto()->dest_addr_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -13149,7 +13149,7 @@ void setsockopt_mock_ignore_optlen_in(void)
 void setsockopt_mock_set_optval_in(const void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_setsockopt()->optval_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -13181,7 +13181,7 @@ void setsockopt_mock_set_optval_in_pointer(const void *optval)
 void setsockopt_mock_set_optval_out(const void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_setsockopt()->optval_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -13827,10 +13827,10 @@ void statvfs_mock_ignore_path_in(void)
     nala_get_params_statvfs()->ignore_path_in = true;
 }
 
-void statvfs_mock_set_path_in(const void *buf_p, size_t size)
+void statvfs_mock_set_path_in(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_statvfs()->path_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -13859,10 +13859,10 @@ void statvfs_mock_set_path_in_pointer(const char *path)
     nala_params_p->path = path;
 }
 
-void statvfs_mock_set_path_out(const void *buf_p, size_t size)
+void statvfs_mock_set_path_out(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_statvfs()->path_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -13882,10 +13882,10 @@ void statvfs_mock_set_path_out_copy(void (*callback)(const char *dst_p, const ch
     nala_params_p->path_out_copy = callback;
 }
 
-void statvfs_mock_set_buf_in(const void *buf_p, size_t size)
+void statvfs_mock_set_buf_in(struct statvfs *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_statvfs()->buf_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -13914,10 +13914,10 @@ void statvfs_mock_set_buf_in_pointer(struct statvfs *buf)
     nala_params_p->buf = buf;
 }
 
-void statvfs_mock_set_buf_out(const void *buf_p, size_t size)
+void statvfs_mock_set_buf_out(struct statvfs *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_statvfs()->buf_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -14222,10 +14222,10 @@ struct nala_struct_param_params_t *struct_param_mock_get_params_in(int handle)
     return (&instance_p->data.params_in);
 }
 
-void struct_param_mock_set_data_in(const void *buf_p, size_t size)
+void struct_param_mock_set_data_in(struct struct_param_type *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_struct_param()->data_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -14254,10 +14254,10 @@ void struct_param_mock_set_data_in_pointer(struct struct_param_type *data)
     nala_params_p->data = data;
 }
 
-void struct_param_mock_set_data_out(const void *buf_p, size_t size)
+void struct_param_mock_set_data_out(struct struct_param_type *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_struct_param()->data_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -14840,10 +14840,10 @@ struct nala_time_params_t *time_mock_get_params_in(int handle)
     return (&instance_p->data.params_in);
 }
 
-void time_mock_set_tloc_in(const void *buf_p, size_t size)
+void time_mock_set_tloc_in(time_t *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_time()->tloc_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -14872,10 +14872,10 @@ void time_mock_set_tloc_in_pointer(time_t *tloc)
     nala_params_p->tloc = tloc;
 }
 
-void time_mock_set_tloc_out(const void *buf_p, size_t size)
+void time_mock_set_tloc_out(time_t *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_time()->tloc_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -15248,10 +15248,10 @@ void timerfd_settime_mock_ignore_flags_in(void)
     nala_get_params_timerfd_settime()->ignore_flags_in = true;
 }
 
-void timerfd_settime_mock_set_new_value_in(const void *buf_p, size_t size)
+void timerfd_settime_mock_set_new_value_in(const struct itimerspec *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_timerfd_settime()->new_value_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -15280,10 +15280,10 @@ void timerfd_settime_mock_set_new_value_in_pointer(const struct itimerspec *new_
     nala_params_p->new_value = new_value;
 }
 
-void timerfd_settime_mock_set_new_value_out(const void *buf_p, size_t size)
+void timerfd_settime_mock_set_new_value_out(const struct itimerspec *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_timerfd_settime()->new_value_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -15303,10 +15303,10 @@ void timerfd_settime_mock_set_new_value_out_copy(void (*callback)(const struct i
     nala_params_p->new_value_out_copy = callback;
 }
 
-void timerfd_settime_mock_set_old_value_in(const void *buf_p, size_t size)
+void timerfd_settime_mock_set_old_value_in(struct itimerspec *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_timerfd_settime()->old_value_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -15335,10 +15335,10 @@ void timerfd_settime_mock_set_old_value_in_pointer(struct itimerspec *old_value)
     nala_params_p->old_value = old_value;
 }
 
-void timerfd_settime_mock_set_old_value_out(const void *buf_p, size_t size)
+void timerfd_settime_mock_set_old_value_out(struct itimerspec *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_timerfd_settime()->old_value_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -17040,7 +17040,7 @@ void write_mock_ignore_count_in(void)
 void write_mock_set_buf_in(const void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_write()->buf_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -17072,7 +17072,7 @@ void write_mock_set_buf_in_pointer(const void *buf)
 void write_mock_set_buf_out(const void *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_write()->buf_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 

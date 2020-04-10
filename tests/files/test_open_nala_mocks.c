@@ -1637,10 +1637,10 @@ void open_mock_ignore_flags_in(void)
     nala_get_params_open()->ignore_flags_in = true;
 }
 
-void open_mock_set_pathname_in(const void *buf_p, size_t size)
+void open_mock_set_pathname_in(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_open()->pathname_in,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 
@@ -1669,10 +1669,10 @@ void open_mock_set_pathname_in_pointer(const char *pathname)
     nala_params_p->pathname = pathname;
 }
 
-void open_mock_set_pathname_out(const void *buf_p, size_t size)
+void open_mock_set_pathname_out(const char *buf_p, size_t size)
 {
     nala_set_param_buf(&nala_get_params_open()->pathname_out,
-                       buf_p,
+                       (const void *)(uintptr_t)buf_p,
                        size);
 }
 

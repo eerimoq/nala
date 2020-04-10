@@ -302,6 +302,7 @@ class FunctionMock:
             if not self.is_pointer(param):
                 continue
 
+            param_buf = self.rename_param(param, 'buf_p')
             param_actual = self.rename_param(param, 'actual_p')
             param_expected = self.rename_param(param, 'expected_p')
             param_dst = self.rename_param(param, 'dst_p')
@@ -315,6 +316,7 @@ class FunctionMock:
                                                          param_dst,
                                                          param_src))
             self.set_params.append((param,
+                                    param_buf,
                                     param_actual,
                                     param_expected,
                                     param_dst,

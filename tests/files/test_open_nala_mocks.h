@@ -50,10 +50,10 @@ void open_mock_set_callback(void (*callback)(const char *pathname, int flags, va
 struct nala_open_params_t *open_mock_get_params_in(int handle);
 void open_mock_ignore_pathname_in(void);
 void open_mock_ignore_flags_in(void);
-void open_mock_set_pathname_in(const void *buf_p, size_t size);
+void open_mock_set_pathname_in(const char *buf_p, size_t size);
 void open_mock_set_pathname_in_assert(void (*callback)(const char *actual_p, const char *expected_p, size_t size));
 void open_mock_set_pathname_in_pointer(const char *pathname);
-void open_mock_set_pathname_out(const void *buf_p, size_t size);
+void open_mock_set_pathname_out(const char *buf_p, size_t size);
 void open_mock_set_pathname_out_copy(void (*callback)(const char *dst_p, const char *src_p, size_t size));
 void open_mock_ignore_va_arg_in_at(unsigned int index);
 void open_mock_set_va_arg_in_at(unsigned int index, const void *buf_p, size_t size);
