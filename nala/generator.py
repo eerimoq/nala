@@ -64,21 +64,16 @@ def in_assert_member(name, param_actual, param_expected):
         ])
 
 
-def out_copy_member(param):
-    name = f'{param.name}_out_copy'
+def out_copy_member(name, param_dst, param_src):
+    name = f'{name}_out_copy'
 
     return function_ptr_decl(
         name,
         void_type(name),
         [
-            param,
-            decl('nala_buf_p',
-                 node.PtrDecl([],
-                              node.TypeDecl('nala_buf_p',
-                                            ['const'],
-                                            node.IdentifierType(["void"])))),
-            decl('nala_size',
-                 node.TypeDecl('nala_size', [], node.IdentifierType(["size_t"])))
+            param_dst,
+            param_src,
+            decl('size', node.TypeDecl('size', [], node.IdentifierType(["size_t"])))
         ])
 
 
@@ -309,15 +304,21 @@ class FunctionMock:
 
             param_actual = self.rename_param(param, 'actual_p')
             param_expected = self.rename_param(param, 'expected_p')
+            param_dst = self.rename_param(param, 'dst_p')
+            param_src = self.rename_param(param, 'src_p')
             self.instance_members.append(set_member(f'{param.name}_in'))
             self.instance_members.append(in_assert_member(param.name,
                                                           param_actual,
                                                           param_expected))
             self.instance_members.append(set_member(f'{param.name}_out'))
-            self.instance_members.append(out_copy_member(param))
+            self.instance_members.append(out_copy_member(param.name,
+                                                         param_dst,
+                                                         param_src))
             self.set_params.append((param,
                                     param_actual,
                                     param_expected,
+                                    param_dst,
+                                    param_src,
                                     self.find_check_function(param)))
 
     def assign_names_to_unnamed_params(self, params):

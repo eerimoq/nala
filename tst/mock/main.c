@@ -966,32 +966,34 @@ TEST(typedef_union_param_and_return_type_function)
     ASSERT_EQ(value.a.number, 1);
 }
 
-static void double_pointer_out_copy(int **value_pp, const void *buf_p, size_t size)
+static void double_pointer_out_copy(int **dst_pp, int **src_pp, size_t size)
 {
     (void)size;
 
-    **value_pp = *(const int *)buf_p;
+    **dst_pp = **src_pp;
 }
 
 TEST(double_pointer_function)
 {
-    int value;
+    int value_1;
+    int value_2;
     int *value_p;
 
-    value = -1;
-    value_p = &value;
+    value_1 = -1;
+    value_p = &value_1;
     ASSERT_EQ(double_pointer(&value_p), 5);
-    ASSERT_EQ(value, 1);
+    ASSERT_EQ(value_1, 1);
 
-    value = -1;
-    value_p = &value;
+    value_1 = -1;
+    value_p = &value_1;
     double_pointer_mock_once(3);
-    value = 2;
-    double_pointer_mock_set_value_pp_out(&value, sizeof(value));
+    value_1 = 2;
+    double_pointer_mock_set_value_pp_out(&value_p, sizeof(value_p));
     double_pointer_mock_set_value_pp_out_copy(double_pointer_out_copy);
-    value = -1;
+    value_2 = -1;
+    value_p = &value_2;
     ASSERT_EQ(double_pointer(&value_p), 3);
-    ASSERT_EQ(value, 2);
+    ASSERT_EQ(value_2, 2);
 }
 
 static void double_pointer_function_out_copy_before_out_error_entry(void *arg_p)

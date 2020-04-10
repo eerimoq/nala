@@ -1202,6 +1202,7 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
     } else {                                            \
         (params_p)->name ## _out_copy(                  \
             name,                                       \
+            (__typeof__((params_p)->name))(uintptr_t)   \
             (params_p)->name ## _out.buf_p,             \
             (params_p)->name ## _out.size);             \
     }
@@ -1330,7 +1331,7 @@ struct nala_params_open_t {
     struct nala_set_param pathname_in;
     void (*pathname_in_assert)(const char *actual_p, const char *expected_p, size_t size);
     struct nala_set_param pathname_out;
-    void (*pathname_out_copy)(const char *pathname, const void *nala_buf_p, size_t nala_size);
+    void (*pathname_out_copy)(const char *dst_p, const char *src_p, size_t size);
     bool ignore_flags_in;
     struct nala_va_arg_list_t nala_va_arg_list;
 };
@@ -1675,7 +1676,7 @@ void open_mock_set_pathname_out(const void *buf_p, size_t size)
                        size);
 }
 
-void open_mock_set_pathname_out_copy(void (*callback)(const char *pathname, const void *nala_buf_p, size_t nala_size))
+void open_mock_set_pathname_out_copy(void (*callback)(const char *dst_p, const char *src_p, size_t size))
 {
     struct nala_params_open_t *nala_params_p;
 

@@ -1188,6 +1188,7 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
     } else {                                            \
         (params_p)->name ## _out_copy(                  \
             name,                                       \
+            (__typeof__((params_p)->name))(uintptr_t)   \
             (params_p)->name ## _out.buf_p,             \
             (params_p)->name ## _out.size);             \
     }

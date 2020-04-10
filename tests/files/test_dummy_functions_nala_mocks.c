@@ -1202,6 +1202,7 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
     } else {                                            \
         (params_p)->name ## _out_copy(                  \
             name,                                       \
+            (__typeof__((params_p)->name))(uintptr_t)   \
             (params_p)->name ## _out.buf_p,             \
             (params_p)->name ## _out.size);             \
     }
@@ -1799,7 +1800,7 @@ struct nala_params_call_t {
     struct nala_set_param callback_in;
     void (*callback_in_assert)(int (*actual_p)(int value), int (*expected_p)(int value), size_t size);
     struct nala_set_param callback_out;
-    void (*callback_out_copy)(int (*callback)(int value), const void *nala_buf_p, size_t nala_size);
+    void (*callback_out_copy)(int (*dst_p)(int value), int (*src_p)(int value), size_t size);
 };
 
 struct nala_data_call_t {
@@ -2060,7 +2061,7 @@ void call_mock_set_callback_out(const void *buf_p, size_t size)
                        size);
 }
 
-void call_mock_set_callback_out_copy(void (*callback)(int (*callback)(int value), const void *nala_buf_p, size_t nala_size))
+void call_mock_set_callback_out_copy(void (*callback)(int (*dst_p)(int value), int (*src_p)(int value), size_t size))
 {
     struct nala_params_call_t *nala_params_p;
 
@@ -2432,12 +2433,12 @@ struct nala_params_compose_twice_t {
     struct nala_set_param dummy_struct_in;
     void (*dummy_struct_in_assert)(DummyStruct *actual_p, DummyStruct *expected_p, size_t size);
     struct nala_set_param dummy_struct_out;
-    void (*dummy_struct_out_copy)(DummyStruct *dummy_struct, const void *nala_buf_p, size_t nala_size);
+    void (*dummy_struct_out_copy)(DummyStruct *dst_p, DummyStruct *src_p, size_t size);
     bool ignore_dummy_struct_modifier_in;
     struct nala_set_param dummy_struct_modifier_in;
     void (*dummy_struct_modifier_in_assert)(DummyStruct *(*actual_p)(DummyStruct *dummy_struct), DummyStruct *(*expected_p)(DummyStruct *dummy_struct), size_t size);
     struct nala_set_param dummy_struct_modifier_out;
-    void (*dummy_struct_modifier_out_copy)(DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct), const void *nala_buf_p, size_t nala_size);
+    void (*dummy_struct_modifier_out_copy)(DummyStruct *(*dst_p)(DummyStruct *dummy_struct), DummyStruct *(*src_p)(DummyStruct *dummy_struct), size_t size);
 };
 
 struct nala_data_compose_twice_t {
@@ -2720,7 +2721,7 @@ void compose_twice_mock_set_dummy_struct_out(const void *buf_p, size_t size)
                        size);
 }
 
-void compose_twice_mock_set_dummy_struct_out_copy(void (*callback)(DummyStruct *dummy_struct, const void *nala_buf_p, size_t nala_size))
+void compose_twice_mock_set_dummy_struct_out_copy(void (*callback)(DummyStruct *dst_p, DummyStruct *src_p, size_t size))
 {
     struct nala_params_compose_twice_t *nala_params_p;
 
@@ -2775,7 +2776,7 @@ void compose_twice_mock_set_dummy_struct_modifier_out(const void *buf_p, size_t 
                        size);
 }
 
-void compose_twice_mock_set_dummy_struct_modifier_out_copy(void (*callback)(DummyStruct *(*dummy_struct_modifier)(DummyStruct *dummy_struct), const void *nala_buf_p, size_t nala_size))
+void compose_twice_mock_set_dummy_struct_modifier_out_copy(void (*callback)(DummyStruct *(*dst_p)(DummyStruct *dummy_struct), DummyStruct *(*src_p)(DummyStruct *dummy_struct), size_t size))
 {
     struct nala_params_compose_twice_t *nala_params_p;
 
@@ -2864,7 +2865,7 @@ struct nala_params_double_pointer_t {
     struct nala_set_param value_pp_in;
     void (*value_pp_in_assert)(int **actual_p, int **expected_p, size_t size);
     struct nala_set_param value_pp_out;
-    void (*value_pp_out_copy)(int **value_pp, const void *nala_buf_p, size_t nala_size);
+    void (*value_pp_out_copy)(int **dst_p, int **src_p, size_t size);
 };
 
 struct nala_data_double_pointer_t {
@@ -3125,7 +3126,7 @@ void double_pointer_mock_set_value_pp_out(const void *buf_p, size_t size)
                        size);
 }
 
-void double_pointer_mock_set_value_pp_out_copy(void (*callback)(int **value_pp, const void *nala_buf_p, size_t nala_size))
+void double_pointer_mock_set_value_pp_out_copy(void (*callback)(int **dst_p, int **src_p, size_t size))
 {
     struct nala_params_double_pointer_t *nala_params_p;
 
@@ -3794,7 +3795,7 @@ struct nala_params_edit_number_t {
     struct nala_set_param dummy_struct_in;
     void (*dummy_struct_in_assert)(DummyStruct *actual_p, DummyStruct *expected_p, size_t size);
     struct nala_set_param dummy_struct_out;
-    void (*dummy_struct_out_copy)(DummyStruct *dummy_struct, const void *nala_buf_p, size_t nala_size);
+    void (*dummy_struct_out_copy)(DummyStruct *dst_p, DummyStruct *src_p, size_t size);
     bool ignore_number_in;
 };
 
@@ -4069,7 +4070,7 @@ void edit_number_mock_set_dummy_struct_out(const void *buf_p, size_t size)
                        size);
 }
 
-void edit_number_mock_set_dummy_struct_out_copy(void (*callback)(DummyStruct *dummy_struct, const void *nala_buf_p, size_t nala_size))
+void edit_number_mock_set_dummy_struct_out_copy(void (*callback)(DummyStruct *dst_p, DummyStruct *src_p, size_t size))
 {
     struct nala_params_edit_number_t *nala_params_p;
 
@@ -4158,7 +4159,7 @@ struct nala_params_endmntent_t {
     struct nala_set_param streamp_in;
     void (*streamp_in_assert)(FILE *actual_p, FILE *expected_p, size_t size);
     struct nala_set_param streamp_out;
-    void (*streamp_out_copy)(FILE *streamp, const void *nala_buf_p, size_t nala_size);
+    void (*streamp_out_copy)(FILE *dst_p, FILE *src_p, size_t size);
 };
 
 struct nala_data_endmntent_t {
@@ -4419,7 +4420,7 @@ void endmntent_mock_set_streamp_out(const void *buf_p, size_t size)
                        size);
 }
 
-void endmntent_mock_set_streamp_out_copy(void (*callback)(FILE *streamp, const void *nala_buf_p, size_t nala_size))
+void endmntent_mock_set_streamp_out_copy(void (*callback)(FILE *dst_p, FILE *src_p, size_t size))
 {
     struct nala_params_endmntent_t *nala_params_p;
 
@@ -4780,7 +4781,7 @@ struct nala_params_fclose_t {
     struct nala_set_param stream_in;
     void (*stream_in_assert)(FILE *actual_p, FILE *expected_p, size_t size);
     struct nala_set_param stream_out;
-    void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
+    void (*stream_out_copy)(FILE *dst_p, FILE *src_p, size_t size);
 };
 
 struct nala_data_fclose_t {
@@ -5041,7 +5042,7 @@ void fclose_mock_set_stream_out(const void *buf_p, size_t size)
                        size);
 }
 
-void fclose_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
+void fclose_mock_set_stream_out_copy(void (*callback)(FILE *dst_p, FILE *src_p, size_t size))
 {
     struct nala_params_fclose_t *nala_params_p;
 
@@ -5130,7 +5131,7 @@ struct nala_params_fflush_t {
     struct nala_set_param stream_in;
     void (*stream_in_assert)(FILE *actual_p, FILE *expected_p, size_t size);
     struct nala_set_param stream_out;
-    void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
+    void (*stream_out_copy)(FILE *dst_p, FILE *src_p, size_t size);
 };
 
 struct nala_data_fflush_t {
@@ -5391,7 +5392,7 @@ void fflush_mock_set_stream_out(const void *buf_p, size_t size)
                        size);
 }
 
-void fflush_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
+void fflush_mock_set_stream_out_copy(void (*callback)(FILE *dst_p, FILE *src_p, size_t size))
 {
     struct nala_params_fflush_t *nala_params_p;
 
@@ -5480,7 +5481,7 @@ struct nala_params_fileno_t {
     struct nala_set_param stream_in;
     void (*stream_in_assert)(FILE *actual_p, FILE *expected_p, size_t size);
     struct nala_set_param stream_out;
-    void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
+    void (*stream_out_copy)(FILE *dst_p, FILE *src_p, size_t size);
 };
 
 struct nala_data_fileno_t {
@@ -5741,7 +5742,7 @@ void fileno_mock_set_stream_out(const void *buf_p, size_t size)
                        size);
 }
 
-void fileno_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
+void fileno_mock_set_stream_out_copy(void (*callback)(FILE *dst_p, FILE *src_p, size_t size))
 {
     struct nala_params_fileno_t *nala_params_p;
 
@@ -5831,12 +5832,12 @@ struct nala_params_fopen_t {
     struct nala_set_param path_in;
     void (*path_in_assert)(const char *actual_p, const char *expected_p, size_t size);
     struct nala_set_param path_out;
-    void (*path_out_copy)(const char *path, const void *nala_buf_p, size_t nala_size);
+    void (*path_out_copy)(const char *dst_p, const char *src_p, size_t size);
     bool ignore_mode_in;
     struct nala_set_param mode_in;
     void (*mode_in_assert)(const char *actual_p, const char *expected_p, size_t size);
     struct nala_set_param mode_out;
-    void (*mode_out_copy)(const char *mode, const void *nala_buf_p, size_t nala_size);
+    void (*mode_out_copy)(const char *dst_p, const char *src_p, size_t size);
 };
 
 struct nala_data_fopen_t {
@@ -6161,7 +6162,7 @@ void fopen_mock_set_path_out(const void *buf_p, size_t size)
                        size);
 }
 
-void fopen_mock_set_path_out_copy(void (*callback)(const char *path, const void *nala_buf_p, size_t nala_size))
+void fopen_mock_set_path_out_copy(void (*callback)(const char *dst_p, const char *src_p, size_t size))
 {
     struct nala_params_fopen_t *nala_params_p;
 
@@ -6216,7 +6217,7 @@ void fopen_mock_set_mode_out(const void *buf_p, size_t size)
                        size);
 }
 
-void fopen_mock_set_mode_out_copy(void (*callback)(const char *mode, const void *nala_buf_p, size_t nala_size))
+void fopen_mock_set_mode_out_copy(void (*callback)(const char *dst_p, const char *src_p, size_t size))
 {
     struct nala_params_fopen_t *nala_params_p;
 
@@ -6308,14 +6309,14 @@ struct nala_params_fread_t {
     struct nala_set_param ptr_in;
     void (*ptr_in_assert)(void *actual_p, void *expected_p, size_t size);
     struct nala_set_param ptr_out;
-    void (*ptr_out_copy)(void *ptr, const void *nala_buf_p, size_t nala_size);
+    void (*ptr_out_copy)(void *dst_p, void *src_p, size_t size);
     bool ignore_size_in;
     bool ignore_nmemb_in;
     bool ignore_stream_in;
     struct nala_set_param stream_in;
     void (*stream_in_assert)(FILE *actual_p, FILE *expected_p, size_t size);
     struct nala_set_param stream_out;
-    void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
+    void (*stream_out_copy)(FILE *dst_p, FILE *src_p, size_t size);
 };
 
 struct nala_data_fread_t {
@@ -6624,7 +6625,7 @@ void fread_mock_set_ptr_out(const void *buf_p, size_t size)
                        size);
 }
 
-void fread_mock_set_ptr_out_copy(void (*callback)(void *ptr, const void *nala_buf_p, size_t nala_size))
+void fread_mock_set_ptr_out_copy(void (*callback)(void *dst_p, void *src_p, size_t size))
 {
     struct nala_params_fread_t *nala_params_p;
 
@@ -6679,7 +6680,7 @@ void fread_mock_set_stream_out(const void *buf_p, size_t size)
                        size);
 }
 
-void fread_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
+void fread_mock_set_stream_out_copy(void (*callback)(FILE *dst_p, FILE *src_p, size_t size))
 {
     struct nala_params_fread_t *nala_params_p;
 
@@ -6768,7 +6769,7 @@ struct nala_params_free_t {
     struct nala_set_param ptr_in;
     void (*ptr_in_assert)(void *actual_p, void *expected_p, size_t size);
     struct nala_set_param ptr_out;
-    void (*ptr_out_copy)(void *ptr, const void *nala_buf_p, size_t nala_size);
+    void (*ptr_out_copy)(void *dst_p, void *src_p, size_t size);
 };
 
 struct nala_data_free_t {
@@ -7019,7 +7020,7 @@ void free_mock_set_ptr_out(const void *buf_p, size_t size)
                        size);
 }
 
-void free_mock_set_ptr_out_copy(void (*callback)(void *ptr, const void *nala_buf_p, size_t nala_size))
+void free_mock_set_ptr_out_copy(void (*callback)(void *dst_p, void *src_p, size_t size))
 {
     struct nala_params_free_t *nala_params_p;
 
@@ -7110,7 +7111,7 @@ struct nala_params_fseek_t {
     struct nala_set_param stream_in;
     void (*stream_in_assert)(FILE *actual_p, FILE *expected_p, size_t size);
     struct nala_set_param stream_out;
-    void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
+    void (*stream_out_copy)(FILE *dst_p, FILE *src_p, size_t size);
     bool ignore_offset_in;
     bool ignore_whence_in;
 };
@@ -7399,7 +7400,7 @@ void fseek_mock_set_stream_out(const void *buf_p, size_t size)
                        size);
 }
 
-void fseek_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
+void fseek_mock_set_stream_out_copy(void (*callback)(FILE *dst_p, FILE *src_p, size_t size))
 {
     struct nala_params_fseek_t *nala_params_p;
 
@@ -7488,7 +7489,7 @@ struct nala_params_ftell_t {
     struct nala_set_param stream_in;
     void (*stream_in_assert)(FILE *actual_p, FILE *expected_p, size_t size);
     struct nala_set_param stream_out;
-    void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
+    void (*stream_out_copy)(FILE *dst_p, FILE *src_p, size_t size);
 };
 
 struct nala_data_ftell_t {
@@ -7749,7 +7750,7 @@ void ftell_mock_set_stream_out(const void *buf_p, size_t size)
                        size);
 }
 
-void ftell_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
+void ftell_mock_set_stream_out_copy(void (*callback)(FILE *dst_p, FILE *src_p, size_t size))
 {
     struct nala_params_ftell_t *nala_params_p;
 
@@ -7841,14 +7842,14 @@ struct nala_params_fwrite_t {
     struct nala_set_param ptr_in;
     void (*ptr_in_assert)(const void *actual_p, const void *expected_p, size_t size);
     struct nala_set_param ptr_out;
-    void (*ptr_out_copy)(const void *ptr, const void *nala_buf_p, size_t nala_size);
+    void (*ptr_out_copy)(const void *dst_p, const void *src_p, size_t size);
     bool ignore_size_in;
     bool ignore_nmemb_in;
     bool ignore_stream_in;
     struct nala_set_param stream_in;
     void (*stream_in_assert)(FILE *actual_p, FILE *expected_p, size_t size);
     struct nala_set_param stream_out;
-    void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
+    void (*stream_out_copy)(FILE *dst_p, FILE *src_p, size_t size);
 };
 
 struct nala_data_fwrite_t {
@@ -8157,7 +8158,7 @@ void fwrite_mock_set_ptr_out(const void *buf_p, size_t size)
                        size);
 }
 
-void fwrite_mock_set_ptr_out_copy(void (*callback)(const void *ptr, const void *nala_buf_p, size_t nala_size))
+void fwrite_mock_set_ptr_out_copy(void (*callback)(const void *dst_p, const void *src_p, size_t size))
 {
     struct nala_params_fwrite_t *nala_params_p;
 
@@ -8212,7 +8213,7 @@ void fwrite_mock_set_stream_out(const void *buf_p, size_t size)
                        size);
 }
 
-void fwrite_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
+void fwrite_mock_set_stream_out_copy(void (*callback)(FILE *dst_p, FILE *src_p, size_t size))
 {
     struct nala_params_fwrite_t *nala_params_p;
 
@@ -8301,7 +8302,7 @@ struct nala_params_getmntent_t {
     struct nala_set_param stream_in;
     void (*stream_in_assert)(FILE *actual_p, FILE *expected_p, size_t size);
     struct nala_set_param stream_out;
-    void (*stream_out_copy)(FILE *stream, const void *nala_buf_p, size_t nala_size);
+    void (*stream_out_copy)(FILE *dst_p, FILE *src_p, size_t size);
 };
 
 struct nala_data_getmntent_t {
@@ -8562,7 +8563,7 @@ void getmntent_mock_set_stream_out(const void *buf_p, size_t size)
                        size);
 }
 
-void getmntent_mock_set_stream_out_copy(void (*callback)(FILE *stream, const void *nala_buf_p, size_t nala_size))
+void getmntent_mock_set_stream_out_copy(void (*callback)(FILE *dst_p, FILE *src_p, size_t size))
 {
     struct nala_params_getmntent_t *nala_params_p;
 
@@ -8651,7 +8652,7 @@ struct nala_params_in_out_t {
     struct nala_set_param buf_p_in;
     void (*buf_p_in_assert)(int *actual_p, int *expected_p, size_t size);
     struct nala_set_param buf_p_out;
-    void (*buf_p_out_copy)(int *buf_p, const void *nala_buf_p, size_t nala_size);
+    void (*buf_p_out_copy)(int *dst_p, int *src_p, size_t size);
 };
 
 struct nala_data_in_out_t {
@@ -8902,7 +8903,7 @@ void in_out_mock_set_buf_p_out(const void *buf_p, size_t size)
                        size);
 }
 
-void in_out_mock_set_buf_p_out_copy(void (*callback)(int *buf_p, const void *nala_buf_p, size_t nala_size))
+void in_out_mock_set_buf_p_out_copy(void (*callback)(int *dst_p, int *src_p, size_t size))
 {
     struct nala_params_in_out_t *nala_params_p;
 
@@ -9968,23 +9969,23 @@ struct nala_params_mount_t {
     struct nala_set_param source_in;
     void (*source_in_assert)(const char *actual_p, const char *expected_p, size_t size);
     struct nala_set_param source_out;
-    void (*source_out_copy)(const char *source, const void *nala_buf_p, size_t nala_size);
+    void (*source_out_copy)(const char *dst_p, const char *src_p, size_t size);
     bool ignore_target_in;
     struct nala_set_param target_in;
     void (*target_in_assert)(const char *actual_p, const char *expected_p, size_t size);
     struct nala_set_param target_out;
-    void (*target_out_copy)(const char *target, const void *nala_buf_p, size_t nala_size);
+    void (*target_out_copy)(const char *dst_p, const char *src_p, size_t size);
     bool ignore_filesystemtype_in;
     struct nala_set_param filesystemtype_in;
     void (*filesystemtype_in_assert)(const char *actual_p, const char *expected_p, size_t size);
     struct nala_set_param filesystemtype_out;
-    void (*filesystemtype_out_copy)(const char *filesystemtype, const void *nala_buf_p, size_t nala_size);
+    void (*filesystemtype_out_copy)(const char *dst_p, const char *src_p, size_t size);
     bool ignore_mountflags_in;
     bool ignore_data_in;
     struct nala_set_param data_in;
     void (*data_in_assert)(const void *actual_p, const void *expected_p, size_t size);
     struct nala_set_param data_out;
-    void (*data_out_copy)(const void *data, const void *nala_buf_p, size_t nala_size);
+    void (*data_out_copy)(const void *dst_p, const void *src_p, size_t size);
 };
 
 struct nala_data_mount_t {
@@ -10387,7 +10388,7 @@ void mount_mock_set_source_out(const void *buf_p, size_t size)
                        size);
 }
 
-void mount_mock_set_source_out_copy(void (*callback)(const char *source, const void *nala_buf_p, size_t nala_size))
+void mount_mock_set_source_out_copy(void (*callback)(const char *dst_p, const char *src_p, size_t size))
 {
     struct nala_params_mount_t *nala_params_p;
 
@@ -10442,7 +10443,7 @@ void mount_mock_set_target_out(const void *buf_p, size_t size)
                        size);
 }
 
-void mount_mock_set_target_out_copy(void (*callback)(const char *target, const void *nala_buf_p, size_t nala_size))
+void mount_mock_set_target_out_copy(void (*callback)(const char *dst_p, const char *src_p, size_t size))
 {
     struct nala_params_mount_t *nala_params_p;
 
@@ -10497,7 +10498,7 @@ void mount_mock_set_filesystemtype_out(const void *buf_p, size_t size)
                        size);
 }
 
-void mount_mock_set_filesystemtype_out_copy(void (*callback)(const char *filesystemtype, const void *nala_buf_p, size_t nala_size))
+void mount_mock_set_filesystemtype_out_copy(void (*callback)(const char *dst_p, const char *src_p, size_t size))
 {
     struct nala_params_mount_t *nala_params_p;
 
@@ -10552,7 +10553,7 @@ void mount_mock_set_data_out(const void *buf_p, size_t size)
                        size);
 }
 
-void mount_mock_set_data_out_copy(void (*callback)(const void *data, const void *nala_buf_p, size_t nala_size))
+void mount_mock_set_data_out_copy(void (*callback)(const void *dst_p, const void *src_p, size_t size))
 {
     struct nala_params_mount_t *nala_params_p;
 
@@ -10641,7 +10642,7 @@ struct nala_params_output_message_t {
     struct nala_set_param message_in;
     void (*message_in_assert)(const char *actual_p, const char *expected_p, size_t size);
     struct nala_set_param message_out;
-    void (*message_out_copy)(const char *message, const void *nala_buf_p, size_t nala_size);
+    void (*message_out_copy)(const char *dst_p, const char *src_p, size_t size);
 };
 
 struct nala_data_output_message_t {
@@ -10913,7 +10914,7 @@ void output_message_mock_set_message_out(const void *buf_p, size_t size)
                        size);
 }
 
-void output_message_mock_set_message_out_copy(void (*callback)(const char *message, const void *nala_buf_p, size_t nala_size))
+void output_message_mock_set_message_out_copy(void (*callback)(const char *dst_p, const char *src_p, size_t size))
 {
     struct nala_params_output_message_t *nala_params_p;
 
@@ -11002,7 +11003,7 @@ struct nala_params_pipe_t {
     struct nala_set_param pipefd_in;
     void (*pipefd_in_assert)(int actual_p[2], int expected_p[2], size_t size);
     struct nala_set_param pipefd_out;
-    void (*pipefd_out_copy)(int pipefd[2], const void *nala_buf_p, size_t nala_size);
+    void (*pipefd_out_copy)(int dst_p[2], int src_p[2], size_t size);
 };
 
 struct nala_data_pipe_t {
@@ -11263,7 +11264,7 @@ void pipe_mock_set_pipefd_out(const void *buf_p, size_t size)
                        size);
 }
 
-void pipe_mock_set_pipefd_out_copy(void (*callback)(int pipefd[2], const void *nala_buf_p, size_t nala_size))
+void pipe_mock_set_pipefd_out_copy(void (*callback)(int dst_p[2], int src_p[2], size_t size))
 {
     struct nala_params_pipe_t *nala_params_p;
 
@@ -11354,7 +11355,7 @@ struct nala_params_poll_t {
     struct nala_set_param fds_in;
     void (*fds_in_assert)(struct pollfd *actual_p, struct pollfd *expected_p, size_t size);
     struct nala_set_param fds_out;
-    void (*fds_out_copy)(struct pollfd *fds, const void *nala_buf_p, size_t nala_size);
+    void (*fds_out_copy)(struct pollfd *dst_p, struct pollfd *src_p, size_t size);
     bool ignore_nfds_in;
     bool ignore_timeout_in;
 };
@@ -11643,7 +11644,7 @@ void poll_mock_set_fds_out(const void *buf_p, size_t size)
                        size);
 }
 
-void poll_mock_set_fds_out_copy(void (*callback)(struct pollfd *fds, const void *nala_buf_p, size_t nala_size))
+void poll_mock_set_fds_out_copy(void (*callback)(struct pollfd *dst_p, struct pollfd *src_p, size_t size))
 {
     struct nala_params_poll_t *nala_params_p;
 
@@ -11993,7 +11994,7 @@ struct nala_params_read_t {
     struct nala_set_param buf_in;
     void (*buf_in_assert)(void *actual_p, void *expected_p, size_t size);
     struct nala_set_param buf_out;
-    void (*buf_out_copy)(void *buf, const void *nala_buf_p, size_t nala_size);
+    void (*buf_out_copy)(void *dst_p, void *src_p, size_t size);
     bool ignore_count_in;
 };
 
@@ -12281,7 +12282,7 @@ void read_mock_set_buf_out(const void *buf_p, size_t size)
                        size);
 }
 
-void read_mock_set_buf_out_copy(void (*callback)(void *buf, const void *nala_buf_p, size_t nala_size))
+void read_mock_set_buf_out_copy(void (*callback)(void *dst_p, void *src_p, size_t size))
 {
     struct nala_params_read_t *nala_params_p;
 
@@ -12376,14 +12377,14 @@ struct nala_params_sendto_t {
     struct nala_set_param buf_in;
     void (*buf_in_assert)(const void *actual_p, const void *expected_p, size_t size);
     struct nala_set_param buf_out;
-    void (*buf_out_copy)(const void *buf, const void *nala_buf_p, size_t nala_size);
+    void (*buf_out_copy)(const void *dst_p, const void *src_p, size_t size);
     bool ignore_len_in;
     bool ignore_flags_in;
     bool ignore_dest_addr_in;
     struct nala_set_param dest_addr_in;
     void (*dest_addr_in_assert)(const struct sockaddr *actual_p, const struct sockaddr *expected_p, size_t size);
     struct nala_set_param dest_addr_out;
-    void (*dest_addr_out_copy)(const struct sockaddr *dest_addr, const void *nala_buf_p, size_t nala_size);
+    void (*dest_addr_out_copy)(const struct sockaddr *dst_p, const struct sockaddr *src_p, size_t size);
     bool ignore_addrlen_in;
 };
 
@@ -12719,7 +12720,7 @@ void sendto_mock_set_buf_out(const void *buf_p, size_t size)
                        size);
 }
 
-void sendto_mock_set_buf_out_copy(void (*callback)(const void *buf, const void *nala_buf_p, size_t nala_size))
+void sendto_mock_set_buf_out_copy(void (*callback)(const void *dst_p, const void *src_p, size_t size))
 {
     struct nala_params_sendto_t *nala_params_p;
 
@@ -12774,7 +12775,7 @@ void sendto_mock_set_dest_addr_out(const void *buf_p, size_t size)
                        size);
 }
 
-void sendto_mock_set_dest_addr_out_copy(void (*callback)(const struct sockaddr *dest_addr, const void *nala_buf_p, size_t nala_size))
+void sendto_mock_set_dest_addr_out_copy(void (*callback)(const struct sockaddr *dst_p, const struct sockaddr *src_p, size_t size))
 {
     struct nala_params_sendto_t *nala_params_p;
 
@@ -12870,7 +12871,7 @@ struct nala_params_setsockopt_t {
     struct nala_set_param optval_in;
     void (*optval_in_assert)(const void *actual_p, const void *expected_p, size_t size);
     struct nala_set_param optval_out;
-    void (*optval_out_copy)(const void *optval, const void *nala_buf_p, size_t nala_size);
+    void (*optval_out_copy)(const void *dst_p, const void *src_p, size_t size);
     bool ignore_optlen_in;
 };
 
@@ -13184,7 +13185,7 @@ void setsockopt_mock_set_optval_out(const void *buf_p, size_t size)
                        size);
 }
 
-void setsockopt_mock_set_optval_out_copy(void (*callback)(const void *optval, const void *nala_buf_p, size_t nala_size))
+void setsockopt_mock_set_optval_out_copy(void (*callback)(const void *dst_p, const void *src_p, size_t size))
 {
     struct nala_params_setsockopt_t *nala_params_p;
 
@@ -13556,12 +13557,12 @@ struct nala_params_statvfs_t {
     struct nala_set_param path_in;
     void (*path_in_assert)(const char *actual_p, const char *expected_p, size_t size);
     struct nala_set_param path_out;
-    void (*path_out_copy)(const char *path, const void *nala_buf_p, size_t nala_size);
+    void (*path_out_copy)(const char *dst_p, const char *src_p, size_t size);
     bool ignore_buf_in;
     struct nala_set_param buf_in;
     void (*buf_in_assert)(struct statvfs *actual_p, struct statvfs *expected_p, size_t size);
     struct nala_set_param buf_out;
-    void (*buf_out_copy)(struct statvfs *buf, const void *nala_buf_p, size_t nala_size);
+    void (*buf_out_copy)(struct statvfs *dst_p, struct statvfs *src_p, size_t size);
 };
 
 struct nala_data_statvfs_t {
@@ -13865,7 +13866,7 @@ void statvfs_mock_set_path_out(const void *buf_p, size_t size)
                        size);
 }
 
-void statvfs_mock_set_path_out_copy(void (*callback)(const char *path, const void *nala_buf_p, size_t nala_size))
+void statvfs_mock_set_path_out_copy(void (*callback)(const char *dst_p, const char *src_p, size_t size))
 {
     struct nala_params_statvfs_t *nala_params_p;
 
@@ -13920,7 +13921,7 @@ void statvfs_mock_set_buf_out(const void *buf_p, size_t size)
                        size);
 }
 
-void statvfs_mock_set_buf_out_copy(void (*callback)(struct statvfs *buf, const void *nala_buf_p, size_t nala_size))
+void statvfs_mock_set_buf_out_copy(void (*callback)(struct statvfs *dst_p, struct statvfs *src_p, size_t size))
 {
     struct nala_params_statvfs_t *nala_params_p;
 
@@ -14009,7 +14010,7 @@ struct nala_params_struct_param_t {
     struct nala_set_param data_in;
     void (*data_in_assert)(struct struct_param_type *actual_p, struct struct_param_type *expected_p, size_t size);
     struct nala_set_param data_out;
-    void (*data_out_copy)(struct struct_param_type *data, const void *nala_buf_p, size_t nala_size);
+    void (*data_out_copy)(struct struct_param_type *dst_p, struct struct_param_type *src_p, size_t size);
 };
 
 struct nala_data_struct_param_t {
@@ -14260,7 +14261,7 @@ void struct_param_mock_set_data_out(const void *buf_p, size_t size)
                        size);
 }
 
-void struct_param_mock_set_data_out_copy(void (*callback)(struct struct_param_type *data, const void *nala_buf_p, size_t nala_size))
+void struct_param_mock_set_data_out_copy(void (*callback)(struct struct_param_type *dst_p, struct struct_param_type *src_p, size_t size))
 {
     struct nala_params_struct_param_t *nala_params_p;
 
@@ -14617,7 +14618,7 @@ struct nala_params_time_t {
     struct nala_set_param tloc_in;
     void (*tloc_in_assert)(time_t *actual_p, time_t *expected_p, size_t size);
     struct nala_set_param tloc_out;
-    void (*tloc_out_copy)(time_t *tloc, const void *nala_buf_p, size_t nala_size);
+    void (*tloc_out_copy)(time_t *dst_p, time_t *src_p, size_t size);
 };
 
 struct nala_data_time_t {
@@ -14878,7 +14879,7 @@ void time_mock_set_tloc_out(const void *buf_p, size_t size)
                        size);
 }
 
-void time_mock_set_tloc_out_copy(void (*callback)(time_t *tloc, const void *nala_buf_p, size_t nala_size))
+void time_mock_set_tloc_out_copy(void (*callback)(time_t *dst_p, time_t *src_p, size_t size))
 {
     struct nala_params_time_t *nala_params_p;
 
@@ -14972,12 +14973,12 @@ struct nala_params_timerfd_settime_t {
     struct nala_set_param new_value_in;
     void (*new_value_in_assert)(const struct itimerspec *actual_p, const struct itimerspec *expected_p, size_t size);
     struct nala_set_param new_value_out;
-    void (*new_value_out_copy)(const struct itimerspec *new_value, const void *nala_buf_p, size_t nala_size);
+    void (*new_value_out_copy)(const struct itimerspec *dst_p, const struct itimerspec *src_p, size_t size);
     bool ignore_old_value_in;
     struct nala_set_param old_value_in;
     void (*old_value_in_assert)(struct itimerspec *actual_p, struct itimerspec *expected_p, size_t size);
     struct nala_set_param old_value_out;
-    void (*old_value_out_copy)(struct itimerspec *old_value, const void *nala_buf_p, size_t nala_size);
+    void (*old_value_out_copy)(struct itimerspec *dst_p, struct itimerspec *src_p, size_t size);
 };
 
 struct nala_data_timerfd_settime_t {
@@ -15286,7 +15287,7 @@ void timerfd_settime_mock_set_new_value_out(const void *buf_p, size_t size)
                        size);
 }
 
-void timerfd_settime_mock_set_new_value_out_copy(void (*callback)(const struct itimerspec *new_value, const void *nala_buf_p, size_t nala_size))
+void timerfd_settime_mock_set_new_value_out_copy(void (*callback)(const struct itimerspec *dst_p, const struct itimerspec *src_p, size_t size))
 {
     struct nala_params_timerfd_settime_t *nala_params_p;
 
@@ -15341,7 +15342,7 @@ void timerfd_settime_mock_set_old_value_out(const void *buf_p, size_t size)
                        size);
 }
 
-void timerfd_settime_mock_set_old_value_out_copy(void (*callback)(struct itimerspec *old_value, const void *nala_buf_p, size_t nala_size))
+void timerfd_settime_mock_set_old_value_out_copy(void (*callback)(struct itimerspec *dst_p, struct itimerspec *src_p, size_t size))
 {
     struct nala_params_timerfd_settime_t *nala_params_p;
 
@@ -16787,7 +16788,7 @@ struct nala_params_write_t {
     struct nala_set_param buf_in;
     void (*buf_in_assert)(const void *actual_p, const void *expected_p, size_t size);
     struct nala_set_param buf_out;
-    void (*buf_out_copy)(const void *buf, const void *nala_buf_p, size_t nala_size);
+    void (*buf_out_copy)(const void *dst_p, const void *src_p, size_t size);
     bool ignore_count_in;
 };
 
@@ -17075,7 +17076,7 @@ void write_mock_set_buf_out(const void *buf_p, size_t size)
                        size);
 }
 
-void write_mock_set_buf_out_copy(void (*callback)(const void *buf, const void *nala_buf_p, size_t nala_size))
+void write_mock_set_buf_out_copy(void (*callback)(const void *dst_p, const void *src_p, size_t size))
 {
     struct nala_params_write_t *nala_params_p;
 
