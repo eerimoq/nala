@@ -72,7 +72,7 @@
     NALA_ASSERT_ARRAY_FUNC(actual)(actual, expected, sizeof((actual)[0]), size)
 
 /**
- * Assert that given function pointes are equal.
+ * Assert that given function pointers are equal.
  */
 #define ASSERT_FUNCTION_POINTER_EQ(actual, expected)                    \
     if (actual != expected) {                                           \
@@ -80,7 +80,7 @@
     }
 
 /**
- * Assert that given function pointes are not equal.
+ * Assert that given function pointers are not equal.
  */
 #define ASSERT_FUNCTION_POINTER_NE(actual, expected)                    \
     if (actual == expected) {                                           \
