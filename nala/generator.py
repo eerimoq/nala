@@ -51,21 +51,16 @@ def set_member(name):
                               node.IdentifierType(["struct nala_set_param"])))
 
 
-def in_assert_member(param):
-    name = f'{param.name}_in_assert'
+def in_assert_member(name, param_actual, param_expected):
+    name = f'{name}_in_assert'
 
     return function_ptr_decl(
         name,
         void_type(name),
         [
-            param,
-            decl('nala_buf_p',
-                 node.PtrDecl([],
-                              node.TypeDecl('nala_buf_p',
-                                            ['const'],
-                                            node.IdentifierType(["void"])))),
-            decl('nala_size',
-                 node.TypeDecl('nala_size', [], node.IdentifierType(["size_t"])))
+            param_actual,
+            param_expected,
+            decl('size', node.TypeDecl('size', [], node.IdentifierType(["size_t"])))
         ])
 
 
@@ -312,11 +307,18 @@ class FunctionMock:
             if not self.is_pointer(param):
                 continue
 
+            param_actual = self.rename_param(param, 'actual_p')
+            param_expected = self.rename_param(param, 'expected_p')
             self.instance_members.append(set_member(f'{param.name}_in'))
-            self.instance_members.append(in_assert_member(param))
+            self.instance_members.append(in_assert_member(param.name,
+                                                          param_actual,
+                                                          param_expected))
             self.instance_members.append(set_member(f'{param.name}_out'))
             self.instance_members.append(out_copy_member(param))
-            self.set_params.append((param, self.find_check_function(param)))
+            self.set_params.append((param,
+                                    param_actual,
+                                    param_expected,
+                                    self.find_check_function(param)))
 
     def assign_names_to_unnamed_params(self, params):
         for i, param in enumerate(params):
@@ -356,6 +358,18 @@ class FunctionMock:
             name,
             node.FuncDecl(self.func_decl.args,
                           rename_return_type(self.func_decl.type, name)))
+
+    def rename_param(self, param, name):
+        param = deepcopy(param)
+        param.name = name
+        param_next = param
+
+        while not isinstance(param_next, node.TypeDecl):
+            param_next = param_next.type
+
+        param_next.declname = name
+
+        return param
 
     def is_char_pointer(self, param):
         if is_ellipsis(param):

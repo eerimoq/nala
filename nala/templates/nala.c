@@ -1164,19 +1164,20 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                 traceback_p));                          \
     }
 
-#define MOCK_ASSERT_PARAM_IN(data_p, assert_in, func, name)     \
-    if ((data_p)->params.name ## _in_assert == NULL) {          \
-        assert_in(&(data_p)->traceback,                         \
-                  #func,                                        \
-                  #name,                                        \
-                  (const void *)(uintptr_t)name,                \
-                  (data_p)->params.name ## _in.buf_p,           \
-                  (data_p)->params.name ## _in.size);           \
-    } else {                                                    \
-        (data_p)->params.name ## _in_assert(                    \
-            name,                                               \
-            (data_p)->params.name ## _in.buf_p,                 \
-            (data_p)->params.name ## _in.size);                 \
+#define MOCK_ASSERT_PARAM_IN(data_p, assert_in, func, name)             \
+    if ((data_p)->params.name ## _in_assert == NULL) {                  \
+        assert_in(&(data_p)->traceback,                                 \
+                  #func,                                                \
+                  #name,                                                \
+                  (const void *)(uintptr_t)name,                        \
+                  (data_p)->params.name ## _in.buf_p,                   \
+                  (data_p)->params.name ## _in.size);                   \
+    } else {                                                            \
+        (data_p)->params.name ## _in_assert(                            \
+            name,                                                       \
+            (__typeof__((data_p)->params.name))(uintptr_t)(data_p)      \
+            ->params.name ## _in.buf_p,                                 \
+            (data_p)->params.name ## _in.size);                         \
     }
 
 #define MOCK_COPY_PARAM_OUT(params_p, name)             \

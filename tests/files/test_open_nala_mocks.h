@@ -51,7 +51,7 @@ struct nala_open_params_t *open_mock_get_params_in(int handle);
 void open_mock_ignore_pathname_in(void);
 void open_mock_ignore_flags_in(void);
 void open_mock_set_pathname_in(const void *buf_p, size_t size);
-void open_mock_set_pathname_in_assert(void (*callback)(const char *pathname, const void *nala_buf_p, size_t nala_size));
+void open_mock_set_pathname_in_assert(void (*callback)(const char *actual_p, const char *expected_p, size_t size));
 void open_mock_set_pathname_in_pointer(const char *pathname);
 void open_mock_set_pathname_out(const void *buf_p, size_t size);
 void open_mock_set_pathname_out_copy(void (*callback)(const char *pathname, const void *nala_buf_p, size_t nala_size));

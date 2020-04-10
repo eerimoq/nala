@@ -3,13 +3,13 @@
 #include "nala.h"
 #include "nala_mocks.h"
 
-static void foo_p_assert(struct foo_t *foo_p, const void *buf_p, size_t size)
+static void foo_p_assert(struct foo_t *actual_p,
+                         struct foo_t *expected_p,
+                         size_t size)
 {
-    struct foo_t *expect_p;
+    (void)size;
 
-    expect_p = (struct foo_t *)buf_p;
-    
-    ASSERT_EQ(foo_p->b, expect_p->b);
+    ASSERT_EQ(actual_p->b, expected_p->b);
 }
 
 TEST(assert_struct_member)

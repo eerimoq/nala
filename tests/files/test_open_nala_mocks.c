@@ -1178,19 +1178,20 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                 traceback_p));                          \
     }
 
-#define MOCK_ASSERT_PARAM_IN(data_p, assert_in, func, name)     \
-    if ((data_p)->params.name ## _in_assert == NULL) {          \
-        assert_in(&(data_p)->traceback,                         \
-                  #func,                                        \
-                  #name,                                        \
-                  (const void *)(uintptr_t)name,                \
-                  (data_p)->params.name ## _in.buf_p,           \
-                  (data_p)->params.name ## _in.size);           \
-    } else {                                                    \
-        (data_p)->params.name ## _in_assert(                    \
-            name,                                               \
-            (data_p)->params.name ## _in.buf_p,                 \
-            (data_p)->params.name ## _in.size);                 \
+#define MOCK_ASSERT_PARAM_IN(data_p, assert_in, func, name)             \
+    if ((data_p)->params.name ## _in_assert == NULL) {                  \
+        assert_in(&(data_p)->traceback,                                 \
+                  #func,                                                \
+                  #name,                                                \
+                  (const void *)(uintptr_t)name,                        \
+                  (data_p)->params.name ## _in.buf_p,                   \
+                  (data_p)->params.name ## _in.size);                   \
+    } else {                                                            \
+        (data_p)->params.name ## _in_assert(                            \
+            name,                                                       \
+            (__typeof__((data_p)->params.name))(uintptr_t)(data_p)      \
+            ->params.name ## _in.buf_p,                                 \
+            (data_p)->params.name ## _in.size);                         \
     }
 
 #define MOCK_COPY_PARAM_OUT(params_p, name)             \
@@ -1327,7 +1328,7 @@ struct nala_params_open_t {
     const char *vafmt_p;
     bool ignore_pathname_in;
     struct nala_set_param pathname_in;
-    void (*pathname_in_assert)(const char *pathname, const void *nala_buf_p, size_t nala_size);
+    void (*pathname_in_assert)(const char *actual_p, const char *expected_p, size_t size);
     struct nala_set_param pathname_out;
     void (*pathname_out_copy)(const char *pathname, const void *nala_buf_p, size_t nala_size);
     bool ignore_flags_in;
@@ -1642,7 +1643,7 @@ void open_mock_set_pathname_in(const void *buf_p, size_t size)
                        size);
 }
 
-void open_mock_set_pathname_in_assert(void (*callback)(const char *pathname, const void *nala_buf_p, size_t nala_size))
+void open_mock_set_pathname_in_assert(void (*callback)(const char *actual_p, const char *expected_p, size_t size))
 {
     struct nala_params_open_t *nala_params_p;
 

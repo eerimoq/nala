@@ -162,7 +162,7 @@ struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
             nala_data_p->params_in.{{param.name}} = {{param.name}};
             {% endfor %}
 
-            {% for param, check in mock.set_params %}
+            {% for param, _, _, check in mock.set_params %}
             MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
                                        nala_data_p,
                                        {{check}},
@@ -322,7 +322,7 @@ struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
 
     {{mock.state_name}}.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
-    {% for param, _ in mock.set_params %}
+    {% for param, _, _, _ in mock.set_params %}
     nala_set_param_init(&nala_instance_p->data.params.{{param.name}}_out);
     nala_set_param_init(&nala_instance_p->data.params.{{param.name}}_in);
     nala_instance_p->data.params.{{param.name}}_in_assert = NULL;
@@ -414,7 +414,7 @@ int {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
 
     {{mock.state_name}}.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
-    {% for param, _ in mock.set_params %}
+    {% for param, _, _, _ in mock.set_params %}
     nala_set_param_init(&instance_p->data.params.{{param.name}}_out);
     nala_set_param_init(&instance_p->data.params.{{param.name}}_in);
     instance_p->data.params.{{param.name}}_in_assert = NULL;
@@ -483,7 +483,7 @@ void {{mock.func_name}}_mock_ignore_{{param}}_in(void)
     nala_get_params_{{mock.func_name}}()->ignore_{{param}}_in = true;
 }
 {% endfor %}
-{% for param, _ in mock.set_params %}
+{% for param, actual, expected, _ in mock.set_params %}
 
 void {{mock.func_name}}_mock_set_{{param.name}}_in(const void *buf_p, size_t size)
 {
@@ -492,7 +492,7 @@ void {{mock.func_name}}_mock_set_{{param.name}}_in(const void *buf_p, size_t siz
                        size);
 }
 
-void {{mock.func_name}}_mock_set_{{param.name}}_in_assert(void (*callback)({{param | render}}, const void *nala_buf_p, size_t nala_size))
+void {{mock.func_name}}_mock_set_{{param.name}}_in_assert(void (*callback)({{actual | render}}, {{expected | render}}, size_t size))
 {
     struct nala_params_{{mock.func_name}}_t *nala_params_p;
 

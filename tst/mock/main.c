@@ -884,13 +884,9 @@ TEST(call_function)
     ASSERT_EQ(call(NULL), 4);
 }
 
-static void buf_p_assert(int *actual_p, const void *buf_p, size_t size)
+static void buf_p_assert(int *actual_p, int *expected_p, size_t size)
 {
     (void)size;
-
-    const int *expected_p;
-
-    expected_p = buf_p;
 
     ASSERT_EQ(actual_p[0], expected_p[0]);
 }
@@ -1175,12 +1171,12 @@ TEST(assert_structs_with_likely_undefined_padding)
 }
 
 static void fail_if_in_assert_is_called_before_set_in_in_assert(
-    struct likely_undefined_padding_t *value_p,
-    const void *buf_p,
+    struct likely_undefined_padding_t *actual_p,
+    struct likely_undefined_padding_t *expected_p,
     size_t size)
 {
-    (void)value_p;
-    (void)buf_p;
+    (void)actual_p;
+    (void)expected_p;
     (void)size;
 }
 
