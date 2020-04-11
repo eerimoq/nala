@@ -4,7 +4,6 @@ import argparse
 import shutil
 import re
 
-from .api import generate_mocks
 from .wrap_internal_symbols import wrap_internal_symbols
 from .version import __version__
 
@@ -45,6 +44,9 @@ def do_generate_mocks(args):
     else:
         real_variadic_functions_file = REAL_VARIADIC_FUNCTIONS_C
 
+    # Only import when needed for faster cli.
+    from .api import generate_mocks
+
     generate_mocks(expanded_code,
                    args.outdir,
                    rename_parameters_file,
@@ -74,6 +76,14 @@ def do_wrap_internal_symbols(args):
 
     with open(args.objectfile, 'wb') as fout:
         fout.write(wrapped_data)
+
+
+def do_include_dir(args):
+    print(DIST_DIR)
+
+
+def do_c_sources(args):
+    print(os.path.join(DIST_DIR, 'nala.c'))
 
 
 def main():
@@ -144,6 +154,18 @@ def main():
     subparser.add_argument('objectfile',
                            help='An object file.')
     subparser.set_defaults(func=do_wrap_internal_symbols)
+
+    # The include_dir subcommand.
+    subparser = subparsers.add_parser(
+        'include_dir',
+        description='Print the path to the C include directory.')
+    subparser.set_defaults(func=do_include_dir)
+
+    # The c_sources subcommand.
+    subparser = subparsers.add_parser(
+        'c_sources',
+        description='Print the C sources.')
+    subparser.set_defaults(func=do_c_sources)
 
     args = parser.parse_args()
 

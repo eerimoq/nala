@@ -2,8 +2,9 @@ BUILD = build
 EXE = $(BUILD)/app
 INC += $(BUILD)
 INC += $(CURDIR)
+INC += $(shell $(NALA) include_dir)
 SRC += $(BUILD)/nala_mocks.c
-SRC += nala.c
+SRC += $(shell $(NALA) c_sources)
 SRC += $(TESTS)
 OBJ = $(patsubst %,$(BUILD)%,$(abspath $(SRC:%.c=%.o)))
 OBJDEPS = $(OBJ:%.o=%.d)
