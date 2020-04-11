@@ -78,8 +78,8 @@ def do_wrap_internal_symbols(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="nala",
-        description="A minimal mocking utility for C projects.")
+        prog='nala',
+        description='A minimal mocking utility for C projects.')
 
     parser.add_argument('-d', '--debug', action='store_true')
     parser.add_argument('--version',

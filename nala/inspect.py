@@ -29,7 +29,7 @@ class IncludeDirective(NamedTuple):
             while True:
                 dirname, basename = os.path.split(dirname)
 
-                if "include" in basename.lower():
+                if 'include' in basename.lower():
                     return cls(fullname, True)
 
                 if not basename:
@@ -40,7 +40,7 @@ class IncludeDirective(NamedTuple):
         return cls(os.path.abspath(source_context[-1]), False)
 
     def __str__(self):
-        return "#include " + (f"<{self.path}>" if self.system else f'"{self.path}"')
+        return '#include ' + (f'<{self.path}>' if self.system else f'"{self.path}"')
 
 
 class MockedFunction(NamedTuple):
@@ -55,20 +55,20 @@ class Token(NamedTuple):
     span: Tuple[int, int]
 
     def is_punctuation(self, *symbols):
-        return self.type == "PUNCTUATION" and self.value in symbols
+        return self.type == 'PUNCTUATION' and self.value in symbols
 
     def is_keyword(self, *keywords):
-        return self.type == "KEYWORD" and self.value in keywords
+        return self.type == 'KEYWORD' and self.value in keywords
 
     @property
     def is_prefix(self):
-        return self.type == "KEYWORD" and self.value in (
-            "typedef",
-            "extern",
-            "static",
-            "auto",
-            "register",
-            "__extension__"
+        return self.type == 'KEYWORD' and self.value in (
+            'typedef',
+            'extern',
+            'static',
+            'auto',
+            'register',
+            '__extension__'
         )
 
 
@@ -110,7 +110,7 @@ def rename_parameters(function_declaration, param_names):
 
         if (not param.name
             and isinstance(param_type.type, node.IdentifierType)
-            and param_type.type.names == ["void"]):
+            and param_type.type.names == ['void']):
             continue
 
         if param_names is not None:
@@ -164,34 +164,34 @@ class ForgivingDeclarationParser:
     linemarker = re.compile(r'^# \d+ "((?:\\.|[^\\"])*)"((?: [1234])*)$')
 
     tokens = {
-        "LINEMARKER": r"^#.*$",
-        "KEYWORD": (
+        'LINEMARKER': r"^#.*$",
+        'KEYWORD': (
             "\\b(?:auto|break|case|char|const|continue|default|do|double|else|enum|"
             "extern|float"
             "|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct"
             "|switch|typedef|union|unsigned|void|volatile|while|__extension__|"
             "__attribute__|__restrict|__signed__)\\b"
         ),
-        "IDENTIFIER": r"\b[a-zA-Z_](?:[a-zA-Z_0-9])*\b",
-        "CHARACTER": r"L?'(?:\\.|[^\\'])+'",
-        "STRING": r'L?"(\\"|\\\\|.)*?"',
-        "INTEGER": r"(?:0[xX][a-fA-F0-9]+|[0-9]+)[uUlL]*",
-        "FLOAT": (
+        'IDENTIFIER': r"\b[a-zA-Z_](?:[a-zA-Z_0-9])*\b",
+        'CHARACTER': r"L?'(?:\\.|[^\\'])+'",
+        'STRING': r'L?"(\\"|\\\\|.)*?"',
+        'INTEGER': r"(?:0[xX][a-fA-F0-9]+|[0-9]+)[uUlL]*",
+        'FLOAT': (
             r"(?:[0-9]+[Ee][+-]?[0-9]+|[0-9]*\.[0-9]+(?:[Ee][+-]?[0-9]+)?|[0-9]+\."
             r"[0-9]*(?:[Ee][+-]?[0-9]+)?)[fFlL]?"
         ),
-        "PUNCTUATION": (
+        'PUNCTUATION': (
             r"\.\.\.|>>=|<<=|\+=|-=|\*=|/=|%=|&=|\^=|\|=|>>|<<|\+\+|--|->|&&|\|\|""|<="
             r"|>=|==|!=|;|\{|\}|,|:|=|\(|\)|\[|\]|\.|&|!|~|-|\+|\*|/|%|<|>|\^|\||\?"
         ),
-        "SPACE": r"[ \t\v\n\f]*",
-        "IGNORE": r".+?",
+        'SPACE': r"[ \t\v\n\f]*",
+        'IGNORE': r".+?",
     }
 
-    ignored_tokens = "SPACE", "IGNORE"
+    ignored_tokens = 'SPACE', 'IGNORE'
 
     regex = re.compile(
-        "|".join(f"(?P<{token}>{pattern})" for token, pattern in tokens.items()),
+        '|'.join(f'(?P<{token}>{pattern})' for token, pattern in tokens.items()),
         flags=re.MULTILINE)
 
     def __init__(self, source_code, functions, rename_parameters_file=None):
@@ -204,7 +204,7 @@ class ForgivingDeclarationParser:
         self.chunks_to_erase = []
         self.bracket_stack = []
         self.source_context = []
-        self.typedefs = ["typedef int __builtin_va_list;"]
+        self.typedefs = ['typedef int __builtin_va_list;']
         self.structs_code = []
         self.structs = []
         self.includes = []
@@ -229,8 +229,8 @@ class ForgivingDeclarationParser:
                       file=sys.stderr)
 
             raise Exception(
-                "Unable to find declarations of all mocked functions. Add missing "
-                "includes to the test file.")
+                'Unable to find declarations of all mocked functions. Add missing '
+                'includes to the test file.')
 
     @classmethod
     def tokenize(cls, source_code):
@@ -240,7 +240,7 @@ class ForgivingDeclarationParser:
 
     def parse(self):
         while self.next():
-            if self.current.is_keyword("typedef"):
+            if self.current.is_keyword('typedef'):
                 self.parse_typedef()
 
             parsed = self.parse_function_declaration_or_struct()
@@ -254,7 +254,7 @@ class ForgivingDeclarationParser:
             if not self.functions:
                 break
 
-            while self.bracket_stack or not self.current.is_punctuation(";", "}"):
+            while self.bracket_stack or not self.current.is_punctuation(';', '}'):
                 self.next()
 
         if self.functions:
@@ -321,25 +321,25 @@ class ForgivingDeclarationParser:
         if not self.current:
             return None
 
-        if self.current.type == "PUNCTUATION":
-            if self.current.value in "({[":
-                self.bracket_stack.append(")}]"["({[".index(self.current.value)])
+        if self.current.type == 'PUNCTUATION':
+            if self.current.value in '({[':
+                self.bracket_stack.append(')}]'['({['.index(self.current.value)])
             elif self.bracket_stack and self.current.value == self.bracket_stack[-1]:
                 self.bracket_stack.pop()
-        elif self.current.type == "LINEMARKER":
+        elif self.current.type == 'LINEMARKER':
             filename, flags = self.linemarker.match(self.current.value).groups()
 
             if self.filename is None:
                 self.filename = filename
 
-            if "1" in flags:
+            if '1' in flags:
                 self.source_context.append(filename)
 
                 if len(self.source_context) == 2:
                     if self.source_context[0] == self.filename:
                         self.includes.append(
                             IncludeDirective.from_source_context(self.source_context))
-            elif "2" in flags:
+            elif '2' in flags:
                 self.source_context.pop()
 
             try:
@@ -349,7 +349,7 @@ class ForgivingDeclarationParser:
 
             self.mark_for_erase(*self.current.span)
             self.next()
-        elif self.current.is_keyword("__attribute__"):
+        elif self.current.is_keyword('__attribute__'):
             begin = self.current.span[0]
             stack_depth = len(self.bracket_stack)
             self.next()
@@ -358,7 +358,7 @@ class ForgivingDeclarationParser:
                 self.next()
 
             self.mark_for_erase(begin, self.current.span[1])
-        elif self.current.is_keyword("__extension__", "__restrict", "__signed__"):
+        elif self.current.is_keyword('__extension__', '__restrict', '__signed__'):
             self.mark_for_erase(*self.current.span)
             self.next()
 
@@ -367,7 +367,7 @@ class ForgivingDeclarationParser:
     def parse_typedef(self):
         begin = self.current.span[0]
 
-        while self.bracket_stack or not self.current.is_punctuation(";"):
+        while self.bracket_stack or not self.current.is_punctuation(';'):
             self.next()
 
         code = self.read_source_code(begin, self.current.span[1])
@@ -377,7 +377,7 @@ class ForgivingDeclarationParser:
         while self.bracket_stack:
             self.next()
 
-        code = self.read_source_code(begin, self.current.span[1]) + ";"
+        code = self.read_source_code(begin, self.current.span[1]) + ';'
         self.structs_code.append(code)
 
     def parse_function_declaration_or_struct(self):
@@ -387,7 +387,7 @@ class ForgivingDeclarationParser:
         begin = self.current.span[0]
         return_type = []
 
-        if self.current.is_keyword("struct"):
+        if self.current.is_keyword('struct'):
             if self.next() and self.current.type == 'IDENTIFIER':
                 struct_name = self.current.value
 
@@ -396,10 +396,10 @@ class ForgivingDeclarationParser:
 
                     return None
 
-        while (not self.current.is_punctuation("(")
+        while (not self.current.is_punctuation('(')
                or self.next()
-               and self.current.is_punctuation("*")):
-            if not self.bracket_stack and self.current.is_punctuation(";"):
+               and self.current.is_punctuation('*')):
+            if not self.bracket_stack and self.current.is_punctuation(';'):
                 return None
 
             return_type.append(self.current.value)
@@ -415,10 +415,10 @@ class ForgivingDeclarationParser:
 
         while (self.bracket_stack
                or self.next()
-               and self.current.is_punctuation("(")):
+               and self.current.is_punctuation('(')):
             self.next()
 
-        code = self.read_source_code(begin, self.previous.span[1]) + ";"
+        code = self.read_source_code(begin, self.previous.span[1]) + ';'
 
         return func_name, code
 

@@ -14,9 +14,9 @@ from . import __version__
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-HEADER_FILE = "nala_mocks.h"
-SOURCE_FILE = "nala_mocks.c"
-LINKER_FILE = "nala_mocks.ldflags"
+HEADER_FILE = 'nala_mocks.h'
+SOURCE_FILE = 'nala_mocks.c'
+LINKER_FILE = 'nala_mocks.ldflags'
 
 
 def is_ellipsis(param):
@@ -41,14 +41,14 @@ def function_ptr_decl(name, return_type, parameters):
 
 
 def bool_param(name):
-    return decl(name, node.TypeDecl(name, [], node.IdentifierType(["bool"])))
+    return decl(name, node.TypeDecl(name, [], node.IdentifierType(['bool'])))
 
 
 def set_member(name):
     return decl(name,
                 node.TypeDecl(name,
                               [],
-                              node.IdentifierType(["struct nala_set_param"])))
+                              node.IdentifierType(['struct nala_set_param'])))
 
 
 def in_assert_member(name, param_actual, param_expected):
@@ -60,7 +60,7 @@ def in_assert_member(name, param_actual, param_expected):
         [
             param_actual,
             param_expected,
-            decl('size', node.TypeDecl('size', [], node.IdentifierType(["size_t"])))
+            decl('size', node.TypeDecl('size', [], node.IdentifierType(['size_t'])))
         ])
 
 
@@ -73,13 +73,13 @@ def out_copy_member(name, param_dst, param_src):
         [
             param_dst,
             param_src,
-            decl('size', node.TypeDecl('size', [], node.IdentifierType(["size_t"])))
+            decl('size', node.TypeDecl('size', [], node.IdentifierType(['size_t'])))
         ])
 
 
 def va_list_param(name):
     return decl(None,
-                node.TypeDecl(name, [], node.IdentifierType(["va_list"])))
+                node.TypeDecl(name, [], node.IdentifierType(['va_list'])))
 
 
 def is_variadic_func(params):
@@ -111,7 +111,7 @@ def rename_return_type(return_type, name):
 
 def create_implementation_params(params):
     return [
-        va_list_param("__nala_va_list")
+        va_list_param('__nala_va_list')
         if is_ellipsis(param)
         else param
         for param in params
@@ -119,9 +119,9 @@ def create_implementation_params(params):
 
 
 def get_guard_name(filename):
-    slug = re.sub(r"[^a-zA-Z0-9]", "_", os.path.normpath(os.path.relpath(filename)))
+    slug = re.sub(r'[^a-zA-Z0-9]', '_', os.path.normpath(os.path.relpath(filename)))
 
-    return re.sub(r"_+", "_", slug).upper().strip("_")
+    return re.sub(r'_+', '_', slug).upper().strip('_')
 
 
 def generate_includes(includes, directory):
@@ -154,13 +154,6 @@ class StructAssertIn:
                 self.assert_in_members.append(member[1])
 
 
-def find_real_variadic_code(function):
-    if function.name == 'open':
-        return REAL_VARIADIC_OPEN
-    else:
-        return ''
-
-
 class FunctionMock:
 
     DECL_MARKER = "// NALA_DECLARATION"
@@ -171,10 +164,10 @@ class FunctionMock:
         self.func_name = function.name
         self.real_variadic_function = real_variadic_function
 
-        self.wrapped_func = f"__wrap_{self.func_name}"
-        self.real_func = f"__real_{self.func_name}"
+        self.wrapped_func = f'__wrap_{self.func_name}'
+        self.real_func = f'__real_{self.func_name}'
 
-        self.state_name = f"nala_mock_{self.func_name}"
+        self.state_name = f'nala_mock_{self.func_name}'
 
         self.func_decl = self.function.declaration.type
         self.func_params = self.func_decl.args.params if self.func_decl.args else []
@@ -191,7 +184,6 @@ class FunctionMock:
         else:
             self.has_implementation = True
 
-
         self.params_struct = [
             decl(param.name, node.PtrDecl([], param.type.type))
             if isinstance(param.type, node.ArrayDecl)
@@ -199,22 +191,22 @@ class FunctionMock:
             for param in self.func_params
             if not is_ellipsis(param) and param.name
         ]
-        self.forward_args = ", ".join(param.name for param in self.params_struct)
+        self.forward_args = ', '.join(param.name for param in self.params_struct)
 
         if self.is_variadic_func:
             self.params_struct.append(decl(
                 None,
                 node.PtrDecl([],
-                             node.TypeDecl("vafmt_p",
+                             node.TypeDecl('vafmt_p',
                                            ['const'],
-                                           node.IdentifierType(["char"])))))
+                                           node.IdentifierType(['char'])))))
             self.forward_args += ', nala_vl'
 
         # -Wpedantic warns on empty structs.
         if not self.params_struct:
             self.params_struct = [
-                decl("dummy",
-                     node.TypeDecl("dummy", [], node.IdentifierType(["int"])))
+                decl('dummy',
+                     node.TypeDecl('dummy', [], node.IdentifierType(['int'])))
             ]
 
         return_type = self.func_decl.type
@@ -222,8 +214,8 @@ class FunctionMock:
             None
             if isinstance(return_type, node.TypeDecl)
             and isinstance(return_type.type, node.IdentifierType)
-            and return_type.type.names[0] == "void"
-            else "return_value")
+            and return_type.type.names[0] == 'void'
+            else 'return_value')
 
         if self.is_variadic_func:
             self.va_list_start_arg_name = self.func_params[-2].name
@@ -235,8 +227,8 @@ class FunctionMock:
             rename_return_type(return_type, self.return_value))
         mock_params = self.create_mock_params()
         self.implementation_decl = function_ptr_decl(
-            "implementation",
-            rename_return_type(return_type, "implementation"),
+            'implementation',
+            rename_return_type(return_type, 'implementation'),
             create_implementation_params(self.func_params))
         self.mock_func = self.void_function_decl(f'{self.func_name}_mock',
                                                  mock_params)
@@ -246,12 +238,12 @@ class FunctionMock:
         self.set_errno_func = self.void_function_decl(
             f'{self.func_name}_mock_set_errno',
             [decl(
-                "errno_value",
-                node.TypeDecl("errno_value", [], node.IdentifierType(["int"])),
+                'errno_value',
+                node.TypeDecl('errno_value', [], node.IdentifierType(['int'])),
             )])
         self.callback_decl = function_ptr_decl(
-            "callback",
-            void_type("callback"),
+            'callback',
+            void_type('callback'),
             create_implementation_params(self.func_params))
         self.variadic_func_real_wrapper_decl = node.FuncDecl(
             node.ParamList(create_implementation_params(self.func_params)),
@@ -486,9 +478,9 @@ class FunctionMock:
                 variable_arguments_params.append(decl(
                     None,
                     node.PtrDecl([],
-                                 node.TypeDecl("vafmt_p",
+                                 node.TypeDecl('vafmt_p',
                                                ['const'],
-                                               node.IdentifierType(["char"])))))
+                                               node.IdentifierType(['char'])))))
                 variable_arguments_params.append(param)
 
         if not self.is_void(self.return_value_decl):
@@ -505,14 +497,14 @@ class FileGenerator:
         self.code_generator = CGenerator()
 
         self.jinja_env = Environment(
-            loader=PackageLoader("nala", "templates"),
+            loader=PackageLoader('nala', 'templates'),
             trim_blocks=True,
             lstrip_blocks=True,
         )
-        self.jinja_env.filters["render"] = self.code_generator.visit
+        self.jinja_env.filters['render'] = self.code_generator.visit
 
-        self.header_template = self.jinja_env.get_template(f"{HEADER_FILE}.jinja2")
-        self.source_template = self.jinja_env.get_template(f"{SOURCE_FILE}.jinja2")
+        self.header_template = self.jinja_env.get_template(f'{HEADER_FILE}.jinja2')
+        self.source_template = self.jinja_env.get_template(f'{SOURCE_FILE}.jinja2')
 
         self.mocks = []
         self.struct_assert_ins = []
@@ -551,8 +543,8 @@ class FileGenerator:
             struct_assert_ins=struct_assert_ins)
 
         includes = [
-            ("stddef.h", True),
-            ("errno.h", True),
+            ('stddef.h', True),
+            ('errno.h', True),
             (header_filename, False)
         ]
         source_code = self.source_template.render(
@@ -562,15 +554,15 @@ class FileGenerator:
             mocks=mocks,
             struct_assert_ins=struct_assert_ins)
 
-        with open(header_filename, "w") as fout:
+        with open(header_filename, 'w') as fout:
             fout.write(header_code.strip())
             fout.write('\n')
 
-        with open(source_filename, "w") as fout:
+        with open(source_filename, 'w') as fout:
             fout.write(source_code.strip())
             fout.write('\n')
 
-        with open(linker_filename, "w") as fout:
+        with open(linker_filename, 'w') as fout:
             fout.write(' '.join([
                 f'-Wl,--wrap={mock.function.name}'
                 for mock in mocks
