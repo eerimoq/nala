@@ -17,9 +17,6 @@ REAL_VARIADIC_FUNCTIONS_C = os.path.join(SCRIPT_DIR, 'real_variadic_functions.c'
 
 def do_init(args):
     shutil.copytree(SUBCOMMANDS_INIT_DIR, args.name)
-    os.chdir(args.name)
-    shutil.copyfile(os.path.join(DIST_DIR, 'nala.h'), 'nala.h')
-    shutil.copyfile(os.path.join(DIST_DIR, 'nala.c'), 'nala.c')
 
     print(f"Run 'make -C {args.name}' to build and run all tests!")
 
