@@ -14,6 +14,8 @@ TEST(assertions)
     ASSERT_NOT_SUBSTRING("12345", "4567");
     ASSERT_MEMORY_EQ("abcd", "abcd", 5);
     ASSERT_ARRAY_EQ(array, array, sizeof(array));
+    ASSERT_FUNCTION_POINTER_EQ(assertions, assertions);
+    ASSERT_FUNCTION_POINTER_NE(assertions, NULL);
     ASSERT(1 == 1);
 
     CAPTURE_OUTPUT(output, errput) {

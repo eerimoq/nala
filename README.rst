@@ -77,6 +77,8 @@ The assertions tests looks like this:
        ASSERT_NOT_SUBSTRING("12345", "4567");
        ASSERT_MEMORY_EQ("abcd", "abcd", 5);
        ASSERT_ARRAY_EQ(array, array, sizeof(array));
+       ASSERT_FUNCTION_POINTER_EQ(assertions, assertions);
+       ASSERT_FUNCTION_POINTER_NE(assertions, NULL);
        ASSERT(1 == 1);
 
        CAPTURE_OUTPUT(output, errput) {
@@ -364,17 +366,17 @@ Limitations
 Debugging tips
 ==============
 
-Nala executes each test in its own process. This means that
-following the execution of a test with a debugger can be a bit tricky
-because debuggers like GDB can only follow a single process at a time.
+Nala executes each test in its own process. This means that following
+the execution of a test with a debugger can be a bit tricky because
+debuggers like `GDB`_ can only follow a single process at a time.
 
-If you're using GDB, set a breakpoint at ``<test>_before_fork`` and
+If you're using `GDB`, set a breakpoint at ``<test>_before_fork`` and
 then run the program until it stops at the breakpoint. Before
-continuing the program execution, tell GDB to follow the forked test
+continuing the program execution, tell `GDB` to follow the forked test
 process by setting ``follow-fork-mode`` to ``child``.
 
-All commands are shown below for the ``assertions`` test in the
-example above.
+Below are all commands to debug the ``assertions`` test in the example
+above.
 
 .. code-block::
 
@@ -384,9 +386,11 @@ example above.
    (gdb) set follow-fork-mode child
    (gdb) c
 
-Or using the make target ``gdb``. Set the ``TEST`` make variable to
-the test to debug. Both ``TEST=test_assertions::assertions`` and
-``TEST=assertions`` are accepted.
+The ``gdb`` make target starts `GDB` and runs all commmands listed
+above. Set the ``TEST`` make variable to the test to debug. Both
+``TEST=test_assertions::assertions`` and ``TEST=assertions`` are
+accepted. The test name may be partialy given, as long as it only
+matches one test.
 
 .. code-block::
 
@@ -446,3 +450,5 @@ Read more about sanitizers here: https://en.wikipedia.org/wiki/AddressSanitizer
 .. _a few variadic functions: https://github.com/eerimoq/nala/blob/master/nala/real_variadic_functions.c
 
 .. _include/nala.h: https://github.com/eerimoq/nala/blob/master/include/nala.h
+
+.. _GDB: https://www.gnu.org/software/gdb/
