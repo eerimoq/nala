@@ -219,30 +219,30 @@ char *format_mock_traceback(const char *message_p,
              long long int: "%llx",             \
              unsigned long long int: "%llx")
 
-#define MOCK_BINARY_ASSERTION(traceback_p,                              \
-                              func_p,                                   \
-                              param_p,                                  \
-                              ignore_in,                                \
-                              actual,                                   \
-                              expecetd)                                 \
-    if (!(ignore_in)) {                                                 \
-        if ((actual) != (expecetd)) {                                   \
-            char _nala_assert_format[512];                              \
-            nala_suspend_all_mocks();                                   \
-            snprintf(&_nala_assert_format[0],                           \
-                     sizeof(_nala_assert_format),                       \
-                     "Mocked %s(%s): %s != %s\n\n",                     \
-                     func_p,                                            \
-                     param_p,                                           \
-                     PRINT_FORMAT(actual),                              \
-                     PRINT_FORMAT(expecetd));                           \
-            nala_test_failure(                                          \
-                format_mock_traceback(                                  \
-                    nala_format(&_nala_assert_format[0],                \
-                                (actual),                               \
-                                (expecetd)),                            \
-                    traceback_p));                                      \
-        }                                                               \
+#define MOCK_BINARY_ASSERTION(traceback_p,              \
+                              func_p,                   \
+                              param_p,                  \
+                              ignore_in,                \
+                              actual,                   \
+                              expecetd)                 \
+    if (!(ignore_in)) {                                 \
+        if ((actual) != (expecetd)) {                   \
+            char assert_format[512];                    \
+            nala_suspend_all_mocks();                   \
+            snprintf(&assert_format[0],                 \
+                     sizeof(assert_format),             \
+                     "Mocked %s(%s): %s != %s\n\n",     \
+                     func_p,                            \
+                     param_p,                           \
+                     PRINT_FORMAT(actual),              \
+                     PRINT_FORMAT(expecetd));           \
+            nala_test_failure(                          \
+                format_mock_traceback(                  \
+                    nala_format(&assert_format[0],      \
+                                (actual),               \
+                                (expecetd)),            \
+                    traceback_p));                      \
+        }                                               \
     }
 
 #define MOCK_BINARY_ASSERTION_HEX(traceback_p,                          \
@@ -253,10 +253,10 @@ char *format_mock_traceback(const char *message_p,
                                   expecetd)                             \
     if (!(ignore_in)) {                                                 \
         if ((actual) != (expecetd)) {                                   \
-            char _nala_assert_format[512];                              \
+            char assert_format[512];                                    \
             nala_suspend_all_mocks();                                   \
-            snprintf(&_nala_assert_format[0],                           \
-                     sizeof(_nala_assert_format),                       \
+            snprintf(&assert_format[0],                                 \
+                     sizeof(assert_format),                             \
                      "Mocked %s(%s): %s != %s (0x%s != 0x%s)\n\n",      \
                      func_p,                                            \
                      param_p,                                           \
@@ -266,7 +266,7 @@ char *format_mock_traceback(const char *message_p,
                      PRINT_FORMAT_HEX(expecetd));                       \
             nala_test_failure(                                          \
                 format_mock_traceback(                                  \
-                    nala_format(&_nala_assert_format[0],                \
+                    nala_format(&assert_format[0],                      \
                                 (actual),                               \
                                 (expecetd),                             \
                                 (actual),                               \
@@ -300,19 +300,19 @@ void nala_mock_assert_memory(struct nala_traceback_t *traceback_p,
                              const void *right_p,
                              size_t size)
 {
-    char _nala_assert_format[512];
+    char assert_format[512];
 
     if (!nala_check_memory(left_p, right_p, size)) {
         nala_suspend_all_mocks();
-        snprintf(&_nala_assert_format[0],
-                 sizeof(_nala_assert_format),
+        snprintf(&assert_format[0],
+                 sizeof(assert_format),
                  "Mocked %s(%s): ",
                  func_p,
                  param_p);
         nala_test_failure(
             format_mock_traceback(
                 nala_format_memory(
-                    &_nala_assert_format[0],
+                    &assert_format[0],
                     left_p,
                     right_p,
                     size),
@@ -329,18 +329,18 @@ void nala_mock_assert_string(struct nala_traceback_t *traceback_p,
 {
     (void)size;
 
-    char _nala_assert_format[512];
+    char assert_format[512];
 
     if (!nala_check_string_equal(acutal_p, expected_p)) {
         nala_suspend_all_mocks();
-        snprintf(&_nala_assert_format[0],
-                 sizeof(_nala_assert_format),
+        snprintf(&assert_format[0],
+                 sizeof(assert_format),
                  "Mocked %s(%s):",
                  func_p,
                  param_p);
         nala_test_failure(
             format_mock_traceback(
-                nala_format_string(&_nala_assert_format[0],
+                nala_format_string(&assert_format[0],
                                    acutal_p,
                                    expected_p),
                 traceback_p));
