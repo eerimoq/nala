@@ -9,7 +9,20 @@ OBJDEPS = $(OBJ:%.o=%.d)
 MOCKGENDEPS = $(BUILD)/nala_mocks.ldflags.d
 DEPS = $(OBJDEPS) $(MOCKGENDEPS)
 CFLAGS += $(INC:%=-I%)
-CFLAGS += -g -O0 -no-pie
+CFLAGS += -g
+CFLAGS += -O0
+CFLAGS += -no-pie
+CFLAGS += -Wall
+CFLAGS += -Wextra
+CFLAGS += -Wpedantic
+CFLAGS += -Wduplicated-branches
+CFLAGS += -Wduplicated-cond
+CFLAGS += -Wjump-misses-init
+CFLAGS += -Wlogical-op
+CFLAGS += -Wnull-dereference
+CFLAGS += -Wrestrict
+CFLAGS += -Werror
+CFLAGS += -Wshadow
 ifeq ($(SANITIZE), yes)
 CFLAGS += -fsanitize=address
 CFLAGS += -fsanitize=undefined

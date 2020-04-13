@@ -15,6 +15,10 @@ CFLAGS += -g
 CFLAGS += -O0
 CFLAGS += -no-pie
 CFLAGS += -coverage
+CFLAGS += -Wall
+CFLAGS += -Wextra
+CFLAGS += -Wpedantic
+CFLAGS += -Werror
 ifeq ($(SANITIZE), yes)
 CFLAGS += -fsanitize=address
 CFLAGS += -fsanitize=undefined

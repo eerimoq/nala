@@ -1631,7 +1631,7 @@ void nala_assert_ullong(unsigned long long actual,
 
 void nala_assert_float(float actual, float expected, int op)
 {
-    BINARY_ASSERTION(actual, expected, op);
+    BINARY_ASSERTION((double)actual, (double)expected, op);
 }
 
 void nala_assert_double(double actual, double expected, int op)
@@ -1808,7 +1808,7 @@ static void format_array_item_ullong(FILE *file_p, const void *value_p)
 
 static void format_array_item_float(FILE *file_p, const void *value_p)
 {
-    fprintf(file_p, "%f", *(float *)value_p);
+    fprintf(file_p, "%f", (double)(*(float *)value_p));
 }
 
 static void format_array_item_double(FILE *file_p, const void *value_p)
