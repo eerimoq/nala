@@ -163,6 +163,8 @@ char *format_mock_traceback(const char *message_p,
     free((void *)message_p);
     free(formatted_traceback_p);
 
+    nala_resume_all_mocks();
+
     return (buf_p);
 }
 
@@ -225,8 +227,8 @@ char *format_mock_traceback(const char *message_p,
                               expecetd)                                 \
     if (!(ignore_in)) {                                                 \
         if ((actual) != (expecetd)) {                                   \
-            nala_suspend_all_mocks();                                   \
             char _nala_assert_format[512];                              \
+            nala_suspend_all_mocks();                                   \
             snprintf(&_nala_assert_format[0],                           \
                      sizeof(_nala_assert_format),                       \
                      "Mocked %s(%s): %s != %s\n\n",                     \
@@ -251,8 +253,8 @@ char *format_mock_traceback(const char *message_p,
                                   expecetd)                             \
     if (!(ignore_in)) {                                                 \
         if ((actual) != (expecetd)) {                                   \
-            nala_suspend_all_mocks();                                   \
             char _nala_assert_format[512];                              \
+            nala_suspend_all_mocks();                                   \
             snprintf(&_nala_assert_format[0],                           \
                      sizeof(_nala_assert_format),                       \
                      "Mocked %s(%s): %s != %s (0x%s != 0x%s)\n\n",      \
@@ -1162,8 +1164,8 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                                 left,                   \
                                 right)                  \
     if ((left) != (right)) {                            \
-        nala_suspend_all_mocks();                       \
         char _nala_assert_format[512];                  \
+        nala_suspend_all_mocks();                       \
         snprintf(&_nala_assert_format[0],               \
                  sizeof(_nala_assert_format),           \
                  format_p,                              \

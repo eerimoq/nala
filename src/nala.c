@@ -87,6 +87,7 @@ __attribute__ ((weak)) void nala_resume_all_mocks(void)
 
 __attribute__ ((weak)) int nala_print_call_mask = 0;
 
+/* Command line options. */
 static bool continue_on_failure = false;
 static const char *report_json_file_p = "report.json";
 static int number_of_jobs = 1;
@@ -1480,9 +1481,9 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
 #define ASSERTION(actual, expected, check, format, formatter)   \
     do {                                                        \
         if (!check(actual, expected)) {                         \
-            nala_reset_all_mocks();                             \
             char _nala_assert_format[512];                      \
                                                                 \
+            nala_suspend_all_mocks();                           \
             snprintf(&_nala_assert_format[0],                   \
                      sizeof(_nala_assert_format),               \
                      format,                                    \
@@ -1497,9 +1498,9 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
 #define ASSERTION_WITH_HEX(actual, expected, check, format, formatter)  \
     do {                                                                \
         if (!check(actual, expected)) {                                 \
-            nala_reset_all_mocks();                                     \
             char _nala_assert_format[512];                              \
                                                                         \
+            nala_suspend_all_mocks();                                   \
             snprintf(&_nala_assert_format[0],                           \
                      sizeof(_nala_assert_format),                       \
                      format,                                            \
@@ -1992,7 +1993,6 @@ void nala_assert_string(const char *actual_p, const char *expected_p, int op)
 
     case NALA_CHECK_EQ:
         if (!nala_check_string_equal(actual_p, expected_p)) {
-            nala_reset_all_mocks();
             nala_test_failure(nala_format_string("The strings are not equal.",
                                                  actual_p,
                                                  expected_p));
@@ -2002,7 +2002,6 @@ void nala_assert_string(const char *actual_p, const char *expected_p, int op)
 
     case NALA_CHECK_NE:
         if (nala_check_string_equal(actual_p, expected_p)) {
-            nala_reset_all_mocks();
             nala_test_failure(nala_format("\"%s\" == \"%s\"\n",
                                           actual_p,
                                           expected_p));
@@ -2019,7 +2018,6 @@ void nala_assert_string(const char *actual_p, const char *expected_p, int op)
 void nala_assert_substring(const char *haystack_p, const char *needle_p)
 {
     if (!nala_check_substring(haystack_p, needle_p)) {
-        nala_reset_all_mocks();
         nala_test_failure(
             nala_format_substring(
                 "The haystack doesn't contain the needle.",
@@ -2040,7 +2038,6 @@ void nala_assert_not_substring(const char *haystack_p, const char *needle_p)
 void nala_assert_memory(const void *actual_p, const void *expected_p, size_t size)
 {
     if (!nala_check_memory(actual_p, expected_p, size)) {
-        nala_reset_all_mocks();
         nala_test_failure(nala_format_memory("", actual_p, expected_p, size));
     }
 }
@@ -2048,14 +2045,13 @@ void nala_assert_memory(const void *actual_p, const void *expected_p, size_t siz
 void nala_assert(bool cond)
 {
     if (!cond) {
-        nala_reset_all_mocks();
         nala_test_failure(nala_format("false != true\n"));
     }
 }
 
 void nala_fail(const char *message_p)
 {
-    nala_reset_all_mocks();
+    nala_suspend_all_mocks();
     char message[strlen(message_p) + 2];
     strcpy(&message[0], message_p);
     strcat(&message[0], "\n");
@@ -2066,9 +2062,8 @@ void nala_exit(int status)
 {
     (void)status;
 
-    nala_assert_all_mocks_completed();
-    nala_reset_all_mocks();
     nala_suspend_all_mocks();
+    nala_assert_all_mocks_completed();
     capture_output_destroy(&capture_stdout);
     capture_output_destroy(&capture_stderr);
     exit(0);
