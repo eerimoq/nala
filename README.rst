@@ -21,6 +21,7 @@ Features
 - Works well with errors reported by sanitizers
 - Test isolation with ``fork()``
 - Only run tests matching given pattern
+- Automatic build and run on file change
 - Optional parallel test execution to save time
 - Amalgamated source and header files ready to drop in your project
 - JSON test report
@@ -114,7 +115,10 @@ is done by giving ``ARGS=time``.
 
 .. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run-one-test.png
 
-Now, make the time test fail to see what an error report looks like.
+Run ``make -s -C foo auto`` to build and run all tests automatically
+when any source file in your project is modified. With the command
+running, make the time test fail by returning ``41`` instead of ``42``
+from the time mock.
 
 .. code-block:: c
 
@@ -129,8 +133,7 @@ Now, make the time test fail to see what an error report looks like.
        ASSERT_EQ(time(NULL), 42);
    }
 
-Build and run all tests. Just as expected, the time test fails since
-41 is not equal to 42.
+Notice how the test is built and run automatically.
 
 .. image:: https://github.com/eerimoq/nala/raw/master/docs/build-and-run-assert-eq-fail.png
 

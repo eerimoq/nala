@@ -21,13 +21,27 @@ CFLAGS += -fsanitize=undefined
 endif
 MOCKGENFLAGS += $(IMPLEMENTATION:%=-i %)
 MOCKGENFLAGS += $(NO_IMPLEMENTATION:%=-n %)
+REPORT_JSON = $(BUILD)/report.json
+EXEARGS += $(ARGS)
+EXEARGS += $(JOBS:%=-j %)
+EXEARGS += $(REPORT_JSON:%=-r %)
 NALA = nala
 
-.PHONY: all build generate clean coverage gdb gdb-run help
+.PHONY: all build generate clean coverage gdb gdb-run auto auto-run help
 
 all:
 	$(MAKE) build
-	$(EXE) $(ARGS)
+	$(EXE) $(EXEARGS)
+
+auto: all
+	while true ; do \
+	    $(MAKE) auto-run ; \
+	done
+
+auto-run:
+	for f in $(OBJDEPS) ; do \
+	    ls -1 $$(cat $$f | sed s/\\\\//g | sed s/.*://g) ; \
+	done | sort | uniq | grep -v $(BUILD) | entr -d -p $(MAKE)
 
 build:
 	$(MAKE) generate
@@ -61,6 +75,7 @@ help:
 	@echo "TARGET        DESCRIPTION"
 	@echo "---------------------------------------------------------"
 	@echo "all           Build and run with given ARGS."
+	@echo "auto          Build and run with given ARGS on source change."
 	@echo "clean         Remove build output."
 	@echo "coverage      Create the code coverage report."
 	@echo "gdb           Debug given test TEST with gdb."

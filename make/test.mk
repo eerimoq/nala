@@ -16,14 +16,27 @@ CFLAGS += -fsanitize=undefined
 endif
 MOCKGENFLAGS += $(IMPLEMENTATION:%=-i %)
 MOCKGENFLAGS += $(NO_IMPLEMENTATION:%=-n %)
-ARGS += $(JOBS:%=-j %)
+REPORT_JSON = $(BUILD)/report.json
+EXEARGS += $(ARGS)
+EXEARGS += $(JOBS:%=-j %)
+EXEARGS += $(REPORT_JSON:%=-r %)
 NALA ?= PYTHONPATH=$(NALA_ROOT) python3 -m nala
 
-.PHONY: all build generate clean coverage gdb gdb-run
+.PHONY: all build generate clean coverage gdb gdb-run auto auto-run
 
 all:
 	$(MAKE) build
-	$(EXE) $(ARGS)
+	$(EXE) $(EXEARGS)
+
+auto: all
+	while true ; do \
+	    $(MAKE) auto-run ; \
+	done
+
+auto-run:
+	for f in $(OBJDEPS) ; do \
+	    ls -1 $$(cat $$f | sed s/\\\\//g | sed s/.*://g) ; \
+	done | sort | uniq | grep -v $(BUILD) | entr -d -p $(MAKE)
 
 build:
 	$(MAKE) generate
