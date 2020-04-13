@@ -19,10 +19,10 @@ TEST(assertions)
     ASSERT(1 == 1);
 
     CAPTURE_OUTPUT(output, errput) {
-        printf("std!\n");
-        fprintf(stderr, "err!\n");
+        printf("output!\n");
+        fprintf(stderr, "errput!\n");
     }
 
-    ASSERT_EQ(output, "std!\n");
-    ASSERT_EQ(errput, "err!\n");
+    ASSERT_EQ(output, "output!\n");
+    ASSERT_EQ(errput, "errput!\n");
 }
