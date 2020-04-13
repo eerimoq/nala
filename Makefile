@@ -20,7 +20,7 @@ all:
 	! $(MAKE) -C my-suite \
 	    NALA="PYTHONPATH=.. python3 -m nala" \
 	    ARGS="--report-json-file foo/report.json"
-	$(MAKE) -C my-suite clean
+	$(MAKE) -C my-suite NALA="PYTHONPATH=.. python3 -m nala" clean
 	$(MAKE) -C my-suite NALA="PYTHONPATH=.. python3 -m nala" SANITIZE=yes
 
 test: test-python test-c
