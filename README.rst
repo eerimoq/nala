@@ -163,8 +163,8 @@ all defined in `include/nala.h`_.
    ASSERT_GT(actual, expected);                  // Assert that actual is greater than expected.
    ASSERT_GE(actual, expected);                  // Assert that actual is greater than or equal to
                                                  // expected.
-   ASSERT_TRUE(cond)                             // Assert that given condition is true.
-   ASSERT_FALSE(cond)                            // Assert that given condition is false.
+   ASSERT_TRUE(cond);                            // Assert that given condition is true.
+   ASSERT_FALSE(cond);                           // Assert that given condition is false.
    ASSERT_SUBSTRING(haystack, needle);           // Assert that given haystack string contains given
                                                  // needle string.
    ASSERT_NOT_SUBSTRING(haystack, needle);       // Assert that given haystack string does not contain
