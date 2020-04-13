@@ -74,13 +74,14 @@ The assertions tests looks like this:
        ASSERT_LE(1, 1);
        ASSERT_GT(2L, 1L);
        ASSERT_GE(1, 1);
+       ASSERT_TRUE(1 == 1);
+       ASSERT_FALSE(2 == 1);
        ASSERT_SUBSTRING("12345", "34");
        ASSERT_NOT_SUBSTRING("12345", "4567");
        ASSERT_MEMORY_EQ("abcd", "abcd", 5);
        ASSERT_ARRAY_EQ(array, array, sizeof(array));
        ASSERT_FUNCTION_POINTER_EQ(assertions, assertions);
        ASSERT_FUNCTION_POINTER_NE(assertions, NULL);
-       ASSERT(1 == 1);
 
        CAPTURE_OUTPUT(output, errput) {
            printf("output!\n");
@@ -162,6 +163,8 @@ all defined in `include/nala.h`_.
    ASSERT_GT(actual, expected);                  // Assert that actual is greater than expected.
    ASSERT_GE(actual, expected);                  // Assert that actual is greater than or equal to
                                                  // expected.
+   ASSERT_TRUE(cond)                             // Assert that given condition is true.
+   ASSERT_FALSE(cond)                            // Assert that given condition is false.
    ASSERT_SUBSTRING(haystack, needle);           // Assert that given haystack string contains given
                                                  // needle string.
    ASSERT_NOT_SUBSTRING(haystack, needle);       // Assert that given haystack string does not contain
@@ -170,7 +173,6 @@ all defined in `include/nala.h`_.
    ASSERT_ARRAY_EQ(actual, expected, size);      // Assert that given arrays are equal.
    ASSERT_FUNCTION_POINTER_EQ(actual, expected); // Assert that given function pointers are equal.
    ASSERT_FUNCTION_POINTER_NE(actual, expected); // Assert that given function pointers are not equal.
-   ASSERT(cond);                                 // Assert that given condition is true.
    FAIL(message);                                // Fail current test with given message.
    CAPTURE_OUTPUT(stdout_name, stderr_name);     // A capture output block.
 

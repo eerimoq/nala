@@ -2042,6 +2042,20 @@ void nala_assert_memory(const void *actual_p, const void *expected_p, size_t siz
     }
 }
 
+void nala_assert_true(bool cond)
+{
+    if (!cond) {
+        nala_test_failure(nala_format("The condition is not true.\n"));
+    }
+}
+
+void nala_assert_false(bool cond)
+{
+    if (cond) {
+        nala_test_failure(nala_format("The condition is not false.\n"));
+    }
+}
+
 void nala_assert(bool cond)
 {
     if (!cond) {

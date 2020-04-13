@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NALA_VERSION "0.145.0"
+#define NALA_VERSION "0.146.0"
 
 /**
  * Assert that given characters, numbers, pointers or strings are
@@ -45,6 +45,16 @@
  */
 #define ASSERT_GE(actual, expected)                                     \
     NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_GE)
+
+/**
+ * Assert that given condition is true.
+ */
+#define ASSERT_TRUE(cond) nala_assert_true(cond)
+
+/**
+ * Assert that given condition is false.
+ */
+#define ASSERT_FALSE(cond) nala_assert_false(cond)
 
 /**
  * Assert that given haystack string contains given needle string.
@@ -373,6 +383,10 @@ void nala_assert_substring(const char *haystack_p, const char *needle_p);
 void nala_assert_not_substring(const char *haystack_p, const char *needle_p);
 
 void nala_assert_memory(const void *actual_p, const void *expected_p, size_t size);
+
+void nala_assert_true(bool cond);
+
+void nala_assert_false(bool cond);
 
 void nala_assert(bool cond);
 

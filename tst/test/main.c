@@ -107,6 +107,16 @@ TEST(assert_function_pointers)
     ASSERT_FUNCTION_POINTER_NE(foo, bar);
 }
 
+TEST(assert_true)
+{
+    ASSERT_TRUE(true);
+}
+
+TEST(assert_false)
+{
+    ASSERT_FALSE(false);
+}
+
 TEST(assert)
 {
     ASSERT(1 == 1);
@@ -261,6 +271,28 @@ static void assert_ge_error_entry()
 TEST(assert_ge_error)
 {
     expect_error_in_subprocess(assert_ge_error_entry, "1 < 2");
+}
+
+static void assert_true_error_entry()
+{
+    ASSERT_TRUE(false);
+}
+
+TEST(assert_true_error)
+{
+    expect_error_in_subprocess(assert_true_error_entry,
+                               "The condition is not true.");
+}
+
+static void assert_false_error_entry()
+{
+    ASSERT_FALSE(true);
+}
+
+TEST(assert_false_error)
+{
+    expect_error_in_subprocess(assert_false_error_entry,
+                               "The condition is not false.");
 }
 
 static void assert_substring_error_entry()
