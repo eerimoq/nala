@@ -103,6 +103,8 @@ TEST(out_of_bounds)
     int a[2];
 
     a[2] = 1;
+
+    (void)a;
 }
 
 TEST(memory_leak)

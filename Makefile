@@ -22,6 +22,8 @@ all:
 	test -f my-suite/foo/report.json
 	$(MAKE) -C my-suite NALA="PYTHONPATH=.. python3 -m nala" clean
 	$(MAKE) -C my-suite NALA="PYTHONPATH=.. python3 -m nala" SANITIZE=yes
+	$(MAKE) -C my-suite NALA="PYTHONPATH=.. python3 -m nala" clean
+	$(MAKE) -C my-suite NALA="PYTHONPATH=.. python3 -m nala" CC=clang
 
 test: test-python test-c
 

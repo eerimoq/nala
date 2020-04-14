@@ -23,6 +23,7 @@ CFLAGS += -Wnull-dereference
 CFLAGS += -Wrestrict
 CFLAGS += -Werror
 CFLAGS += -Wshadow
+CFLAGS += -Wno-unused-command-line-argument
 ifeq ($(SANITIZE), yes)
 CFLAGS += -fsanitize=address
 CFLAGS += -fsanitize=undefined

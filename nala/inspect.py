@@ -337,8 +337,10 @@ class ForgivingDeclarationParser:
 
                 if len(self.source_context) == 2:
                     if self.source_context[0] == self.filename:
-                        self.includes.append(
-                            IncludeDirective.from_source_context(self.source_context))
+                        if self.source_context[-1] != '<built-in>':
+                            self.includes.append(
+                                IncludeDirective.from_source_context(
+                                    self.source_context))
             elif '2' in flags:
                 self.source_context.pop()
 
