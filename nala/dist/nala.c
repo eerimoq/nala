@@ -2059,7 +2059,7 @@ static void assert_array_failure(const void *actual_p,
 
 static void format_array_item_char(FILE *file_p, const void *value_p)
 {
-    fprintf(file_p, "%hhd", (int)*(char *)value_p);
+    fprintf(file_p, "%hhd", *(char *)value_p);
 }
 
 static void format_array_item_schar(FILE *file_p, const void *value_p)
