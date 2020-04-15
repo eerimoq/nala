@@ -1,9 +1,13 @@
+NALA ?= PYTHONPATH=$(NALA_ROOT) python3 -m nala
 BUILD = build
 EXE = $(BUILD)/app
 INC += $(BUILD)
 INC += $(CURDIR)
 SRC += $(BUILD)/nala_mocks.c
 SRC += $(TESTS)
+# To evaluate once for fewer nala include_dir/c_sources calls.
+INC := $(INC)
+SRC := $(SRC)
 OBJ = $(patsubst %,$(BUILD)%,$(abspath $(SRC:%.c=%.o)))
 OBJDEPS = $(OBJ:%.o=%.d)
 MOCKGENDEPS = $(BUILD)/nala_mocks.ldflags.d
@@ -34,12 +38,10 @@ REPORT_JSON = $(BUILD)/report.json
 EXEARGS += $(ARGS)
 EXEARGS += $(JOBS:%=-j %)
 EXEARGS += $(REPORT_JSON:%=-r %)
-NALA ?= PYTHONPATH=$(NALA_ROOT) python3 -m nala
 
 .PHONY: all build generate clean coverage gdb gdb-run auto auto-run
 
-all:
-	$(MAKE) build
+all: build
 	$(EXE) $(EXEARGS)
 
 auto: all
@@ -52,8 +54,7 @@ auto-run:
 	    ls -1 $$(cat $$f | sed s/\\\\//g | sed s/.*://g) ; \
 	done | sort | uniq | grep -v $(BUILD) | entr -d -p $(MAKE)
 
-build:
-	$(MAKE) generate
+build: generate
 	$(MAKE) $(EXE)
 
 generate: $(BUILD)/nala_mocks.ldflags
