@@ -1,6 +1,7 @@
 |buildstatus|_
 |coverage|_
 |codecov|_
+|tryit|_
 
 🦁 Nala
 =======
@@ -446,6 +447,9 @@ Read more about sanitizers here: https://en.wikipedia.org/wiki/AddressSanitizer
 
 .. _Narwhal: https://github.com/vberlier/narwhal
 .. _Narmock: https://github.com/vberlier/narmock
+
+.. |tryit| image:: https://img.shields.io/badge/try-online-f34b7d.svg
+.. _tryit: https://repl.it/@eerimoq/nala
 
 .. _amalgamated: https://sqlite.org/amalgamation.html
 .. _nala.h: https://raw.githubusercontent.com/eerimoq/nala/master/nala/dist/nala.h
