@@ -271,7 +271,7 @@ Same behaviour for every call.
    void FUNC_mock_ignore_in(<res>);     // ignore parameters and return
    void FUNC_mock_none();               // no calls allowed
    void FUNC_mock_implementation(*);    // replace implementation
-   void FUNC_mock_real();               // call real implementation
+   void FUNC_mock_real();               // real implementation
 
 Per call control.
 
@@ -281,7 +281,7 @@ Per call control.
                                         // returns a mock instance handle
    int FUNC_mock_ignore_in_once(<res>); // ignore parameters and return once (per call)
                                         // returns a mock instance handle
-   void FUNC_mock_real_once();          // call real implementation once (per call)
+   void FUNC_mock_real_once();          // real implementation once (per call)
 
 Change behaviour of currect mock. Works for both per call and every
 call functions above.
