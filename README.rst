@@ -1,7 +1,6 @@
 |buildstatus|_
 |coverage|_
 |codecov|_
-|tryit|_
 
 🦁 Nala
 =======
@@ -49,6 +48,8 @@ you should be good to go.
 
 Getting started
 ===============
+
+|tryit|_
 
 Use ``nala init foo`` to create a folder ``foo`` with two test files,
 ``test_assertions.c`` and ``test_time.c``. The first uses all
