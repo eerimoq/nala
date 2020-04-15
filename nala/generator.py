@@ -23,13 +23,6 @@ def is_ellipsis(param):
     return isinstance(param, node.EllipsisParam)
 
 
-def is_va_list(param):
-    try:
-        return param.type.type.names[0] == 'va_list'
-    except AttributeError:
-        return False
-
-
 def decl(name, type):
     return node.Decl(name, [], [], [], type, None, None)
 
@@ -273,7 +266,7 @@ class FunctionMock:
                 continue
             elif self.is_union(param):
                 continue
-            elif is_va_list(param):
+            elif self.is_va_list(param):
                 continue
 
             if not param.name:
@@ -365,6 +358,14 @@ class FunctionMock:
         param_next.declname = name
 
         return param
+
+    def is_va_list(self, param):
+        try:
+            # Should check for __builtin_va_list, but that requires
+            # typedef lookup.
+            return param.type.type.names[0] in ['__gnuc_va_list', 'va_list']
+        except AttributeError:
+            return False
 
     def is_char_pointer(self, param):
         if is_ellipsis(param):
@@ -470,7 +471,7 @@ class FunctionMock:
                 continue
             elif self.is_union(param):
                 continue
-            elif is_va_list(param):
+            elif self.is_va_list(param):
                 continue
             elif self.is_char_pointer_or_non_pointer(param):
                 once_params.append(param)

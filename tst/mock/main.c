@@ -14,6 +14,7 @@
 #include <netdb.h>
 #include <fcntl.h>
 #include <sys/epoll.h>
+#include <syslog.h>
 
 #include "subprocess.h"
 #include "nala.h"
@@ -1308,4 +1309,12 @@ TEST(underscore_prefixed_params_function)
     underscore_prefixed_params_mock(1, 1, 2);
     underscore_prefixed_params_mock_ignore_a_in();
     underscore_prefixed_params_mock_ignore_b_in();
+}
+
+TEST(vsyslog_ignore_va_list)
+{
+    va_list ap;
+
+    vsyslog_mock_once(1, "Hello");
+    vsyslog(1, "Hello", ap);
 }
