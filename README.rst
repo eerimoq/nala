@@ -29,7 +29,8 @@ Features
 Installation
 ============
 
-It's recommended to install `Nala` with ``pip``.
+It's recommended to install `Nala` with ``pip``. Only Python 3 is
+supported.
 
 .. code-block:: bash
 
