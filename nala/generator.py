@@ -136,6 +136,16 @@ def read_nala_c():
         return fin.read()
 
 
+def load_typedefs(ast):
+    typedefs = {}
+
+    for item in ast:
+        if isinstance(item, node.Typedef):
+            typedefs[item.name] = item
+
+    return typedefs
+
+
 class StructAssertIn:
 
     def __init__(self, struct):
@@ -162,6 +172,7 @@ class FunctionMock:
 
         self.state_name = f'nala_mock_{self.func_name}'
 
+        self.typedefs = load_typedefs(function.file_ast)
         self.func_decl = self.function.declaration.type
         self.func_params = self.func_decl.args.params if self.func_decl.args else []
         self.assign_names_to_unnamed_params(self.func_params)
@@ -361,11 +372,19 @@ class FunctionMock:
 
     def is_va_list(self, param):
         try:
-            # Should check for __builtin_va_list, but that requires
-            # typedef lookup.
-            return param.type.type.names[0] in ['__gnuc_va_list', 'va_list']
+            if param.type.type.names[0] == '__builtin_va_list':
+                return True
         except AttributeError:
-            return False
+            pass
+
+        try:
+            name = param.type.type.names[0]
+
+            return self.is_va_list(self.lookup_typedef(name))
+        except AttributeError:
+            pass
+
+        return False
 
     def is_char_pointer(self, param):
         if is_ellipsis(param):
@@ -455,10 +474,8 @@ class FunctionMock:
         return False
 
     def lookup_typedef(self, name):
-        for item in self.function.file_ast:
-            if isinstance(item, node.Typedef):
-                if item.name == name:
-                    return item
+        if name in self.typedefs:
+            return self.typedefs[name]
 
     def create_mock_params(self):
         once_params = []

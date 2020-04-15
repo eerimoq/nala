@@ -1318,3 +1318,12 @@ TEST(vsyslog_ignore_va_list)
     vsyslog_mock_once(1, "Hello");
     vsyslog(1, "Hello", ap);
 }
+
+TEST(my_va_list_function)
+{
+    va_list ap;
+    
+    my_va_list_mock(1);
+
+    ASSERT_EQ(my_va_list(ap), 1);
+}

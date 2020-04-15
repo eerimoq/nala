@@ -167,3 +167,10 @@ int underscore_prefixed_params(int __a, int __b)
 {
     return (__a + __b);
 }
+
+int my_va_list(my_va_list_t ap)
+{
+    (void)ap;
+
+    return (0);
+}

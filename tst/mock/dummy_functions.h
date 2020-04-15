@@ -56,6 +56,8 @@ typedef struct DummyStruct struct_typedef_t;
 
 typedef struct_typedef_t struct_typedef_2_t;
 
+typedef va_list my_va_list_t;
+
 int add(int x, int y);
 void output_message(const char *message);
 void keep_args_output_message(const char *message);
@@ -90,5 +92,6 @@ int parameter_name_omitted(int, int *);
 int no_implementation(void);
 int another_missing_implementation(void);
 int underscore_prefixed_params(int __a, int __b);
+int my_va_list(my_va_list_t ap);
 
 #endif
