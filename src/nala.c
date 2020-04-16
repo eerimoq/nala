@@ -279,10 +279,10 @@ static float timeval_to_ms(struct timeval *timeval_p)
 static void print_test_failure_report_begin(void)
 {
     printf("\n"
-           "------------------------------"
-           "--------------------"
-           "-----------------------------\n");
-    printf("\n");
+           "――――――――――――――――――――――――――――――――――――――――"
+           "――――――――――――――――――――――――――――――――――――――――"
+           "\n"
+           "\n");
 }
 
 static void print_test_failure_report_end(void)

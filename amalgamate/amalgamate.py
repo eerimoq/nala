@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # amalgamate.py - Amalgamate C source and header files.
 # Copyright (c) 2012, Erik Edlund <erik.edlund@32767.se>
