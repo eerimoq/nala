@@ -306,9 +306,11 @@ TEST(assert_substring_error)
                                "  Haystack:\n"
                                "\n"
                                "    123\n"
+                               "\n"
                                "  Needle:\n"
                                "\n"
-                               "    4\n");
+                               "    4\n"
+                               "\n");
 }
 
 static void assert_not_substring_error_entry()

@@ -1337,7 +1337,7 @@ const char *nala_format_substring(const char *format_p,
 
     fprintf(file_p, "  Haystack:\n\n");
     print_with_line_prefix(file_p, "    ", haystack_p);
-    fprintf(file_p, "\n");
+    fprintf(file_p, "\n\n");
     fprintf(file_p, "  Needle:\n\n");
     print_with_line_prefix(file_p, "    ", needle_p);
     fprintf(file_p, "\n");
