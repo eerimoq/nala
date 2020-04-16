@@ -1638,78 +1638,6 @@ static int print_test_file_func(const char *test_pattern_p)
     return (0);
 }
 
-__attribute__((weak)) int main(int argc, char *argv[])
-{
-    static struct option long_options[] = {
-        { "help",                 no_argument,       NULL, 'h' },
-        { "version",              no_argument,       NULL, 'v' },
-        { "continue-on-failure",  no_argument,       NULL, 'c' },
-        { "print-all-calls",      no_argument,       NULL, 'a' },
-        { "report-json-file",     required_argument, NULL, 'r' },
-        { "print-test-file-func", required_argument, NULL, 'f' },
-        { "jobs",                 required_argument, NULL, 'j' },
-        { NULL,                   no_argument,       NULL, 0 }
-    };
-    int option;
-
-    /* Do not print function calls outside tests. */
-    nala_suspend_all_mocks();
-
-    while (1) {
-        option = getopt_long(argc, argv, "hvcar:f:j:", &long_options[0], NULL);
-
-        if (option == -1) {
-            break;
-        }
-
-        switch (option) {
-
-        case 'h':
-            print_usage_and_exit(argv[0], 0);
-            break;
-
-        case 'v':
-            print_version_and_exit();
-            break;
-
-        case 'c':
-            continue_on_failure = true;
-            break;
-
-        case 'a':
-            nala_print_call_mask = 0xff;
-            break;
-
-        case 'r':
-            report_json_file_p = optarg;
-            break;
-
-        case 'f':
-            return (print_test_file_func(optarg));
-
-        case 'j':
-            number_of_jobs = atoi(optarg);
-
-            if (number_of_jobs < 1) {
-                printf("error: At least one job is required, %d given.\n",
-                       number_of_jobs);
-                exit(1);
-            }
-
-            break;
-
-        default:
-            print_usage_and_exit(argv[0], 1);
-        }
-    }
-
-    if (optind < argc) {
-        filter_tests(argv[optind]);
-    }
-
-    return (nala_run_tests());
-}
-
 static bool mock_traceback_skip_filter(void *arg_p, const char *line_p)
 {
     (void)arg_p;
@@ -2387,6 +2315,78 @@ void nala_exit(int status)
     capture_output_destroy(&capture_stdout);
     capture_output_destroy(&capture_stderr);
     exit(0);
+}
+
+int main(int argc, char *argv[])
+{
+    static struct option long_options[] = {
+        { "help",                 no_argument,       NULL, 'h' },
+        { "version",              no_argument,       NULL, 'v' },
+        { "continue-on-failure",  no_argument,       NULL, 'c' },
+        { "print-all-calls",      no_argument,       NULL, 'a' },
+        { "report-json-file",     required_argument, NULL, 'r' },
+        { "print-test-file-func", required_argument, NULL, 'f' },
+        { "jobs",                 required_argument, NULL, 'j' },
+        { NULL,                   no_argument,       NULL, 0 }
+    };
+    int option;
+
+    /* Do not print function calls outside tests. */
+    nala_suspend_all_mocks();
+
+    while (1) {
+        option = getopt_long(argc, argv, "hvcar:f:j:", &long_options[0], NULL);
+
+        if (option == -1) {
+            break;
+        }
+
+        switch (option) {
+
+        case 'h':
+            print_usage_and_exit(argv[0], 0);
+            break;
+
+        case 'v':
+            print_version_and_exit();
+            break;
+
+        case 'c':
+            continue_on_failure = true;
+            break;
+
+        case 'a':
+            nala_print_call_mask = 0xff;
+            break;
+
+        case 'r':
+            report_json_file_p = optarg;
+            break;
+
+        case 'f':
+            return (print_test_file_func(optarg));
+
+        case 'j':
+            number_of_jobs = atoi(optarg);
+
+            if (number_of_jobs < 1) {
+                printf("error: At least one job is required, %d given.\n",
+                       number_of_jobs);
+                exit(1);
+            }
+
+            break;
+
+        default:
+            print_usage_and_exit(argv[0], 1);
+        }
+    }
+
+    if (optind < argc) {
+        filter_tests(argv[optind]);
+    }
+
+    return (nala_run_tests());
 }
 /*
  * The MIT License (MIT)
