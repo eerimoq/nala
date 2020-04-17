@@ -1424,7 +1424,11 @@ static bool traceback_skip_filter(void *arg_p, const char *line_p)
 {
     (void)arg_p;
 
-    if (strstr(line_p, "nala.c:") != NULL) {
+    if (strstr(line_p, " nala.c:") != NULL) {
+        return (true);
+    }
+
+    if (strstr(line_p, "/nala.c:") != NULL) {
         return (true);
     }
 

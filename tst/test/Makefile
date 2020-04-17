@@ -1,4 +1,5 @@
 TESTS += main.c
+TESTS += test_filter_nala.c
 INC += ../../include
 SRC += ../../src/nala.c
 SRC += ../../src/diff/diff.c
