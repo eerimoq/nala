@@ -60,6 +60,11 @@ int io_control(int kind, ...)
     return (kind);
 }
 
+void io_control_return_void(int kind, ...)
+{
+    (void)kind;
+}
+
 int io_vcontrol(int kind, va_list ap)
 {
     (void)ap;

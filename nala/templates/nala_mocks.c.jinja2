@@ -372,7 +372,11 @@ struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
 }
 
 {% if mock.is_variadic_func %}
+{% if mock.return_value %}
 void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}}, const char *vafmt_p)
+{% else %}
+void {{mock.func_name}}_mock_ignore_in(const char *vafmt_p)
+{% endif %}
 {% else %}
 void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
 {% endif %}
@@ -405,7 +409,11 @@ void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
 }
 
 {% if mock.is_variadic_func %}
+{% if mock.return_value %}
 int {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}}, const char *vafmt_p)
+{% else %}
+int {{mock.func_name}}_mock_ignore_in_once(const char *vafmt_p)
+{% endif %}
 {% else %}
 int {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
 {% endif %}

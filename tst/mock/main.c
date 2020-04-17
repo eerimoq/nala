@@ -848,6 +848,12 @@ TEST(variadic_function_error_format_null)
         "Mocked variadic function format must be a string, not NULL.");
 }
 
+TEST(variadic_function_return_void)
+{
+    io_control_return_void_mock_ignore_in("");
+    io_control_return_void(1);
+}
+
 TEST(compose_twice_function)
 {
     DummyStruct dummy_struct = { .number = 1 };

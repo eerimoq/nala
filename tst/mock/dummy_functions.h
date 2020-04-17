@@ -70,6 +70,7 @@ DummyStruct *compose_twice(DummyStruct *dummy_struct,
 DummyStruct *add_two(DummyStruct *dummy_struct);
 DummyStruct *(*return_add_one(void))(DummyStruct *dummy_struct);
 int io_control(int kind, ...);
+void io_control_return_void(int kind, ...);
 int io_vcontrol(int kind, va_list ap);
 int io_control_no_implementation(int kind, ...);
 void struct_param(struct struct_param_type *data);
