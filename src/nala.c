@@ -85,7 +85,25 @@ __attribute__ ((weak)) void nala_resume_all_mocks(void)
 {
 }
 
+__attribute__ ((weak)) char *nala_format_mock_traceback(
+    const char *message_p,
+    struct nala_traceback_t *traceback_p)
+{
+    (void)message_p;
+    (void)traceback_p;
+
+    return (strdup(""));
+}
+
+__attribute__ ((weak)) bool nala_mock_current_is_set(void)
+{
+    return (false);
+}
+
 __attribute__ ((weak)) int nala_print_call_mask = 0;
+__attribute__ ((weak)) const char *nala_mock_func_p = NULL;
+__attribute__ ((weak)) const char *nala_mock_param_p = NULL;
+__attribute__ ((weak)) struct nala_traceback_t *nala_mock_traceback_p = NULL;
 
 /* Command line options. */
 static bool continue_on_failure = false;
@@ -1113,13 +1131,27 @@ static bool traceback_skip_filter(void *arg_p, const char *line_p)
 
 void nala_test_failure(const char *message_p)
 {
+    const char *traceback_p;
+
     nala_suspend_all_mocks();
     nala_capture_output_stop();
     capture_output_destroy(&capture_stdout);
     capture_output_destroy(&capture_stderr);
     print_test_failure_report_begin();
     printf("  Test:  " COLOR_BOLD(CYAN, "%s\n"), full_test_name(current_test_p));
-    printf("  Error: %s", message_p);
+
+    if (nala_mock_current_is_set()) {
+        printf("  Error: "COLOR_BOLD(RED, "Mocked %s(%s): %s\n"),
+               nala_mock_func_p,
+               nala_mock_param_p,
+               message_p);
+        traceback_p = nala_format_mock_traceback(strdup(""), nala_mock_traceback_p);
+        printf("%s", traceback_p);
+        free((void *)traceback_p);
+    } else {
+        printf("  Error: %s", message_p);
+    }
+
     printf("\n");
     nala_traceback_print("  ",
                          "Assert traceback (most recent call last):",

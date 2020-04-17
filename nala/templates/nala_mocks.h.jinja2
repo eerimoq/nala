@@ -14,11 +14,6 @@ Do not edit manually
 #include <stddef.h>
 {{ includes }}
 
-struct nala_traceback_t {
-    void *addresses[32];
-    int depth;
-};
-
 typedef void (*nala_mock_in_assert_t)(const void *actual_p,
                                       const void *expected_p,
                                       size_t size);

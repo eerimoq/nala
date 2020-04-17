@@ -158,6 +158,11 @@ void nala_exit(int status);
 #define NALA_CHECK_GT  4
 #define NALA_CHECK_GE  5
 
+struct nala_traceback_t {
+    void *addresses[32];
+    int depth;
+};
+
 #define NALA_ASSERT_FUNC(value)                         \
     _Generic((value),                                   \
              char: nala_assert_char,                    \

@@ -675,7 +675,7 @@ void {{mock.func_name}}_mock_assert_completed(void)
 {
     if ({{mock.state_name}}.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked {{mock.func_name}}() called fewer times than "
                     "expected. %d call(s) missing.\n\n",

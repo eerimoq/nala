@@ -1201,6 +1201,53 @@ TEST(fail_if_in_assert_is_called_before_set_in)
         "before likely_undefined_padding_mock_set_value_p_in_assert().");
 }
 
+static void in_assert_error_mock_traceback_message_in_assert(
+    struct likely_undefined_padding_t *actual_p,
+    struct likely_undefined_padding_t *expected_p,
+    size_t size)
+{
+    (void)size;
+
+    ASSERT_EQ(actual_p->b, expected_p->b);
+}
+
+static void in_assert_error_mock_traceback_message_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    struct likely_undefined_padding_t data;
+
+    memset(&data, 0, sizeof(data));
+    data.b = 4;
+    likely_undefined_padding_mock_once();
+    likely_undefined_padding_mock_set_value_p_in(&data, sizeof(data));
+    likely_undefined_padding_mock_set_value_p_in_assert(
+        in_assert_error_mock_traceback_message_in_assert);
+    data.b++;
+    likely_undefined_padding(&data);
+}
+
+TEST(in_assert_error_mock_traceback_message)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(
+        in_assert_error_mock_traceback_message_entry,
+        NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "Mocked likely_undefined_padding(value_p):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "5 != 4 (0x5 != 0x4)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "Mock traceback (most recent call last):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "Assert traceback (most recent call last):");
+
+    subprocess_result_free(result_p);
+}
+
 static int call_with_arg_callback(void *arg_p)
 {
     (void)arg_p;
@@ -1322,7 +1369,7 @@ TEST(vsyslog_ignore_va_list)
 TEST(my_va_list_function)
 {
     va_list ap;
-    
+
     my_va_list_mock(1);
 
     ASSERT_EQ(my_va_list(ap), 1);

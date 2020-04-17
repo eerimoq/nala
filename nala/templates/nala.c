@@ -9,6 +9,10 @@
 #define INSTANCE_MODE_NORMAL  0
 #define INSTANCE_MODE_REAL    1
 
+const char *nala_mock_func_p = NULL;
+const char *nala_mock_param_p = NULL;
+struct nala_traceback_t *nala_mock_traceback_p = NULL;
+
 #define NALA_INSTANCE_NEW(instance_p, mode_in)          \
     do {                                                \
         instance_p = nala_xmalloc(sizeof(*instance_p)); \
@@ -124,8 +128,8 @@ static void nala_free(void *buf_p)
     nala_resume_all_mocks();
 }
 
-char *format_mock_traceback(const char *message_p,
-                            struct nala_traceback_t *traceback_p)
+char *nala_format_mock_traceback(const char *message_p,
+                                 struct nala_traceback_t *traceback_p)
 {
     FILE *file_p;
     char *buf_p;
@@ -223,7 +227,7 @@ char *format_mock_traceback(const char *message_p,
                      PRINT_FORMAT(actual),              \
                      PRINT_FORMAT(expecetd));           \
             nala_test_failure(                          \
-                format_mock_traceback(                  \
+                nala_format_mock_traceback(             \
                     nala_format(&assert_format[0],      \
                                 (actual),               \
                                 (expecetd)),            \
@@ -251,7 +255,7 @@ char *format_mock_traceback(const char *message_p,
                      PRINT_FORMAT_HEX(actual),                          \
                      PRINT_FORMAT_HEX(expecetd));                       \
             nala_test_failure(                                          \
-                format_mock_traceback(                                  \
+                nala_format_mock_traceback(                             \
                     nala_format(&assert_format[0],                      \
                                 (actual),                               \
                                 (expecetd),                             \
@@ -296,7 +300,7 @@ void nala_mock_assert_memory(struct nala_traceback_t *traceback_p,
                  func_p,
                  param_p);
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format_memory(
                     &assert_format[0],
                     left_p,
@@ -325,7 +329,7 @@ void nala_mock_assert_string(struct nala_traceback_t *traceback_p,
                  func_p,
                  param_p);
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format_string(&assert_format[0],
                                    acutal_p,
                                    expected_p),
@@ -588,6 +592,25 @@ void nala_mock_assert_in_eq_string(struct nala_traceback_t *traceback_p,
                                 expected_p,
                                 0);
     }
+}
+
+void nala_mock_current_set(const char *func_p,
+                           const char *param_p,
+                           struct nala_traceback_t *traceback_p)
+{
+    nala_mock_func_p = func_p;
+    nala_mock_param_p = param_p;
+    nala_mock_traceback_p = traceback_p;
+}
+
+void nala_mock_current_clear(void)
+{
+    nala_mock_func_p = NULL;
+}
+
+bool nala_mock_current_is_set(void)
+{
+    return (nala_mock_func_p != NULL);
 }
 
 enum nala_va_arg_item_type_t {
@@ -999,7 +1022,9 @@ void nala_va_arg_list_assert_p(struct nala_va_arg_list_t *self_p,
 
     if (item_p->in.buf_p != NULL) {
         if (item_p->in_assert != NULL) {
+            nala_mock_current_set(self_p->func_p, "...", self_p->traceback_p);
             item_p->in_assert(value_p, item_p->in.buf_p, item_p->in.size);
+            nala_mock_current_clear();
         } else {
             nala_mock_assert_memory(self_p->traceback_p,
                                     self_p->func_p,
@@ -1026,7 +1051,9 @@ void nala_va_arg_list_assert_s(struct nala_va_arg_list_t *self_p,
 
     if (item_p->in.buf_p != NULL) {
         if (item_p->in_assert != NULL) {
+            nala_mock_current_set(self_p->func_p, "...", self_p->traceback_p);
             item_p->in_assert(value_p, item_p->in.buf_p, item_p->in.size);
+            nala_mock_current_clear();
         } else {
             nala_mock_assert_string(self_p->traceback_p,
                                     self_p->func_p,
@@ -1159,7 +1186,7 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                  PRINT_FORMAT(left),                    \
                  PRINT_FORMAT(right));                  \
         nala_test_failure(                              \
-            format_mock_traceback(                      \
+            nala_format_mock_traceback(                 \
                 nala_format(&_nala_assert_format[0],    \
                             left,                       \
                             right),                     \
@@ -1175,11 +1202,13 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                   (data_p)->params.name ## _in.buf_p,                   \
                   (data_p)->params.name ## _in.size);                   \
     } else {                                                            \
+        nala_mock_current_set(#func, #name, &(data_p)->traceback);      \
         (data_p)->params.name ## _in_assert(                            \
             name,                                                       \
             (__typeof__((data_p)->params.name))(uintptr_t)(data_p)      \
             ->params.name ## _in.buf_p,                                 \
             (data_p)->params.name ## _in.size);                         \
+        nala_mock_current_clear();                                      \
     }
 
 #define MOCK_COPY_PARAM_OUT(params_p, name)             \
@@ -1237,7 +1266,7 @@ void nala_mock_none_fail(struct nala_traceback_t *traceback_p,
                          const char *func_p)
 {
     nala_test_failure(
-        format_mock_traceback(
+        nala_format_mock_traceback(
             nala_format("Mocked %s() called unexpectedly.\n\n",
                         func_p),
             traceback_p));
