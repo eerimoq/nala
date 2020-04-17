@@ -15,11 +15,6 @@ Do not edit manually
 #include "../nala/dist/nala.h"
 #include "../tests/files/test_collect.h"
 
-struct nala_traceback_t {
-    void *addresses[32];
-    int depth;
-};
-
 typedef void (*nala_mock_in_assert_t)(const void *actual_p,
                                       const void *expected_p,
                                       size_t size);

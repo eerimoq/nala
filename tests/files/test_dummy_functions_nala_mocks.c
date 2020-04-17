@@ -23,6 +23,10 @@ Do not edit manually
 #define INSTANCE_MODE_NORMAL  0
 #define INSTANCE_MODE_REAL    1
 
+const char *nala_mock_func_p = NULL;
+const char *nala_mock_param_p = NULL;
+struct nala_traceback_t *nala_mock_traceback_p = NULL;
+
 #define NALA_INSTANCE_NEW(instance_p, mode_in)          \
     do {                                                \
         instance_p = nala_xmalloc(sizeof(*instance_p)); \
@@ -138,8 +142,8 @@ static void nala_free(void *buf_p)
     nala_resume_all_mocks();
 }
 
-char *format_mock_traceback(const char *message_p,
-                            struct nala_traceback_t *traceback_p)
+char *nala_format_mock_traceback(const char *message_p,
+                                 struct nala_traceback_t *traceback_p)
 {
     FILE *file_p;
     char *buf_p;
@@ -237,7 +241,7 @@ char *format_mock_traceback(const char *message_p,
                      PRINT_FORMAT(actual),              \
                      PRINT_FORMAT(expecetd));           \
             nala_test_failure(                          \
-                format_mock_traceback(                  \
+                nala_format_mock_traceback(             \
                     nala_format(&assert_format[0],      \
                                 (actual),               \
                                 (expecetd)),            \
@@ -265,7 +269,7 @@ char *format_mock_traceback(const char *message_p,
                      PRINT_FORMAT_HEX(actual),                          \
                      PRINT_FORMAT_HEX(expecetd));                       \
             nala_test_failure(                                          \
-                format_mock_traceback(                                  \
+                nala_format_mock_traceback(                             \
                     nala_format(&assert_format[0],                      \
                                 (actual),                               \
                                 (expecetd),                             \
@@ -310,7 +314,7 @@ void nala_mock_assert_memory(struct nala_traceback_t *traceback_p,
                  func_p,
                  param_p);
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format_memory(
                     &assert_format[0],
                     left_p,
@@ -339,7 +343,7 @@ void nala_mock_assert_string(struct nala_traceback_t *traceback_p,
                  func_p,
                  param_p);
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format_string(&assert_format[0],
                                    acutal_p,
                                    expected_p),
@@ -602,6 +606,25 @@ void nala_mock_assert_in_eq_string(struct nala_traceback_t *traceback_p,
                                 expected_p,
                                 0);
     }
+}
+
+void nala_mock_current_set(const char *func_p,
+                           const char *param_p,
+                           struct nala_traceback_t *traceback_p)
+{
+    nala_mock_func_p = func_p;
+    nala_mock_param_p = param_p;
+    nala_mock_traceback_p = traceback_p;
+}
+
+void nala_mock_current_clear(void)
+{
+    nala_mock_func_p = NULL;
+}
+
+bool nala_mock_current_is_set(void)
+{
+    return (nala_mock_func_p != NULL);
 }
 
 enum nala_va_arg_item_type_t {
@@ -1013,7 +1036,9 @@ void nala_va_arg_list_assert_p(struct nala_va_arg_list_t *self_p,
 
     if (item_p->in.buf_p != NULL) {
         if (item_p->in_assert != NULL) {
+            nala_mock_current_set(self_p->func_p, "...", self_p->traceback_p);
             item_p->in_assert(value_p, item_p->in.buf_p, item_p->in.size);
+            nala_mock_current_clear();
         } else {
             nala_mock_assert_memory(self_p->traceback_p,
                                     self_p->func_p,
@@ -1040,7 +1065,9 @@ void nala_va_arg_list_assert_s(struct nala_va_arg_list_t *self_p,
 
     if (item_p->in.buf_p != NULL) {
         if (item_p->in_assert != NULL) {
+            nala_mock_current_set(self_p->func_p, "...", self_p->traceback_p);
             item_p->in_assert(value_p, item_p->in.buf_p, item_p->in.size);
+            nala_mock_current_clear();
         } else {
             nala_mock_assert_string(self_p->traceback_p,
                                     self_p->func_p,
@@ -1173,7 +1200,7 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                  PRINT_FORMAT(left),                    \
                  PRINT_FORMAT(right));                  \
         nala_test_failure(                              \
-            format_mock_traceback(                      \
+            nala_format_mock_traceback(                 \
                 nala_format(&_nala_assert_format[0],    \
                             left,                       \
                             right),                     \
@@ -1189,11 +1216,13 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                   (data_p)->params.name ## _in.buf_p,                   \
                   (data_p)->params.name ## _in.size);                   \
     } else {                                                            \
+        nala_mock_current_set(#func, #name, &(data_p)->traceback);      \
         (data_p)->params.name ## _in_assert(                            \
             name,                                                       \
             (__typeof__((data_p)->params.name))(uintptr_t)(data_p)      \
             ->params.name ## _in.buf_p,                                 \
             (data_p)->params.name ## _in.size);                         \
+        nala_mock_current_clear();                                      \
     }
 
 #define MOCK_COPY_PARAM_OUT(params_p, name)             \
@@ -1251,7 +1280,7 @@ void nala_mock_none_fail(struct nala_traceback_t *traceback_p,
                          const char *func_p)
 {
     nala_test_failure(
-        format_mock_traceback(
+        nala_format_mock_traceback(
             nala_format("Mocked %s() called unexpectedly.\n\n",
                         func_p),
             traceback_p));
@@ -1783,7 +1812,7 @@ void add_mock_assert_completed(void)
 {
     if (nala_mock_add.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked add() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -2133,7 +2162,7 @@ void call_mock_assert_completed(void)
 {
     if (nala_mock_call.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked call() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -2415,7 +2444,7 @@ void close_mock_assert_completed(void)
 {
     if (nala_mock_close.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked close() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -2848,7 +2877,7 @@ void compose_twice_mock_assert_completed(void)
 {
     if (nala_mock_compose_twice.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked compose_twice() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -3198,7 +3227,7 @@ void double_pointer_mock_assert_completed(void)
 {
     if (nala_mock_double_pointer.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked double_pointer() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -3480,7 +3509,7 @@ void dup_mock_assert_completed(void)
 {
     if (nala_mock_dup.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked dup() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -3777,7 +3806,7 @@ void dup2_mock_assert_completed(void)
 {
     if (nala_mock_dup2.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked dup2() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -4142,7 +4171,7 @@ void edit_number_mock_assert_completed(void)
 {
     if (nala_mock_edit_number.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked edit_number() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -4492,7 +4521,7 @@ void endmntent_mock_assert_completed(void)
 {
     if (nala_mock_endmntent.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked endmntent() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -4764,7 +4793,7 @@ void enum_param_mock_assert_completed(void)
 {
     if (nala_mock_enum_param.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked enum_param() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -5114,7 +5143,7 @@ void fclose_mock_assert_completed(void)
 {
     if (nala_mock_fclose.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked fclose() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -5464,7 +5493,7 @@ void fflush_mock_assert_completed(void)
 {
     if (nala_mock_fflush.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked fflush() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -5814,7 +5843,7 @@ void fileno_mock_assert_completed(void)
 {
     if (nala_mock_fileno.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked fileno() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -6289,7 +6318,7 @@ void fopen_mock_assert_completed(void)
 {
     if (nala_mock_fopen.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked fopen() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -6752,7 +6781,7 @@ void fread_mock_assert_completed(void)
 {
     if (nala_mock_fread.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked fread() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -7092,7 +7121,7 @@ void free_mock_assert_completed(void)
 {
     if (nala_mock_free.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked free() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -7472,7 +7501,7 @@ void fseek_mock_assert_completed(void)
 {
     if (nala_mock_fseek.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked fseek() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -7822,7 +7851,7 @@ void ftell_mock_assert_completed(void)
 {
     if (nala_mock_ftell.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked ftell() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -8285,7 +8314,7 @@ void fwrite_mock_assert_completed(void)
 {
     if (nala_mock_fwrite.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked fwrite() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -8635,7 +8664,7 @@ void getmntent_mock_assert_completed(void)
 {
     if (nala_mock_getmntent.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked getmntent() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -8975,7 +9004,7 @@ void in_out_mock_assert_completed(void)
 {
     if (nala_mock_in_out.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked in_out() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -9383,7 +9412,7 @@ void io_control_mock_assert_completed(void)
 {
     if (nala_mock_io_control.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked io_control() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -9666,7 +9695,7 @@ void io_vcontrol_mock_assert_completed(void)
 {
     if (nala_mock_io_vcontrol.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked io_vcontrol() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -9948,7 +9977,7 @@ void malloc_mock_assert_completed(void)
 {
     if (nala_mock_malloc.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked malloc() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -10625,7 +10654,7 @@ void mount_mock_assert_completed(void)
 {
     if (nala_mock_mount.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked mount() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -10986,7 +11015,7 @@ void output_message_mock_assert_completed(void)
 {
     if (nala_mock_output_message.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked output_message() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -11336,7 +11365,7 @@ void pipe_mock_assert_completed(void)
 {
     if (nala_mock_pipe.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked pipe() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -11716,7 +11745,7 @@ void poll_mock_assert_completed(void)
 {
     if (nala_mock_poll.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked poll() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -11974,7 +12003,7 @@ void print_hello_mock_assert_completed(void)
 {
     if (nala_mock_print_hello.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked print_hello() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -12354,7 +12383,7 @@ void read_mock_assert_completed(void)
 {
     if (nala_mock_read.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked read() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -12847,7 +12876,7 @@ void sendto_mock_assert_completed(void)
 {
     if (nala_mock_sendto.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked sendto() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -13257,7 +13286,7 @@ void setsockopt_mock_assert_completed(void)
 {
     if (nala_mock_setsockopt.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked setsockopt() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -13539,7 +13568,7 @@ void sleep_mock_assert_completed(void)
 {
     if (nala_mock_sleep.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked sleep() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -13993,7 +14022,7 @@ void statvfs_mock_assert_completed(void)
 {
     if (nala_mock_statvfs.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked statvfs() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -14333,7 +14362,7 @@ void struct_param_mock_assert_completed(void)
 {
     if (nala_mock_struct_param.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked struct_param() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -14601,7 +14630,7 @@ void struct_param_and_return_type_mock_assert_completed(void)
 {
     if (nala_mock_struct_param_and_return_type.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked struct_param_and_return_type() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -14951,7 +14980,7 @@ void time_mock_assert_completed(void)
 {
     if (nala_mock_time.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked time() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -15414,7 +15443,7 @@ void timerfd_settime_mock_assert_completed(void)
 {
     if (nala_mock_timerfd_settime.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked timerfd_settime() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -15682,7 +15711,7 @@ void tmpfile_mock_assert_completed(void)
 {
     if (nala_mock_tmpfile.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked tmpfile() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -15950,7 +15979,7 @@ void typedef_struct_param_and_return_type_mock_assert_completed(void)
 {
     if (nala_mock_typedef_struct_param_and_return_type.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked typedef_struct_param_and_return_type() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -16218,7 +16247,7 @@ void typedef_union_param_and_return_type_mock_assert_completed(void)
 {
     if (nala_mock_typedef_union_param_and_return_type.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked typedef_union_param_and_return_type() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -16486,7 +16515,7 @@ void union_param_and_return_type_mock_assert_completed(void)
 {
     if (nala_mock_union_param_and_return_type.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked union_param_and_return_type() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -16768,7 +16797,7 @@ void usleep_mock_assert_completed(void)
 {
     if (nala_mock_usleep.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked usleep() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
@@ -17148,7 +17177,7 @@ void write_mock_assert_completed(void)
 {
     if (nala_mock_write.instances.length != 0) {
         nala_test_failure(
-            format_mock_traceback(
+            nala_format_mock_traceback(
                 nala_format(
                     "Mocked write() called fewer times than "
                     "expected. %d call(s) missing.\n\n",
