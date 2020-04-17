@@ -351,6 +351,13 @@ void nala_mock_assert_string(struct nala_traceback_t *traceback_p,
     }
 }
 
+void nala_mock_assert_in_string(void *acutal_p, void *expected_p, size_t size)
+{
+    (void)size;
+
+    nala_assert_string(acutal_p, expected_p, NALA_CHECK_EQ);
+}
+
 void nala_mock_assert_in_eq_char(struct nala_traceback_t *traceback_p,
                                  const char *func_p,
                                  const char *param_p,
@@ -1207,23 +1214,14 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                 traceback_p));                          \
     }
 
-#define MOCK_ASSERT_PARAM_IN(data_p, assert_in, func, name)             \
-    if ((data_p)->params.name ## _in_assert == NULL) {                  \
-        assert_in(&(data_p)->traceback,                                 \
-                  #func,                                                \
-                  #name,                                                \
-                  (const void *)(uintptr_t)name,                        \
-                  (data_p)->params.name ## _in.buf_p,                   \
-                  (data_p)->params.name ## _in.size);                   \
-    } else {                                                            \
-        nala_mock_current_set(#func, #name, &(data_p)->traceback);      \
-        (data_p)->params.name ## _in_assert(                            \
-            name,                                                       \
-            (__typeof__((data_p)->params.name))(uintptr_t)(data_p)      \
-            ->params.name ## _in.buf_p,                                 \
-            (data_p)->params.name ## _in.size);                         \
-        nala_mock_current_clear();                                      \
-    }
+#define MOCK_ASSERT_PARAM_IN(data_p, func, name)                \
+    nala_mock_current_set(#func, #name, &(data_p)->traceback);  \
+    (data_p)->params.name ## _in_assert(                        \
+        name,                                                   \
+        (__typeof__((data_p)->params.name))(uintptr_t)(data_p)  \
+        ->params.name ## _in.buf_p,                             \
+        (data_p)->params.name ## _in.size);                     \
+    nala_mock_current_clear();
 
 #define MOCK_COPY_PARAM_OUT(params_p, name)             \
     if ((params_p)->name ## _out_copy == NULL) {        \
@@ -1238,23 +1236,19 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
             (params_p)->name ## _out.size);             \
     }
 
-#define MOCK_ASSERT_COPY_SET_PARAM(instance_p,                  \
-                                   data_p,                      \
-                                   assert_in,                   \
-                                   func,                        \
-                                   name)                        \
-    if ((data_p)->params.name ## _in.buf_p != NULL) {           \
-        MOCK_ASSERT_PARAM_IN(data_p, assert_in, func, name);    \
-        if (instance_p != NULL) {                               \
-            nala_free((data_p)->params.name ## _in.buf_p);      \
-        }                                                       \
-    }                                                           \
-                                                                \
-    if ((data_p)->params.name ## _out.buf_p != NULL) {          \
-        MOCK_COPY_PARAM_OUT(&(data_p)->params, name);           \
-        if (instance_p != NULL) {                               \
-            nala_free((data_p)->params.name ## _out.buf_p);     \
-        }                                                       \
+#define MOCK_ASSERT_COPY_SET_PARAM(instance_p, data_p, func, name)      \
+    if ((data_p)->params.name ## _in.buf_p != NULL) {                   \
+        MOCK_ASSERT_PARAM_IN(data_p, func, name);                       \
+        if (instance_p != NULL) {                                       \
+            nala_free((data_p)->params.name ## _in.buf_p);              \
+        }                                                               \
+    }                                                                   \
+                                                                        \
+    if ((data_p)->params.name ## _out.buf_p != NULL) {                  \
+        MOCK_COPY_PARAM_OUT(&(data_p)->params, name);                   \
+        if (instance_p != NULL) {                                       \
+            nala_free((data_p)->params.name ## _out.buf_p);             \
+        }                                                               \
     }
 
 void nala_state_suspend(struct nala_state_t *state_p)
@@ -1461,7 +1455,6 @@ int __wrap_open(const char *pathname, int flags, ...)
 
             MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
                                        nala_data_p,
-                                       nala_mock_assert_string,
                                        open,
                                        pathname);
 
@@ -1516,6 +1509,21 @@ void open_mock(const char *pathname, int flags, int return_value, const char *va
 {
     CHECK_NO_INSTANCES(nala_mock_open);
     nala_mock_open.state.mode = MODE_MOCK;
+    nala_set_param_init(&nala_mock_open.data.params.pathname_out);
+    nala_set_param_init(&nala_mock_open.data.params.pathname_in);
+    nala_mock_open.data.params.pathname_in_assert =
+        (__typeof__(nala_mock_open.data.params.pathname_in_assert))nala_mock_assert_in_string;
+    nala_mock_open.data.params.pathname_out_copy = NULL;
+    nala_mock_open.data.params.vafmt_p = vafmt_p;
+    nala_va_arg_list_init(&nala_mock_open.data.params.nala_va_arg_list,
+                          &nala_mock_open.data.traceback,
+                          "open");
+    va_list nala_vl;
+    va_start(nala_vl, vafmt_p);
+    nala_parse_va_list(&nala_mock_open.data.params.nala_va_arg_list,
+                       vafmt_p,
+                       &nala_vl);
+    va_end(nala_vl);
     nala_mock_open.data.params.pathname = NULL;
     nala_mock_open.data.params.ignore_pathname_in = true;
 
@@ -1528,16 +1536,6 @@ void open_mock(const char *pathname, int flags, int return_value, const char *va
 
     nala_mock_open.data.params.flags = flags;
     nala_mock_open.data.params.ignore_flags_in = false;
-    nala_mock_open.data.params.vafmt_p = vafmt_p;
-    nala_va_arg_list_init(&nala_mock_open.data.params.nala_va_arg_list,
-                          &nala_mock_open.data.traceback,
-                          "open");
-    va_list nala_vl;
-    va_start(nala_vl, vafmt_p);
-    nala_parse_va_list(&nala_mock_open.data.params.nala_va_arg_list,
-                       vafmt_p,
-                       &nala_vl);
-    va_end(nala_vl);
     nala_mock_open.data.return_value = return_value;
     nala_mock_open.data.errno_value = 0;
     nala_mock_open.data.callback = NULL;
@@ -1552,7 +1550,8 @@ int open_mock_once(const char *pathname, int flags, int return_value, const char
     NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
     nala_set_param_init(&nala_instance_p->data.params.pathname_out);
     nala_set_param_init(&nala_instance_p->data.params.pathname_in);
-    nala_instance_p->data.params.pathname_in_assert = NULL;
+    nala_instance_p->data.params.pathname_in_assert =
+        (__typeof__(nala_instance_p->data.params.pathname_in_assert))nala_mock_assert_in_string;
     nala_instance_p->data.params.pathname_out_copy = NULL;
     nala_instance_p->data.params.vafmt_p = vafmt_p;
     nala_va_arg_list_init(&nala_instance_p->data.params.nala_va_arg_list,
@@ -1589,9 +1588,11 @@ void open_mock_ignore_in(int return_value, const char *vafmt_p)
 {
     CHECK_NO_INSTANCES(nala_mock_open);
     nala_mock_open.state.mode = MODE_MOCK;
-    nala_mock_open.data.params.ignore_pathname_in = true;
-    nala_mock_open.data.params.ignore_flags_in = true;
-    nala_mock_open.data.return_value = return_value;
+    nala_set_param_init(&nala_mock_open.data.params.pathname_out);
+    nala_set_param_init(&nala_mock_open.data.params.pathname_in);
+    nala_mock_open.data.params.pathname_in_assert =
+        (__typeof__(nala_mock_open.data.params.pathname_in_assert))nala_mock_assert_in_string;
+    nala_mock_open.data.params.pathname_out_copy = NULL;
     nala_mock_open.data.params.vafmt_p = vafmt_p;
     nala_va_arg_list_init(&nala_mock_open.data.params.nala_va_arg_list,
                           &nala_mock_open.data.traceback,
@@ -1599,6 +1600,9 @@ void open_mock_ignore_in(int return_value, const char *vafmt_p)
     nala_parse_va_list(&nala_mock_open.data.params.nala_va_arg_list,
                        vafmt_p,
                        NULL);
+    nala_mock_open.data.params.ignore_pathname_in = true;
+    nala_mock_open.data.params.ignore_flags_in = true;
+    nala_mock_open.data.return_value = return_value;
     nala_mock_open.data.errno_value = 0;
     nala_mock_open.data.callback = NULL;
 }
@@ -1611,7 +1615,8 @@ int open_mock_ignore_in_once(int return_value, const char *vafmt_p)
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
     nala_set_param_init(&instance_p->data.params.pathname_out);
     nala_set_param_init(&instance_p->data.params.pathname_in);
-    instance_p->data.params.pathname_in_assert = NULL;
+    instance_p->data.params.pathname_in_assert =
+        (__typeof__(instance_p->data.params.pathname_in_assert))nala_mock_assert_in_string;
     instance_p->data.params.pathname_out_copy = NULL;
     instance_p->data.params.vafmt_p = vafmt_p;
     nala_va_arg_list_init(&instance_p->data.params.nala_va_arg_list,

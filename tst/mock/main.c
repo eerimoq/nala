@@ -288,7 +288,7 @@ TEST(output_message_function_error_mismatch)
 {
     function_error_in_subprocess(
         output_message_function_error_mismatch_entry,
-        "Mocked output_message(message): See diff for details.\n");
+        "The strings are not equal. See diff for details.\n");
 }
 
 TEST(time_function)
@@ -1246,6 +1246,39 @@ TEST(in_assert_error_mock_traceback_message)
                      "Mocked likely_undefined_padding(value_p):");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
                      "5 != 4 (0x5 != 0x4)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "Mock traceback (most recent call last):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "Assert traceback (most recent call last):");
+
+    subprocess_result_free(result_p);
+}
+
+static void struct_assert_error_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    struct likely_undefined_padding_t data;
+
+    memset(&data, 0, sizeof(data));
+    data.d = 2;
+    likely_undefined_padding_mock_once();
+    likely_undefined_padding_mock_set_value_p_in(&data, sizeof(data));
+    data.d++;
+    likely_undefined_padding(&data);
+}
+
+TEST(struct_assert_error)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(struct_assert_error_entry, NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "Mocked likely_undefined_padding(value_p):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "3 != 2 (0x3 != 0x2)");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
                      "Mock traceback (most recent call last):");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,

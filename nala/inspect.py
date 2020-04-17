@@ -204,7 +204,8 @@ class ForgivingDeclarationParser:
         self.chunks_to_erase = []
         self.bracket_stack = []
         self.source_context = []
-        self.typedefs = ['typedef int __builtin_va_list;']
+        self.typedefs_code = ['typedef int __builtin_va_list;']
+        self.typedefs = {}
         self.structs_code = []
         self.structs = []
         self.includes = []
@@ -260,10 +261,11 @@ class ForgivingDeclarationParser:
         if self.functions:
             return
 
-        code = '\n'.join(self.typedefs + self.structs_code + self.func_signatures)
+        code = '\n'.join(
+            self.typedefs_code + self.structs_code + self.func_signatures)
         self.file_ast = self.cparser.parse(code)
         items = zip(self.func_names, self.func_source_contexts)
-        func_offset = len(self.typedefs + self.structs_code)
+        func_offset = len(self.typedefs_code + self.structs_code)
 
         for i, (func_name, _) in enumerate(items, func_offset):
             if self.param_names is None:
@@ -278,15 +280,43 @@ class ForgivingDeclarationParser:
                 func_declaration,
                 self.file_ast))
 
+        self.load_typedefs()
         self.load_structs()
+
+    def is_primitive_type(self, member):
+        if member is None:
+            return False
+
+        if not isinstance(member.type, node.TypeDecl):
+            return False
+
+        if not isinstance(member.type.type, node.IdentifierType):
+            return False
+
+        name = ' '.join(member.type.type.names)
+
+        if name in PRIMITIVE_TYPES:
+            return True
+
+        return self.is_primitive_type(self.lookup_typedef(name))
+
+    def lookup_typedef(self, name):
+        if name in self.typedefs:
+            return self.typedefs[name]
 
     def load_struct_member(self, member):
         item = None
 
-        if isinstance(member.type, node.TypeDecl):
-            if isinstance(member.type.type, node.IdentifierType):
-                if ' '.join(member.type.type.names) in PRIMITIVE_TYPES:
-                    item = ('assert-eq', member.name)
+        if isinstance(member.type, node.ArrayDecl):
+            pass
+        elif isinstance(member.type, node.Union):
+            pass
+        elif isinstance(member.type, node.Struct):
+            pass
+        elif isinstance(member.type, node.PtrDecl):
+            pass
+        elif self.is_primitive_type(member):
+            item = ('assert-eq', member.name)
 
         return item
 
@@ -297,7 +327,7 @@ class ForgivingDeclarationParser:
             item = self.load_struct_member(member)
 
             if item is None:
-                return []
+                continue
 
             items.append(item)
 
@@ -313,6 +343,11 @@ class ForgivingDeclarationParser:
                 if isinstance(item.type, node.Struct):
                     items = self.load_struct_members(item.type)
                     self.structs.append((item.type.name, items))
+
+    def load_typedefs(self):
+        for item in self.file_ast:
+            if isinstance(item, node.Typedef):
+                self.typedefs[item.name] = item
 
     def next(self):
         self.previous = self.current
@@ -373,7 +408,7 @@ class ForgivingDeclarationParser:
             self.next()
 
         code = self.read_source_code(begin, self.current.span[1])
-        self.typedefs.append(code)
+        self.typedefs_code.append(code)
 
     def parse_struct(self, begin, _name):
         while self.bracket_stack:

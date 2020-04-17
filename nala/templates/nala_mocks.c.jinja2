@@ -162,10 +162,9 @@ struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
             nala_data_p->params_in.{{param.name}} = {{param.name}};
             {% endfor %}
 
-            {% for param, _, _, _, _, _, check in mock.set_params %}
+            {% for param, _, _, _, _, _, _ in mock.set_params %}
             MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
                                        nala_data_p,
-                                       {{check}},
                                        {{mock.func_name}},
                                        {{param.name}});
             {% endfor %}
@@ -276,6 +275,25 @@ struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
 {
     CHECK_NO_INSTANCES({{mock.state_name}});
     {{mock.state_name}}.state.mode = MODE_MOCK;
+    {% for param, _, _, _, _, _, check in mock.set_params %}
+    nala_set_param_init(&{{mock.state_name}}.data.params.{{param.name}}_out);
+    nala_set_param_init(&{{mock.state_name}}.data.params.{{param.name}}_in);
+    {{mock.state_name}}.data.params.{{param.name}}_in_assert =
+        (__typeof__({{mock.state_name}}.data.params.{{param.name}}_in_assert)){{check}};
+    {{mock.state_name}}.data.params.{{param.name}}_out_copy = NULL;
+    {% endfor %}
+    {% if mock.is_variadic_func %}
+    {{mock.state_name}}.data.params.vafmt_p = vafmt_p;
+    nala_va_arg_list_init(&{{mock.state_name}}.data.params.nala_va_arg_list,
+                          &{{mock.state_name}}.data.traceback,
+                          "{{mock.func_name}}");
+    va_list nala_vl;
+    va_start(nala_vl, vafmt_p);
+    nala_parse_va_list(&{{mock.state_name}}.data.params.nala_va_arg_list,
+                       vafmt_p,
+                       &nala_vl);
+    va_end(nala_vl);
+    {% endif %}
     {% for param in mock.char_pointer_params %}
     {{mock.state_name}}.data.params.{{param.name}} = NULL;
     {{mock.state_name}}.data.params.ignore_{{param.name}}_in = true;
@@ -296,18 +314,6 @@ struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
     {{mock.state_name}}.data.params.{{param.name}} = {{param.name}};
     {{mock.state_name}}.data.params.ignore_{{param.name}}_in = false;
     {% endfor %}
-    {% if mock.is_variadic_func %}
-    {{mock.state_name}}.data.params.vafmt_p = vafmt_p;
-    nala_va_arg_list_init(&{{mock.state_name}}.data.params.nala_va_arg_list,
-                          &{{mock.state_name}}.data.traceback,
-                          "{{mock.func_name}}");
-    va_list nala_vl;
-    va_start(nala_vl, vafmt_p);
-    nala_parse_va_list(&{{mock.state_name}}.data.params.nala_va_arg_list,
-                       vafmt_p,
-                       &nala_vl);
-    va_end(nala_vl);
-    {% endif %}
     {% if mock.return_value %}
     {{mock.state_name}}.data.return_value = return_value;
     {% endif %}
@@ -322,10 +328,11 @@ struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
 
     {{mock.state_name}}.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
-    {% for param, _, _, _, _, _, _ in mock.set_params %}
+    {% for param, _, _, _, _, _, check in mock.set_params %}
     nala_set_param_init(&nala_instance_p->data.params.{{param.name}}_out);
     nala_set_param_init(&nala_instance_p->data.params.{{param.name}}_in);
-    nala_instance_p->data.params.{{param.name}}_in_assert = NULL;
+    nala_instance_p->data.params.{{param.name}}_in_assert =
+        (__typeof__(nala_instance_p->data.params.{{param.name}}_in_assert)){{check}};
     nala_instance_p->data.params.{{param.name}}_out_copy = NULL;
     {% endfor %}
     {% if mock.is_variadic_func %}
@@ -383,6 +390,22 @@ void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
 {
     CHECK_NO_INSTANCES({{mock.state_name}});
     {{mock.state_name}}.state.mode = MODE_MOCK;
+    {% for param, _, _, _, _, _, check in mock.set_params %}
+    nala_set_param_init(&{{mock.state_name}}.data.params.{{param.name}}_out);
+    nala_set_param_init(&{{mock.state_name}}.data.params.{{param.name}}_in);
+    {{mock.state_name}}.data.params.{{param.name}}_in_assert =
+        (__typeof__({{mock.state_name}}.data.params.{{param.name}}_in_assert)){{check}};
+    {{mock.state_name}}.data.params.{{param.name}}_out_copy = NULL;
+    {% endfor %}
+    {% if mock.is_variadic_func %}
+    {{mock.state_name}}.data.params.vafmt_p = vafmt_p;
+    nala_va_arg_list_init(&{{mock.state_name}}.data.params.nala_va_arg_list,
+                          &{{mock.state_name}}.data.traceback,
+                          "{{mock.func_name}}");
+    nala_parse_va_list(&{{mock.state_name}}.data.params.nala_va_arg_list,
+                       vafmt_p,
+                       NULL);
+    {% endif %}
     {% for param in mock.char_pointer_params %}
     {{mock.state_name}}.data.params.ignore_{{param.name}}_in = true;
     {% endfor %}
@@ -394,15 +417,6 @@ void {{mock.func_name}}_mock_ignore_in({{mock.return_value_decl | render}})
     {% endfor %}
     {% if mock.return_value %}
     {{mock.state_name}}.data.return_value = return_value;
-    {% endif %}
-    {% if mock.is_variadic_func %}
-    {{mock.state_name}}.data.params.vafmt_p = vafmt_p;
-    nala_va_arg_list_init(&{{mock.state_name}}.data.params.nala_va_arg_list,
-                          &{{mock.state_name}}.data.traceback,
-                          "{{mock.func_name}}");
-    nala_parse_va_list(&{{mock.state_name}}.data.params.nala_va_arg_list,
-                       vafmt_p,
-                       NULL);
     {% endif %}
     {{mock.state_name}}.data.errno_value = 0;
     {{mock.state_name}}.data.callback = NULL;
@@ -422,10 +436,11 @@ int {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
 
     {{mock.state_name}}.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
-    {% for param, _, _, _, _, _, _ in mock.set_params %}
+    {% for param, _, _, _, _, _, check in mock.set_params %}
     nala_set_param_init(&instance_p->data.params.{{param.name}}_out);
     nala_set_param_init(&instance_p->data.params.{{param.name}}_in);
-    instance_p->data.params.{{param.name}}_in_assert = NULL;
+    instance_p->data.params.{{param.name}}_in_assert =
+        (__typeof__(instance_p->data.params.{{param.name}}_in_assert)){{check}};
     instance_p->data.params.{{param.name}}_out_copy = NULL;
     {% endfor %}
     {% if mock.is_variadic_func %}
@@ -694,37 +709,17 @@ void {{mock.func_name}}_mock_assert_completed(void)
 {% endfor %}
 
 // Struct assertions
-{% for assert_in in struct_assert_ins %}
+{% for assert in struct_asserts %}
 
-void nala_mock_assert_in_struct_{{assert_in.name}}(
-    struct nala_traceback_t *traceback_p,
-    const char *func_p,
-    const char *param_p,
-    const void *left_p,
-    const void *right_p,
-    size_t size)
+void nala_mock_assert_struct_{{assert.name}}(struct {{assert.name}} *actual_p, struct {{assert.name}} *expected_p, size_t size)
 {
-    {% if assert_in.assert_in_members %}
-    (void)size;
-    const struct {{assert_in.name}} *actual_p = left_p;
-    const struct {{assert_in.name}} *expected_p = right_p;
-    char format[512];
-
-    snprintf(&format[0],
-             sizeof(format),
-             "Mocked %s(%s%%s): %%s != %%s\n\n",
-             func_p,
-             param_p);
-
-    if ((actual_p != NULL) && (expected_p != NULL)) {
-            {% for member in assert_in.assert_in_members %}
-        MOCK_ASSERT_PARAM_IN_EQ(traceback_p, format, "->{{member}}", actual_p->{{member}}, expected_p->{{member}})
-            {% endfor %}
-    } else {
-        MOCK_ASSERT_PARAM_IN_EQ(traceback_p, format, "", actual_p, expected_p);
-    }
-    {% else %}
-    nala_mock_assert_memory(traceback_p, func_p, param_p, left_p, right_p, size);
+    {% if not assert.assert_eq_members %}
+    (void)expected_p;
     {% endif %}
+    ASSERT_NE(actual_p, NULL);
+    ASSERT_EQ(size, sizeof(*actual_p));
+    {% for member in assert.assert_eq_members %}
+    ASSERT_EQ(actual_p->{{member}}, expected_p->{{member}});
+    {% endfor %}
 }
 {% endfor %}

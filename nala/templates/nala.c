@@ -337,6 +337,13 @@ void nala_mock_assert_string(struct nala_traceback_t *traceback_p,
     }
 }
 
+void nala_mock_assert_in_string(void *acutal_p, void *expected_p, size_t size)
+{
+    (void)size;
+
+    nala_assert_string(acutal_p, expected_p, NALA_CHECK_EQ);
+}
+
 void nala_mock_assert_in_eq_char(struct nala_traceback_t *traceback_p,
                                  const char *func_p,
                                  const char *param_p,
@@ -1193,23 +1200,14 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
                 traceback_p));                          \
     }
 
-#define MOCK_ASSERT_PARAM_IN(data_p, assert_in, func, name)             \
-    if ((data_p)->params.name ## _in_assert == NULL) {                  \
-        assert_in(&(data_p)->traceback,                                 \
-                  #func,                                                \
-                  #name,                                                \
-                  (const void *)(uintptr_t)name,                        \
-                  (data_p)->params.name ## _in.buf_p,                   \
-                  (data_p)->params.name ## _in.size);                   \
-    } else {                                                            \
-        nala_mock_current_set(#func, #name, &(data_p)->traceback);      \
-        (data_p)->params.name ## _in_assert(                            \
-            name,                                                       \
-            (__typeof__((data_p)->params.name))(uintptr_t)(data_p)      \
-            ->params.name ## _in.buf_p,                                 \
-            (data_p)->params.name ## _in.size);                         \
-        nala_mock_current_clear();                                      \
-    }
+#define MOCK_ASSERT_PARAM_IN(data_p, func, name)                \
+    nala_mock_current_set(#func, #name, &(data_p)->traceback);  \
+    (data_p)->params.name ## _in_assert(                        \
+        name,                                                   \
+        (__typeof__((data_p)->params.name))(uintptr_t)(data_p)  \
+        ->params.name ## _in.buf_p,                             \
+        (data_p)->params.name ## _in.size);                     \
+    nala_mock_current_clear();
 
 #define MOCK_COPY_PARAM_OUT(params_p, name)             \
     if ((params_p)->name ## _out_copy == NULL) {        \
@@ -1224,23 +1222,19 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
             (params_p)->name ## _out.size);             \
     }
 
-#define MOCK_ASSERT_COPY_SET_PARAM(instance_p,                  \
-                                   data_p,                      \
-                                   assert_in,                   \
-                                   func,                        \
-                                   name)                        \
-    if ((data_p)->params.name ## _in.buf_p != NULL) {           \
-        MOCK_ASSERT_PARAM_IN(data_p, assert_in, func, name);    \
-        if (instance_p != NULL) {                               \
-            nala_free((data_p)->params.name ## _in.buf_p);      \
-        }                                                       \
-    }                                                           \
-                                                                \
-    if ((data_p)->params.name ## _out.buf_p != NULL) {          \
-        MOCK_COPY_PARAM_OUT(&(data_p)->params, name);           \
-        if (instance_p != NULL) {                               \
-            nala_free((data_p)->params.name ## _out.buf_p);     \
-        }                                                       \
+#define MOCK_ASSERT_COPY_SET_PARAM(instance_p, data_p, func, name)      \
+    if ((data_p)->params.name ## _in.buf_p != NULL) {                   \
+        MOCK_ASSERT_PARAM_IN(data_p, func, name);                       \
+        if (instance_p != NULL) {                                       \
+            nala_free((data_p)->params.name ## _in.buf_p);              \
+        }                                                               \
+    }                                                                   \
+                                                                        \
+    if ((data_p)->params.name ## _out.buf_p != NULL) {                  \
+        MOCK_COPY_PARAM_OUT(&(data_p)->params, name);                   \
+        if (instance_p != NULL) {                                       \
+            nala_free((data_p)->params.name ## _out.buf_p);             \
+        }                                                               \
     }
 
 void nala_state_suspend(struct nala_state_t *state_p)
