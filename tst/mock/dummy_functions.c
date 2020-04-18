@@ -179,3 +179,8 @@ int my_va_list(my_va_list_t ap)
 
     return (0);
 }
+
+int array_member(struct array_member_t *value_p)
+{
+    return (value_p->a[0] + value_p->a[1]);
+}

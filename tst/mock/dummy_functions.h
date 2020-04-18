@@ -46,6 +46,10 @@ struct likely_undefined_padding_t {
     long d;
 };
 
+struct array_member_t {
+    int a[2];
+};
+
 typedef int (*call_with_arg_t)(void *arg_p);
 
 typedef struct DummyStruct * struct_pointer_typedef_t;
@@ -94,5 +98,6 @@ int no_implementation(void);
 int another_missing_implementation(void);
 int underscore_prefixed_params(int __a, int __b);
 int my_va_list(my_va_list_t ap);
+int array_member(struct array_member_t *value_p);
 
 #endif

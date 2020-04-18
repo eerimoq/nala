@@ -1413,3 +1413,34 @@ TEST(my_va_list_function)
 
     ASSERT_EQ(my_va_list(ap), 1);
 }
+
+static void array_member_function_error_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    struct array_member_t value;
+
+    value.a[0] = 2;
+    value.a[1] = 4;
+
+    array_member_mock_once(9);
+    array_member_mock_set_value_p_in(&value, sizeof(value));
+
+    value.a[1] = 10;
+    array_member(&value);
+}
+
+TEST(array_member_function_error)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(array_member_function_error_entry, NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "Mocked array_member(value_p):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "The arrays differ at index 1. See diff for details.");
+
+    subprocess_result_free(result_p);
+}

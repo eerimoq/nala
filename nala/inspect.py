@@ -300,6 +300,15 @@ class ForgivingDeclarationParser:
 
         return self.is_primitive_type(self.lookup_typedef(name))
 
+    def is_array(self, member):
+        if not isinstance(member.type, node.ArrayDecl):
+            return False
+
+        if member.type.dim is None:
+            return False
+
+        return True
+
     def lookup_typedef(self, name):
         if name in self.typedefs:
             return self.typedefs[name]
@@ -307,8 +316,8 @@ class ForgivingDeclarationParser:
     def load_struct_member(self, member):
         item = None
 
-        if isinstance(member.type, node.ArrayDecl):
-            pass
+        if self.is_array(member):
+            item = ('assert-array-eq', member.name)
         elif isinstance(member.type, node.Union):
             pass
         elif isinstance(member.type, node.Struct):
