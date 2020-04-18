@@ -325,7 +325,8 @@ class ForgivingDeclarationParser:
         elif isinstance(member.type, node.PtrDecl):
             pass
         elif self.is_primitive_type(member):
-            item = ('assert-eq', member.name)
+            if member.bitsize is None:
+                item = ('assert-eq', member.name)
 
         return item
 
@@ -333,6 +334,9 @@ class ForgivingDeclarationParser:
         items = []
 
         for member in struct.decls:
+            if member.name is None:
+                continue
+
             item = self.load_struct_member(member)
 
             if item is None:
@@ -424,7 +428,12 @@ class ForgivingDeclarationParser:
             self.next()
 
         code = self.read_source_code(begin, self.current.span[1]) + ';'
-        self.structs_code.append(code)
+
+        if self.is_in_header_file():
+            self.structs_code.append(code)
+
+    def is_in_header_file(self):
+        return len(self.source_context) > 1
 
     def parse_function_declaration_or_struct(self):
         while self.current.is_prefix:

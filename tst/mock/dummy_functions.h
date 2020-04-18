@@ -50,6 +50,11 @@ struct array_member_t {
     int a[2];
 };
 
+struct unnamed_member_t {
+    int a : 31;
+    int : 1;
+};
+
 typedef int (*call_with_arg_t)(void *arg_p);
 
 typedef struct DummyStruct * struct_pointer_typedef_t;

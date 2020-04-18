@@ -1444,3 +1444,19 @@ TEST(array_member_function_error)
 
     subprocess_result_free(result_p);
 }
+
+/* The generator should ignore this type as it is declared in the test
+   file, which can't be included by nala_mocks.h. */
+struct should_be_ignored_t {
+    int a;
+};
+
+void to_be_mocked()
+{
+}
+
+TEST(to_be_mocked_function)
+{
+    /* Only structs declared before mocked functions are used. */
+    to_be_mocked_mock_ignore_in();
+}
