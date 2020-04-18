@@ -724,5 +724,8 @@ void nala_mock_assert_struct_{{assert.name}}(struct {{assert.name}} *actual_p, s
     {% for member in assert.assert_array_eq_members %}
     ASSERT_ARRAY_EQ(actual_p->{{member}}, expected_p->{{member}}, sizeof(actual_p->{{member}}));
     {% endfor %}
+    {% for member in assert.assert_struct_members %}
+    nala_mock_assert_struct_{{member[1]}}(&actual_p->{{member[0]}}, &expected_p->{{member[0]}}, sizeof(actual_p->{{member[0]}}));
+    {% endfor %}
 }
 {% endfor %}

@@ -1460,3 +1460,87 @@ TEST(to_be_mocked_function)
     /* Only structs declared before mocked functions are used. */
     to_be_mocked_mock_ignore_in();
 }
+
+static void nested_structs_error_1_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    struct nested_bar_t value;
+
+    memset(&value, 0, sizeof(value));
+
+    nested_types_mock_once();
+    nested_types_mock_set_bar_p_in(&value, sizeof(value));
+
+    value.c.a = 1;
+    nested_types(&value);
+}
+
+TEST(nested_structs_error_1)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(nested_structs_error_1_entry, NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types(bar_p):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)");
+
+    subprocess_result_free(result_p);
+}
+
+static void nested_structs_error_2_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    struct nested_bar_t value;
+
+    memset(&value, 0, sizeof(value));
+
+    nested_types_mock_once();
+    nested_types_mock_set_bar_p_in(&value, sizeof(value));
+
+    value.e.f.g.a = 1;
+    nested_types(&value);
+}
+
+TEST(nested_structs_error_2)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(nested_structs_error_2_entry, NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types(bar_p):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)");
+
+    subprocess_result_free(result_p);
+}
+
+static void nested_structs_error_3_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    struct nested_bar_t value;
+
+    memset(&value, 0, sizeof(value));
+
+    nested_types_mock_once();
+    nested_types_mock_set_bar_p_in(&value, sizeof(value));
+
+    value.e.f.h = 1;
+    nested_types(&value);
+}
+
+TEST(nested_structs_error_3)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(nested_structs_error_3_entry, NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types(bar_p):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)");
+
+    subprocess_result_free(result_p);
+}

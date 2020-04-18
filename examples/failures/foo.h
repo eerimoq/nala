@@ -6,6 +6,15 @@ struct foo_t {
     int b;
 };
 
+struct bar_t {
+    struct foo_t c;
+    struct {
+        int d;
+    } e;
+};
+
 int foo(struct foo_t *foo_p);
+
+void bar(struct bar_t *bar_p);
 
 #endif

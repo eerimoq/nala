@@ -229,3 +229,33 @@ TEST(variadic_function_open_null_format)
 {
     open_mock("hello", 0, 0, NULL);
 }
+
+TEST(nested_structs)
+{
+    struct bar_t value;
+
+    value.c.a = 1;
+    value.c.b = 2;
+    value.e.d = 3;
+
+    bar_mock();
+    bar_mock_set_bar_p_in(&value, sizeof(value));
+
+    value.c.a++;
+    bar(&value);
+}
+
+TEST(nested_inline_structs)
+{
+    struct bar_t value;
+
+    value.c.a = 1;
+    value.c.b = 2;
+    value.e.d = 3;
+
+    bar_mock();
+    bar_mock_set_bar_p_in(&value, sizeof(value));
+
+    value.e.d++;
+    bar(&value);
+}

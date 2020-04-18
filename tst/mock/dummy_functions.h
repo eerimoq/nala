@@ -55,6 +55,25 @@ struct unnamed_member_t {
     int : 1;
 };
 
+struct nested_foo_t {
+    int a;
+    int b;
+};
+
+struct nested_bar_t {
+    struct nested_foo_t c;
+    struct {
+        int d;
+        struct {
+            struct nested_foo_t g;
+            int h;
+        } f;
+    } e;
+    union {
+        int a;
+    } i;
+};
+
 typedef int (*call_with_arg_t)(void *arg_p);
 
 typedef struct DummyStruct * struct_pointer_typedef_t;
@@ -104,5 +123,6 @@ int another_missing_implementation(void);
 int underscore_prefixed_params(int __a, int __b);
 int my_va_list(my_va_list_t ap);
 int array_member(struct array_member_t *value_p);
+void nested_types(struct nested_bar_t *bar_p);
 
 #endif

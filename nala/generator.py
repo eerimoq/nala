@@ -152,12 +152,15 @@ class StructAssert:
         self.name = struct[0]
         self.assert_eq_members = []
         self.assert_array_eq_members = []
-
+        self.assert_struct_members = []
+        
         for member in struct[1]:
             if member[0] == 'assert-eq':
                 self.assert_eq_members.append(member[1])
             elif member[0] == 'assert-array-eq':
                 self.assert_array_eq_members.append(member[1])
+            elif member[0] == 'assert-struct':
+                self.assert_struct_members.append(member[1:])
 
 
 class FunctionMock:

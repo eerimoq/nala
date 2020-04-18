@@ -309,15 +309,31 @@ class ForgivingDeclarationParser:
 
         return True
 
+    def is_struct(self, member):
+        if not isinstance(member.type, node.TypeDecl):
+            return False
+
+        if not isinstance(member.type.type, node.Struct):
+            return False
+
+        return True
+
     def lookup_typedef(self, name):
         if name in self.typedefs:
             return self.typedefs[name]
 
     def load_struct_member(self, member):
-        item = None
+        items = []
 
         if self.is_array(member):
-            item = ('assert-array-eq', member.name)
+            items.append(['assert-array-eq', member.name])
+        elif self.is_struct(member):
+            if member.type.type.name is not None:
+                items.append(['assert-struct', member.name, member.type.type.name])
+            else:
+                for item in self.load_struct_members(member.type.type):
+                    item[1] = f'{member.name}.{item[1]}'
+                    items.append(item)
         elif isinstance(member.type, node.Union):
             pass
         elif isinstance(member.type, node.Struct):
@@ -326,9 +342,9 @@ class ForgivingDeclarationParser:
             pass
         elif self.is_primitive_type(member):
             if member.bitsize is None:
-                item = ('assert-eq', member.name)
+                items.append(['assert-eq', member.name])
 
-        return item
+        return items
 
     def load_struct_members(self, struct):
         items = []
@@ -337,12 +353,7 @@ class ForgivingDeclarationParser:
             if member.name is None:
                 continue
 
-            item = self.load_struct_member(member)
-
-            if item is None:
-                continue
-
-            items.append(item)
+            items += self.load_struct_member(member)
 
         return items
 

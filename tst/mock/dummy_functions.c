@@ -184,3 +184,8 @@ int array_member(struct array_member_t *value_p)
 {
     return (value_p->a[0] + value_p->a[1]);
 }
+
+void nested_types(struct nested_bar_t *bar_p)
+{
+    (void)bar_p;
+}
