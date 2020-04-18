@@ -26,4 +26,6 @@ NO_IMPLEMENTATION += io_control_no_implementation
 NO_IMPLEMENTATION += ioctl
 MOCKGENFLAGS += --no-cache
 
+.PHONY: build/nala_mocks.ldflags
+
 include ../../make/test.mk

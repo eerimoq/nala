@@ -20,6 +20,8 @@ CFLAGS += -fprofile-arcs
 CFLAGS += -ftest-coverage
 MOCKGENFLAGS += --no-cache
 
+.PHONY: build/nala_mocks.ldflags
+
 default:
 	$(MAKE) -C subtest SANITIZE=no build
 	$(MAKE) all
