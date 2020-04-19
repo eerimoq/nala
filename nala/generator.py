@@ -343,7 +343,9 @@ class FunctionMock:
             param.declname = name
 
     def find_check_function(self, param):
-        if self.is_char_pointer(param):
+        if self.is_pointer_pointer(param):
+            return f'nala_mock_assert_pointer'
+        elif self.is_char_pointer(param):
             return 'nala_mock_assert_in_string'
         elif self.is_primitive_type_pointer(param):
             return f'nala_mock_assert_{"_".join(param.type.type.type.names)}'
@@ -365,6 +367,15 @@ class FunctionMock:
             if name not in PRIMITIVE_TYPES:
                 return False
         except AttributeError:
+            return False
+
+        return True
+
+    def is_pointer_pointer(self, param):
+        if not isinstance(param.type, node.PtrDecl):
+            return False
+
+        if not isinstance(param.type.type, node.PtrDecl):
             return False
 
         return True

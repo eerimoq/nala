@@ -1610,6 +1610,18 @@ TEST(struct_param_typedef_pointer_error)
     subprocess_result_free(result_p);
 }
 
+TEST(nested_types_pp_function)
+{
+    struct nested_bar_t value;
+    struct nested_bar_t *value_p;
+
+    value_p = &value;
+    nested_types_pp_mock_once();
+    nested_types_pp_mock_set_bar_pp_in(&value_p, sizeof(value_p));
+
+    nested_types_pp(&value_p);
+}
+
 static void nested_types_pp_error_entry(void *arg_p)
 {
     (void)arg_p;
@@ -1633,10 +1645,7 @@ TEST(nested_types_pp_error)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types_pp(bar_pp):");
-    /* ToDo. */
-    ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "Memory mismatch. See diff for details.");
-    /* ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)"); */
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, " != (nil)");
 
     subprocess_result_free(result_p);
 }
@@ -1664,10 +1673,7 @@ TEST(nested_types_2_pp_error)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types_2_pp(foo_pp):");
-    /* ToDo. */
-    ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "Memory mismatch. See diff for details.");
-    /* ASSERT_SUBSTRING(result_p->stdout.buf_p, "something"); */
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, " != (nil)");
 
     subprocess_result_free(result_p);
 }

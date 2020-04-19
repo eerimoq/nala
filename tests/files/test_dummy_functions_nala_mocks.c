@@ -358,6 +358,14 @@ void nala_mock_assert_in_string(void *acutal_p, void *expected_p, size_t size)
     nala_assert_string(acutal_p, expected_p, NALA_CHECK_EQ);
 }
 
+void nala_mock_assert_pointer(void **acutal_pp, void **expected_pp, size_t size)
+{
+    ASSERT_EQ(size, sizeof(*acutal_pp));
+    ASSERT_NE(acutal_pp, NULL);
+    ASSERT_NE(expected_pp, NULL);
+    ASSERT_EQ(*acutal_pp, *expected_pp);
+}
+
 #define PRIMITIVE_TYPE_ASSERT(type, name)               \
     void nala_mock_assert_ ## name(type *acutal_p,      \
                                    type *expected_p,    \
@@ -3102,7 +3110,7 @@ void double_pointer_mock(int return_value)
     nala_set_param_init(&nala_mock_double_pointer.data.params.value_pp_out);
     nala_set_param_init(&nala_mock_double_pointer.data.params.value_pp_in);
     nala_mock_double_pointer.data.params.value_pp_in_assert =
-        (__typeof__(nala_mock_double_pointer.data.params.value_pp_in_assert))nala_assert_memory;
+        (__typeof__(nala_mock_double_pointer.data.params.value_pp_in_assert))nala_mock_assert_pointer;
     nala_mock_double_pointer.data.params.value_pp_out_copy = NULL;
     nala_mock_double_pointer.data.params.value_pp = NULL;
     nala_mock_double_pointer.data.params.ignore_value_pp_in = true;
@@ -3121,7 +3129,7 @@ int double_pointer_mock_once(int return_value)
     nala_set_param_init(&nala_instance_p->data.params.value_pp_out);
     nala_set_param_init(&nala_instance_p->data.params.value_pp_in);
     nala_instance_p->data.params.value_pp_in_assert =
-        (__typeof__(nala_instance_p->data.params.value_pp_in_assert))nala_assert_memory;
+        (__typeof__(nala_instance_p->data.params.value_pp_in_assert))nala_mock_assert_pointer;
     nala_instance_p->data.params.value_pp_out_copy = NULL;
     nala_instance_p->data.params.value_pp = NULL;
     nala_instance_p->data.params.ignore_value_pp_in = true;
@@ -3141,7 +3149,7 @@ void double_pointer_mock_ignore_in(int return_value)
     nala_set_param_init(&nala_mock_double_pointer.data.params.value_pp_out);
     nala_set_param_init(&nala_mock_double_pointer.data.params.value_pp_in);
     nala_mock_double_pointer.data.params.value_pp_in_assert =
-        (__typeof__(nala_mock_double_pointer.data.params.value_pp_in_assert))nala_assert_memory;
+        (__typeof__(nala_mock_double_pointer.data.params.value_pp_in_assert))nala_mock_assert_pointer;
     nala_mock_double_pointer.data.params.value_pp_out_copy = NULL;
     nala_mock_double_pointer.data.params.ignore_value_pp_in = true;
     nala_mock_double_pointer.data.return_value = return_value;
@@ -3158,7 +3166,7 @@ int double_pointer_mock_ignore_in_once(int return_value)
     nala_set_param_init(&instance_p->data.params.value_pp_out);
     nala_set_param_init(&instance_p->data.params.value_pp_in);
     instance_p->data.params.value_pp_in_assert =
-        (__typeof__(instance_p->data.params.value_pp_in_assert))nala_assert_memory;
+        (__typeof__(instance_p->data.params.value_pp_in_assert))nala_mock_assert_pointer;
     instance_p->data.params.value_pp_out_copy = NULL;
     instance_p->data.params.value_pp = NULL;
     instance_p->data.params.ignore_value_pp_in = true;

@@ -344,6 +344,14 @@ void nala_mock_assert_in_string(void *acutal_p, void *expected_p, size_t size)
     nala_assert_string(acutal_p, expected_p, NALA_CHECK_EQ);
 }
 
+void nala_mock_assert_pointer(void **acutal_pp, void **expected_pp, size_t size)
+{
+    ASSERT_EQ(size, sizeof(*acutal_pp));
+    ASSERT_NE(acutal_pp, NULL);
+    ASSERT_NE(expected_pp, NULL);
+    ASSERT_EQ(*acutal_pp, *expected_pp);
+}
+
 #define PRIMITIVE_TYPE_ASSERT(type, name)               \
     void nala_mock_assert_ ## name(type *acutal_p,      \
                                    type *expected_p,    \
