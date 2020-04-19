@@ -219,3 +219,149 @@ void nested_types_2_pp(nested_foo_2_t **foo_pp)
 {
     (void)foo_pp;
 }
+
+void primitive_type_char_pointer(char *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_signed_char_pointer(signed char *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_unsigned_char_pointer(unsigned char *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_short_pointer(short *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_short_int_pointer(short int *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_signed_short_pointer(signed short *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_signed_short_int_pointer(signed short int *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_unsigned_short_pointer(unsigned short *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_unsigned_short_int_pointer(unsigned short int *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_int_pointer(int *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_signed_pointer(signed *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_signed_int_pointer(signed int *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_unsigned_pointer(unsigned *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_unsigned_int_pointer(unsigned int *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_long_pointer(long *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_long_int_pointer(long int *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_signed_long_pointer(signed long *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_signed_long_int_pointer(signed long int *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_unsigned_long_pointer(unsigned long *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_unsigned_long_int_pointer(unsigned long int *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_long_long_pointer(long long *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_long_long_int_pointer(long long int *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_signed_long_long_pointer(signed long long *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_signed_long_long_int_pointer(signed long long int *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_unsigned_long_long_pointer(unsigned long long *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_unsigned_long_long_int_pointer(unsigned long long int *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_float_pointer(float *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_double_pointer(double *value_p)
+{
+    (void)value_p;
+}
+
+void primitive_type_long_double_pointer(long double *value_p)
+{
+    (void)value_p;
+}
+

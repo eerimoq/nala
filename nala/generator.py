@@ -9,6 +9,7 @@ from jinja2 import PackageLoader
 from pycparser import c_ast as node
 from pycparser.c_generator import CGenerator
 
+from .inspect import PRIMITIVE_TYPES
 from . import __version__
 
 
@@ -344,6 +345,8 @@ class FunctionMock:
     def find_check_function(self, param):
         if self.is_char_pointer(param):
             return 'nala_mock_assert_in_string'
+        elif self.is_primitive_type_pointer(param):
+            return f'nala_mock_assert_{"_".join(param.type.type.type.names)}'
         elif self.is_struct_pointer(param):
             try:
                 return f'nala_mock_assert_struct_{param.type.type.type.name}'
@@ -351,6 +354,20 @@ class FunctionMock:
                 return 'nala_assert_memory'
 
         return 'nala_assert_memory'
+
+    def is_primitive_type_pointer(self, param):
+        if not isinstance(param.type, node.PtrDecl):
+            return False
+
+        try:
+            name = ' '.join(param.type.type.type.names)
+
+            if name not in PRIMITIVE_TYPES:
+                return False
+        except AttributeError:
+            return False
+
+        return True
 
     def void_function_decl(self, name, parameters):
         return node.FuncDecl(node.ParamList(parameters),

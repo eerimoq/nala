@@ -1671,3 +1671,63 @@ TEST(nested_types_2_pp_error)
 
     subprocess_result_free(result_p);
 }
+
+static void primitive_type_int_pointer_error_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    int value;
+
+    value = 0;
+    primitive_type_int_pointer_mock_once();
+    primitive_type_int_pointer_mock_set_value_p_in(&value, sizeof(value));
+
+    value = 1;
+    primitive_type_int_pointer(&value);
+}
+
+TEST(primitive_type_int_pointer_error)
+{
+    function_error_in_subprocess(primitive_type_int_pointer_error_entry,
+                                 "1 != 0 (0x1 != 0x0)");
+}
+
+static void primitive_type_long_pointer_error_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    long value;
+
+    value = 1;
+    primitive_type_long_pointer_mock_once();
+    primitive_type_long_pointer_mock_set_value_p_in(&value, sizeof(value));
+
+    value = 2;
+    primitive_type_long_pointer(&value);
+}
+
+TEST(primitive_type_long_pointer_error)
+{
+    function_error_in_subprocess(primitive_type_long_pointer_error_entry,
+                                 "2 != 1 (0x2 != 0x1)");
+}
+
+static void primitive_type_float_pointer_error_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    float value;
+
+    value = 1.0f;
+    primitive_type_float_pointer_mock_once();
+    primitive_type_float_pointer_mock_set_value_p_in(&value, sizeof(value));
+
+    value = 2.0f;
+    primitive_type_float_pointer(&value);
+}
+
+TEST(primitive_type_float_pointer_error)
+{
+    function_error_in_subprocess(primitive_type_float_pointer_error_entry,
+                                 "2.000000 != 1.000000");
+}
