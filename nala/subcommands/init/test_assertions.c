@@ -10,14 +10,15 @@ TEST(assertions)
     ASSERT_LE(1, 1);
     ASSERT_GT(2L, 1L);
     ASSERT_GE(1, 1);
-    ASSERT_TRUE(1 == 1);
-    ASSERT_FALSE(2 == 1);
+    ASSERT_TRUE(true);
+    ASSERT_FALSE(false);
     ASSERT_SUBSTRING("12345", "34");
     ASSERT_NOT_SUBSTRING("12345", "4567");
     ASSERT_MEMORY_EQ("abcd", "abcd", 5);
     ASSERT_ARRAY_EQ(array, array, sizeof(array));
     ASSERT_FUNCTION_POINTER_EQ(assertions, assertions);
     ASSERT_FUNCTION_POINTER_NE(assertions, NULL);
+    ASSERT(1 == 1);
 
     CAPTURE_OUTPUT(output, errput) {
         printf("output!\n");
