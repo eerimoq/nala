@@ -149,7 +149,7 @@ def load_typedefs(ast):
 
 class StructAssert:
 
-    def __init__(self, struct):
+    def __init__(self, struct, struct_names, struct_typedef_names):
         self.name = struct[0]
         self.assert_eq_members = []
         self.assert_array_eq_members = []
@@ -162,14 +162,16 @@ class StructAssert:
             elif member[0] == 'assert-array-eq':
                 self.assert_array_eq_members.append(member[1])
             elif member[0] == 'assert-struct':
-                self.assert_struct_members.append(member[1:])
+                if member[2] in struct_names:
+                    self.assert_struct_members.append(member[1:])
             elif member[0] == 'assert-struct-typedef':
-                self.assert_struct_typedef_members.append(member[1:])
+                if member[2] in struct_typedef_names:
+                    self.assert_struct_typedef_members.append(member[1:])
 
 
 class StructTypedefAssert:
 
-    def __init__(self, typedef):
+    def __init__(self, typedef, struct_names, struct_typedef_names):
         self.name = typedef[0]
         self.assert_eq_members = []
         self.assert_array_eq_members = []
@@ -182,9 +184,11 @@ class StructTypedefAssert:
             elif member[0] == 'assert-array-eq':
                 self.assert_array_eq_members.append(member[1])
             elif member[0] == 'assert-struct':
-                self.assert_struct_members.append(member[1:])
+                if member[2] in struct_names:
+                    self.assert_struct_members.append(member[1:])
             elif member[0] == 'assert-struct-typedef':
-                self.assert_struct_typedef_members.append(member[1:])
+                if member[2] in struct_typedef_names:
+                    self.assert_struct_typedef_members.append(member[1:])
 
 
 class FunctionMock:
@@ -381,15 +385,12 @@ class FunctionMock:
             return f'nala_mock_assert_{"_".join(param.type.type.type.names)}'
         elif self.is_struct_typedef_pointer(param):
             param = self.lookup_typedef(param.type.type.type.names[0])
-            name = f'nala_mock_assert_typedef_struct_{param.name}'
 
-            if name in self.struct_typedef_names:
-                return name
+            if param.name in self.struct_typedef_names:
+                return f'nala_mock_assert_typedef_struct_{param.name}'
         elif self.is_struct_pointer(param):
-            name = f'nala_mock_assert_struct_{param.type.type.type.name}'
-
-            if name in self.struct_names:
-                return name
+            if param.type.type.type.name in self.struct_names:
+                return f'nala_mock_assert_struct_{param.type.type.type.name}'
 
         return 'nala_assert_memory'
 
@@ -626,8 +627,8 @@ class FileGenerator:
         self.source_template = self.jinja_env.get_template(f'{SOURCE_FILE}.jinja2')
 
         self.mocks = []
-        self.struct_asserts = []
-        self.struct_typedef_asserts = []
+        self.structs = []
+        self.struct_typedefs = []
         self.struct_names = set()
         self.struct_typedef_names = set()
         self.includes = []
@@ -646,14 +647,12 @@ class FileGenerator:
         self.includes.append((include.path, include.system))
 
     def add_struct(self, struct):
-        self.struct_asserts.append(StructAssert(struct))
-        self.struct_names.add(
-            f'nala_mock_assert_struct_{self.struct_asserts[-1].name}')
+        self.structs.append(struct)
+        self.struct_names.add(struct[0])
 
     def add_struct_typedef(self, typedef):
-        self.struct_typedef_asserts.append(StructTypedefAssert(typedef))
-        self.struct_typedef_names.add(
-            f'nala_mock_assert_typedef_struct_{self.struct_typedef_asserts[-1].name}')
+        self.struct_typedefs.append(typedef)
+        self.struct_typedef_names.add(typedef[0])
 
     def write_to_directory(self, directory):
         os.makedirs(directory, exist_ok=True)
@@ -663,9 +662,20 @@ class FileGenerator:
         linker_filename = os.path.join(directory, LINKER_FILE)
 
         mocks = list(sorted(self.mocks, key=lambda m: m.func_name))
-        struct_asserts = list(sorted(self.struct_asserts, key=lambda a: a.name))
-        struct_typedef_asserts = list(sorted(self.struct_typedef_asserts,
-                                             key=lambda a: a.name))
+        struct_asserts = []
+
+        for struct in sorted(self.structs):
+            struct_asserts.append(StructAssert(struct,
+                                               self.struct_names,
+                                               self.struct_typedef_names))
+
+        struct_typedef_asserts = []
+
+        for typedef in sorted(self.struct_typedefs):
+            struct_typedef_asserts.append(
+                StructTypedefAssert(typedef,
+                                    self.struct_names,
+                                    self.struct_typedef_names))
 
         header_code = self.header_template.render(
             nala_version=__version__,

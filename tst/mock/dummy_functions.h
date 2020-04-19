@@ -69,6 +69,8 @@ typedef struct {
     struct nested_foo_t b;
 } nested_foo_2_t;
 
+typedef nested_foo_2_t nested_foo_3_t;
+
 struct nested_bar_t {
     struct nested_foo_t c;
     struct {
@@ -82,6 +84,7 @@ struct nested_bar_t {
         int a;
     } i;
     nested_foo_2_t j;
+    nested_foo_3_t k;
     int (*fp)(void);
 };
 
