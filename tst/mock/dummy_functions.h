@@ -82,6 +82,7 @@ struct nested_bar_t {
         int a;
     } i;
     nested_foo_2_t j;
+    int (*fp)(void);
 };
 
 typedef int (*call_with_arg_t)(void *arg_p);
