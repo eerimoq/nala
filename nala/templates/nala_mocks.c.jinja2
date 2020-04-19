@@ -713,19 +713,47 @@ void {{mock.func_name}}_mock_assert_completed(void)
 
 void nala_mock_assert_struct_{{assert.name}}(struct {{assert.name}} *actual_p, struct {{assert.name}} *expected_p, size_t size)
 {
-    {% if not assert.assert_eq_members and not assert.assert_array_eq_members %}
-    (void)expected_p;
-    {% endif %}
-    ASSERT_NE(actual_p, NULL);
-    ASSERT_EQ(size, sizeof(*actual_p));
-    {% for member in assert.assert_eq_members %}
-    ASSERT_EQ(actual_p->{{member}}, expected_p->{{member}});
-    {% endfor %}
-    {% for member in assert.assert_array_eq_members %}
-    ASSERT_ARRAY_EQ(actual_p->{{member}}, expected_p->{{member}}, sizeof(actual_p->{{member}}));
-    {% endfor %}
-    {% for member in assert.assert_struct_members %}
-    nala_mock_assert_struct_{{member[1]}}(&actual_p->{{member[0]}}, &expected_p->{{member[0]}}, sizeof(actual_p->{{member[0]}}));
-    {% endfor %}
+    if (size == sizeof(*actual_p)) {
+        ASSERT_NE(actual_p, NULL);
+        {% for member in assert.assert_eq_members %}
+        ASSERT_EQ(actual_p->{{member}}, expected_p->{{member}});
+        {% endfor %}
+        {% for member in assert.assert_array_eq_members %}
+        ASSERT_ARRAY_EQ(actual_p->{{member}}, expected_p->{{member}}, sizeof(actual_p->{{member}}));
+        {% endfor %}
+        {% for member in assert.assert_struct_members %}
+        nala_mock_assert_struct_{{member[1]}}(&actual_p->{{member[0]}}, &expected_p->{{member[0]}}, sizeof(actual_p->{{member[0]}}));
+        {% endfor %}
+        {% for member in assert.assert_struct_typedef_members %}
+        nala_mock_assert_typedef_struct_{{member[1]}}(&actual_p->{{member[0]}}, &expected_p->{{member[0]}}, sizeof(actual_p->{{member[0]}}));
+        {% endfor %}
+    } else {
+        nala_assert_memory(actual_p, expected_p, size);
+    }
+}
+{% endfor %}
+
+// Struct typedef assertions
+{% for assert in struct_typedef_asserts %}
+
+void nala_mock_assert_typedef_struct_{{assert.name}}({{assert.name}} *actual_p, {{assert.name}} *expected_p, size_t size)
+{
+    if (size == sizeof(*actual_p)) {
+        ASSERT_NE(actual_p, NULL);
+        {% for member in assert.assert_eq_members %}
+        ASSERT_EQ(actual_p->{{member}}, expected_p->{{member}});
+        {% endfor %}
+        {% for member in assert.assert_array_eq_members %}
+        ASSERT_ARRAY_EQ(actual_p->{{member}}, expected_p->{{member}}, sizeof(actual_p->{{member}}));
+        {% endfor %}
+        {% for member in assert.assert_struct_members %}
+        nala_mock_assert_struct_{{member[1]}}(&actual_p->{{member[0]}}, &expected_p->{{member[0]}}, sizeof(actual_p->{{member[0]}}));
+        {% endfor %}
+        {% for member in assert.assert_struct_typedef_members %}
+        nala_mock_assert_typedef_struct_{{member[1]}}(&actual_p->{{member[0]}}, &expected_p->{{member[0]}}, sizeof(actual_p->{{member[0]}}));
+        {% endfor %}
+    } else {
+        nala_assert_memory(actual_p, expected_p, size);
+    }
 }
 {% endfor %}

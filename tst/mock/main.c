@@ -416,7 +416,7 @@ static void once_in_error_entry(void *arg_p)
 
 TEST(once_in_error)
 {
-    function_error_in_subprocess(once_in_error_entry, "Memory mismatch.");
+    function_error_in_subprocess(once_in_error_entry, "1 != 2 (0x1 != 0x2)");
 }
 
 static void in_error_entry(void *arg_p)
@@ -432,7 +432,7 @@ static void in_error_entry(void *arg_p)
 
 TEST(in_error)
 {
-    function_error_in_subprocess(in_error_entry, "Memory mismatch.");
+    function_error_in_subprocess(in_error_entry, "1 != 2 (0x1 != 0x2)");
 }
 
 static void in_pointer_error_entry(void *arg_p)
@@ -1569,10 +1569,7 @@ TEST(nested_types_2_error)
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
                      "Mocked nested_types_2(foo_p):");
-    /* ToDo. */
-    ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "Memory mismatch. See diff for details.");
-    /* ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)"); */
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)");
 
     subprocess_result_free(result_p);
 }

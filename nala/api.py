@@ -120,6 +120,9 @@ def generate_mocks(expanded_code,
         for struct in parser.structs:
             generator.add_struct(struct)
 
+        for struct_typedef in parser.struct_typedefs:
+            generator.add_struct_typedef(struct_typedef)
+
         for include in parser.includes:
             generator.add_include(include)
 

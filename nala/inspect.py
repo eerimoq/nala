@@ -208,6 +208,7 @@ class ForgivingDeclarationParser:
         self.typedefs = {}
         self.structs_code = []
         self.structs = []
+        self.struct_typedefs = []
         self.includes = []
         self.filename = None
 
@@ -318,6 +319,23 @@ class ForgivingDeclarationParser:
 
         return True
 
+    def is_struct_typedef(self, member):
+        if member is None:
+            return False
+
+        if self.is_struct(member):
+            return True
+
+        if not isinstance(member.type, node.TypeDecl):
+            return False
+
+        if not isinstance(member.type.type, node.IdentifierType):
+            return False
+
+        member = self.lookup_typedef(member.type.type.names[0])
+
+        return self.is_struct_typedef(member)
+
     def lookup_typedef(self, name):
         if name in self.typedefs:
             return self.typedefs[name]
@@ -327,6 +345,9 @@ class ForgivingDeclarationParser:
 
         if self.is_array(member):
             items.append(['assert-array-eq', member.name])
+        elif self.is_primitive_type(member):
+            if member.bitsize is None:
+                items.append(['assert-eq', member.name])
         elif self.is_struct(member):
             if member.type.type.name is not None:
                 items.append(['assert-struct', member.name, member.type.type.name])
@@ -334,19 +355,16 @@ class ForgivingDeclarationParser:
                 for item in self.load_struct_members(member.type.type):
                     item[1] = f'{member.name}.{item[1]}'
                     items.append(item)
-        elif isinstance(member.type, node.Union):
-            pass
-        elif isinstance(member.type, node.Struct):
-            pass
-        elif isinstance(member.type, node.PtrDecl):
-            pass
-        elif self.is_primitive_type(member):
-            if member.bitsize is None:
-                items.append(['assert-eq', member.name])
+        elif self.is_struct_typedef(member):
+            items.append(
+                ['assert-struct-typedef', member.name, member.type.type.names[0]])
 
         return items
 
     def load_struct_members(self, struct):
+        if not struct.decls:
+            return []
+
         items = []
 
         for member in struct.decls:
@@ -362,7 +380,8 @@ class ForgivingDeclarationParser:
             if isinstance(item, node.Typedef):
                 if isinstance(item.type, node.TypeDecl):
                     if isinstance(item.type.type, node.Struct):
-                        pass
+                        items = self.load_struct_members(item.type.type)
+                        self.struct_typedefs.append((item.name, items))
             elif isinstance(item, node.Decl):
                 if isinstance(item.type, node.Struct):
                     items = self.load_struct_members(item.type)

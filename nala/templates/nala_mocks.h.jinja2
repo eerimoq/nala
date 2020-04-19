@@ -90,6 +90,12 @@ void {{mock.func_name}}_mock_assert_completed(void);
 void nala_mock_assert_struct_{{assert.name}}(struct {{assert.name}} *actual_p, struct {{assert.name}} *expected_p, size_t size);
 {% endfor %}
 
+// Struct typedef assertions
+
+{% for assert in struct_typedef_asserts %}
+void nala_mock_assert_typedef_struct_{{assert.name}}({{assert.name}} *actual_p, {{assert.name}} *expected_p, size_t size);
+{% endfor %}
+
 #endif
 
 #endif

@@ -154,6 +154,7 @@ class StructAssert:
         self.assert_eq_members = []
         self.assert_array_eq_members = []
         self.assert_struct_members = []
+        self.assert_struct_typedef_members = []
 
         for member in struct[1]:
             if member[0] == 'assert-eq':
@@ -162,6 +163,28 @@ class StructAssert:
                 self.assert_array_eq_members.append(member[1])
             elif member[0] == 'assert-struct':
                 self.assert_struct_members.append(member[1:])
+            elif member[0] == 'assert-struct-typedef':
+                self.assert_struct_typedef_members.append(member[1:])
+
+
+class StructTypedefAssert:
+
+    def __init__(self, typedef):
+        self.name = typedef[0]
+        self.assert_eq_members = []
+        self.assert_array_eq_members = []
+        self.assert_struct_members = []
+        self.assert_struct_typedef_members = []
+
+        for member in typedef[1]:
+            if member[0] == 'assert-eq':
+                self.assert_eq_members.append(member[1])
+            elif member[0] == 'assert-array-eq':
+                self.assert_array_eq_members.append(member[1])
+            elif member[0] == 'assert-struct':
+                self.assert_struct_members.append(member[1:])
+            elif member[0] == 'assert-struct-typedef':
+                self.assert_struct_typedef_members.append(member[1:])
 
 
 class FunctionMock:
@@ -349,11 +372,12 @@ class FunctionMock:
             return 'nala_mock_assert_in_string'
         elif self.is_primitive_type_pointer(param):
             return f'nala_mock_assert_{"_".join(param.type.type.type.names)}'
+        elif self.is_struct_typedef_pointer(param):
+            param = self.lookup_typedef(param.type.type.type.names[0])
+
+            return f'nala_mock_assert_typedef_struct_{param.name}'
         elif self.is_struct_pointer(param):
-            try:
-                return f'nala_mock_assert_struct_{param.type.type.type.name}'
-            except AttributeError:
-                return 'nala_assert_memory'
+            return f'nala_mock_assert_struct_{param.type.type.type.name}'
 
         return 'nala_assert_memory'
 
@@ -486,6 +510,26 @@ class FunctionMock:
 
         return True
 
+    def is_struct_typedef_pointer(self, param):
+        if not self.is_pointer(param):
+            return False
+
+        if not isinstance(param.type.type, node.TypeDecl):
+            return False
+
+        if not isinstance(param.type.type.type, node.IdentifierType):
+            return False
+
+        param = self.lookup_typedef(param.type.type.type.names[0])
+
+        if param is None:
+            return False
+
+        if not isinstance(param.type.type, node.Struct):
+            return False
+
+        return True
+
     def is_struct(self, param):
         try:
             if isinstance(param.type.type, node.Struct):
@@ -571,6 +615,7 @@ class FileGenerator:
 
         self.mocks = []
         self.struct_asserts = []
+        self.struct_typedef_asserts = []
         self.includes = []
 
     def add_mock(self,
@@ -587,6 +632,9 @@ class FileGenerator:
     def add_struct(self, struct):
         self.struct_asserts.append(StructAssert(struct))
 
+    def add_struct_typedef(self, typedef):
+        self.struct_typedef_asserts.append(StructTypedefAssert(typedef))
+
     def write_to_directory(self, directory):
         os.makedirs(directory, exist_ok=True)
 
@@ -596,13 +644,16 @@ class FileGenerator:
 
         mocks = list(sorted(self.mocks, key=lambda m: m.func_name))
         struct_asserts = list(sorted(self.struct_asserts, key=lambda a: a.name))
+        struct_typedef_asserts = list(sorted(self.struct_typedef_asserts,
+                                             key=lambda a: a.name))
 
         header_code = self.header_template.render(
             nala_version=__version__,
             guard_name=get_guard_name(header_filename),
             includes=generate_includes(self.includes, directory),
             mocks=mocks,
-            struct_asserts=struct_asserts)
+            struct_asserts=struct_asserts,
+            struct_typedef_asserts=struct_typedef_asserts)
 
         includes = [
             ('stddef.h', True),
@@ -614,7 +665,8 @@ class FileGenerator:
             includes=generate_includes(includes, directory),
             nala_c=read_nala_c(),
             mocks=mocks,
-            struct_asserts=struct_asserts)
+            struct_asserts=struct_asserts,
+            struct_typedef_asserts=struct_typedef_asserts)
 
         with open(header_filename, 'w') as fout:
             fout.write(header_code.strip())
