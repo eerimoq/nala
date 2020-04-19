@@ -40,7 +40,8 @@ EXEARGS += $(REPORT_JSON:%=-r %)
 all: build
 	$(EXE) $(EXEARGS)
 
-auto: all
+auto:
+	$(MAKE) || true
 	while true ; do \
 	    $(MAKE) auto-run ; \
 	done
