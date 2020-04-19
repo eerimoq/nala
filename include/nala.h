@@ -47,14 +47,14 @@
     NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_GE)
 
 /**
- * Assert that given condition is true.
+ * Assert that given value is true.
  */
-#define ASSERT_TRUE(cond) nala_assert_true(cond)
+#define ASSERT_TRUE(actual) nala_assert_true(actual)
 
 /**
- * Assert that given condition is false.
+ * Assert that given value is false.
  */
-#define ASSERT_FALSE(cond) nala_assert_false(cond)
+#define ASSERT_FALSE(actual) nala_assert_false(actual)
 
 /**
  * Assert that given haystack string contains given needle string.
