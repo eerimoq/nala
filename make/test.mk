@@ -91,7 +91,7 @@ $(BUILD)/nala_mocks.ldflags: $(TESTS)
 	[ -f $(BUILD)/nala_mocks.h ] || touch $(BUILD)/nala_mocks.h
 	cat $(TESTS) \
 	    | $(CC) $(CFLAGS) -DNALA_GENERATE_MOCKS -x c -E - > $(TESTS_PP_C)
-	cat $(TESTS_PP_C) | $(NALA) generate_mocks $(MOCKGENFLAGS) -o $(BUILD)
+	cat $(TESTS_PP_C) | $(NALA) -d generate_mocks $(MOCKGENFLAGS) -o $(BUILD)
 	cat $(TESTS) \
 	    | $(CC) -MM -MT $@ $(CFLAGS) -x c -o $@.d -
 	touch $@

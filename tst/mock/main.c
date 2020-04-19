@@ -1734,3 +1734,28 @@ TEST(primitive_type_float_pointer_error)
     function_error_in_subprocess(primitive_type_float_pointer_error_entry,
                                  "2.000000 != 1.000000");
 }
+
+TEST(forward_declaration_function)
+{
+    forward_declaration_mock();
+}
+
+TEST(forward_declaration_2_function)
+{
+    forward_declaration_2_mock();
+}
+
+TEST(forward_declaration_3_function)
+{
+    forward_declaration_3_mock();
+}
+
+TEST(struct_declared_in_typedef_function)
+{
+    struct_declared_in_typedef_mock();
+}
+
+TEST(my_fclose_mock_function)
+{
+    my_fclose_mock();
+}

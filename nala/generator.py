@@ -192,10 +192,17 @@ class FunctionMock:
     DECL_MARKER = "// NALA_DECLARATION"
     IMPL_MARKER = "// NALA_IMPLEMENTATION"
 
-    def __init__(self, function, has_implementation, real_variadic_function):
+    def __init__(self,
+                 function,
+                 has_implementation,
+                 real_variadic_function,
+                 struct_names,
+                 struct_typedef_names):
         self.function = function
         self.func_name = function.name
         self.real_variadic_function = real_variadic_function
+        self.struct_names = struct_names
+        self.struct_typedef_names = struct_typedef_names
 
         self.wrapped_func = f'__wrap_{self.func_name}'
         self.real_func = f'__real_{self.func_name}'
@@ -374,10 +381,15 @@ class FunctionMock:
             return f'nala_mock_assert_{"_".join(param.type.type.type.names)}'
         elif self.is_struct_typedef_pointer(param):
             param = self.lookup_typedef(param.type.type.type.names[0])
+            name = f'nala_mock_assert_typedef_struct_{param.name}'
 
-            return f'nala_mock_assert_typedef_struct_{param.name}'
+            if name in self.struct_typedef_names:
+                return name
         elif self.is_struct_pointer(param):
-            return f'nala_mock_assert_struct_{param.type.type.type.name}'
+            name = f'nala_mock_assert_struct_{param.type.type.type.name}'
+
+            if name in self.struct_names:
+                return name
 
         return 'nala_assert_memory'
 
@@ -616,6 +628,8 @@ class FileGenerator:
         self.mocks = []
         self.struct_asserts = []
         self.struct_typedef_asserts = []
+        self.struct_names = set()
+        self.struct_typedef_names = set()
         self.includes = []
 
     def add_mock(self,
@@ -624,16 +638,22 @@ class FileGenerator:
                  real_variadic_function):
         self.mocks.append(FunctionMock(mocked_function,
                                        has_implementation,
-                                       real_variadic_function))
+                                       real_variadic_function,
+                                       self.struct_names,
+                                       self.struct_typedef_names))
 
     def add_include(self, include):
         self.includes.append((include.path, include.system))
 
     def add_struct(self, struct):
         self.struct_asserts.append(StructAssert(struct))
+        self.struct_names.add(
+            f'nala_mock_assert_struct_{self.struct_asserts[-1].name}')
 
     def add_struct_typedef(self, typedef):
         self.struct_typedef_asserts.append(StructTypedefAssert(typedef))
+        self.struct_typedef_names.add(
+            f'nala_mock_assert_typedef_struct_{self.struct_typedef_asserts[-1].name}')
 
     def write_to_directory(self, directory):
         os.makedirs(directory, exist_ok=True)

@@ -97,6 +97,27 @@ typedef struct_typedef_t struct_typedef_2_t;
 
 typedef va_list my_va_list_t;
 
+struct apa_t;
+
+typedef struct apa_t apa_2_t;
+
+typedef struct {
+    int a;
+    struct apa_t *apa_p;
+} banan_t;
+
+typedef struct banan_2_t {
+    int a;
+    struct banan_2_t *banan_p;
+} banan_3_t;
+
+struct my_io_file;
+typedef struct my_io_file my_file;
+struct my_file
+{
+  int flags;
+};
+
 int add(int x, int y);
 void output_message(const char *message);
 void keep_args_output_message(const char *message);
@@ -170,5 +191,10 @@ void primitive_type_unsigned_long_long_int_pointer(unsigned long long int *value
 void primitive_type_float_pointer(float *value_p);
 void primitive_type_double_pointer(double *value_p);
 void primitive_type_long_double_pointer(long double *value_p);
+void forward_declaration(struct apa_t *apa_p);
+void forward_declaration_2(apa_2_t *apa_p);
+void forward_declaration_3(banan_t *banan_p);
+void struct_declared_in_typedef(struct banan_2_t *banan_p);
+void my_fclose(my_file *file_p);
 
 #endif

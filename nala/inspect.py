@@ -380,8 +380,9 @@ class ForgivingDeclarationParser:
             if isinstance(item, node.Typedef):
                 if isinstance(item.type, node.TypeDecl):
                     if isinstance(item.type.type, node.Struct):
-                        items = self.load_struct_members(item.type.type)
-                        self.struct_typedefs.append((item.name, items))
+                        if item.type.type.decls is not None:
+                            items = self.load_struct_members(item.type.type)
+                            self.struct_typedefs.append((item.name, items))
             elif isinstance(item, node.Decl):
                 if isinstance(item.type, node.Struct):
                     items = self.load_struct_members(item.type)
