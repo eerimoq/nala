@@ -27,7 +27,11 @@ union union_type
 
 typedef union union_type union_type;
 
+typedef union union_type *union_type_pointer;
+
 typedef struct struct_param_type struct_param_type;
+
+typedef struct struct_param_type *struct_param_type_pointer;
 
 struct variadic_function_t {
     int a;
@@ -60,6 +64,11 @@ struct nested_foo_t {
     int b;
 };
 
+typedef struct {
+    int a;
+    int b;
+} nested_foo_2_t;
+
 struct nested_bar_t {
     struct nested_foo_t c;
     struct {
@@ -72,6 +81,7 @@ struct nested_bar_t {
     union {
         int a;
     } i;
+    nested_foo_2_t j;
 };
 
 typedef int (*call_with_arg_t)(void *arg_p);
@@ -107,9 +117,12 @@ void enum_param_typedef(enum_param_type_e value);
 int call(int (*callback)(int value));
 void in_out(int *buf_p);
 struct struct_param_type struct_param_and_return_type(struct struct_param_type arg);
+void struct_param_typedef_pointer(struct_param_type_pointer arg);
 union union_type union_param_and_return_type(union union_type arg);
 struct_param_type typedef_struct_param_and_return_type(struct_param_type arg);
 union_type typedef_union_param_and_return_type(union_type arg);
+void union_pointer(union union_type *arg);
+void typedef_union_pointer(union_type_pointer arg);
 int double_pointer(int **value_pp);
 void likely_undefined_padding(struct likely_undefined_padding_t *value_p);
 int call_with_arg(call_with_arg_t func, void *arg_p);
@@ -124,5 +137,8 @@ int underscore_prefixed_params(int __a, int __b);
 int my_va_list(my_va_list_t ap);
 int array_member(struct array_member_t *value_p);
 void nested_types(struct nested_bar_t *bar_p);
+void nested_types_2(nested_foo_2_t *foo_p);
+void nested_types_pp(struct nested_bar_t **bar_pp);
+void nested_types_2_pp(nested_foo_2_t **foo_pp);
 
 #endif

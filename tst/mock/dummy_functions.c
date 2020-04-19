@@ -104,6 +104,11 @@ struct struct_param_type struct_param_and_return_type(struct struct_param_type a
     return (arg);
 }
 
+void struct_param_typedef_pointer(struct_param_type_pointer arg)
+{
+    (void)arg;
+}
+
 union union_type union_param_and_return_type(union union_type arg)
 {
     arg.a.number++;
@@ -123,6 +128,16 @@ union_type typedef_union_param_and_return_type(union_type arg)
     arg.a.number++;
 
     return (arg);
+}
+
+void union_pointer(union union_type *arg)
+{
+    (void)arg;
+}
+
+void typedef_union_pointer(union_type_pointer arg)
+{
+    (void)arg;
 }
 
 int double_pointer(int **value_pp)
@@ -188,4 +203,19 @@ int array_member(struct array_member_t *value_p)
 void nested_types(struct nested_bar_t *bar_p)
 {
     (void)bar_p;
+}
+
+void nested_types_2(nested_foo_2_t *foo_p)
+{
+    (void)foo_p;
+}
+
+void nested_types_pp(struct nested_bar_t **bar_pp)
+{
+    (void)bar_pp;
+}
+
+void nested_types_2_pp(nested_foo_2_t **foo_pp)
+{
+    (void)foo_pp;
 }

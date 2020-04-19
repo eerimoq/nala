@@ -370,10 +370,10 @@ Limitations
 
 - ``static`` functions can't be mocked.
 
-- Only primitive data type struct members are asserted for struct
-  pointer parameters when set with ``FUNC_mock_set_PARAM_in(*,
-  size_t)``. Pointer and union struct members are not asserted, and
-  probably never will be.
+- Only primitive data type members are asserted for struct pointer
+  parameters when set with ``FUNC_mock_set_PARAM_in(*,
+  size_t)``. Pointer and union members are not asserted, and probably
+  never will be.
 
 Debugging tips
 ==============

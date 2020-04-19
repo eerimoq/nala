@@ -153,7 +153,7 @@ class StructAssert:
         self.assert_eq_members = []
         self.assert_array_eq_members = []
         self.assert_struct_members = []
-        
+
         for member in struct[1]:
             if member[0] == 'assert-eq':
                 self.assert_eq_members.append(member[1])
@@ -344,9 +344,11 @@ class FunctionMock:
     def find_check_function(self, param):
         if self.is_char_pointer(param):
             return 'nala_mock_assert_in_string'
-        elif isinstance(param.type.type, node.TypeDecl):
-            if isinstance(param.type.type.type, node.Struct):
+        elif self.is_struct_pointer(param):
+            try:
                 return f'nala_mock_assert_struct_{param.type.type.type.name}'
+            except AttributeError:
+                return 'nala_assert_memory'
 
         return 'nala_assert_memory'
 
@@ -446,6 +448,15 @@ class FunctionMock:
 
     def is_enum(self, param):
         return isinstance(param.type.type, node.Enum)
+
+    def is_struct_pointer(self, param):
+        if not self.is_pointer(param):
+            return False
+
+        if not self.is_struct(param.type):
+            return False
+
+        return True
 
     def is_struct(self, param):
         try:
