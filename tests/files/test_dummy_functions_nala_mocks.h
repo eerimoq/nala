@@ -459,8 +459,8 @@ struct nala_free_params_t {
     void *ptr;
 };
 
-void free_mock();
-int free_mock_once();
+void free_mock(void);
+int free_mock_once(void);
 void free_mock_ignore_in(void);
 int free_mock_ignore_in_once(void);
 void free_mock_set_errno(int errno_value);
@@ -608,8 +608,8 @@ struct nala_in_out_params_t {
     int *buf_p;
 };
 
-void in_out_mock();
-int in_out_mock_once();
+void in_out_mock(void);
+int in_out_mock_once(void);
 void in_out_mock_ignore_in(void);
 int in_out_mock_ignore_in_once(void);
 void in_out_mock_set_errno(int errno_value);
@@ -849,8 +849,8 @@ struct nala_print_hello_params_t {
     int dummy;
 };
 
-void print_hello_mock();
-int print_hello_mock_once();
+void print_hello_mock(void);
+int print_hello_mock_once(void);
 void print_hello_mock_ignore_in(void);
 int print_hello_mock_ignore_in_once(void);
 void print_hello_mock_set_errno(int errno_value);
@@ -1035,8 +1035,8 @@ struct nala_struct_param_params_t {
     struct struct_param_type *data;
 };
 
-void struct_param_mock();
-int struct_param_mock_once();
+void struct_param_mock(void);
+int struct_param_mock_once(void);
 void struct_param_mock_ignore_in(void);
 int struct_param_mock_ignore_in_once(void);
 void struct_param_mock_set_errno(int errno_value);

@@ -30,7 +30,8 @@ def decl(name, type):
 
 def function_ptr_decl(name, return_type, parameters):
     return decl(
-        name, node.PtrDecl([], node.FuncDecl(node.ParamList(parameters), return_type))
+        name,
+        node.PtrDecl([], node.FuncDecl(node.ParamList(parameters), return_type))
     )
 
 
@@ -418,10 +419,16 @@ class FunctionMock:
         return True
 
     def void_function_decl(self, name, parameters):
+        if not parameters:
+            parameters = [void_type('')]
+
         return node.FuncDecl(node.ParamList(parameters),
                              void_type(name))
 
     def int_function_decl(self, name, parameters):
+        if not parameters:
+            parameters = [void_type('')]
+
         return node.FuncDecl(node.ParamList(parameters),
                              int_type(name))
 

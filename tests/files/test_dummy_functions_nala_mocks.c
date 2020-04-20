@@ -7111,7 +7111,7 @@ void __wrap_free(void *ptr)
     return;
 }
 
-void free_mock()
+void free_mock(void)
 {
     CHECK_NO_INSTANCES(nala_mock_free);
     nala_mock_free.state.mode = MODE_MOCK;
@@ -7127,7 +7127,7 @@ void free_mock()
     nala_traceback(&nala_mock_free.data.traceback);
 }
 
-int free_mock_once()
+int free_mock_once(void)
 {
     struct nala_instance_free_t *nala_instance_p;
 
@@ -9060,7 +9060,7 @@ void __wrap_in_out(int *buf_p)
     return;
 }
 
-void in_out_mock()
+void in_out_mock(void)
 {
     CHECK_NO_INSTANCES(nala_mock_in_out);
     nala_mock_in_out.state.mode = MODE_MOCK;
@@ -9076,7 +9076,7 @@ void in_out_mock()
     nala_traceback(&nala_mock_in_out.data.traceback);
 }
 
-int in_out_mock_once()
+int in_out_mock_once(void)
 {
     struct nala_instance_in_out_t *nala_instance_p;
 
@@ -12218,7 +12218,7 @@ void __wrap_print_hello()
     return;
 }
 
-void print_hello_mock()
+void print_hello_mock(void)
 {
     CHECK_NO_INSTANCES(nala_mock_print_hello);
     nala_mock_print_hello.state.mode = MODE_MOCK;
@@ -12227,7 +12227,7 @@ void print_hello_mock()
     nala_traceback(&nala_mock_print_hello.data.traceback);
 }
 
-int print_hello_mock_once()
+int print_hello_mock_once(void)
 {
     struct nala_instance_print_hello_t *nala_instance_p;
 
@@ -14572,7 +14572,7 @@ void __wrap_struct_param(struct struct_param_type *data)
     return;
 }
 
-void struct_param_mock()
+void struct_param_mock(void)
 {
     CHECK_NO_INSTANCES(nala_mock_struct_param);
     nala_mock_struct_param.state.mode = MODE_MOCK;
@@ -14588,7 +14588,7 @@ void struct_param_mock()
     nala_traceback(&nala_mock_struct_param.data.traceback);
 }
 
-int struct_param_mock_once()
+int struct_param_mock_once(void)
 {
     struct nala_instance_struct_param_t *nala_instance_p;
 
