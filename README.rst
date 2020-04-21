@@ -325,8 +325,8 @@ ellipsis (``...``), as shown below.
 
    void FUNC_mock(<params>, <res>, format, ...);
    void FUNC_mock_once(<params>, <res>, format, ...);
-   void FUNC_mock_ignore_in(<params>, <res>, format);
-   void FUNC_mock_ignore_in_once(<params>, <res>, format);
+   void FUNC_mock_ignore_in(<res>, format);
+   void FUNC_mock_ignore_in_once(<res>, format);
 
 The format string supports the following specifiers.
 
