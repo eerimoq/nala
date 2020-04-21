@@ -4,7 +4,8 @@ from fnmatch import fnmatch
 
 from .inspect import ForgivingDeclarationParser
 from .generator import FileGenerator
-from .generator import HEADER_FILE
+from .generator import header_file
+from .generator import does_generated_files_exist
 
 
 NALA_C_FUNCTIONS = [
@@ -89,7 +90,6 @@ def load_real_variadic_functions(filename):
     }
 
 
-
 def generate_mocks(expanded_code,
                    output_directory,
                    rename_parameters_file,
@@ -102,38 +102,38 @@ def generate_mocks(expanded_code,
     """
 
     functions = find_mocked_functions(expanded_code)
-    nala_mocks_h = os.path.join(output_directory, HEADER_FILE)
 
-    if cache and os.path.exists(nala_mocks_h):
-        cached_mocked_functions = find_cached_mocked_functions(nala_mocks_h)
+    if cache and does_generated_files_exist(output_directory):
+        cached_mocked_functions = find_cached_mocked_functions(
+            header_file(output_directory))
         generate = (functions != cached_mocked_functions)
     else:
         generate = True
 
-    if generate:
-        parser = ForgivingDeclarationParser(expanded_code,
-                                            functions,
-                                            rename_parameters_file)
+    if not generate:
+        return
 
-        if real_variadic_functions_file:
-            real_variadic_functions = load_real_variadic_functions(
-                real_variadic_functions_file)
-        else:
-            real_variadic_functions = {}
+    parser = ForgivingDeclarationParser(expanded_code,
+                                        functions,
+                                        rename_parameters_file)
 
-        generator = FileGenerator(parser)
+    if real_variadic_functions_file:
+        real_variadic_functions = load_real_variadic_functions(
+            real_variadic_functions_file)
+    else:
+        real_variadic_functions = {}
 
-        for function in parser.mocked_functions:
-            if function.name in NALA_C_FUNCTIONS:
-                raise Exception(
-                    f"'{function.name}()' cannot be mocked as it is used by Nala.")
+    generator = FileGenerator(parser)
 
-            generator.add_mock(function,
-                               has_implementation(function.name,
-                                                  implementation,
-                                                  no_implementation),
-                               real_variadic_functions.get(function.name, ''))
+    for function in parser.mocked_functions:
+        if function.name in NALA_C_FUNCTIONS:
+            raise Exception(
+                f"'{function.name}()' cannot be mocked as it is used by Nala.")
 
-        generator.write_to_directory(output_directory)
-    elif not functions:
-        FileGenerator().write_to_directory(output_directory)
+        generator.add_mock(function,
+                           has_implementation(function.name,
+                                              implementation,
+                                              no_implementation),
+                           real_variadic_functions.get(function.name, ''))
+
+    generator.write_to_directory(output_directory)

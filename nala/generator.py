@@ -657,9 +657,9 @@ class FileGenerator:
     def write_to_directory(self, directory):
         os.makedirs(directory, exist_ok=True)
 
-        header_filename = os.path.join(directory, HEADER_FILE)
-        source_filename = os.path.join(directory, SOURCE_FILE)
-        linker_filename = os.path.join(directory, LINKER_FILE)
+        header_filename = header_file(directory)
+        source_filename = source_file(directory)
+        linker_filename = linker_file(directory)
 
         mocks = list(sorted(self.mocks, key=lambda m: m.func_name))
         struct_asserts = []
@@ -711,3 +711,28 @@ class FileGenerator:
                 f'-Wl,--wrap={mock.function.name}'
                 for mock in mocks
             ]))
+
+
+def header_file(directory):
+    return os.path.join(directory, HEADER_FILE)
+
+
+def source_file(directory):
+    return os.path.join(directory, SOURCE_FILE)
+
+
+def linker_file(directory):
+    return os.path.join(directory, LINKER_FILE)
+
+
+def does_generated_files_exist(directory):
+    if not os.path.exists(header_file(directory)):
+        return False
+
+    if not os.path.exists(source_file(directory)):
+        return False
+
+    if not os.path.exists(linker_file(directory)):
+        return False
+
+    return True

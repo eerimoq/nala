@@ -174,3 +174,81 @@ class CommandLineTest(unittest.TestCase):
         self.assertTrue(
             filecmp.cmp('test_wrap_internal_symbols.o',
                         'tests/files/test_wrap_internal_symbols.wrapped.o'))
+
+    def test_regenerate_mocks_cache_no_change(self):
+        argv = [
+            'nala',
+            'generate_mocks',
+            '-o', 'output',
+            'tests/files/test_dummy_functions_tests.pp.c'
+        ]
+
+        remove_optput()
+        pre_process_file('dummy_functions')
+
+        with patch('sys.argv', argv):
+            nala.cli.main()
+
+        # Set file date to 1970.
+        os.utime('output/nala_mocks.h', (0, 0))
+        os.utime('output/nala_mocks.c', (0, 0))
+        os.utime('output/nala_mocks.ldflags', (0, 0))
+
+        with patch('sys.argv', argv):
+            nala.cli.main()
+
+        # No regeneration should have happened.
+        self.assertEqual(os.stat('output/nala_mocks.h').st_mtime, 0)
+        self.assertEqual(os.stat('output/nala_mocks.c').st_mtime, 0)
+        self.assertEqual(os.stat('output/nala_mocks.ldflags').st_mtime, 0)
+
+    def test_regenerate_mocks_no_cache_no_change(self):
+        argv = [
+            'nala',
+            'generate_mocks',
+            '-o', 'output',
+            '--no-cache',
+            'tests/files/test_dummy_functions_tests.pp.c'
+        ]
+
+        remove_optput()
+        pre_process_file('dummy_functions')
+
+        with patch('sys.argv', argv):
+            nala.cli.main()
+
+        # Set file date to 1970.
+        os.utime('output/nala_mocks.h', (0, 0))
+        os.utime('output/nala_mocks.c', (0, 0))
+        os.utime('output/nala_mocks.ldflags', (0, 0))
+
+        with patch('sys.argv', argv):
+            nala.cli.main()
+
+        # Regeneration happened as --no-cache was given.
+        self.assertNotEqual(os.stat('output/nala_mocks.h').st_mtime, 0)
+        self.assertNotEqual(os.stat('output/nala_mocks.c').st_mtime, 0)
+        self.assertNotEqual(os.stat('output/nala_mocks.ldflags').st_mtime, 0)
+
+    def test_generate_mocks_touched_nala_mocks_h_and_empty_test(self):
+        argv = [
+            'nala',
+            'generate_mocks',
+            '-o', 'output',
+            'tests/files/test_empty_tests.pp.c'
+        ]
+
+        remove_optput()
+        pre_process_file('empty')
+
+        # Touch output/nala_mocks.h before generating, just as test.mk
+        # does.
+        os.mkdir('output')
+
+        with open('output/nala_mocks.h', 'w'):
+            pass
+
+        with patch('sys.argv', argv):
+            nala.cli.main()
+
+        self.assert_generated_files('empty')
