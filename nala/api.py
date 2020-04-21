@@ -97,7 +97,8 @@ def generate_mocks(expanded_code,
                    cache,
                    implementation,
                    no_implementation):
-    """Identify mocked functions and generate the source and header files.
+    """Identify mocked functions and generate the source, header and
+    linker files.
 
     """
 

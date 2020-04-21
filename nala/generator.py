@@ -6,7 +6,7 @@ from copy import deepcopy
 
 from jinja2 import Environment
 from jinja2 import PackageLoader
-from pycparser import c_ast as node
+from pycparser import c_ast
 from pycparser.c_generator import CGenerator
 
 from .inspect import PRIMITIVE_TYPES
@@ -21,29 +21,29 @@ LINKER_FILE = 'nala_mocks.ldflags'
 
 
 def is_ellipsis(param):
-    return isinstance(param, node.EllipsisParam)
+    return isinstance(param, c_ast.EllipsisParam)
 
 
 def decl(name, type):
-    return node.Decl(name, [], [], [], type, None, None)
+    return c_ast.Decl(name, [], [], [], type, None, None)
 
 
 def function_ptr_decl(name, return_type, parameters):
     return decl(
         name,
-        node.PtrDecl([], node.FuncDecl(node.ParamList(parameters), return_type))
+        c_ast.PtrDecl([], c_ast.FuncDecl(c_ast.ParamList(parameters), return_type))
     )
 
 
 def bool_param(name):
-    return decl(name, node.TypeDecl(name, [], node.IdentifierType(['bool'])))
+    return decl(name, c_ast.TypeDecl(name, [], c_ast.IdentifierType(['bool'])))
 
 
 def set_member(name):
     return decl(name,
-                node.TypeDecl(name,
-                              [],
-                              node.IdentifierType(['struct nala_set_param'])))
+                c_ast.TypeDecl(name,
+                               [],
+                               c_ast.IdentifierType(['struct nala_set_param'])))
 
 
 def in_assert_member(name, param_actual, param_expected):
@@ -55,7 +55,8 @@ def in_assert_member(name, param_actual, param_expected):
         [
             param_actual,
             param_expected,
-            decl('size', node.TypeDecl('size', [], node.IdentifierType(['size_t'])))
+            decl('size',
+                 c_ast.TypeDecl('size', [], c_ast.IdentifierType(['size_t'])))
         ])
 
 
@@ -68,13 +69,14 @@ def out_copy_member(name, param_dst, param_src):
         [
             param_dst,
             param_src,
-            decl('size', node.TypeDecl('size', [], node.IdentifierType(['size_t'])))
+            decl('size',
+                 c_ast.TypeDecl('size', [], c_ast.IdentifierType(['size_t'])))
         ])
 
 
 def va_list_param(name):
     return decl(None,
-                node.TypeDecl(name, [], node.IdentifierType(['va_list'])))
+                c_ast.TypeDecl(name, [], c_ast.IdentifierType(['va_list'])))
 
 
 def is_variadic_func(params):
@@ -85,18 +87,18 @@ def is_variadic_func(params):
 
 
 def void_type(name):
-    return node.TypeDecl(name, [], node.IdentifierType(['void']))
+    return c_ast.TypeDecl(name, [], c_ast.IdentifierType(['void']))
 
 
 def int_type(name):
-    return node.TypeDecl(name, [], node.IdentifierType(['int']))
+    return c_ast.TypeDecl(name, [], c_ast.IdentifierType(['int']))
 
 
 def rename_return_type(return_type, name):
     return_type = deepcopy(return_type)
     type_decl = return_type
 
-    while not isinstance(type_decl, node.TypeDecl):
+    while not isinstance(type_decl, c_ast.TypeDecl):
         type_decl = type_decl.type
 
     type_decl.declname = name
@@ -220,8 +222,8 @@ class FunctionMock:
             self.has_implementation = True
 
         self.params_struct = [
-            decl(param.name, node.PtrDecl([], param.type.type))
-            if isinstance(param.type, node.ArrayDecl)
+            decl(param.name, c_ast.PtrDecl([], param.type.type))
+            if isinstance(param.type, c_ast.ArrayDecl)
             else param
             for param in self.func_params
             if not is_ellipsis(param) and param.name
@@ -231,24 +233,24 @@ class FunctionMock:
         if self.is_variadic_func:
             self.params_struct.append(decl(
                 None,
-                node.PtrDecl([],
-                             node.TypeDecl('vafmt_p',
-                                           ['const'],
-                                           node.IdentifierType(['char'])))))
+                c_ast.PtrDecl([],
+                              c_ast.TypeDecl('vafmt_p',
+                                             ['const'],
+                                             c_ast.IdentifierType(['char'])))))
             self.forward_args += ', nala_vl'
 
         # -Wpedantic warns on empty structs.
         if not self.params_struct:
             self.params_struct = [
                 decl('dummy',
-                     node.TypeDecl('dummy', [], node.IdentifierType(['int'])))
+                     c_ast.TypeDecl('dummy', [], c_ast.IdentifierType(['int'])))
             ]
 
         return_type = self.func_decl.type
         self.return_value = (
             None
-            if isinstance(return_type, node.TypeDecl)
-            and isinstance(return_type.type, node.IdentifierType)
+            if isinstance(return_type, c_ast.TypeDecl)
+            and isinstance(return_type.type, c_ast.IdentifierType)
             and return_type.type.names[0] == 'void'
             else 'return_value')
 
@@ -274,21 +276,21 @@ class FunctionMock:
             f'{self.func_name}_mock_set_errno',
             [decl(
                 'errno_value',
-                node.TypeDecl('errno_value', [], node.IdentifierType(['int'])),
+                c_ast.TypeDecl('errno_value', [], c_ast.IdentifierType(['int'])),
             )])
         self.callback_decl = function_ptr_decl(
             'callback',
             void_type('callback'),
             create_implementation_params(self.func_params))
-        self.variadic_func_real_wrapper_decl = node.FuncDecl(
-            node.ParamList(create_implementation_params(self.func_params)),
-            node.TypeDecl(
+        self.variadic_func_real_wrapper_decl = c_ast.FuncDecl(
+            c_ast.ParamList(create_implementation_params(self.func_params)),
+            c_ast.TypeDecl(
                 f'{self.func_name}_mock_va_arg_real',
                 [],
                 return_type))
-        self.default_variadic_func_real_wrapper_decl = node.FuncDecl(
-            node.ParamList(create_implementation_params(self.func_params)),
-            node.TypeDecl(
+        self.default_variadic_func_real_wrapper_decl = c_ast.FuncDecl(
+            c_ast.ParamList(create_implementation_params(self.func_params)),
+            c_ast.TypeDecl(
                 f'nala_v{self.func_name}',
                 [],
                 return_type))
@@ -352,7 +354,7 @@ class FunctionMock:
 
     def assign_names_to_unnamed_params(self, params):
         for i, param in enumerate(params):
-            if not isinstance(param, node.Typename):
+            if not isinstance(param, c_ast.Typename):
                 continue
 
             if self.is_void(param):
@@ -361,7 +363,7 @@ class FunctionMock:
             name = f'nala_{i}'
             param.name = name
 
-            while not isinstance(param, node.TypeDecl):
+            while not isinstance(param, c_ast.TypeDecl):
                 param = param.type
 
             param.declname = name
@@ -385,7 +387,7 @@ class FunctionMock:
         return 'nala_assert_memory'
 
     def is_primitive_type_pointer(self, param):
-        if not isinstance(param.type, node.PtrDecl):
+        if not isinstance(param.type, c_ast.PtrDecl):
             return False
 
         try:
@@ -399,10 +401,10 @@ class FunctionMock:
         return True
 
     def is_pointer_pointer(self, param):
-        if not isinstance(param.type, node.PtrDecl):
+        if not isinstance(param.type, c_ast.PtrDecl):
             return False
 
-        if not isinstance(param.type.type, node.PtrDecl):
+        if not isinstance(param.type.type, c_ast.PtrDecl):
             return False
 
         return True
@@ -411,28 +413,28 @@ class FunctionMock:
         if not parameters:
             parameters = [void_type('')]
 
-        return node.FuncDecl(node.ParamList(parameters),
-                             void_type(name))
+        return c_ast.FuncDecl(c_ast.ParamList(parameters),
+                              void_type(name))
 
     def int_function_decl(self, name, parameters):
         if not parameters:
             parameters = [void_type('')]
 
-        return node.FuncDecl(node.ParamList(parameters),
-                             int_type(name))
+        return c_ast.FuncDecl(c_ast.ParamList(parameters),
+                              int_type(name))
 
     def rename_function(self, name):
         return decl(
             name,
-            node.FuncDecl(self.func_decl.args,
-                          rename_return_type(self.func_decl.type, name)))
+            c_ast.FuncDecl(self.func_decl.args,
+                           rename_return_type(self.func_decl.type, name)))
 
     def rename_param(self, param, name):
         param = deepcopy(param)
         param.name = name
         param_next = param
 
-        while not isinstance(param_next, node.TypeDecl):
+        while not isinstance(param_next, c_ast.TypeDecl):
             param_next = param_next.type
 
         param_next.declname = name
@@ -458,10 +460,10 @@ class FunctionMock:
     def is_char_pointer(self, param):
         if is_ellipsis(param):
             return False
-        elif isinstance(param.type, node.PtrDecl):
-            if isinstance(param.type.type, (node.FuncDecl, node.PtrDecl)):
+        elif isinstance(param.type, c_ast.PtrDecl):
+            if isinstance(param.type.type, (c_ast.FuncDecl, c_ast.PtrDecl)):
                 return False
-            elif isinstance(param.type.type.type, node.Struct):
+            elif isinstance(param.type.type.type, c_ast.Struct):
                 return False
             elif param.type.type.type.names[0] == 'char':
                 return True
@@ -495,7 +497,7 @@ class FunctionMock:
             return param.type.type.names[0] == 'void'
 
     def is_pointer(self, param):
-        if isinstance(param.type, (node.PtrDecl, node.ArrayDecl)):
+        if isinstance(param.type, (c_ast.PtrDecl, c_ast.ArrayDecl)):
             return True
 
         try:
@@ -508,7 +510,7 @@ class FunctionMock:
         return False
 
     def is_enum(self, param):
-        return isinstance(param.type.type, node.Enum)
+        return isinstance(param.type.type, c_ast.Enum)
 
     def is_struct_pointer(self, param):
         if not self.is_pointer(param):
@@ -523,10 +525,10 @@ class FunctionMock:
         if not self.is_pointer(param):
             return False
 
-        if not isinstance(param.type.type, node.TypeDecl):
+        if not isinstance(param.type.type, c_ast.TypeDecl):
             return False
 
-        if not isinstance(param.type.type.type, node.IdentifierType):
+        if not isinstance(param.type.type.type, c_ast.IdentifierType):
             return False
 
         param = self.lookup_typedef(param.type.type.type.names[0])
@@ -534,14 +536,14 @@ class FunctionMock:
         if param is None:
             return False
 
-        if not isinstance(param.type.type, node.Struct):
+        if not isinstance(param.type.type, c_ast.Struct):
             return False
 
         return True
 
     def is_struct(self, param):
         try:
-            if isinstance(param.type.type, node.Struct):
+            if isinstance(param.type.type, c_ast.Struct):
                 return True
         except AttributeError:
             pass
@@ -557,7 +559,7 @@ class FunctionMock:
 
     def is_union(self, param):
         try:
-            if isinstance(param.type.type, node.Union):
+            if isinstance(param.type.type, c_ast.Union):
                 return True
         except AttributeError:
             pass
@@ -592,10 +594,10 @@ class FunctionMock:
             elif is_ellipsis(param):
                 variable_arguments_params.append(decl(
                     None,
-                    node.PtrDecl([],
-                                 node.TypeDecl('vafmt_p',
-                                               ['const'],
-                                               node.IdentifierType(['char'])))))
+                    c_ast.PtrDecl([],
+                                  c_ast.TypeDecl('vafmt_p',
+                                                 ['const'],
+                                                 c_ast.IdentifierType(['char'])))))
                 variable_arguments_params.append(param)
 
         if not self.is_void(self.return_value_decl):

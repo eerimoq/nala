@@ -6,7 +6,7 @@ import re
 from typing import NamedTuple
 from typing import Tuple
 
-from pycparser import c_ast as node
+from pycparser import c_ast
 from pycparser.c_parser import CParser
 
 
@@ -45,7 +45,7 @@ class IncludeDirective(NamedTuple):
 
 class MockedFunction(NamedTuple):
     name: str
-    declaration: node.FuncDecl
+    declaration: c_ast.FuncDecl
 
 
 class Token(NamedTuple):
@@ -102,13 +102,13 @@ def rename_parameters(function_declaration, param_names):
         return function_declaration
 
     for i, param in enumerate(function_declaration.type.args.params):
-        if isinstance(param, node.EllipsisParam):
+        if isinstance(param, c_ast.EllipsisParam):
             continue
 
         param_type = param.type
 
         if (not param.name
-            and isinstance(param_type.type, node.IdentifierType)
+            and isinstance(param_type.type, c_ast.IdentifierType)
             and param_type.type.names == ['void']):
             continue
 
@@ -118,7 +118,7 @@ def rename_parameters(function_declaration, param_names):
             if len(param.name) > 2 and param.name.startswith('__'):
                 param.name = param.name[2:]
 
-        while not isinstance(param_type, node.TypeDecl):
+        while not isinstance(param_type, c_ast.TypeDecl):
             param_type = param_type.type
 
         param_type.declname = param.name
@@ -286,10 +286,10 @@ class ForgivingDeclarationParser:
         if member is None:
             return False
 
-        if not isinstance(member.type, node.TypeDecl):
+        if not isinstance(member.type, c_ast.TypeDecl):
             return False
 
-        if not isinstance(member.type.type, node.IdentifierType):
+        if not isinstance(member.type.type, c_ast.IdentifierType):
             return False
 
         name = ' '.join(member.type.type.names)
@@ -300,7 +300,7 @@ class ForgivingDeclarationParser:
         return self.is_primitive_type(self.lookup_typedef(name))
 
     def is_array(self, member):
-        if not isinstance(member.type, node.ArrayDecl):
+        if not isinstance(member.type, c_ast.ArrayDecl):
             return False
 
         if member.type.dim is None:
@@ -309,10 +309,10 @@ class ForgivingDeclarationParser:
         return True
 
     def is_struct(self, member):
-        if not isinstance(member.type, node.TypeDecl):
+        if not isinstance(member.type, c_ast.TypeDecl):
             return False
 
-        if not isinstance(member.type.type, node.Struct):
+        if not isinstance(member.type.type, c_ast.Struct):
             return False
 
         return True
@@ -324,10 +324,10 @@ class ForgivingDeclarationParser:
         if self.is_struct(member):
             return True
 
-        if not isinstance(member.type, node.TypeDecl):
+        if not isinstance(member.type, c_ast.TypeDecl):
             return False
 
-        if not isinstance(member.type.type, node.IdentifierType):
+        if not isinstance(member.type.type, c_ast.IdentifierType):
             return False
 
         member = self.lookup_typedef(member.type.type.names[0])
@@ -375,20 +375,20 @@ class ForgivingDeclarationParser:
 
     def load_structs(self):
         for item in self.file_ast:
-            if isinstance(item, node.Typedef):
-                if isinstance(item.type, node.TypeDecl):
-                    if isinstance(item.type.type, node.Struct):
+            if isinstance(item, c_ast.Typedef):
+                if isinstance(item.type, c_ast.TypeDecl):
+                    if isinstance(item.type.type, c_ast.Struct):
                         if item.type.type.decls is not None:
                             items = self.load_struct_members(item.type.type)
                             self.struct_typedefs.append((item.name, items))
-            elif isinstance(item, node.Decl):
-                if isinstance(item.type, node.Struct):
+            elif isinstance(item, c_ast.Decl):
+                if isinstance(item.type, c_ast.Struct):
                     items = self.load_struct_members(item.type)
                     self.structs.append((item.type.name, items))
 
     def load_typedefs(self):
         for item in self.file_ast:
-            if isinstance(item, node.Typedef):
+            if isinstance(item, c_ast.Typedef):
                 self.typedefs[item.name] = item
 
     def next(self):
