@@ -138,16 +138,6 @@ def read_nala_c():
         return fin.read()
 
 
-def load_typedefs(ast):
-    typedefs = {}
-
-    for item in ast:
-        if isinstance(item, node.Typedef):
-            typedefs[item.name] = item
-
-    return typedefs
-
-
 class StructAssert:
 
     def __init__(self, struct, struct_names, struct_typedef_names):
@@ -201,20 +191,19 @@ class FunctionMock:
                  function,
                  has_implementation,
                  real_variadic_function,
-                 struct_names,
-                 struct_typedef_names):
+                 generator):
         self.function = function
         self.func_name = function.name
         self.real_variadic_function = real_variadic_function
-        self.struct_names = struct_names
-        self.struct_typedef_names = struct_typedef_names
+        self.struct_names = generator.struct_names
+        self.struct_typedef_names = generator.struct_typedef_names
 
         self.wrapped_func = f'__wrap_{self.func_name}'
         self.real_func = f'__real_{self.func_name}'
 
         self.state_name = f'nala_mock_{self.func_name}'
 
-        self.typedefs = load_typedefs(function.file_ast)
+        self.generator = generator
         self.func_decl = self.function.declaration.type
         self.func_params = self.func_decl.args.params if self.func_decl.args else []
         self.assign_names_to_unnamed_params(self.func_params)
@@ -583,8 +572,7 @@ class FunctionMock:
         return False
 
     def lookup_typedef(self, name):
-        if name in self.typedefs:
-            return self.typedefs[name]
+        return self.generator.lookup_typedef(name)
 
     def create_mock_params(self):
         once_params = []
@@ -620,7 +608,7 @@ class FunctionMock:
 
 class FileGenerator:
 
-    def __init__(self):
+    def __init__(self, parser=None):
         self.code_generator = CGenerator()
 
         self.jinja_env = Environment(
@@ -634,11 +622,24 @@ class FileGenerator:
         self.source_template = self.jinja_env.get_template(f'{SOURCE_FILE}.jinja2')
 
         self.mocks = []
+        self.includes = []
         self.structs = []
         self.struct_typedefs = []
         self.struct_names = set()
         self.struct_typedef_names = set()
-        self.includes = []
+        self.parser = parser
+
+        if parser is not None:
+            for include in parser.includes:
+                self.includes.append((include.path, include.system))
+
+            for struct in parser.structs:
+                self.structs.append(struct)
+                self.struct_names.add(struct[0])
+
+            for struct_typedef in parser.struct_typedefs:
+                self.struct_typedefs.append(struct_typedef)
+                self.struct_typedef_names.add(struct_typedef[0])
 
     def add_mock(self,
                  mocked_function,
@@ -647,19 +648,11 @@ class FileGenerator:
         self.mocks.append(FunctionMock(mocked_function,
                                        has_implementation,
                                        real_variadic_function,
-                                       self.struct_names,
-                                       self.struct_typedef_names))
+                                       self))
 
-    def add_include(self, include):
-        self.includes.append((include.path, include.system))
-
-    def add_struct(self, struct):
-        self.structs.append(struct)
-        self.struct_names.add(struct[0])
-
-    def add_struct_typedef(self, typedef):
-        self.struct_typedefs.append(typedef)
-        self.struct_typedef_names.add(typedef[0])
+    def lookup_typedef(self, name):
+        if name in self.parser.typedefs:
+            return self.parser.typedefs[name]
 
     def write_to_directory(self, directory):
         os.makedirs(directory, exist_ok=True)

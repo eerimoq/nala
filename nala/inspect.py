@@ -46,7 +46,6 @@ class IncludeDirective(NamedTuple):
 class MockedFunction(NamedTuple):
     name: str
     declaration: node.FuncDecl
-    file_ast: node.FileAST
 
 
 class Token(NamedTuple):
@@ -278,8 +277,7 @@ class ForgivingDeclarationParser:
 
             self.mocked_functions.append(MockedFunction(
                 func_name,
-                func_declaration,
-                self.file_ast))
+                func_declaration))
 
         self.load_typedefs()
         self.load_structs()

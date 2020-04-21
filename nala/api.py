@@ -110,27 +110,18 @@ def generate_mocks(expanded_code,
     else:
         generate = True
 
-    generator = FileGenerator()
-
     if generate:
         parser = ForgivingDeclarationParser(expanded_code,
                                             functions,
                                             rename_parameters_file)
-
-        for struct in parser.structs:
-            generator.add_struct(struct)
-
-        for struct_typedef in parser.struct_typedefs:
-            generator.add_struct_typedef(struct_typedef)
-
-        for include in parser.includes:
-            generator.add_include(include)
 
         if real_variadic_functions_file:
             real_variadic_functions = load_real_variadic_functions(
                 real_variadic_functions_file)
         else:
             real_variadic_functions = {}
+
+        generator = FileGenerator(parser)
 
         for function in parser.mocked_functions:
             if function.name in NALA_C_FUNCTIONS:
@@ -145,4 +136,4 @@ def generate_mocks(expanded_code,
 
         generator.write_to_directory(output_directory)
     elif not functions:
-        generator.write_to_directory(output_directory)
+        FileGenerator().write_to_directory(output_directory)
