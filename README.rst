@@ -319,7 +319,7 @@ For variadic functions
 
 Variadic function mocks are slightly different from the above. Their
 parameter list is extended with a format string (``format``) and an
-ellipsis (``...``) in some "every call" and "per call" functions.
+ellipsis (``...``), as shown below.
 
 .. code-block:: c
 
