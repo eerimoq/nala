@@ -157,9 +157,6 @@ class StructAssert:
             elif member[0] == 'assert-struct':
                 if member[2] in struct_names:
                     self.assert_struct_members.append(member[1:])
-            elif member[0] == 'assert-struct-typedef':
-                if member[2] in struct_typedef_names:
-                    self.assert_struct_typedef_members.append(member[1:])
 
 
 class StructTypedefAssert:
@@ -179,9 +176,6 @@ class StructTypedefAssert:
             elif member[0] == 'assert-struct':
                 if member[2] in struct_names:
                     self.assert_struct_members.append(member[1:])
-            elif member[0] == 'assert-struct-typedef':
-                if member[2] in struct_typedef_names:
-                    self.assert_struct_typedef_members.append(member[1:])
 
 
 class FunctionMock:
