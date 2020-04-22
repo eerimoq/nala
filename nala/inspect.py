@@ -163,6 +163,39 @@ PRIMITIVE_TYPES = [
     'long double'
 ]
 
+LINEMARKER = re.compile(r'^# \d+ "((?:\\.|[^\\"])*)"((?: [1234])*)$')
+
+TOKENS = {
+    'LINEMARKER': r"^#.*$",
+    'KEYWORD': (
+        "\\b(?:auto|break|case|char|const|continue|default|do|double|else|enum|"
+        "extern|float"
+        "|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct"
+        "|switch|typedef|union|unsigned|void|volatile|while|__extension__|"
+        "__attribute__|__restrict|__signed__)\\b"
+    ),
+    'IDENTIFIER': r"\b[a-zA-Z_](?:[a-zA-Z_0-9])*\b",
+    'CHARACTER': r"L?'(?:\\.|[^\\'])+'",
+    'STRING': r'L?"(\\"|\\\\|.)*?"',
+    'INTEGER': r"(?:0[xX][a-fA-F0-9]+|[0-9]+)[uUlL]*",
+    'FLOAT': (
+        r"(?:[0-9]+[Ee][+-]?[0-9]+|[0-9]*\.[0-9]+(?:[Ee][+-]?[0-9]+)?|[0-9]+\."
+        r"[0-9]*(?:[Ee][+-]?[0-9]+)?)[fFlL]?"
+    ),
+    'PUNCTUATION': (
+        r"\.\.\.|>>=|<<=|\+=|-=|\*=|/=|%=|&=|\^=|\|=|>>|<<|\+\+|--|->|&&|\|\|""|<="
+        r"|>=|==|!=|;|\{|\}|,|:|=|\(|\)|\[|\]|\.|&|!|~|-|\+|\*|/|%|<|>|\^|\||\?"
+    ),
+    'SPACE': r"[ \t\v\n\f]*",
+    'IGNORE': r".+?",
+}
+
+IGNORED_TOKENS = set(['SPACE', 'IGNORE'])
+
+RE_TOKEN = re.compile(
+    '|'.join(f'(?P<{token}>{pattern})' for token, pattern in TOKENS.items()),
+    flags=re.MULTILINE)
+
 
 class PrimitiveType(NamedTuple):
 
@@ -175,38 +208,6 @@ class VoidType(NamedTuple):
 
 
 class ForgivingDeclarationParser:
-    linemarker = re.compile(r'^# \d+ "((?:\\.|[^\\"])*)"((?: [1234])*)$')
-
-    tokens = {
-        'LINEMARKER': r"^#.*$",
-        'KEYWORD': (
-            "\\b(?:auto|break|case|char|const|continue|default|do|double|else|enum|"
-            "extern|float"
-            "|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct"
-            "|switch|typedef|union|unsigned|void|volatile|while|__extension__|"
-            "__attribute__|__restrict|__signed__)\\b"
-        ),
-        'IDENTIFIER': r"\b[a-zA-Z_](?:[a-zA-Z_0-9])*\b",
-        'CHARACTER': r"L?'(?:\\.|[^\\'])+'",
-        'STRING': r'L?"(\\"|\\\\|.)*?"',
-        'INTEGER': r"(?:0[xX][a-fA-F0-9]+|[0-9]+)[uUlL]*",
-        'FLOAT': (
-            r"(?:[0-9]+[Ee][+-]?[0-9]+|[0-9]*\.[0-9]+(?:[Ee][+-]?[0-9]+)?|[0-9]+\."
-            r"[0-9]*(?:[Ee][+-]?[0-9]+)?)[fFlL]?"
-        ),
-        'PUNCTUATION': (
-            r"\.\.\.|>>=|<<=|\+=|-=|\*=|/=|%=|&=|\^=|\|=|>>|<<|\+\+|--|->|&&|\|\|""|<="
-            r"|>=|==|!=|;|\{|\}|,|:|=|\(|\)|\[|\]|\.|&|!|~|-|\+|\*|/|%|<|>|\^|\||\?"
-        ),
-        'SPACE': r"[ \t\v\n\f]*",
-        'IGNORE': r".+?",
-    }
-
-    ignored_tokens = 'SPACE', 'IGNORE'
-
-    regex = re.compile(
-        '|'.join(f'(?P<{token}>{pattern})' for token, pattern in tokens.items()),
-        flags=re.MULTILINE)
 
     def __init__(self, source_code, functions, rename_parameters_file=None):
         self.source_code = source_code
@@ -250,8 +251,8 @@ class ForgivingDeclarationParser:
 
     @classmethod
     def tokenize(cls, source_code):
-        for match in cls.regex.finditer(source_code):
-            if match.lastgroup not in cls.ignored_tokens:
+        for match in RE_TOKEN.finditer(source_code):
+            if match.lastgroup not in IGNORED_TOKENS:
                 yield Token(match.lastgroup, match.group().strip(), match.span())
 
     def parse(self):
@@ -411,7 +412,7 @@ class ForgivingDeclarationParser:
             elif self.bracket_stack and self.current.value == self.bracket_stack[-1]:
                 self.bracket_stack.pop()
         elif self.current.type == 'LINEMARKER':
-            filename, flags = self.linemarker.match(self.current.value).groups()
+            filename, flags = LINEMARKER.match(self.current.value).groups()
 
             if self.filename is None:
                 self.filename = filename
