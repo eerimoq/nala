@@ -219,7 +219,6 @@ class ForgivingDeclarationParser:
 
         self.func_names = []
         self.func_signatures = []
-        self.func_source_contexts = []
         self.file_ast = None
         self.mocked_functions = []
         self.parse()
@@ -249,7 +248,6 @@ class ForgivingDeclarationParser:
             if parsed is not None:
                 self.func_names.append(parsed[0])
                 self.func_signatures.append(parsed[1])
-                self.func_source_contexts.append(self.source_context[:])
                 self.functions.remove(parsed[0])
 
             if not self.functions:
@@ -264,10 +262,9 @@ class ForgivingDeclarationParser:
         code = '\n'.join(
             self.typedefs_code + self.structs_code + self.func_signatures)
         self.file_ast = self.cparser.parse(code)
-        items = zip(self.func_names, self.func_source_contexts)
         func_offset = len(self.typedefs_code + self.structs_code)
 
-        for i, (func_name, _) in enumerate(items, func_offset):
+        for i, func_name in enumerate(self.func_names, func_offset):
             if self.param_names is None:
                 func_declaration = self.file_ast.ext[i]
             else:

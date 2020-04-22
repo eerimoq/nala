@@ -616,8 +616,7 @@ class FileGenerator:
         self.jinja_env = Environment(
             loader=PackageLoader('nala', 'templates'),
             trim_blocks=True,
-            lstrip_blocks=True,
-        )
+            lstrip_blocks=True)
         self.jinja_env.filters['render'] = self.code_generator.visit
 
         self.header_template = self.jinja_env.get_template(f'{HEADER_FILE}.jinja2')
@@ -663,7 +662,7 @@ class FileGenerator:
         source_filename = source_file(directory)
         linker_filename = linker_file(directory)
 
-        mocks = list(sorted(self.mocks, key=lambda m: m.func_name))
+        mocks = sorted(self.mocks, key=lambda m: m.func_name)
         struct_asserts = []
 
         for struct in sorted(self.structs):
