@@ -711,3 +711,8 @@ TEST(malloc_free)
     ASSERT_EQ(a_p, &a);
     free(a_p);
 }
+
+TEST(parameter_name_omitted_function)
+{
+    parameter_name_omitted_mock_ignore_in();
+}

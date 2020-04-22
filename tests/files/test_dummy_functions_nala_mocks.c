@@ -1403,6 +1403,7 @@ void nala_suspend_all_mocks(void)
     malloc_mock_suspend();
     mount_mock_suspend();
     output_message_mock_suspend();
+    parameter_name_omitted_mock_suspend();
     pipe_mock_suspend();
     poll_mock_suspend();
     print_hello_mock_suspend();
@@ -1451,6 +1452,7 @@ void nala_resume_all_mocks(void)
     malloc_mock_resume();
     mount_mock_resume();
     output_message_mock_resume();
+    parameter_name_omitted_mock_resume();
     pipe_mock_resume();
     poll_mock_resume();
     print_hello_mock_resume();
@@ -1499,6 +1501,7 @@ void nala_reset_all_mocks(void)
     malloc_mock_reset();
     mount_mock_reset();
     output_message_mock_reset();
+    parameter_name_omitted_mock_reset();
     pipe_mock_reset();
     poll_mock_reset();
     print_hello_mock_reset();
@@ -1547,6 +1550,7 @@ void nala_assert_all_mocks_completed(void)
     malloc_mock_assert_completed();
     mount_mock_assert_completed();
     output_message_mock_assert_completed();
+    parameter_name_omitted_mock_assert_completed();
     pipe_mock_assert_completed();
     poll_mock_assert_completed();
     print_hello_mock_assert_completed();
@@ -11339,6 +11343,466 @@ void output_message_mock_assert_completed(void)
                     "expected. %d call(s) missing.\n\n",
                     nala_mock_output_message.instances.length),
                 &nala_mock_output_message.instances.head_p->data.traceback));
+    }
+}
+
+// NALA_IMPLEMENTATION parameter_name_omitted
+
+void __real_parameter_name_omitted(int nala_0, int *nala_1, void ***nala_2);
+
+struct nala_params_parameter_name_omitted_t {
+    int nala_0;
+    int *nala_1;
+    void ***nala_2;
+    bool ignore_nala_0_in;
+    bool ignore_nala_1_in;
+    struct nala_set_param nala_1_in;
+    void (*nala_1_in_assert)(int *actual_p, int *expected_p, size_t size);
+    struct nala_set_param nala_1_out;
+    void (*nala_1_out_copy)(int *dst_p, int *src_p, size_t size);
+    bool ignore_nala_2_in;
+    struct nala_set_param nala_2_in;
+    void (*nala_2_in_assert)(void ***actual_p, void ***expected_p, size_t size);
+    struct nala_set_param nala_2_out;
+    void (*nala_2_out_copy)(void ***dst_p, void ***src_p, size_t size);
+};
+
+struct nala_data_parameter_name_omitted_t {
+    struct nala_params_parameter_name_omitted_t params;
+    int errno_value;
+    void (*implementation)(int nala_0, int *nala_1, void ***nala_2);
+    void (*callback)(int nala_0, int *nala_1, void ***nala_2);
+    struct nala_traceback_t traceback;
+    struct nala_parameter_name_omitted_params_t params_in;
+};
+
+struct nala_instance_parameter_name_omitted_t {
+    int mode;
+    int handle;
+    struct nala_data_parameter_name_omitted_t data;
+    struct nala_instance_parameter_name_omitted_t *next_p;
+};
+
+struct nala_instances_parameter_name_omitted_t {
+    struct nala_instance_parameter_name_omitted_t *head_p;
+    struct nala_instance_parameter_name_omitted_t *next_p;
+    struct nala_instance_parameter_name_omitted_t *tail_p;
+    int length;
+};
+
+struct nala_mock_parameter_name_omitted_t {
+    struct nala_state_t state;
+    struct nala_data_parameter_name_omitted_t data;
+    struct nala_instances_parameter_name_omitted_t instances;
+};
+
+static struct nala_mock_parameter_name_omitted_t nala_mock_parameter_name_omitted = {
+    .state = {
+        .mode = MODE_REAL,
+        .suspended = {
+            .count = 0,
+            .mode = MODE_REAL
+        }
+    },
+    .instances = {
+        .head_p = NULL,
+        .next_p = NULL,
+        .tail_p = NULL,
+        .length = 0
+    }
+};
+
+struct nala_data_parameter_name_omitted_t *nala_get_data_parameter_name_omitted()
+{
+    if (nala_mock_parameter_name_omitted.instances.tail_p != NULL) {
+        return (&nala_mock_parameter_name_omitted.instances.tail_p->data);
+    } else {
+        return (&nala_mock_parameter_name_omitted.data);
+    }
+}
+
+struct nala_params_parameter_name_omitted_t *nala_get_params_parameter_name_omitted()
+{
+    return (&nala_get_data_parameter_name_omitted()->params);
+}
+
+void __wrap_parameter_name_omitted(int nala_0, int *nala_1, void ***nala_2)
+{
+    struct nala_instance_parameter_name_omitted_t *nala_instance_p;
+    struct nala_data_parameter_name_omitted_t *nala_data_p;
+
+    nala_print_call("parameter_name_omitted", &nala_mock_parameter_name_omitted.state);
+
+    switch (nala_mock_parameter_name_omitted.state.mode) {
+
+    case MODE_MOCK_ONCE:
+    case MODE_MOCK:
+        if (nala_mock_parameter_name_omitted.state.mode == MODE_MOCK_ONCE) {
+            NALA_INSTANCES_POP(nala_mock_parameter_name_omitted.instances, &nala_instance_p);
+
+            if (nala_instance_p == NULL) {
+                nala_test_failure(nala_format(
+                        "Mocked parameter_name_omitted() called more times than expected.\n"));
+            }
+
+            nala_data_p = &nala_instance_p->data;
+        } else {
+            nala_instance_p = NULL;
+            nala_data_p = &nala_mock_parameter_name_omitted.data;
+        }
+
+        if (nala_instance_p == NULL || nala_instance_p->mode == INSTANCE_MODE_NORMAL) {
+            MOCK_ASSERT_POINTERS_IN_EQ(nala_data_p, parameter_name_omitted, nala_1);
+            nala_data_p->params_in.nala_1 = nala_1;
+            MOCK_ASSERT_POINTERS_IN_EQ(nala_data_p, parameter_name_omitted, nala_2);
+            nala_data_p->params_in.nala_2 = nala_2;
+            MOCK_ASSERT_IN_EQ(nala_data_p, parameter_name_omitted, nala_0);
+            nala_data_p->params_in.nala_0 = nala_0;
+
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
+                                       parameter_name_omitted,
+                                       nala_1);
+            MOCK_ASSERT_COPY_SET_PARAM(nala_instance_p,
+                                       nala_data_p,
+                                       parameter_name_omitted,
+                                       nala_2);
+
+            errno = nala_data_p->errno_value;
+
+            if (nala_data_p->callback != NULL) {
+                nala_data_p->callback(nala_0, nala_1, nala_2);
+            }
+
+        } else {
+            __real_parameter_name_omitted(nala_0, nala_1, nala_2);
+        }
+        break;
+
+    case MODE_IMPLEMENTATION:
+        nala_mock_parameter_name_omitted.data.implementation(nala_0, nala_1, nala_2);
+        break;
+
+    case MODE_NONE:
+        nala_mock_none_fail(&nala_mock_parameter_name_omitted.data.traceback,
+                            "parameter_name_omitted");
+        exit(1);
+        break;
+
+    default:
+        __real_parameter_name_omitted(nala_0, nala_1, nala_2);
+        break;
+    }
+
+    return;
+}
+
+void parameter_name_omitted_mock(int nala_0)
+{
+    CHECK_NO_INSTANCES(nala_mock_parameter_name_omitted);
+    nala_mock_parameter_name_omitted.state.mode = MODE_MOCK;
+    nala_set_param_init(&nala_mock_parameter_name_omitted.data.params.nala_1_out);
+    nala_set_param_init(&nala_mock_parameter_name_omitted.data.params.nala_1_in);
+    nala_mock_parameter_name_omitted.data.params.nala_1_in_assert =
+        (__typeof__(nala_mock_parameter_name_omitted.data.params.nala_1_in_assert))nala_mock_assert_int;
+    nala_mock_parameter_name_omitted.data.params.nala_1_out_copy = NULL;
+    nala_set_param_init(&nala_mock_parameter_name_omitted.data.params.nala_2_out);
+    nala_set_param_init(&nala_mock_parameter_name_omitted.data.params.nala_2_in);
+    nala_mock_parameter_name_omitted.data.params.nala_2_in_assert =
+        (__typeof__(nala_mock_parameter_name_omitted.data.params.nala_2_in_assert))nala_mock_assert_pointer;
+    nala_mock_parameter_name_omitted.data.params.nala_2_out_copy = NULL;
+    nala_mock_parameter_name_omitted.data.params.nala_1 = NULL;
+    nala_mock_parameter_name_omitted.data.params.ignore_nala_1_in = true;
+    nala_mock_parameter_name_omitted.data.params.nala_2 = NULL;
+    nala_mock_parameter_name_omitted.data.params.ignore_nala_2_in = true;
+    nala_mock_parameter_name_omitted.data.params.nala_0 = nala_0;
+    nala_mock_parameter_name_omitted.data.params.ignore_nala_0_in = false;
+    nala_mock_parameter_name_omitted.data.errno_value = 0;
+    nala_mock_parameter_name_omitted.data.callback = NULL;
+    nala_traceback(&nala_mock_parameter_name_omitted.data.traceback);
+}
+
+int parameter_name_omitted_mock_once(int nala_0)
+{
+    struct nala_instance_parameter_name_omitted_t *nala_instance_p;
+
+    nala_mock_parameter_name_omitted.state.mode = MODE_MOCK_ONCE;
+    NALA_INSTANCE_NEW(nala_instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&nala_instance_p->data.params.nala_1_out);
+    nala_set_param_init(&nala_instance_p->data.params.nala_1_in);
+    nala_instance_p->data.params.nala_1_in_assert =
+        (__typeof__(nala_instance_p->data.params.nala_1_in_assert))nala_mock_assert_int;
+    nala_instance_p->data.params.nala_1_out_copy = NULL;
+    nala_set_param_init(&nala_instance_p->data.params.nala_2_out);
+    nala_set_param_init(&nala_instance_p->data.params.nala_2_in);
+    nala_instance_p->data.params.nala_2_in_assert =
+        (__typeof__(nala_instance_p->data.params.nala_2_in_assert))nala_mock_assert_pointer;
+    nala_instance_p->data.params.nala_2_out_copy = NULL;
+    nala_instance_p->data.params.nala_1 = NULL;
+    nala_instance_p->data.params.ignore_nala_1_in = true;
+    nala_instance_p->data.params.nala_2 = NULL;
+    nala_instance_p->data.params.ignore_nala_2_in = true;
+    nala_instance_p->data.params.nala_0 = nala_0;
+    nala_instance_p->data.params.ignore_nala_0_in = false;
+    nala_instance_p->data.errno_value = 0;
+    nala_instance_p->data.callback = NULL;
+    NALA_INSTANCES_APPEND(nala_mock_parameter_name_omitted.instances,
+                          nala_instance_p);
+
+    return (nala_instance_p->handle);
+}
+
+void parameter_name_omitted_mock_ignore_in(void)
+{
+    CHECK_NO_INSTANCES(nala_mock_parameter_name_omitted);
+    nala_mock_parameter_name_omitted.state.mode = MODE_MOCK;
+    nala_set_param_init(&nala_mock_parameter_name_omitted.data.params.nala_1_out);
+    nala_set_param_init(&nala_mock_parameter_name_omitted.data.params.nala_1_in);
+    nala_mock_parameter_name_omitted.data.params.nala_1_in_assert =
+        (__typeof__(nala_mock_parameter_name_omitted.data.params.nala_1_in_assert))nala_mock_assert_int;
+    nala_mock_parameter_name_omitted.data.params.nala_1_out_copy = NULL;
+    nala_set_param_init(&nala_mock_parameter_name_omitted.data.params.nala_2_out);
+    nala_set_param_init(&nala_mock_parameter_name_omitted.data.params.nala_2_in);
+    nala_mock_parameter_name_omitted.data.params.nala_2_in_assert =
+        (__typeof__(nala_mock_parameter_name_omitted.data.params.nala_2_in_assert))nala_mock_assert_pointer;
+    nala_mock_parameter_name_omitted.data.params.nala_2_out_copy = NULL;
+    nala_mock_parameter_name_omitted.data.params.ignore_nala_1_in = true;
+    nala_mock_parameter_name_omitted.data.params.ignore_nala_2_in = true;
+    nala_mock_parameter_name_omitted.data.params.ignore_nala_0_in = true;
+    nala_mock_parameter_name_omitted.data.errno_value = 0;
+    nala_mock_parameter_name_omitted.data.callback = NULL;
+}
+
+int parameter_name_omitted_mock_ignore_in_once(void)
+{
+    struct nala_instance_parameter_name_omitted_t *instance_p;
+
+    nala_mock_parameter_name_omitted.state.mode = MODE_MOCK_ONCE;
+    NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    nala_set_param_init(&instance_p->data.params.nala_1_out);
+    nala_set_param_init(&instance_p->data.params.nala_1_in);
+    instance_p->data.params.nala_1_in_assert =
+        (__typeof__(instance_p->data.params.nala_1_in_assert))nala_mock_assert_int;
+    instance_p->data.params.nala_1_out_copy = NULL;
+    nala_set_param_init(&instance_p->data.params.nala_2_out);
+    nala_set_param_init(&instance_p->data.params.nala_2_in);
+    instance_p->data.params.nala_2_in_assert =
+        (__typeof__(instance_p->data.params.nala_2_in_assert))nala_mock_assert_pointer;
+    instance_p->data.params.nala_2_out_copy = NULL;
+    instance_p->data.params.nala_1 = NULL;
+    instance_p->data.params.ignore_nala_1_in = true;
+    instance_p->data.params.nala_2 = NULL;
+    instance_p->data.params.ignore_nala_2_in = true;
+    instance_p->data.params.ignore_nala_0_in = true;
+    instance_p->data.errno_value = 0;
+    instance_p->data.callback = NULL;
+    NALA_INSTANCES_APPEND(nala_mock_parameter_name_omitted.instances,
+                          instance_p);
+
+    return (instance_p->handle);
+}
+
+void parameter_name_omitted_mock_set_errno(int errno_value)
+{
+    nala_get_data_parameter_name_omitted()->errno_value = errno_value;
+}
+
+void parameter_name_omitted_mock_set_callback(void (*callback)(int nala_0, int *nala_1, void ***nala_2))
+{
+    nala_get_data_parameter_name_omitted()->callback = callback;
+}
+
+struct nala_parameter_name_omitted_params_t *parameter_name_omitted_mock_get_params_in(int handle)
+{
+    struct nala_instance_parameter_name_omitted_t *instance_p;
+
+    NALA_INSTANCES_FIND_USED(nala_mock_parameter_name_omitted.instances, &instance_p, handle);
+
+    if (instance_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "parameter_name_omitted() has not been called yet for given mock "
+                "handle. No parameters available.\n"));
+    }
+
+    return (&instance_p->data.params_in);
+}
+
+void parameter_name_omitted_mock_ignore_nala_0_in(void)
+{
+    nala_get_params_parameter_name_omitted()->ignore_nala_0_in = true;
+}
+
+void parameter_name_omitted_mock_set_nala_1_in(int *buf_p, size_t size)
+{
+    nala_set_param_buf(&nala_get_params_parameter_name_omitted()->nala_1_in,
+                       (const void *)(uintptr_t)buf_p,
+                       size);
+}
+
+void parameter_name_omitted_mock_set_nala_1_in_assert(void (*callback)(int *actual_p, int *expected_p, size_t size))
+{
+    struct nala_params_parameter_name_omitted_t *nala_params_p;
+
+    nala_params_p = nala_get_params_parameter_name_omitted();
+
+    if (nala_params_p->nala_1_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "parameter_name_omitted_mock_set_nala_1_in() must be called "
+                "before parameter_name_omitted_mock_set_nala_1_in_assert().\n"));
+    }
+
+    nala_params_p->nala_1_in_assert = callback;
+}
+
+void parameter_name_omitted_mock_set_nala_1_in_pointer(int *nala_1)
+{
+    struct nala_params_parameter_name_omitted_t *nala_params_p;
+
+    nala_params_p = nala_get_params_parameter_name_omitted();
+    nala_params_p->ignore_nala_1_in = false;
+    nala_params_p->nala_1 = nala_1;
+}
+
+void parameter_name_omitted_mock_set_nala_1_out(int *buf_p, size_t size)
+{
+    nala_set_param_buf(&nala_get_params_parameter_name_omitted()->nala_1_out,
+                       (const void *)(uintptr_t)buf_p,
+                       size);
+}
+
+void parameter_name_omitted_mock_set_nala_1_out_copy(void (*callback)(int *dst_p, int *src_p, size_t size))
+{
+    struct nala_params_parameter_name_omitted_t *nala_params_p;
+
+    nala_params_p = nala_get_params_parameter_name_omitted();
+
+    if (nala_params_p->nala_1_out.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "parameter_name_omitted_mock_set_nala_1_out() must be called "
+                "before parameter_name_omitted_mock_set_nala_1_out_copy().\n"));
+    }
+
+    nala_params_p->nala_1_out_copy = callback;
+}
+
+void parameter_name_omitted_mock_set_nala_2_in(void ***buf_p, size_t size)
+{
+    nala_set_param_buf(&nala_get_params_parameter_name_omitted()->nala_2_in,
+                       (const void *)(uintptr_t)buf_p,
+                       size);
+}
+
+void parameter_name_omitted_mock_set_nala_2_in_assert(void (*callback)(void ***actual_p, void ***expected_p, size_t size))
+{
+    struct nala_params_parameter_name_omitted_t *nala_params_p;
+
+    nala_params_p = nala_get_params_parameter_name_omitted();
+
+    if (nala_params_p->nala_2_in.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "parameter_name_omitted_mock_set_nala_2_in() must be called "
+                "before parameter_name_omitted_mock_set_nala_2_in_assert().\n"));
+    }
+
+    nala_params_p->nala_2_in_assert = callback;
+}
+
+void parameter_name_omitted_mock_set_nala_2_in_pointer(void ***nala_2)
+{
+    struct nala_params_parameter_name_omitted_t *nala_params_p;
+
+    nala_params_p = nala_get_params_parameter_name_omitted();
+    nala_params_p->ignore_nala_2_in = false;
+    nala_params_p->nala_2 = nala_2;
+}
+
+void parameter_name_omitted_mock_set_nala_2_out(void ***buf_p, size_t size)
+{
+    nala_set_param_buf(&nala_get_params_parameter_name_omitted()->nala_2_out,
+                       (const void *)(uintptr_t)buf_p,
+                       size);
+}
+
+void parameter_name_omitted_mock_set_nala_2_out_copy(void (*callback)(void ***dst_p, void ***src_p, size_t size))
+{
+    struct nala_params_parameter_name_omitted_t *nala_params_p;
+
+    nala_params_p = nala_get_params_parameter_name_omitted();
+
+    if (nala_params_p->nala_2_out.buf_p == NULL) {
+        nala_test_failure(
+            nala_format(
+                "parameter_name_omitted_mock_set_nala_2_out() must be called "
+                "before parameter_name_omitted_mock_set_nala_2_out_copy().\n"));
+    }
+
+    nala_params_p->nala_2_out_copy = callback;
+}
+
+void parameter_name_omitted_mock_none(void)
+{
+    CHECK_NO_INSTANCES(nala_mock_parameter_name_omitted);
+    nala_mock_parameter_name_omitted.state.mode = MODE_NONE;
+    nala_traceback(&nala_mock_parameter_name_omitted.data.traceback);
+}
+
+void parameter_name_omitted_mock_implementation(void (*implementation)(int nala_0, int *nala_1, void ***nala_2))
+{
+    CHECK_NO_INSTANCES(nala_mock_parameter_name_omitted);
+    nala_mock_parameter_name_omitted.state.mode = MODE_IMPLEMENTATION;
+    nala_mock_parameter_name_omitted.data.implementation = implementation;
+    nala_traceback(&nala_mock_parameter_name_omitted.data.traceback);
+}
+
+void parameter_name_omitted_mock_real(void)
+{
+    CHECK_NO_INSTANCES(nala_mock_parameter_name_omitted);
+    nala_mock_parameter_name_omitted.state.mode = MODE_REAL;
+    nala_traceback(&nala_mock_parameter_name_omitted.data.traceback);
+}
+
+void parameter_name_omitted_mock_real_once(void)
+{
+    struct nala_instance_parameter_name_omitted_t *instance_p;
+
+    nala_mock_parameter_name_omitted.state.mode = MODE_MOCK_ONCE;
+    NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_REAL);
+    NALA_INSTANCES_APPEND(nala_mock_parameter_name_omitted.instances,
+                          instance_p);
+}
+
+void parameter_name_omitted_mock_suspend(void)
+{
+    nala_state_suspend(&nala_mock_parameter_name_omitted.state);
+}
+
+void parameter_name_omitted_mock_resume(void)
+{
+    nala_state_resume(&nala_mock_parameter_name_omitted.state);
+}
+
+void parameter_name_omitted_mock_reset(void)
+{
+    struct nala_instance_parameter_name_omitted_t *current_p;
+    struct nala_instance_parameter_name_omitted_t *tmp_p;
+
+    NALA_STATE_RESET(nala_mock_parameter_name_omitted, current_p, tmp_p);
+}
+
+void parameter_name_omitted_mock_assert_completed(void)
+{
+    if (nala_mock_parameter_name_omitted.instances.length != 0) {
+        nala_test_failure(
+            nala_format_mock_traceback(
+                nala_format(
+                    "Mocked parameter_name_omitted() called fewer times than "
+                    "expected. %d call(s) missing.\n\n",
+                    nala_mock_parameter_name_omitted.instances.length),
+                &nala_mock_parameter_name_omitted.instances.head_p->data.traceback));
     }
 }
 

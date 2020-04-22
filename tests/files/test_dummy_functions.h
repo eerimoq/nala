@@ -59,5 +59,6 @@ union union_type union_param_and_return_type(union union_type arg);
 struct_param_type typedef_struct_param_and_return_type(struct_param_type arg);
 union_type typedef_union_param_and_return_type(union_type arg);
 int double_pointer(int **value_pp);
+void parameter_name_omitted(int, int *, void ***);
 
 #endif

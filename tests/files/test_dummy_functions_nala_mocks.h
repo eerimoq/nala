@@ -785,6 +785,41 @@ void output_message_mock_resume(void);
 void output_message_mock_reset(void);
 void output_message_mock_assert_completed(void);
 
+// NALA_DECLARATION parameter_name_omitted
+
+struct nala_parameter_name_omitted_params_t {
+    int nala_0;
+    int *nala_1;
+    void ***nala_2;
+};
+
+void parameter_name_omitted_mock(int nala_0);
+int parameter_name_omitted_mock_once(int nala_0);
+void parameter_name_omitted_mock_ignore_in(void);
+int parameter_name_omitted_mock_ignore_in_once(void);
+void parameter_name_omitted_mock_set_errno(int errno_value);
+void parameter_name_omitted_mock_set_callback(void (*callback)(int nala_0, int *nala_1, void ***nala_2));
+struct nala_parameter_name_omitted_params_t *parameter_name_omitted_mock_get_params_in(int handle);
+void parameter_name_omitted_mock_ignore_nala_0_in(void);
+void parameter_name_omitted_mock_set_nala_1_in(int *buf_p, size_t size);
+void parameter_name_omitted_mock_set_nala_1_in_assert(void (*callback)(int *actual_p, int *expected_p, size_t size));
+void parameter_name_omitted_mock_set_nala_1_in_pointer(int *nala_1);
+void parameter_name_omitted_mock_set_nala_1_out(int *buf_p, size_t size);
+void parameter_name_omitted_mock_set_nala_1_out_copy(void (*callback)(int *dst_p, int *src_p, size_t size));
+void parameter_name_omitted_mock_set_nala_2_in(void ***buf_p, size_t size);
+void parameter_name_omitted_mock_set_nala_2_in_assert(void (*callback)(void ***actual_p, void ***expected_p, size_t size));
+void parameter_name_omitted_mock_set_nala_2_in_pointer(void ***nala_2);
+void parameter_name_omitted_mock_set_nala_2_out(void ***buf_p, size_t size);
+void parameter_name_omitted_mock_set_nala_2_out_copy(void (*callback)(void ***dst_p, void ***src_p, size_t size));
+void parameter_name_omitted_mock_none(void);
+void parameter_name_omitted_mock_implementation(void (*implementation)(int nala_0, int *nala_1, void ***nala_2));
+void parameter_name_omitted_mock_real(void);
+void parameter_name_omitted_mock_real_once(void);
+void parameter_name_omitted_mock_suspend(void);
+void parameter_name_omitted_mock_resume(void);
+void parameter_name_omitted_mock_reset(void);
+void parameter_name_omitted_mock_assert_completed(void);
+
 // NALA_DECLARATION pipe
 
 struct nala_pipe_params_t {
