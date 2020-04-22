@@ -11,6 +11,7 @@ from pycparser.c_parser import CParser
 
 
 class IncludeDirective(NamedTuple):
+
     path: str
     system: bool
 
@@ -44,11 +45,13 @@ class IncludeDirective(NamedTuple):
 
 
 class MockedFunction(NamedTuple):
+
     name: str
     declaration: c_ast.FuncDecl
 
 
 class Token(NamedTuple):
+
     type: str
     value: str
     span: Tuple[int, int]
@@ -147,16 +150,28 @@ PRIMITIVE_TYPES = [
     'signed long int',
     'unsigned long',
     'unsigned long int',
+    'long unsigned int',
     'long long',
     'long long int',
     'signed long long',
     'signed long long int',
     'unsigned long long',
     'unsigned long long int',
+    'long long unsigned int',
     'float',
     'double',
     'long double'
 ]
+
+
+class PrimitiveType(NamedTuple):
+
+    name: str
+
+
+class VoidType(NamedTuple):
+
+    pass
 
 
 class ForgivingDeclarationParser:
@@ -280,6 +295,26 @@ class ForgivingDeclarationParser:
         self.load_typedefs()
         self.load_structs()
 
+    def resolve_type(self, type_):
+        if isinstance(type_, c_ast.IdentifierType):
+            name = ' '.join(type_.names)
+
+            if name in PRIMITIVE_TYPES or name == '_Bool':
+                return PrimitiveType(name)
+            elif name == 'void':
+                return VoidType()
+            else:
+                return self.resolve_type(self.lookup_typedef(name).type)
+        elif isinstance(type_, (c_ast.Union,
+                                c_ast.Struct,
+                                c_ast.FuncDecl,
+                                c_ast.Enum)):
+            return type_
+        elif isinstance(type_, (c_ast.TypeDecl, c_ast.ArrayDecl, c_ast.PtrDecl)):
+            return self.resolve_type(type_.type)
+        else:
+            raise Exception(f'Unknown type {type_}.')
+
     def is_primitive_type(self, member):
         if member is None:
             return False
@@ -298,13 +333,26 @@ class ForgivingDeclarationParser:
         return self.is_primitive_type(self.lookup_typedef(name))
 
     def is_array(self, member):
-        if not isinstance(member.type, c_ast.ArrayDecl):
+        if isinstance(member.type, c_ast.ArrayDecl):
+            return member.type.dim is not None
+
+        try:
+            typedef = self.lookup_typedef(' '.join(member.type.type.names))
+
+            return self.is_array(typedef)
+        except AttributeError:
             return False
 
-        if member.type.dim is None:
-            return False
+    def is_pointer(self, member):
+        if isinstance(member.type, c_ast.PtrDecl):
+            return True
 
-        return True
+        try:
+            typedef = self.lookup_typedef(' '.join(member.type.type.names))
+
+            return self.is_pointer(typedef)
+        except AttributeError:
+            return False
 
     def is_struct(self, member):
         if not isinstance(member.type, c_ast.TypeDecl):
@@ -341,19 +389,21 @@ class ForgivingDeclarationParser:
 
         if self.is_array(member):
             items.append(['assert-array-eq', member.name])
-        elif self.is_primitive_type(member):
-            if member.bitsize is None:
-                items.append(['assert-eq', member.name])
-        elif self.is_struct(member):
-            if member.type.type.name is not None:
-                items.append(['assert-struct', member.name, member.type.type.name])
-            else:
-                for item in self.load_struct_members(member.type.type):
-                    item[1] = f'{member.name}.{item[1]}'
-                    items.append(item)
-        elif self.is_struct_typedef(member):
-            items.append(
-                ['assert-struct-typedef', member.name, member.type.type.names[0]])
+        elif self.is_pointer(member):
+            pass
+        else:
+            type_ = self.resolve_type(member.type)
+
+            if isinstance(type_, (PrimitiveType, c_ast.Enum)):
+                if member.bitsize is None:
+                    items.append(['assert-eq', member.name])
+            elif isinstance(type_, c_ast.Struct):
+                if type_.name is None:
+                    for item in self.load_struct_members(type_):
+                        item[1] = f'{member.name}.{item[1]}'
+                        items.append(item)
+                else:
+                    items.append(['assert-struct', member.name, type_.name])
 
         return items
 

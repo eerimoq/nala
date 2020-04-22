@@ -2,6 +2,7 @@
 #define TEST_DUMMY_FUNCTIONS_H
 
 #include <stdarg.h>
+#include <stdbool.h>
 
 typedef struct DummyStruct
 {
@@ -15,7 +16,8 @@ struct struct_param_type
 
 enum enum_param_type
 {
-    enum_param_type_a = 0
+    enum_param_type_a = 0,
+    enum_param_type_b
 };
 
 typedef enum enum_param_type enum_param_type_e;
@@ -87,6 +89,10 @@ struct nested_bar_t {
     nested_foo_2_t j;
     nested_foo_3_t k;
     nested_foo_4_t l;
+    bool m;
+    int *n_p;
+    enum enum_param_type o;
+    enum_param_type_e p;
     int (*fp)(void);
 };
 
