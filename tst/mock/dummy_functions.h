@@ -70,6 +70,7 @@ typedef struct {
 } nested_foo_2_t;
 
 typedef nested_foo_2_t nested_foo_3_t;
+typedef nested_foo_2_t *nested_foo_4_t;
 
 struct nested_bar_t {
     struct nested_foo_t c;
@@ -85,6 +86,7 @@ struct nested_bar_t {
     } i;
     nested_foo_2_t j;
     nested_foo_3_t k;
+    nested_foo_4_t l;
     int (*fp)(void);
 };
 
