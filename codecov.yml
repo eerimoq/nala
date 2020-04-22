@@ -4,6 +4,3 @@ ignore:
   - "src/subprocess.*"
   - "src/traceback.*"
   - "src/hf.*"
-
-fixes:
-  - "../../::"
