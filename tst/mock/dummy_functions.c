@@ -389,3 +389,8 @@ void my_fclose(my_file *file_p)
 {
     (void)file_p;
 }
+
+void string_pointer(char **string_pp)
+{
+    (void)string_pp;
+}

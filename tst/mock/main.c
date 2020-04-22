@@ -1845,3 +1845,25 @@ TEST(my_fclose_mock_function)
 {
     my_fclose_mock();
 }
+
+TEST(string_pointer_function)
+{
+    char string[] = "string";
+    char *string_p;
+
+    string_pointer_mock_once();
+    string_p = &string[0];
+    string_pointer_mock_set_string_pp_out(&string_p, sizeof(string_p));
+    string_p = NULL;
+    string_pointer(&string_p);
+    ASSERT_EQ(string_p, &string[0]);
+
+    string_pointer_mock_once();
+    string_p = &string[0];
+    string_pointer_mock_set_string_pp_in(&string_p, sizeof(string_p));
+    string_pointer(&string_p);
+
+    string_pointer_mock_once();
+    string_pointer_mock_set_string_pp_in_pointer(NULL);
+    string_pointer(NULL);
+}

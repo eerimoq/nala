@@ -207,5 +207,6 @@ void forward_declaration_2(apa_2_t *apa_p);
 void forward_declaration_3(banan_t *banan_p);
 void struct_declared_in_typedef(struct banan_2_t *banan_p);
 void my_fclose(my_file *file_p);
+void string_pointer(char **string_pp);
 
 #endif
