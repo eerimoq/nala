@@ -354,6 +354,8 @@ class ForgivingDeclarationParser:
             if isinstance(type_, (PrimitiveType, c_ast.Enum)):
                 if member.bitsize is None:
                     items.append(['assert-eq', member.name])
+                else:
+                    items.append(['assert-eq-bit-field', member.name, type_.name])
             elif isinstance(type_, c_ast.Struct):
                 if type_.name is None:
                     for item in self.load_struct_members(type_):

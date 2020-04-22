@@ -394,3 +394,8 @@ void string_pointer(char **string_pp)
 {
     (void)string_pp;
 }
+
+void bit_field(struct bit_field_t *value_p)
+{
+    (void)value_p;
+}

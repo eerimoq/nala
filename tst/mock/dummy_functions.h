@@ -3,6 +3,7 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef struct DummyStruct
 {
@@ -93,6 +94,7 @@ struct nested_bar_t {
     int *n_p;
     enum enum_param_type o;
     enum_param_type_e p;
+    int32_t q;
     int (*fp)(void);
 };
 
@@ -128,6 +130,12 @@ struct my_file
 {
   int flags;
 };
+
+struct bit_field_t {
+    uint32_t a : 1;
+    int b : 5;
+};
+
 
 int add(int x, int y);
 void output_message(const char *message);
@@ -208,5 +216,6 @@ void forward_declaration_3(banan_t *banan_p);
 void struct_declared_in_typedef(struct banan_2_t *banan_p);
 void my_fclose(my_file *file_p);
 void string_pointer(char **string_pp);
+void bit_field(struct bit_field_t *value_p);
 
 #endif

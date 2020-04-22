@@ -145,13 +145,15 @@ class StructAssert:
     def __init__(self, struct, struct_names, struct_typedef_names):
         self.name = struct[0]
         self.assert_eq_members = []
+        self.assert_eq_cast_members = []
         self.assert_array_eq_members = []
         self.assert_struct_members = []
-        self.assert_struct_typedef_members = []
 
         for member in struct[1]:
             if member[0] == 'assert-eq':
                 self.assert_eq_members.append(member[1])
+            elif member[0] == 'assert-eq-bit-field':
+                self.assert_eq_cast_members.append(member[1:])
             elif member[0] == 'assert-array-eq':
                 self.assert_array_eq_members.append(member[1])
             elif member[0] == 'assert-struct':
@@ -164,13 +166,15 @@ class StructTypedefAssert:
     def __init__(self, typedef, struct_names, struct_typedef_names):
         self.name = typedef[0]
         self.assert_eq_members = []
+        self.assert_eq_cast_members = []
         self.assert_array_eq_members = []
         self.assert_struct_members = []
-        self.assert_struct_typedef_members = []
 
         for member in typedef[1]:
             if member[0] == 'assert-eq':
                 self.assert_eq_members.append(member[1])
+            elif member[0] == 'assert-eq-bit-field':
+                self.assert_eq_cast_members.append(member[1:])
             elif member[0] == 'assert-array-eq':
                 self.assert_array_eq_members.append(member[1])
             elif member[0] == 'assert-struct':

@@ -1603,6 +1603,34 @@ TEST(nested_types_error_enum)
     subprocess_result_free(result_p);
 }
 
+static void nested_types_error_int32_t_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    struct nested_bar_t value;
+
+    memset(&value, 0, sizeof(value));
+
+    nested_types_mock_once();
+    nested_types_mock_set_bar_p_in(&value, sizeof(value));
+
+    value.q = 1;
+    nested_types(&value);
+}
+
+TEST(nested_types_error_int32_t)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(nested_types_error_int32_t_entry, NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types(bar_p):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)");
+
+    subprocess_result_free(result_p);
+}
+
 TEST(nested_types_pointer_not_asserted)
 {
     struct nested_bar_t value;
@@ -1866,4 +1894,60 @@ TEST(string_pointer_function)
     string_pointer_mock_once();
     string_pointer_mock_set_string_pp_in_pointer(NULL);
     string_pointer(NULL);
+}
+
+static void bit_field_error_uint32_t_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    struct bit_field_t value;
+
+    memset(&value, 0, sizeof(value));
+
+    bit_field_mock_once();
+    bit_field_mock_set_value_p_in(&value, sizeof(value));
+
+    value.a = 1;
+    bit_field(&value);
+}
+
+TEST(bit_field_error_uint32_t)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(bit_field_error_uint32_t_entry, NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked bit_field(value_p):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)");
+
+    subprocess_result_free(result_p);
+}
+
+static void bit_field_error_int_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    struct bit_field_t value;
+
+    memset(&value, 0, sizeof(value));
+
+    bit_field_mock_once();
+    bit_field_mock_set_value_p_in(&value, sizeof(value));
+
+    value.b = 2;
+    bit_field(&value);
+}
+
+TEST(bit_field_error_int)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(bit_field_error_int_entry, NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked bit_field(value_p):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "2 != 0 (0x2 != 0x0)");
+
+    subprocess_result_free(result_p);
 }
