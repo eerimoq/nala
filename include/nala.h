@@ -47,12 +47,12 @@
     NALA_ASSERT_FUNC(actual)((actual), (expected), NALA_CHECK_GE)
 
 /**
- * Assert that actual is true.
+ * Assert that given value is true.
  */
 #define ASSERT_TRUE(actual) nala_assert_true(actual)
 
 /**
- * Assert that actual is false.
+ * Assert that given value is false.
  */
 #define ASSERT_FALSE(actual) nala_assert_false(actual)
 
