@@ -225,12 +225,13 @@ class ForgivingDeclarationParser:
 
         if self.functions:
             for function in sorted(functions):
-                print(f"error: Mocked function '{function}' undeclared. Missing include?",
+                print(f"error: Mocked function '{function}' undeclared. Add "
+                      "missing include in the test file.",
                       file=sys.stderr)
 
             raise Exception(
                 'Unable to find declarations of all mocked functions. Add missing '
-                'includes to the test file.')
+                'include(s) in the test file.')
 
     @classmethod
     def tokenize(cls, source_code):

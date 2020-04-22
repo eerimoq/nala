@@ -94,17 +94,24 @@ class CommandLineTest(unittest.TestCase):
                 with self.assertRaises(Exception) as cm:
                     nala.cli.main()
 
-        self.assertEqual(stderr.getvalue(),
-                         "error: Mocked function 'bar' undeclared. Missing include?\n"
-                         "error: Mocked function 'fie' undeclared. Missing include?\n"
-                         "error: Mocked function 'foo' undeclared. Missing include?\n"
-                         "error: Mocked function 'fum' undeclared. Missing include?\n"
-                         "error: Mocked function 'gam' undeclared. Missing include?\n"
-                         "error: Mocked function 'hit' undeclared. Missing include?\n")
+        self.assertEqual(
+            stderr.getvalue(),
+            "error: Mocked function 'bar' undeclared. Add missing include in "
+            "the test file.\n"
+            "error: Mocked function 'fie' undeclared. Add missing include in "
+            "the test file.\n"
+            "error: Mocked function 'foo' undeclared. Add missing include in "
+            "the test file.\n"
+            "error: Mocked function 'fum' undeclared. Add missing include in "
+            "the test file.\n"
+            "error: Mocked function 'gam' undeclared. Add missing include in "
+            "the test file.\n"
+            "error: Mocked function 'hit' undeclared. Add missing include in "
+            "the test file.\n")
         self.assertEqual(
             str(cm.exception),
             'Unable to find declarations of all mocked functions. Add '
-            'missing includes to the test file.')
+            'missing include(s) in the test file.')
 
     def test_generate_mocks_open_no_real_variadic(self):
         argv = [
