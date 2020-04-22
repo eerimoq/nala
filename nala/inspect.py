@@ -315,23 +315,6 @@ class ForgivingDeclarationParser:
         else:
             raise Exception(f'Unknown type {type_}.')
 
-    def is_primitive_type(self, member):
-        if member is None:
-            return False
-
-        if not isinstance(member.type, c_ast.TypeDecl):
-            return False
-
-        if not isinstance(member.type.type, c_ast.IdentifierType):
-            return False
-
-        name = ' '.join(member.type.type.names)
-
-        if name in PRIMITIVE_TYPES:
-            return True
-
-        return self.is_primitive_type(self.lookup_typedef(name))
-
     def is_array(self, member):
         if isinstance(member.type, c_ast.ArrayDecl):
             return member.type.dim is not None
@@ -353,32 +336,6 @@ class ForgivingDeclarationParser:
             return self.is_pointer(typedef)
         except AttributeError:
             return False
-
-    def is_struct(self, member):
-        if not isinstance(member.type, c_ast.TypeDecl):
-            return False
-
-        if not isinstance(member.type.type, c_ast.Struct):
-            return False
-
-        return True
-
-    def is_struct_typedef(self, member):
-        if member is None:
-            return False
-
-        if self.is_struct(member):
-            return True
-
-        if not isinstance(member.type, c_ast.TypeDecl):
-            return False
-
-        if not isinstance(member.type.type, c_ast.IdentifierType):
-            return False
-
-        member = self.lookup_typedef(member.type.type.names[0])
-
-        return self.is_struct_typedef(member)
 
     def lookup_typedef(self, name):
         if name in self.typedefs:
