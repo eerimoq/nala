@@ -1,3 +1,4 @@
+#include <sys/types.h>
 #include "nala.h"
 #include "subprocess.h"
 
@@ -48,6 +49,8 @@ TEST(assert_eq)
     ASSERT_EQ(const_string, "bar");
     ASSERT_EQ("foo", string);
     ASSERT_EQ("bar", const_string);
+    ASSERT_EQ((size_t)1, (size_t)1);
+    ASSERT_EQ((ssize_t)1, (ssize_t)1);
 }
 
 TEST(assert_ne)
