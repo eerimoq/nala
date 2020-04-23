@@ -442,6 +442,15 @@ error reporting.
 
 Read more about sanitizers here: https://en.wikipedia.org/wiki/AddressSanitizer
 
+Other unit test frameworks
+==========================
+
+Other C unit test frameworks with similar feature set as Nala.
+
+- `CMock`_ + `Unity`_
+
+- `cmocka`_
+
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
 
@@ -468,3 +477,9 @@ Read more about sanitizers here: https://en.wikipedia.org/wiki/AddressSanitizer
 .. _include/nala.h: https://github.com/eerimoq/nala/blob/master/include/nala.h
 
 .. _GDB: https://www.gnu.org/software/gdb/
+
+.. _CMock: https://github.com/ThrowTheSwitch/CMock
+
+.. _Unity: https://github.com/ThrowTheSwitch/Unity
+
+.. _cmocka: https://cmocka.org/
