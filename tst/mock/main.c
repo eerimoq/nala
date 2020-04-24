@@ -2013,3 +2013,11 @@ TEST(const_pointer_data_function)
     a = 1;
     const_pointer_data(&a);
 }
+
+/* ToDo: Should work! */
+
+/* TEST(string_typedef_function) */
+/* { */
+/*     string_typedef_mock_once("hello"); */
+/*     string_typedef("hello"); */
+/* } */

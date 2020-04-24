@@ -424,3 +424,8 @@ void const_pointer_data(int * const value_p)
 {
     (void)value_p;
 }
+
+void string_typedef(string_t string)
+{
+    (void)string;
+}
