@@ -1951,3 +1951,39 @@ TEST(bit_field_error_int)
 
     subprocess_result_free(result_p);
 }
+
+TEST(const_parameter_function)
+{
+    const_parameter_mock_once(1);
+    const_parameter(1);
+}
+
+static void const_parameter_function_error_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    const_parameter_mock_once(1);
+    const_parameter(2);
+}
+
+TEST(const_parameter_function_error)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(const_parameter_function_error_entry,
+                                      NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked const_parameter(value):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "2 != 1 (0x2 != 0x1)");
+
+    subprocess_result_free(result_p);
+}
+
+/* ToDo: Support this! */
+
+/* TEST(const_typedef_parameter_function) */
+/* { */
+/*     const_typedef_parameter_mock_once(1); */
+/*     const_typedef_parameter(1); */
+/* } */

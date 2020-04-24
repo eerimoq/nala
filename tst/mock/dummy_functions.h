@@ -138,6 +138,8 @@ struct bit_field_t {
     int b : 5;
 };
 
+typedef const int cint;
+
 int add(int x, int y);
 void output_message(const char *message);
 void keep_args_output_message(const char *message);
@@ -219,5 +221,7 @@ void struct_declared_in_typedef(struct banan_2_t *banan_p);
 void my_fclose(my_file *file_p);
 void string_pointer(char **string_pp);
 void bit_field(struct bit_field_t *value_p);
+void const_parameter(const int value);
+void const_typedef_parameter(cint value);
 
 #endif

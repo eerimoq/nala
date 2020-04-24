@@ -228,6 +228,12 @@ class FunctionMock:
             if isinstance(param.type, c_ast.ArrayDecl):
                 param = decl(param.name, c_ast.PtrDecl([], param.type.type))
 
+            if 'const' in param.type.quals:
+                param = deepcopy(param)
+                param.type.quals = [qual
+                                    for qual in param.type.quals
+                                    if qual != 'const']
+
             self.params_struct.append(param)
 
         self.forward_args = ', '.join(param.name for param in self.params_struct)

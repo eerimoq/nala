@@ -399,3 +399,13 @@ void bit_field(struct bit_field_t *value_p)
 {
     (void)value_p;
 }
+
+void const_parameter(const int value)
+{
+    (void)value;
+}
+
+void const_typedef_parameter(cint value)
+{
+    (void)value;
+}
