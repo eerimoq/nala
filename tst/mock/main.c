@@ -1987,3 +1987,29 @@ TEST(const_parameter_function_error)
 /*     const_typedef_parameter_mock_once(1); */
 /*     const_typedef_parameter(1); */
 /* } */
+
+TEST(const_struct_pointer_function)
+{
+    struct banan_2_t banan;
+
+    const_struct_pointer_mock_once();
+    const_struct_pointer(&banan);
+}
+
+TEST(const_typedef_struct_pointer_function)
+{
+    banan_3_t banan;
+
+    const_typedef_struct_pointer_mock_once();
+    const_typedef_struct_pointer(&banan);
+}
+
+TEST(const_pointer_data_function)
+{
+    int a;
+
+    const_pointer_data_mock_once();
+
+    a = 1;
+    const_pointer_data(&a);
+}

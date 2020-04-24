@@ -223,5 +223,8 @@ void string_pointer(char **string_pp);
 void bit_field(struct bit_field_t *value_p);
 void const_parameter(const int value);
 void const_typedef_parameter(cint value);
+void const_struct_pointer(const struct banan_2_t *banan_p);
+void const_typedef_struct_pointer(const banan_3_t *banan_p);
+void const_pointer_data(int * const value_p);
 
 #endif
