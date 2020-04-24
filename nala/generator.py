@@ -219,13 +219,17 @@ class FunctionMock:
         else:
             self.has_implementation = True
 
-        self.params_struct = [
-            decl(param.name, c_ast.PtrDecl([], param.type.type))
-            if isinstance(param.type, c_ast.ArrayDecl)
-            else param
-            for param in self.func_params
-            if not is_ellipsis(param) and param.name
-        ]
+        self.params_struct = []
+
+        for param in self.func_params:
+            if is_ellipsis(param) or not param.name:
+                continue
+
+            if isinstance(param.type, c_ast.ArrayDecl):
+                param = decl(param.name, c_ast.PtrDecl([], param.type.type))
+
+            self.params_struct.append(param)
+
         self.forward_args = ', '.join(param.name for param in self.params_struct)
 
         if self.is_variadic_func:
