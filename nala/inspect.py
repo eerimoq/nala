@@ -202,6 +202,11 @@ class PrimitiveType(NamedTuple):
     name: str
 
 
+class VaList(NamedTuple):
+
+    pass
+
+
 class VoidType(NamedTuple):
 
     pass
@@ -296,47 +301,49 @@ class ForgivingDeclarationParser:
         self.load_typedefs()
         self.load_structs()
 
-    def resolve_type(self, type_):
+    def resolve_type(self, type_, prefix=None):
+        if prefix is None:
+            prefix = []
+
         if isinstance(type_, c_ast.IdentifierType):
             name = ' '.join(type_.names)
 
             if name in PRIMITIVE_TYPES or name == '_Bool':
-                return PrimitiveType(name)
+                return (PrimitiveType(name), prefix)
+            elif name == '__builtin_va_list':
+                return (VaList(), prefix)
             elif name == 'void':
-                return VoidType()
+                return (VoidType(), prefix)
             else:
-                return self.resolve_type(self.lookup_typedef(name).type)
+                return self.resolve_type(self.lookup_typedef(name).type, prefix)
         elif isinstance(type_, (c_ast.Union,
                                 c_ast.Struct,
                                 c_ast.FuncDecl,
                                 c_ast.Enum)):
-            return type_
-        elif isinstance(type_, (c_ast.TypeDecl, c_ast.ArrayDecl, c_ast.PtrDecl)):
-            return self.resolve_type(type_.type)
+            return type_, prefix
+        elif isinstance(type_, c_ast.TypeDecl):
+            return self.resolve_type(type_.type, prefix)
+        elif isinstance(type_, c_ast.ArrayDecl):
+            if type_.dim is None:
+                return self.resolve_type(type_.type, prefix + ['[]'])
+            else:
+                return self.resolve_type(type_.type, prefix + ['[size]'])
+        elif isinstance(type_, c_ast.PtrDecl):
+            return self.resolve_type(type_.type, prefix + ['*'])
         else:
             raise Exception(f'Unknown type {type_}.')
 
-    def is_array(self, member):
-        if isinstance(member.type, c_ast.ArrayDecl):
-            return member.type.dim is not None
-
-        try:
-            typedef = self.lookup_typedef(' '.join(member.type.type.names))
-
-            return self.is_array(typedef)
-        except AttributeError:
-            return False
-
-    def is_pointer(self, member):
-        if isinstance(member.type, c_ast.PtrDecl):
+    def is_array(self, prefix):
+        if self.is_fixed_array(prefix):
             return True
+        
+        return '[]' in prefix;
 
-        try:
-            typedef = self.lookup_typedef(' '.join(member.type.type.names))
+    def is_fixed_array(self, prefix):
+        return '[size]' in prefix;
 
-            return self.is_pointer(typedef)
-        except AttributeError:
-            return False
+    def is_pointer(self, prefix):
+        return '*' in prefix
 
     def lookup_typedef(self, name):
         if name in self.typedefs:
@@ -344,26 +351,24 @@ class ForgivingDeclarationParser:
 
     def load_struct_member(self, member):
         items = []
+        type_, prefix = self.resolve_type(member.type)
 
-        if self.is_array(member):
+        if self.is_fixed_array(prefix):
             items.append(['assert-array-eq', member.name])
-        elif self.is_pointer(member):
+        elif self.is_pointer(prefix):
             pass
-        else:
-            type_ = self.resolve_type(member.type)
-
-            if isinstance(type_, (PrimitiveType, c_ast.Enum)):
-                if member.bitsize is None:
-                    items.append(['assert-eq', member.name])
-                else:
-                    items.append(['assert-eq-bit-field', member.name, type_.name])
-            elif isinstance(type_, c_ast.Struct):
-                if type_.name is None:
-                    for item in self.load_struct_members(type_):
-                        item[1] = f'{member.name}.{item[1]}'
-                        items.append(item)
-                else:
-                    items.append(['assert-struct', member.name, type_.name])
+        elif isinstance(type_, (PrimitiveType, c_ast.Enum)):
+            if member.bitsize is None:
+                items.append(['assert-eq', member.name])
+            else:
+                items.append(['assert-eq-bit-field', member.name, type_.name])
+        elif isinstance(type_, c_ast.Struct):
+            if type_.name is None:
+                for item in self.load_struct_members(type_):
+                    item[1] = f'{member.name}.{item[1]}'
+                    items.append(item)
+            else:
+                items.append(['assert-struct', member.name, type_.name])
 
         return items
 

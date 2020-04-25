@@ -2014,10 +2014,32 @@ TEST(const_pointer_data_function)
     const_pointer_data(&a);
 }
 
-/* ToDo: Should work! */
+TEST(string_typedef_function)
+{
+    string_typedef_mock_once("hello");
+    string_typedef("hello");
+}
 
-/* TEST(string_typedef_function) */
-/* { */
-/*     string_typedef_mock_once("hello"); */
-/*     string_typedef("hello"); */
-/* } */
+static void string_typedef_error_message_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    string_typedef_mock_once("hello");
+    string_typedef("HELLO");
+}
+
+TEST(string_typedef_error_message)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(string_typedef_error_message_entry, NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked string_typedef(string):");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "     - "B("1")" |  "B("hello"));
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "     "CR("+ ")CBR("1")CR(" |  ")CBR("HELLO"));
+
+    subprocess_result_free(result_p);
+}

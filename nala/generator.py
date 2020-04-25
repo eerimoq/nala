@@ -10,6 +10,8 @@ from pycparser import c_ast
 from pycparser.c_generator import CGenerator
 
 from .inspect import PRIMITIVE_TYPES
+from .inspect import VaList
+from .inspect import PrimitiveType
 from . import __version__
 
 
@@ -207,7 +209,21 @@ class FunctionMock:
         self.func_decl = self.function.declaration.type
         self.func_params = self.func_decl.args.params if self.func_decl.args else []
         self.assign_names_to_unnamed_params(self.func_params)
-        self.is_variadic_func = is_variadic_func(self.func_params)
+        self.is_variadic_func = False
+        self.params = []
+
+        for param in self.func_params:
+            if is_ellipsis(param):
+                self.is_variadic_func = True
+                break
+
+            if param.name is None:
+                break
+
+            type_, prefix = self.generator.parser.resolve_type(param.type)
+            self.params.append((param, type_, prefix))
+
+        # print(self.params)
 
         if has_implementation is not None:
             self.has_implementation = has_implementation
@@ -311,32 +327,24 @@ class FunctionMock:
         self.non_pointer_params = []
         self.ignore_params = []
 
-        for param in self.func_params:
-            if is_ellipsis(param):
-                continue
-            elif self.is_struct(param):
-                continue
-            elif self.is_union(param):
-                continue
-            elif self.is_va_list(param):
-                continue
-
-            if not param.name:
+        for param, type_, prefix in self.params:
+            if isinstance(type_, (c_ast.Struct, c_ast.Union)):
+                if not self.is_pointer_or_array(prefix):
+                    continue
+            elif isinstance(type_, VaList):
                 continue
 
             self.instance_members.append(bool_param(f'ignore_{param.name}_in'))
 
-            if self.is_char_pointer(param):
-                self.char_pointer_params.append(param)
-            elif self.is_pointer(param):
-                self.pointer_params.append(param)
+            if self.is_pointer_or_array(prefix):
+                if self.is_char_pointer(type_, prefix):
+                    self.char_pointer_params.append(param)
+                    self.ignore_params.append(param.name)
+                else:
+                    self.pointer_params.append(param)
             else:
                 self.non_pointer_params.append(param)
-
-            if self.is_char_pointer_or_non_pointer(param):
                 self.ignore_params.append(param.name)
-
-            if not self.is_pointer(param):
                 continue
 
             param_buf = self.rename_param(param, 'buf_p')
@@ -358,7 +366,7 @@ class FunctionMock:
                                     param_expected,
                                     param_dst,
                                     param_src,
-                                    self.find_check_function(param)))
+                                    self.find_check_function(param, type_, prefix)))
 
     def assign_names_to_unnamed_params(self, params):
         for i, param in enumerate(params):
@@ -376,10 +384,10 @@ class FunctionMock:
 
             param.declname = name
 
-    def find_check_function(self, param):
+    def find_check_function(self, param, type_, prefix):
         if self.is_pointer_pointer(param):
             return f'nala_mock_assert_pointer'
-        elif self.is_char_pointer(param):
+        elif self.is_char_pointer(type_, prefix):
             return 'nala_mock_assert_in_string'
         elif self.is_primitive_type_pointer(param):
             return f'nala_mock_assert_{"_".join(param.type.type.type.names)}'
@@ -465,30 +473,14 @@ class FunctionMock:
 
         return False
 
-    def is_char_pointer(self, param):
-        if is_ellipsis(param):
-            return False
-        elif isinstance(param.type, c_ast.PtrDecl):
-            if isinstance(param.type.type, (c_ast.FuncDecl, c_ast.PtrDecl)):
-                return False
-            elif isinstance(param.type.type.type, c_ast.Struct):
-                return False
-            elif param.type.type.type.names[0] == 'char':
-                return True
-            else:
-                return False
-        else:
+    def is_char_pointer(self, type_, prefix):
+        if not isinstance(type_, PrimitiveType):
             return False
 
-    def is_char_pointer_or_non_pointer(self, param):
-        if is_ellipsis(param):
+        if type_.name != 'char':
             return False
-        elif self.is_char_pointer(param):
-            return True
-        elif self.is_pointer(param):
-            return False
-        else:
-            return True
+
+        return prefix == ['*']
 
     def is_void(self, param):
         if is_ellipsis(param):
@@ -516,6 +508,14 @@ class FunctionMock:
             pass
 
         return False
+
+    def is_pointer_or_array(self, prefix):
+        if self.generator.parser.is_pointer(prefix):
+            return True
+        elif self.generator.parser.is_array(prefix):
+            return True
+        else:
+            return False
 
     def is_enum(self, param):
         return isinstance(param.type.type, c_ast.Enum)
@@ -585,35 +585,28 @@ class FunctionMock:
         return self.generator.lookup_typedef(name)
 
     def create_mock_params(self):
-        once_params = []
-        variable_arguments_params = []
+        mock_params = []
 
-        for param in self.func_params:
-            if self.is_void(param):
-                continue
-            elif self.is_struct(param):
-                continue
-            elif self.is_union(param):
-                continue
-            elif self.is_va_list(param):
-                continue
-            elif self.is_char_pointer_or_non_pointer(param):
-                once_params.append(param)
-            elif is_ellipsis(param):
-                variable_arguments_params.append(decl(
-                    None,
-                    c_ast.PtrDecl([],
-                                  c_ast.TypeDecl('vafmt_p',
-                                                 ['const'],
-                                                 c_ast.IdentifierType(['char'])))))
-                variable_arguments_params.append(param)
+        for param, type_, prefix in self.params:
+            if self.is_char_pointer(type_, prefix):
+                mock_params.append(param)
+            elif isinstance(type_, (PrimitiveType, c_ast.Enum)):
+                if not self.is_pointer_or_array(prefix):
+                    mock_params.append(param)
 
         if not self.is_void(self.return_value_decl):
-            once_params.append(self.return_value_decl)
+            mock_params.append(self.return_value_decl)
 
-        once_params += variable_arguments_params
+        if self.is_variadic_func:
+            mock_params.append(decl(
+                None,
+                c_ast.PtrDecl([],
+                              c_ast.TypeDecl('vafmt_p',
+                                             ['const'],
+                                             c_ast.IdentifierType(['char'])))))
+            mock_params.append(decl(None, c_ast.EllipsisParam()))
 
-        return once_params
+        return mock_params
 
 
 class FileGenerator:
