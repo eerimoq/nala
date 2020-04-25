@@ -216,8 +216,7 @@ class FunctionMock:
             expanded_param = deepcopy(param)
             expanded_param.type = self.generator.parser.expand_type(
                 expanded_param.type)
-            type_ = self.generator.parser.resolve_type(param.type)[0]
-            self.params.append((param, expanded_param, type_))
+            self.params.append((param, expanded_param))
 
         if has_implementation is not None:
             self.has_implementation = has_implementation
@@ -231,12 +230,11 @@ class FunctionMock:
 
         self.params_struct = []
 
-        for param in self.func_params:
-            if is_ellipsis(param) or not param.name:
-                continue
-
-            if isinstance(param.type, c_ast.ArrayDecl):
-                param = decl(param.name, c_ast.PtrDecl([], param.type.type))
+        for param, expanded_param in self.params:
+            if self.is_array(expanded_param.type):
+                param = deepcopy(expanded_param)
+                param.type = self.convert_array_to_pointer(param.type)
+                param = self.rename_param(param, param.name)
 
             if 'const' in param.type.quals:
                 param = deepcopy(param)
@@ -321,17 +319,16 @@ class FunctionMock:
         self.non_pointer_params = []
         self.ignore_params = []
 
-        for param, expanded_param, _ in self.params:
-            if isinstance(expanded_param.type, (c_ast.Struct, c_ast.Union)):
+        for param, expanded_param in self.params:
+            if self.is_struct_or_union(expanded_param.type):
                 continue
-            elif isinstance(expanded_param.type, c_ast.IdentifierType):
-                if expanded_param.type.names[0] == '__builtin_va_list':
-                    continue
+            elif self.is_va_list(expanded_param.type):
+                continue
 
             self.instance_members.append(bool_param(f'ignore_{param.name}_in'))
 
-            if isinstance(expanded_param.type, (c_ast.PtrDecl, c_ast.ArrayDecl)):
-                if self.is_char_pointer(expanded_param):
+            if self.is_pointer_or_array(expanded_param.type):
+                if self.is_char_pointer(expanded_param.type):
                     self.char_pointer_params.append(param)
                     self.ignore_params.append(param.name)
                 else:
@@ -362,6 +359,12 @@ class FunctionMock:
                                     param_src,
                                     self.find_check_function(param, expanded_param)))
 
+    def convert_array_to_pointer(self, type_):
+        if isinstance(type_, c_ast.ArrayDecl):
+            return c_ast.PtrDecl([], type_.type)
+
+        return self.convert_array_to_pointer(type_.type)
+
     def assign_names_to_unnamed_params(self, params):
         for i, param in enumerate(params):
             if not isinstance(param, c_ast.Typename):
@@ -381,7 +384,7 @@ class FunctionMock:
     def find_check_function(self, param, expanded_param):
         if self.is_pointer_pointer(param):
             return f'nala_mock_assert_pointer'
-        elif self.is_char_pointer(expanded_param):
+        elif self.is_char_pointer(expanded_param.type):
             return 'nala_mock_assert_in_string'
         elif self.is_primitive_type_pointer(param):
             return f'nala_mock_assert_{"_".join(param.type.type.type.names)}'
@@ -395,6 +398,42 @@ class FunctionMock:
                 return f'nala_mock_assert_struct_{param.type.type.type.name}'
 
         return 'nala_assert_memory'
+
+    def is_struct_or_union(self, type_):
+        if isinstance(type_, (c_ast.Struct, c_ast.Union)):
+            return True
+
+        if isinstance(type_, c_ast.TypeDecl):
+            return self.is_struct_or_union(type_.type)
+
+        return False
+
+    def is_va_list(self, type_):
+        if isinstance(type_, c_ast.IdentifierType):
+            return type_.names[0] == '__builtin_va_list'
+
+        if isinstance(type_, c_ast.TypeDecl):
+            return self.is_va_list(type_.type)
+
+        return False
+
+    def is_pointer_or_array(self, type_):
+        if isinstance(type_, (c_ast.PtrDecl, c_ast.ArrayDecl)):
+            return True
+
+        if isinstance(type_, c_ast.TypeDecl):
+            return self.is_pointer_or_array(type_.type)
+
+        return False
+
+    def is_array(self, type_):
+        if isinstance(type_, c_ast.ArrayDecl):
+            return True
+
+        if isinstance(type_, c_ast.TypeDecl):
+            return self.is_array(type_.type)
+
+        return False
 
     def is_primitive_type_pointer(self, param):
         if not isinstance(param.type, c_ast.PtrDecl):
@@ -451,14 +490,23 @@ class FunctionMock:
 
         return param
 
-    def is_char_pointer(self, expanded_param):
-        if not isinstance(expanded_param.type, c_ast.PtrDecl):
-            return False
+    def is_char_pointer_char(self, type_):
+        if isinstance(type_, c_ast.IdentifierType):
+            return 'char' in type_.names
 
-        if not isinstance(expanded_param.type.type, c_ast.IdentifierType):
-            return False
+        if isinstance(type_, c_ast.TypeDecl):
+            return self.is_char_pointer_char(type_.type)
 
-        return 'char' in expanded_param.type.type.names
+        return False
+
+    def is_char_pointer(self, type_):
+        if isinstance(type_, c_ast.TypeDecl):
+            return self.is_char_pointer(type_.type)
+
+        if isinstance(type_, c_ast.PtrDecl):
+            return self.is_char_pointer_char(type_.type)
+
+        return False
 
     def is_void(self, param):
         if is_ellipsis(param):
@@ -557,13 +605,17 @@ class FunctionMock:
     def create_mock_params(self):
         mock_params = []
 
-        for param, expanded_param, type_ in self.params:
-            if self.is_char_pointer(expanded_param):
+        for param, expanded_param in self.params:
+            if self.is_char_pointer(expanded_param.type):
                 mock_params.append(param)
-            elif isinstance(type_, (PrimitiveType, c_ast.Enum)):
-                if not isinstance(expanded_param.type, (c_ast.PtrDecl,
-                                                        c_ast.ArrayDecl)):
-                    mock_params.append(param)
+            elif self.is_pointer_or_array(expanded_param.type):
+                pass
+            elif self.is_va_list(expanded_param.type):
+                pass
+            elif self.is_struct_or_union(expanded_param.type):
+                pass
+            else:
+                mock_params.append(param)
 
         if not self.is_void(self.return_value_decl):
             mock_params.append(self.return_value_decl)

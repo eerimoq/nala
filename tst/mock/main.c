@@ -2072,28 +2072,28 @@ TEST(char_typedef_function)
     char_typedef("hello");
 }
 
-/* ToDo: Flexible array... */
+TEST(int_array_function)
+{
+    int value[3];
 
-/* TEST(int_array_function) */
-/* { */
-/*     int value[3]; */
+    value[0] = 3;
+    value[1] = 2;
+    value[2] = 1;
 
-/*     value[0] = 3; */
-/*     value[1] = 2; */
-/*     value[2] = 1; */
+    int_array_mock();
+    int_array_mock_set_value_in(&value[0], sizeof(value));
+    int_array(&value[0]);
+}
 
-/*     int_array_mock(); */
-/*     int_array(&value[0]); */
-/* } */
+TEST(int_array_fixed_function)
+{
+    int_array_fixed_t value;
 
-/* TEST(int_array_fixed_function) */
-/* { */
-/*     int_array_fixed_t value; */
+    value[0] = 3;
+    value[1] = 2;
+    value[2] = 1;
 
-/*     value[0] = 3; */
-/*     value[1] = 2; */
-/*     value[2] = 1; */
-
-/*     int_array_fixed_mock(); */
-/*     int_array_fixed(&value[0]); */
-/* } */
+    int_array_fixed_mock();
+    int_array_fixed_mock_set_value_in(&value[0], sizeof(value));
+    int_array_fixed(&value[0]);
+}

@@ -351,7 +351,7 @@ class ForgivingDeclarationParser:
                                 c_ast.Enum)):
             pass
         elif isinstance(type_, c_ast.TypeDecl):
-            type_ = self.expand_type(type_.type)
+            type_.type = self.expand_type(type_.type)
         elif isinstance(type_, (c_ast.PtrDecl, c_ast.ArrayDecl)):
             type_.type = self.expand_type(type_.type)
         else:
