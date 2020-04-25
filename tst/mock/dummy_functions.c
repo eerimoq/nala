@@ -449,3 +449,13 @@ void int_array_fixed(int_array_fixed_t value)
 {
     (void)value;
 }
+
+void int8(int8_t *buf_p)
+{
+    (void)buf_p;
+}
+
+void uint8(uint8_t *buf_p)
+{
+    (void)buf_p;
+}

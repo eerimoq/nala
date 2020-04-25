@@ -239,5 +239,7 @@ void string_typedef_p(string_t *string_p);
 void char_typedef(char_t *string_p);
 void int_array(int_array_t value);
 void int_array_fixed(int_array_fixed_t value);
+void int8(int8_t *buf_p);
+void uint8(uint8_t *buf_p);
 
 #endif

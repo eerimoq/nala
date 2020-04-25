@@ -2097,3 +2097,15 @@ TEST(int_array_fixed_function)
     int_array_fixed_mock_set_value_in(&value[0], sizeof(value));
     int_array_fixed(&value[0]);
 }
+
+TEST(int8_function)
+{
+    int8_mock();
+    int8(NULL);
+}
+
+TEST(uint8_function)
+{
+    uint8_mock();
+    uint8(NULL);
+}

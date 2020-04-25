@@ -337,11 +337,9 @@ class ForgivingDeclarationParser:
         if isinstance(type_, c_ast.IdentifierType):
             name = ' '.join(type_.names)
 
-            if name in PRIMITIVE_TYPES or name == '_Bool':
+            if name in PRIMITIVE_TYPES:
                 pass
-            elif name == '__builtin_va_list':
-                pass
-            elif name == 'void':
+            elif name in ['__builtin_va_list', 'int8_t', 'uint8_t', 'void', '_Bool']:
                 pass
             else:
                 type_ = self.expand_type(self.lookup_typedef(name).type)
