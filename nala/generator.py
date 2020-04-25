@@ -216,8 +216,6 @@ class FunctionMock:
             type_, prefix = self.generator.parser.resolve_type(param.type)
             self.params.append((param, type_, prefix))
 
-        # print(self.params)
-
         if has_implementation is not None:
             self.has_implementation = has_implementation
         elif self.is_variadic_func:

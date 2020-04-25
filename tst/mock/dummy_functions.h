@@ -142,6 +142,12 @@ typedef const int cint;
 
 typedef char *string_t;
 
+typedef char char_t;
+
+typedef int int_array_t[];
+
+typedef int int_array_fixed_t[3];
+
 int add(int x, int y);
 void output_message(const char *message);
 void keep_args_output_message(const char *message);
@@ -229,5 +235,9 @@ void const_struct_pointer(const struct banan_2_t *banan_p);
 void const_typedef_struct_pointer(const banan_3_t *banan_p);
 void const_pointer_data(int * const value_p);
 void string_typedef(string_t string);
+void string_typedef_p(string_t *string_p);
+void char_typedef(char_t *string_p);
+void int_array(int_array_t value);
+void int_array_fixed(int_array_fixed_t value);
 
 #endif

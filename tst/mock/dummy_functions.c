@@ -429,3 +429,23 @@ void string_typedef(string_t string)
 {
     (void)string;
 }
+
+void string_typedef_p(string_t *string_p)
+{
+    (void)string_p;
+}
+
+void char_typedef(char_t *string_p)
+{
+    (void)string_p;
+}
+
+void int_array(int_array_t value)
+{
+    (void)value;
+}
+
+void int_array_fixed(int_array_fixed_t value)
+{
+    (void)value;
+}

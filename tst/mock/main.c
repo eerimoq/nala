@@ -2043,3 +2043,57 @@ TEST(string_typedef_error_message)
 
     subprocess_result_free(result_p);
 }
+
+TEST(string_typedef_p_function)
+{
+    char string[] = "string";
+    char *string_p;
+
+    string_typedef_p_mock_once();
+    string_p = &string[0];
+    string_typedef_p_mock_set_string_p_out(&string_p, sizeof(string_p));
+    string_p = NULL;
+    string_typedef_p(&string_p);
+    ASSERT_EQ(string_p, &string[0]);
+
+    string_typedef_p_mock_once();
+    string_p = &string[0];
+    string_typedef_p_mock_set_string_p_in(&string_p, sizeof(string_p));
+    string_typedef_p(&string_p);
+
+    string_typedef_p_mock_once();
+    string_typedef_p_mock_set_string_p_in_pointer(NULL);
+    string_typedef_p(NULL);
+}
+
+TEST(char_typedef_function)
+{
+    char_typedef_mock_once("hello");
+    char_typedef("hello");
+}
+
+/* ToDo: Flexible array... */
+
+/* TEST(int_array_function) */
+/* { */
+/*     int value[3]; */
+
+/*     value[0] = 3; */
+/*     value[1] = 2; */
+/*     value[2] = 1; */
+
+/*     int_array_mock(); */
+/*     int_array(&value[0]); */
+/* } */
+
+/* TEST(int_array_fixed_function) */
+/* { */
+/*     int_array_fixed_t value; */
+
+/*     value[0] = 3; */
+/*     value[1] = 2; */
+/*     value[2] = 1; */
+
+/*     int_array_fixed_mock(); */
+/*     int_array_fixed(&value[0]); */
+/* } */
