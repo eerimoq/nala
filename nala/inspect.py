@@ -359,12 +359,6 @@ class ForgivingDeclarationParser:
 
         return type_
 
-    def is_array(self, prefix):
-        if self.is_fixed_array(prefix):
-            return True
-
-        return '[]' in prefix;
-
     def is_fixed_array(self, prefix):
         return '[size]' in prefix;
 
