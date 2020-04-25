@@ -81,13 +81,6 @@ def va_list_param(name):
                 c_ast.TypeDecl(name, [], c_ast.IdentifierType(['va_list'])))
 
 
-def is_variadic_func(params):
-    if params:
-        return is_ellipsis(params[-1])
-    else:
-        return False
-
-
 def void_type(name):
     return c_ast.TypeDecl(name, [], c_ast.IdentifierType(['void']))
 
@@ -456,22 +449,6 @@ class FunctionMock:
         param_next.declname = name
 
         return param
-
-    def is_va_list(self, param):
-        try:
-            if param.type.type.names[0] == '__builtin_va_list':
-                return True
-        except AttributeError:
-            pass
-
-        try:
-            name = param.type.type.names[0]
-
-            return self.is_va_list(self.lookup_typedef(name))
-        except AttributeError:
-            pass
-
-        return False
 
     def is_char_pointer(self, type_, prefix):
         if not isinstance(type_, PrimitiveType):
