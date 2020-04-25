@@ -333,10 +333,36 @@ class ForgivingDeclarationParser:
         else:
             raise Exception(f'Unknown type {type_}.')
 
+    def expand_type(self, type_):
+        if isinstance(type_, c_ast.IdentifierType):
+            name = ' '.join(type_.names)
+
+            if name in PRIMITIVE_TYPES or name == '_Bool':
+                pass
+            elif name == '__builtin_va_list':
+                pass
+            elif name == 'void':
+                pass
+            else:
+                type_ = self.expand_type(self.lookup_typedef(name).type)
+        elif isinstance(type_, (c_ast.Union,
+                                c_ast.Struct,
+                                c_ast.FuncDecl,
+                                c_ast.Enum)):
+            pass
+        elif isinstance(type_, c_ast.TypeDecl):
+            type_ = self.expand_type(type_.type)
+        elif isinstance(type_, (c_ast.PtrDecl, c_ast.ArrayDecl)):
+            type_.type = self.expand_type(type_.type)
+        else:
+            raise Exception(f'Unknown type {type_}.')
+
+        return type_
+
     def is_array(self, prefix):
         if self.is_fixed_array(prefix):
             return True
-        
+
         return '[]' in prefix;
 
     def is_fixed_array(self, prefix):

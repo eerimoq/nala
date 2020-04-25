@@ -213,8 +213,11 @@ class FunctionMock:
             if param.name is None:
                 break
 
+            expanded_param = deepcopy(param)
+            expanded_param.type = self.generator.parser.expand_type(
+                expanded_param.type)
             type_, prefix = self.generator.parser.resolve_type(param.type)
-            self.params.append((param, type_, prefix))
+            self.params.append((param, expanded_param, type_, prefix))
 
         if has_implementation is not None:
             self.has_implementation = has_implementation
@@ -318,7 +321,7 @@ class FunctionMock:
         self.non_pointer_params = []
         self.ignore_params = []
 
-        for param, type_, prefix in self.params:
+        for param, expanded_param, type_, prefix in self.params:
             if isinstance(type_, (c_ast.Struct, c_ast.Union)):
                 if not self.is_pointer_or_array(prefix):
                     continue
@@ -562,7 +565,7 @@ class FunctionMock:
     def create_mock_params(self):
         mock_params = []
 
-        for param, type_, prefix in self.params:
+        for param, expanded_param, type_, prefix in self.params:
             if self.is_char_pointer(type_, prefix):
                 mock_params.append(param)
             elif isinstance(type_, (PrimitiveType, c_ast.Enum)):
