@@ -239,7 +239,63 @@ TEST(output_message_function_check_non_string)
 {
     output_message_mock_ignore_in_once();
     output_message_mock_set_message_in("\x00\x01\x02", 3);
-    output_message("\x00\x01\x02");
+    /* Only first three should be compared, make sure 4th is not
+       zero. */
+    output_message("\x00\x01\x02\x03");
+}
+
+static void output_message_function_check_non_string_error_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    output_message_mock_ignore_in_once();
+    output_message_mock_set_message_in("\x31\x31\x31", 3);
+    /* Only first three should be compared, make sure 4th is not
+       zero. */
+    output_message("\x30\x31\x32\x33");
+}
+
+TEST(output_message_function_check_non_string_error)
+{
+    function_error_in_subprocess(
+        output_message_function_check_non_string_error_entry,
+        "Memory mismatch. See diff for details.");
+}
+
+TEST(output_message_function_check_non_string_2)
+{
+    output_message_mock_ignore_in_once();
+    output_message_mock_set_message_in("\x00\x01\x02\x03", 3);
+    /* Only first three should be compared, make sure 4th is not
+       zero. */
+    output_message("\x00\x01\x02\x04");
+}
+
+TEST(output_message_function_check_non_string_string)
+{
+    output_message_mock_once("");
+    output_message_mock_set_message_in("\x00\x01\x02", 3);
+    /* Only first three should be compared, make sure 4th is not
+       zero. */
+    output_message("\x00\x01\x02\x03");
+}
+
+static void output_message_function_check_non_string_string_error_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    output_message_mock_once("");
+    output_message_mock_set_message_in("\x31\x31\x31", 3);
+    /* Only first three should be compared, make sure 4th is not
+       zero. */
+    output_message("\x30\x31\x32\x33");
+}
+
+TEST(output_message_function_check_non_string_string_error)
+{
+    function_error_in_subprocess(
+        output_message_function_check_non_string_string_error_entry,
+        "Memory mismatch. See diff for details.");
 }
 
 static void output_message_function_error_check_pointers_entry(void *arg_p)
@@ -272,8 +328,7 @@ TEST(output_message_function_error_call_null)
 {
     function_error_in_subprocess(
         output_message_function_error_call_null_entry,
-        "     - "B("1")" |  "B("a")"\n"
-        "     "CR("+ ")CBR("1")CR(" |  ")CBR("<null>")"\n");
+        "(nil) != ");
 }
 
 static void output_message_function_error_mismatch_entry(void *arg_p)
@@ -288,7 +343,7 @@ TEST(output_message_function_error_mismatch)
 {
     function_error_in_subprocess(
         output_message_function_error_mismatch_entry,
-        "The strings are not equal. See diff for details.\n");
+        "Memory mismatch. See diff for details.");
 }
 
 TEST(time_function)
@@ -2036,10 +2091,8 @@ TEST(string_typedef_error_message)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked string_typedef(string):");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "     - "B("1")" |  "B("hello"));
-    ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "     "CR("+ ")CBR("1")CR(" |  ")CBR("HELLO"));
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, B("hello"));
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, CBR("HELLO"));
 
     subprocess_result_free(result_p);
 }

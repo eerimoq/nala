@@ -1075,23 +1075,33 @@ const char *nala_format_memory(const char *prefix_p,
     nala_suspend_all_mocks();
 
     file_p = open_memstream(&buf_p, &file_size);
-    fprintf(file_p,
-            COLOR_BOLD(RED, "%sMemory mismatch. See diff for details.\n"),
-            prefix_p);
 
-    if (left_p == NULL) {
-        left_p = "<null>";
+    if ((left_p != NULL) && (right_p != NULL)) {
+        fprintf(file_p,
+                COLOR_BOLD(RED, "%sMemory mismatch. See diff for details.\n"),
+                prefix_p);
+
+        if (left_p == NULL) {
+            left_p = "<null>";
+        }
+
+        if (right_p == NULL) {
+            right_p = "<null>";
+        }
+
+        left_hexdump_p = nala_hexdump(left_p, size, 16);
+        right_hexdump_p = nala_hexdump(right_p, size, 16);
+        print_string_diff(file_p, right_hexdump_p, left_hexdump_p);
+        free(left_hexdump_p);
+        free(right_hexdump_p);
+    } else {
+        fprintf(file_p,
+                COLOR_BOLD(RED, "%s%p != %p.\n"),
+                prefix_p,
+                left_p,
+                right_p);
     }
 
-    if (right_p == NULL) {
-        right_p = "<null>";
-    }
-
-    left_hexdump_p = nala_hexdump(left_p, size, 16);
-    right_hexdump_p = nala_hexdump(right_p, size, 16);
-    print_string_diff(file_p, right_hexdump_p, left_hexdump_p);
-    free(left_hexdump_p);
-    free(right_hexdump_p);
     fputc('\0', file_p);
     fclose(file_p);
 
