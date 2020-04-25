@@ -722,6 +722,10 @@ void nala_set_param_buf(struct nala_set_param *self_p,
                         const void *buf_p,
                         size_t size)
 {
+    if (self_p->buf_p != NULL) {
+        nala_free(self_p->buf_p);
+    }
+
     self_p->buf_p = nala_xmalloc(size);
     self_p->size = size;
     memcpy(self_p->buf_p, buf_p, size);
