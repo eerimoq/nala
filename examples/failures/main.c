@@ -142,12 +142,12 @@ TEST(strings_eq)
               "string.\n");
 }
 
-TEST(strings_eq_special_characters)
+TEST(strings_eq_control_characters)
 {
-    ASSERT_EQ("The\x01\n"
+    ASSERT_EQ("The\n"
               "first\x02\n"
               "\x03string.\n",
-              "The\n"
+              "Th\x01""e\n"
               "second\n"
               "string.\n");
 }

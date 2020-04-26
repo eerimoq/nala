@@ -1273,6 +1273,36 @@ static void print_string_diff(FILE *file_p,
     nala_resume_all_mocks();
 }
 
+static char *make_string_readable(const char *string_p)
+{
+    size_t size;
+    char *buf_p;
+    FILE *file_p;
+
+    file_p = open_memstream(&buf_p, &size);
+
+    while (*string_p != '\0') {
+         if (isprint(*string_p)) {
+             fputc(*string_p, file_p);
+         } else if (*string_p == '\r') {
+             fprintf(file_p, "\\r");
+             fputc(*string_p, file_p);
+         } else if (*string_p == '\n') {
+             fprintf(file_p, "\\n");
+             fputc(*string_p, file_p);
+         } else {
+             fprintf(file_p, "\\x%02x", *string_p);
+         }
+
+         string_p++;
+    }
+
+    fputc(*string_p, file_p);
+    fclose(file_p);
+    
+    return (buf_p);
+}
+
 const char *nala_format_string(const char *prefix_p,
                                const char *actual_p,
                                const char *expected_p)
@@ -1298,7 +1328,11 @@ const char *nala_format_string(const char *prefix_p,
         fprintf(file_p, "%s", prefix_p);
         fprintf(file_p, " See diff for details.\n");
         color_reset(file_p);
+        actual_p = make_string_readable(actual_p);
+        expected_p = make_string_readable(expected_p);
         print_string_diff(file_p, expected_p, actual_p);
+        free((void *)actual_p);
+        free((void *)expected_p);
     }
 
     fputc('\0', file_p);
