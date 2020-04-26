@@ -328,7 +328,7 @@ TEST(output_message_function_error_call_null)
 {
     function_error_in_subprocess(
         output_message_function_error_call_null_entry,
-        "(nil) is not equal to ");
+        "Actual memory pointer is NULL.");
 }
 
 static void output_message_function_error_mismatch_entry(void *arg_p)

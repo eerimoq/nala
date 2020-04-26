@@ -142,6 +142,16 @@ TEST(strings_eq)
               "string.\n");
 }
 
+TEST(strings_eq_special_characters)
+{
+    ASSERT_EQ("The\x01\n"
+              "first\x02\n"
+              "\x03string.\n",
+              "The\n"
+              "second\n"
+              "string.\n");
+}
+
 TEST(substring)
 {
     ASSERT_SUBSTRING("The\n"

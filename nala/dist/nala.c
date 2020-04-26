@@ -1273,37 +1273,34 @@ static void print_string_diff(FILE *file_p,
     nala_resume_all_mocks();
 }
 
-const char *nala_format_string(const char *format_p, ...)
+const char *nala_format_string(const char *prefix_p,
+                               const char *actual_p,
+                               const char *expected_p)
 {
     size_t size;
     char *buf_p;
     FILE *file_p;
-    va_list vl;
-    const char *left_p;
-    const char *right_p;
 
     nala_suspend_all_mocks();
 
-    va_start(vl, format_p);
-    left_p = va_arg(vl, const char *);
-    right_p = va_arg(vl, const char *);
-    va_end(vl);
-
     file_p = open_memstream(&buf_p, &size);
-    color_start(file_p, ANSI_COLOR_RED);
-    fprintf(file_p, format_p, left_p, right_p);
-    fprintf(file_p, " See diff for details.\n");
-    color_reset(file_p);
 
-    if (right_p == NULL) {
-        right_p = "<null>";
+    if (actual_p == NULL) {
+        fprintf(file_p,
+                COLOR_BOLD(RED, "%s Actual string is NULL.\n"),
+                prefix_p);
+    } else if (expected_p == NULL) {
+        fprintf(file_p,
+                COLOR_BOLD(RED, "%s Expected string is NULL.\n"),
+                prefix_p);
+    } else {
+        color_start(file_p, ANSI_COLOR_RED);
+        fprintf(file_p, "%s", prefix_p);
+        fprintf(file_p, " See diff for details.\n");
+        color_reset(file_p);
+        print_string_diff(file_p, expected_p, actual_p);
     }
 
-    if (left_p == NULL) {
-        left_p = "<null>";
-    }
-
-    print_string_diff(file_p, right_p, left_p);
     fputc('\0', file_p);
     fclose(file_p);
 
@@ -1329,9 +1326,9 @@ static void print_with_line_prefix(FILE *file_p,
     }
 }
 
-const char *nala_format_substring(const char *format_p,
-                                  const char *haystack_p,
-                                  const char *needle_p)
+static const char *nala_format_substring(const char *prefix_p,
+                                         const char *haystack_p,
+                                         const char *needle_p)
 {
     size_t size;
     char *buf_p;
@@ -1340,25 +1337,24 @@ const char *nala_format_substring(const char *format_p,
     nala_suspend_all_mocks();
 
     file_p = open_memstream(&buf_p, &size);
-    color_start(file_p, ANSI_COLOR_RED);
-    fprintf(file_p, "%s", format_p);
-    fprintf(file_p, " See below for details.\n");
-    color_reset(file_p);
 
     if (haystack_p == NULL) {
-        haystack_p = "<null>";
+        fprintf(file_p, COLOR_BOLD(RED, "The haystack is NULL.\n"));
+    } else if (needle_p == NULL) {
+        fprintf(file_p, COLOR_BOLD(RED, "The needle is NULL.\n"));
+    } else {
+        color_start(file_p, ANSI_COLOR_RED);
+        fprintf(file_p, "%s", prefix_p);
+        fprintf(file_p, " See below for details.\n");
+        color_reset(file_p);
+        fprintf(file_p, "  Haystack:\n\n");
+        print_with_line_prefix(file_p, "    ", haystack_p);
+        fprintf(file_p, "\n\n");
+        fprintf(file_p, "  Needle:\n\n");
+        print_with_line_prefix(file_p, "    ", needle_p);
+        fprintf(file_p, "\n");
     }
 
-    if (needle_p == NULL) {
-        needle_p = "<null>";
-    }
-
-    fprintf(file_p, "  Haystack:\n\n");
-    print_with_line_prefix(file_p, "    ", haystack_p);
-    fprintf(file_p, "\n\n");
-    fprintf(file_p, "  Needle:\n\n");
-    print_with_line_prefix(file_p, "    ", needle_p);
-    fprintf(file_p, "\n");
     fputc('\0', file_p);
     fclose(file_p);
 
@@ -1368,44 +1364,37 @@ const char *nala_format_substring(const char *format_p,
 }
 
 const char *nala_format_memory(const char *prefix_p,
-                               const void *left_p,
-                               const void *right_p,
+                               const void *actual_p,
+                               const void *expected_p,
                                size_t size)
 {
     size_t file_size;
     char *buf_p;
     FILE *file_p;
-    char *left_hexdump_p;
-    char *right_hexdump_p;
+    char *actual_hexdump_p;
+    char *expected_hexdump_p;
 
     nala_suspend_all_mocks();
 
     file_p = open_memstream(&buf_p, &file_size);
 
-    if ((left_p != NULL) && (right_p != NULL)) {
+    if (actual_p == NULL) {
+        fprintf(file_p,
+                COLOR_BOLD(RED, "%sActual memory pointer is NULL.\n"),
+                prefix_p);
+    } else if (expected_p == NULL) {
+        fprintf(file_p,
+                COLOR_BOLD(RED, "%sExpected memory pointer is NULL.\n"),
+                prefix_p);
+    } else {
         fprintf(file_p,
                 COLOR_BOLD(RED, "%sMemory mismatch. See diff for details.\n"),
                 prefix_p);
-
-        if (left_p == NULL) {
-            left_p = "<null>";
-        }
-
-        if (right_p == NULL) {
-            right_p = "<null>";
-        }
-
-        left_hexdump_p = nala_hexdump(left_p, size, 16);
-        right_hexdump_p = nala_hexdump(right_p, size, 16);
-        print_string_diff(file_p, right_hexdump_p, left_hexdump_p);
-        free(left_hexdump_p);
-        free(right_hexdump_p);
-    } else {
-        fprintf(file_p,
-                COLOR_BOLD(RED, "%s%p is not equal to %p.\n"),
-                prefix_p,
-                left_p,
-                right_p);
+        actual_hexdump_p = nala_hexdump(actual_p, size, 16);
+        expected_hexdump_p = nala_hexdump(expected_p, size, 16);
+        print_string_diff(file_p, expected_hexdump_p, actual_hexdump_p);
+        free(actual_hexdump_p);
+        free(expected_hexdump_p);
     }
 
     fputc('\0', file_p);
@@ -1416,18 +1405,22 @@ const char *nala_format_memory(const char *prefix_p,
     return (buf_p);
 }
 
-bool nala_check_substring(const char *string_p, const char *substring_p)
+bool nala_check_substring(const char *haystack_p, const char *needle_p)
 {
-    return ((string_p != NULL)
-            && (substring_p != NULL)
-            && (strstr(string_p, substring_p) != NULL));
+    if ((haystack_p == NULL) || (needle_p == NULL)) {
+        return (false);
+    }
+
+    return (strstr(haystack_p, needle_p) != NULL);
 }
 
-bool nala_check_memory(const void *left_p, const void *right_p, size_t size)
+bool nala_check_memory(const void *actual_p, const void *expected_p, size_t size)
 {
-    return !(((left_p == NULL) && (right_p != NULL))
-             || ((left_p != NULL) && (right_p == NULL))
-             || (memcmp(left_p, right_p, size) != 0));
+    if ((actual_p == NULL) || (expected_p == NULL)) {
+        return (false);
+    }
+
+    return (memcmp(actual_p, expected_p, size) == 0);
 }
 
 static bool traceback_skip_filter(void *arg_p, const char *line_p)

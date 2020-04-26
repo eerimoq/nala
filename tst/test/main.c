@@ -227,6 +227,30 @@ TEST(assert_eq_error_string_deleted_line)
         CM("       2")" |  3\n");
 }
 
+static void assert_eq_error_string_actual_null_entry()
+{
+    ASSERT_EQ((char *)NULL, "23");
+}
+
+TEST(assert_eq_error_string_actual_null)
+{
+    expect_error_in_subprocess(
+        assert_eq_error_string_actual_null_entry,
+        "The strings are not equal. Actual string is NULL.");
+}
+
+static void assert_eq_error_string_expected_null_entry()
+{
+    ASSERT_EQ("23", NULL);
+}
+
+TEST(assert_eq_error_string_expected_null)
+{
+    expect_error_in_subprocess(
+        assert_eq_error_string_expected_null_entry,
+        "The strings are not equal. Expected string is NULL.");
+}
+
 static void assert_ne_error_entry()
 {
     ASSERT_NE(1, 1);
@@ -322,6 +346,28 @@ TEST(assert_substring_error)
                                "\n");
 }
 
+static void assert_substring_error_haystack_null_entry()
+{
+    ASSERT_SUBSTRING(NULL, "4");
+}
+
+TEST(assert_substring_error_haystack_null)
+{
+    expect_error_in_subprocess(assert_substring_error_haystack_null_entry,
+                               CBR("The haystack is NULL.\n"));
+}
+
+static void assert_substring_error_needle_null_entry()
+{
+    ASSERT_SUBSTRING("4", NULL);
+}
+
+TEST(assert_substring_error_needle_null)
+{
+    expect_error_in_subprocess(assert_substring_error_needle_null_entry,
+                               CBR("The needle is NULL.\n"));
+}
+
 static void assert_not_substring_error_entry()
 {
     ASSERT_NOT_SUBSTRING("123", "3");
@@ -363,6 +409,42 @@ TEST(assert_memory_eq_error)
         CM("       8")" |  000070  33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38  3456789012345678\n"
         CM("       9")" |  000080  39 30 31 32 33 34 35 36 37 38 39 30 31 32 33 34  9012345678901234\n"
         CM("      10")" |  000090  35 36 37 38 39 30 -- -- -- -- -- -- -- -- -- --  567890          \n");
+}
+
+static void assert_memory_eq_error_actual_null_entry()
+{
+    ASSERT_MEMORY_EQ(NULL, "1", 1);
+}
+
+TEST(assert_memory_eq_error_actual_null)
+{
+    expect_error_in_subprocess(
+        assert_memory_eq_error_actual_null_entry,
+        "Actual memory pointer is NULL.");
+}
+
+static void assert_memory_eq_error_expected_null_entry()
+{
+    ASSERT_MEMORY_EQ("1", NULL, 1);
+}
+
+TEST(assert_memory_eq_error_expected_null)
+{
+    expect_error_in_subprocess(
+        assert_memory_eq_error_expected_null_entry,
+        "Expected memory pointer is NULL.");
+}
+
+static void assert_memory_eq_error_actual_and_expected_null_entry()
+{
+    ASSERT_MEMORY_EQ(NULL, NULL, 1);
+}
+
+TEST(assert_memory_eq_error_actual_and_expected_null)
+{
+    expect_error_in_subprocess(
+        assert_memory_eq_error_actual_and_expected_null_entry,
+        "Actual memory pointer is NULL.");
 }
 
 static void assert_function_pointers_eq_entry()

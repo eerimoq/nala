@@ -241,11 +241,13 @@ bool nala_check_string_equal(const char *actual_p, const char *expected_p);
 
 const char *nala_format(const char *format_p, ...);
 
-const char *nala_format_string(const char *format_p, ...);
+const char *nala_format_string(const char *prefix_p,
+                               const char *actual_p,
+                               const char *expected_p);
 
 const char *nala_format_memory(const char *prefix_p,
-                               const void *left_p,
-                               const void *right_p,
+                               const void *actual_p,
+                               const void *expected_p,
                                size_t size);
 
 bool nala_check_substring(const char *string_p, const char *substring_p);
