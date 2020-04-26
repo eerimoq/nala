@@ -124,3 +124,4 @@ tst/mock/tests.c
 examples/*/tests.c
 *.d
 a.out
+/foo
