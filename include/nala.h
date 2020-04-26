@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NALA_VERSION "0.157.3"
+#define NALA_VERSION "0.158.0"
 
 /**
  * Assert that given characters, numbers, pointers or strings are
@@ -84,17 +84,21 @@
 /**
  * Assert that given function pointers are equal.
  */
-#define ASSERT_FUNCTION_POINTER_EQ(actual, expected)                    \
-    if (actual != expected) {                                           \
-        nala_test_failure(nala_format("%p != %p", actual, expected));   \
+#define ASSERT_FUNCTION_POINTER_EQ(actual, expected)            \
+    if (actual != expected) {                                   \
+        nala_test_failure(nala_format("%p is not equal to %p",  \
+                                      actual,                   \
+                                      expected));               \
     }
 
 /**
  * Assert that given function pointers are not equal.
  */
-#define ASSERT_FUNCTION_POINTER_NE(actual, expected)                    \
-    if (actual == expected) {                                           \
-        nala_test_failure(nala_format("%p == %p", actual, expected));   \
+#define ASSERT_FUNCTION_POINTER_NE(actual, expected)            \
+    if (actual == expected) {                                   \
+        nala_test_failure(nala_format("%p is equal to %p",      \
+                                      actual,                   \
+                                      expected));               \
     }
 
 /**

@@ -1096,7 +1096,7 @@ const char *nala_format_memory(const char *prefix_p,
         free(right_hexdump_p);
     } else {
         fprintf(file_p,
-                COLOR_BOLD(RED, "%s%p != %p.\n"),
+                COLOR_BOLD(RED, "%s%p is not equal to %p.\n"),
                 prefix_p,
                 left_p,
                 right_p);
@@ -1490,36 +1490,60 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
         }                                                               \
     } while (0);
 
-#define BINARY_ASSERTION(actual, expected, op)                          \
-    switch (op) {                                                       \
-                                                                        \
-    case NALA_CHECK_EQ:                                                 \
-        ASSERTION(actual, expected, CHECK_EQ, "%s != %s\n", nala_format); \
-        break;                                                          \
-                                                                        \
-    case NALA_CHECK_NE:                                                 \
-        ASSERTION(actual, expected, CHECK_NE, "%s == %s\n", nala_format); \
-        break;                                                          \
-                                                                        \
-    case NALA_CHECK_LT:                                                 \
-        ASSERTION(actual, expected, CHECK_LT, "%s >= %s\n", nala_format); \
-        break;                                                          \
-                                                                        \
-    case NALA_CHECK_LE:                                                 \
-        ASSERTION(actual, expected, CHECK_LE, "%s > %s\n", nala_format); \
-        break;                                                          \
-                                                                        \
-    case NALA_CHECK_GT:                                                 \
-        ASSERTION(actual, expected, CHECK_GT, "%s <= %s\n", nala_format); \
-        break;                                                          \
-                                                                        \
-    case NALA_CHECK_GE:                                                 \
-        ASSERTION(actual, expected, CHECK_GE, "%s < %s\n", nala_format); \
-        break;                                                          \
-                                                                        \
-    default:                                                            \
-        FAIL("Internal nala error.");                                   \
-        break;                                                          \
+#define BINARY_ASSERTION(actual, expected, op)                  \
+    switch (op) {                                               \
+                                                                \
+    case NALA_CHECK_EQ:                                         \
+        ASSERTION(actual,                                       \
+                  expected,                                     \
+                  CHECK_EQ,                                     \
+                  "%s is not equal to %s\n",                    \
+                  nala_format);                                 \
+        break;                                                  \
+                                                                \
+    case NALA_CHECK_NE:                                         \
+        ASSERTION(actual,                                       \
+                  expected,                                     \
+                  CHECK_NE,                                     \
+                  "%s is equal to %s\n",                        \
+                  nala_format);                                 \
+        break;                                                  \
+                                                                \
+    case NALA_CHECK_LT:                                         \
+        ASSERTION(actual,                                       \
+                  expected,                                     \
+                  CHECK_LT,                                     \
+                  "%s is not less than %s\n",                   \
+                  nala_format);                                 \
+        break;                                                  \
+                                                                \
+    case NALA_CHECK_LE:                                         \
+        ASSERTION(actual,                                       \
+                  expected,                                     \
+                  CHECK_LE,                                     \
+                  "%s is not less than or equal to %s\n",       \
+                  nala_format);                                 \
+        break;                                                  \
+                                                                \
+    case NALA_CHECK_GT:                                         \
+        ASSERTION(actual,                                       \
+                  expected,                                     \
+                  CHECK_GT,                                     \
+                  "%s is not greater than %s\n",                \
+                  nala_format);                                 \
+        break;                                                  \
+                                                                \
+    case NALA_CHECK_GE:                                         \
+        ASSERTION(actual,                                       \
+                  expected,                                     \
+                  CHECK_GE,                                     \
+                  "%s is not greater than or equal to %s\n",    \
+                  nala_format);                                 \
+        break;                                                  \
+                                                                \
+    default:                                                    \
+        FAIL("Internal nala error.");                           \
+        break;                                                  \
     }
 
 #define BINARY_ASSERTION_WITH_HEX(actual, expected, op)                 \
@@ -1529,7 +1553,7 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
         ASSERTION_WITH_HEX(actual,                                      \
                            expected,                                    \
                            CHECK_EQ,                                    \
-                           "%s != %s (0x%s != 0x%s)\n",                 \
+                           "%s is not equal to %s (0x%s, 0x%s)\n",      \
                            nala_format);                                \
         break;                                                          \
                                                                         \
@@ -1537,7 +1561,7 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
         ASSERTION_WITH_HEX(actual,                                      \
                            expected,                                    \
                            CHECK_NE,                                    \
-                           "%s == %s (0x%s == 0x%s)\n",                 \
+                           "%s is equal to %s (0x%s, 0x%s)\n",          \
                            nala_format);                                \
         break;                                                          \
                                                                         \

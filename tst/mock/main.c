@@ -102,7 +102,7 @@ TEST(add_function_error_wrong_x_two_tracebacks)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "Mocked add(x): 3 != 1 (0x3 != 0x1)");
+                     "Mocked add(x): 3 is not equal to 1 (0x3, 0x1)");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
                      "Mock traceback (most recent call last):");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
@@ -128,7 +128,7 @@ TEST(add_function_error_wrong_result_one_traceback)
         NULL);
 
     ASSERT_NE(result_p->exit_code, 0);
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "42 != 41 (0x2a != 0x29)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "42 is not equal to 41 (0x2a, 0x29)");
     ASSERT_NOT_SUBSTRING(result_p->stdout.buf_p,
                      "Mock traceback (most recent call last):");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
@@ -328,7 +328,7 @@ TEST(output_message_function_error_call_null)
 {
     function_error_in_subprocess(
         output_message_function_error_call_null_entry,
-        "(nil) != ");
+        "(nil) is not equal to ");
 }
 
 static void output_message_function_error_mismatch_entry(void *arg_p)
@@ -471,7 +471,7 @@ static void once_in_error_entry(void *arg_p)
 
 TEST(once_in_error)
 {
-    function_error_in_subprocess(once_in_error_entry, "1 != 2 (0x1 != 0x2)");
+    function_error_in_subprocess(once_in_error_entry, "1 is not equal to 2 (0x1, 0x2)");
 }
 
 static void in_error_entry(void *arg_p)
@@ -487,7 +487,7 @@ static void in_error_entry(void *arg_p)
 
 TEST(in_error)
 {
-    function_error_in_subprocess(in_error_entry, "1 != 2 (0x1 != 0x2)");
+    function_error_in_subprocess(in_error_entry, "1 is not equal to 2 (0x1, 0x2)");
 }
 
 static void in_pointer_error_entry(void *arg_p)
@@ -744,7 +744,7 @@ TEST(variadic_function_error_integer)
 {
     function_error_in_subprocess(
         variadic_function_error_integer_entry,
-        "Mocked io_control(...): 6 != 5 (0x6 != 0x5)");
+        "Mocked io_control(...): 6 is not equal to 5 (0x6, 0x5)");
 }
 
 static void variadic_function_error_string_entry(void *arg_p)
@@ -846,7 +846,7 @@ TEST(variadic_function_pointer_error_wrong_call_order)
 {
     function_error_in_subprocess(
         variadic_function_pointer_error_wrong_call_order_entry,
-        " != 0x");
+        " is not equal to 0x");
 }
 
 static void variadic_function_error_set_in_for_integer_entry(void *arg_p)
@@ -1300,7 +1300,7 @@ TEST(in_assert_error_mock_traceback_message)
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
                      "Mocked likely_undefined_padding(value_p):");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "5 != 4 (0x5 != 0x4)");
+                     "5 is not equal to 4 (0x5, 0x4)");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
                      "Mock traceback (most recent call last):");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
@@ -1333,7 +1333,7 @@ TEST(struct_assert_error)
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
                      "Mocked likely_undefined_padding(value_p):");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "3 != 2 (0x3 != 0x2)");
+                     "3 is not equal to 2 (0x3, 0x2)");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
                      "Mock traceback (most recent call last):");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
@@ -1539,7 +1539,7 @@ TEST(nested_types_error_1)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types(bar_p):");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 is not equal to 0 (0x1, 0x0)");
 
     subprocess_result_free(result_p);
 }
@@ -1567,7 +1567,7 @@ TEST(nested_types_error_2)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types(bar_p):");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 is not equal to 0 (0x1, 0x0)");
 
     subprocess_result_free(result_p);
 }
@@ -1596,7 +1596,7 @@ TEST(nested_types_error_nested_struct)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types(bar_p):");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 is not equal to 0 (0x1, 0x0)");
 
     subprocess_result_free(result_p);
 }
@@ -1625,7 +1625,7 @@ TEST(nested_types_error_struct_typedef)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types(bar_p):");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 is not equal to 0 (0x1, 0x0)");
 
     subprocess_result_free(result_p);
 }
@@ -1653,7 +1653,7 @@ TEST(nested_types_error_enum)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types(bar_p):");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 is not equal to 0 (0x1, 0x0)");
 
     subprocess_result_free(result_p);
 }
@@ -1681,7 +1681,7 @@ TEST(nested_types_error_int32_t)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types(bar_p):");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 is not equal to 0 (0x1, 0x0)");
 
     subprocess_result_free(result_p);
 }
@@ -1738,7 +1738,7 @@ TEST(nested_types_2_error)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types_2(foo_p):");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 is not equal to 0 (0x1, 0x0)");
 
     subprocess_result_free(result_p);
 }
@@ -1771,7 +1771,7 @@ TEST(struct_param_typedef_pointer_error)
     /* ToDo. */
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
                      "Memory mismatch. See diff for details.");
-    /* ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)"); */
+    /* ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 is not equal to 0 (0x1, 0x0)"); */
 
     subprocess_result_free(result_p);
 }
@@ -1811,7 +1811,7 @@ TEST(nested_types_pp_error)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types_pp(bar_pp):");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, " != (nil)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, " is not equal to (nil)");
 
     subprocess_result_free(result_p);
 }
@@ -1839,7 +1839,7 @@ TEST(nested_types_2_pp_error)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked nested_types_2_pp(foo_pp):");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, " != (nil)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, " is not equal to (nil)");
 
     subprocess_result_free(result_p);
 }
@@ -1861,7 +1861,7 @@ static void primitive_type_int_pointer_error_entry(void *arg_p)
 TEST(primitive_type_int_pointer_error)
 {
     function_error_in_subprocess(primitive_type_int_pointer_error_entry,
-                                 "1 != 0 (0x1 != 0x0)");
+                                 "1 is not equal to 0 (0x1, 0x0)");
 }
 
 static void primitive_type_long_pointer_error_entry(void *arg_p)
@@ -1881,7 +1881,7 @@ static void primitive_type_long_pointer_error_entry(void *arg_p)
 TEST(primitive_type_long_pointer_error)
 {
     function_error_in_subprocess(primitive_type_long_pointer_error_entry,
-                                 "2 != 1 (0x2 != 0x1)");
+                                 "2 is not equal to 1 (0x2, 0x1)");
 }
 
 static void primitive_type_float_pointer_error_entry(void *arg_p)
@@ -1901,7 +1901,7 @@ static void primitive_type_float_pointer_error_entry(void *arg_p)
 TEST(primitive_type_float_pointer_error)
 {
     function_error_in_subprocess(primitive_type_float_pointer_error_entry,
-                                 "2.000000 != 1.000000");
+                                 "2.000000 is not equal to 1.000000");
 }
 
 TEST(forward_declaration_function)
@@ -1974,7 +1974,7 @@ TEST(bit_field_error_uint32_t)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked bit_field(value_p):");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 != 0 (0x1 != 0x0)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "1 is not equal to 0 (0x1, 0x0)");
 
     subprocess_result_free(result_p);
 }
@@ -2002,7 +2002,7 @@ TEST(bit_field_error_int)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked bit_field(value_p):");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "2 != 0 (0x2 != 0x0)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "2 is not equal to 0 (0x2, 0x0)");
 
     subprocess_result_free(result_p);
 }
@@ -2030,7 +2030,7 @@ TEST(const_parameter_function_error)
 
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "Mocked const_parameter(value):");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "2 != 1 (0x2 != 0x1)");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "2 is not equal to 1 (0x2, 0x1)");
 
     subprocess_result_free(result_p);
 }

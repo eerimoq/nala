@@ -209,30 +209,30 @@ char *nala_format_mock_traceback(const char *message_p,
              long long int: "%llx",             \
              unsigned long long int: "%llx")
 
-#define MOCK_BINARY_ASSERTION(traceback_p,              \
-                              func_p,                   \
-                              param_p,                  \
-                              ignore_in,                \
-                              actual,                   \
-                              expecetd)                 \
-    if (!(ignore_in)) {                                 \
-        if ((actual) != (expecetd)) {                   \
-            char assert_format[512];                    \
-            nala_suspend_all_mocks();                   \
-            snprintf(&assert_format[0],                 \
-                     sizeof(assert_format),             \
-                     "Mocked %s(%s): %s != %s\n\n",     \
-                     func_p,                            \
-                     param_p,                           \
-                     PRINT_FORMAT(actual),              \
-                     PRINT_FORMAT(expecetd));           \
-            nala_test_failure(                          \
-                nala_format_mock_traceback(             \
-                    nala_format(&assert_format[0],      \
-                                (actual),               \
-                                (expecetd)),            \
-                    traceback_p));                      \
-        }                                               \
+#define MOCK_BINARY_ASSERTION(traceback_p,                              \
+                              func_p,                                   \
+                              param_p,                                  \
+                              ignore_in,                                \
+                              actual,                                   \
+                              expecetd)                                 \
+    if (!(ignore_in)) {                                                 \
+        if ((actual) != (expecetd)) {                                   \
+            char assert_format[512];                                    \
+            nala_suspend_all_mocks();                                   \
+            snprintf(&assert_format[0],                                 \
+                     sizeof(assert_format),                             \
+                     "Mocked %s(%s): %s is not equal to %s\n\n",        \
+                     func_p,                                            \
+                     param_p,                                           \
+                     PRINT_FORMAT(actual),                              \
+                     PRINT_FORMAT(expecetd));                           \
+            nala_test_failure(                                          \
+                nala_format_mock_traceback(                             \
+                    nala_format(&assert_format[0],                      \
+                                (actual),                               \
+                                (expecetd)),                            \
+                    traceback_p));                                      \
+        }                                                               \
     }
 
 #define MOCK_BINARY_ASSERTION_HEX(traceback_p,                          \
@@ -247,7 +247,7 @@ char *nala_format_mock_traceback(const char *message_p,
             nala_suspend_all_mocks();                                   \
             snprintf(&assert_format[0],                                 \
                      sizeof(assert_format),                             \
-                     "Mocked %s(%s): %s != %s (0x%s != 0x%s)\n\n",      \
+                     "Mocked %s(%s): %s is not equal to %s (0x%s, 0x%s)\n\n", \
                      func_p,                                            \
                      param_p,                                           \
                      PRINT_FORMAT(actual),                              \
