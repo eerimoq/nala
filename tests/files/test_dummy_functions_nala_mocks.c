@@ -15670,7 +15670,7 @@ void time_mock(time_t return_value)
     nala_set_param_init(&nala_mock_time.data.params.tloc_out);
     nala_set_param_init(&nala_mock_time.data.params.tloc_in);
     nala_mock_time.data.params.tloc_in_assert =
-        (__typeof__(nala_mock_time.data.params.tloc_in_assert))nala_assert_memory;
+        (__typeof__(nala_mock_time.data.params.tloc_in_assert))nala_mock_assert_long_int;
     nala_mock_time.data.params.tloc_out_copy = NULL;
     nala_mock_time.data.params.tloc = NULL;
     nala_mock_time.data.params.ignore_tloc_in = true;
@@ -15689,7 +15689,7 @@ int time_mock_once(time_t return_value)
     nala_set_param_init(&nala_instance_p->data.params.tloc_out);
     nala_set_param_init(&nala_instance_p->data.params.tloc_in);
     nala_instance_p->data.params.tloc_in_assert =
-        (__typeof__(nala_instance_p->data.params.tloc_in_assert))nala_assert_memory;
+        (__typeof__(nala_instance_p->data.params.tloc_in_assert))nala_mock_assert_long_int;
     nala_instance_p->data.params.tloc_out_copy = NULL;
     nala_instance_p->data.params.tloc = NULL;
     nala_instance_p->data.params.ignore_tloc_in = true;
@@ -15709,7 +15709,7 @@ void time_mock_ignore_in(time_t return_value)
     nala_set_param_init(&nala_mock_time.data.params.tloc_out);
     nala_set_param_init(&nala_mock_time.data.params.tloc_in);
     nala_mock_time.data.params.tloc_in_assert =
-        (__typeof__(nala_mock_time.data.params.tloc_in_assert))nala_assert_memory;
+        (__typeof__(nala_mock_time.data.params.tloc_in_assert))nala_mock_assert_long_int;
     nala_mock_time.data.params.tloc_out_copy = NULL;
     nala_mock_time.data.params.ignore_tloc_in = true;
     nala_mock_time.data.return_value = return_value;
@@ -15726,7 +15726,7 @@ int time_mock_ignore_in_once(time_t return_value)
     nala_set_param_init(&instance_p->data.params.tloc_out);
     nala_set_param_init(&instance_p->data.params.tloc_in);
     instance_p->data.params.tloc_in_assert =
-        (__typeof__(instance_p->data.params.tloc_in_assert))nala_assert_memory;
+        (__typeof__(instance_p->data.params.tloc_in_assert))nala_mock_assert_long_int;
     instance_p->data.params.tloc_out_copy = NULL;
     instance_p->data.params.tloc = NULL;
     instance_p->data.params.ignore_tloc_in = true;

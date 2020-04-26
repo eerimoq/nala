@@ -212,6 +212,93 @@ class VoidType(NamedTuple):
     pass
 
 
+def is_types(type_, types):
+    if isinstance(type_, types):
+        return True
+
+    if isinstance(type_, c_ast.TypeDecl):
+        return is_types(type_.type, types)
+
+    return False
+
+
+def is_struct(type_):
+    return is_types(type_, c_ast.Struct)
+
+
+def is_struct_or_union(type_):
+    return is_types(type_, (c_ast.Struct, c_ast.Union))
+
+
+def is_pointer_or_array(type_):
+    return is_types(type_, (c_ast.PtrDecl, c_ast.ArrayDecl))
+
+
+def is_pointer(type_):
+    return is_types(type_, c_ast.PtrDecl)
+
+
+def is_array(type_):
+    return is_types(type_, c_ast.ArrayDecl)
+
+
+def is_pointer_to_pointer(type_):
+    if isinstance(type_, c_ast.PtrDecl):
+        return is_pointer(type_.type)
+
+    if isinstance(type_, c_ast.TypeDecl):
+        return is_pointer_to_pointer(type_.type)
+
+    return False
+
+
+def is_va_list(type_):
+    if isinstance(type_, c_ast.IdentifierType):
+        return type_.names[0] == '__builtin_va_list'
+
+    if isinstance(type_, c_ast.TypeDecl):
+        return is_va_list(type_.type)
+
+    return False
+
+
+def is_fixed_array(type_):
+    if isinstance(type_, c_ast.ArrayDecl):
+        return type_.dim is not None
+
+    if isinstance(type_, c_ast.TypeDecl):
+        return is_fixed_array(type_.type)
+
+    return False
+
+
+def is_primitive_type_pointer_type(type_, types):
+    if isinstance(type_, c_ast.IdentifierType):
+        return ' '.join(type_.names) in types
+
+    if isinstance(type_, c_ast.TypeDecl):
+        return is_primitive_type_pointer_type(type_.type, types)
+
+    return False
+
+
+def is_primitive_type_pointer(type_, types=None):
+    if types is None:
+        types = PRIMITIVE_TYPES
+
+    if isinstance(type_, c_ast.TypeDecl):
+        return is_primitive_type_pointer(type_.type, types)
+
+    if isinstance(type_, c_ast.PtrDecl):
+        return is_primitive_type_pointer_type(type_.type, types)
+
+    return False
+
+
+def is_char_pointer(type_):
+    return is_primitive_type_pointer(type_, ['char'])
+
+
 class ForgivingDeclarationParser:
 
     def __init__(self, source_code, functions, rename_parameters_file=None):
@@ -301,35 +388,32 @@ class ForgivingDeclarationParser:
         self.load_typedefs()
         self.load_structs()
 
-    def resolve_type(self, type_, prefix=None):
-        if prefix is None:
-            prefix = []
-
+    def resolve_type(self, type_):
         if isinstance(type_, c_ast.IdentifierType):
             name = ' '.join(type_.names)
 
             if name in PRIMITIVE_TYPES or name == '_Bool':
-                return (PrimitiveType(name), prefix)
+                return PrimitiveType(name)
             elif name == '__builtin_va_list':
-                return (VaList(), prefix)
+                return VaList()
             elif name == 'void':
-                return (VoidType(), prefix)
+                return VoidType()
             else:
-                return self.resolve_type(self.lookup_typedef(name).type, prefix)
+                return self.resolve_type(self.lookup_typedef(name).type)
         elif isinstance(type_, (c_ast.Union,
                                 c_ast.Struct,
                                 c_ast.FuncDecl,
                                 c_ast.Enum)):
-            return type_, prefix
+            return type_
         elif isinstance(type_, c_ast.TypeDecl):
-            return self.resolve_type(type_.type, prefix)
+            return self.resolve_type(type_.type)
         elif isinstance(type_, c_ast.ArrayDecl):
             if type_.dim is None:
-                return self.resolve_type(type_.type, prefix + ['[]'])
+                return self.resolve_type(type_.type)
             else:
-                return self.resolve_type(type_.type, prefix + ['[size]'])
+                return self.resolve_type(type_.type)
         elif isinstance(type_, c_ast.PtrDecl):
-            return self.resolve_type(type_.type, prefix + ['*'])
+            return self.resolve_type(type_.type)
         else:
             raise Exception(f'Unknown type {type_}.')
 
@@ -357,30 +441,25 @@ class ForgivingDeclarationParser:
 
         return type_
 
-    def is_fixed_array(self, prefix):
-        return '[size]' in prefix;
-
-    def is_pointer(self, prefix):
-        return '*' in prefix
-
     def lookup_typedef(self, name):
         if name in self.typedefs:
             return self.typedefs[name]
 
     def load_struct_member(self, member):
         items = []
-        type_, prefix = self.resolve_type(member.type)
+        expanded_type = self.expand_type(member.type)
+        type_ = self.resolve_type(member.type)
 
-        if self.is_fixed_array(prefix):
+        if is_fixed_array(expanded_type):
             items.append(['assert-array-eq', member.name])
-        elif self.is_pointer(prefix):
+        elif is_pointer_or_array(expanded_type):
             pass
         elif isinstance(type_, (PrimitiveType, c_ast.Enum)):
             if member.bitsize is None:
                 items.append(['assert-eq', member.name])
             else:
                 items.append(['assert-eq-bit-field', member.name, type_.name])
-        elif isinstance(type_, c_ast.Struct):
+        elif is_struct(expanded_type):
             if type_.name is None:
                 for item in self.load_struct_members(type_):
                     item[1] = f'{member.name}.{item[1]}'
@@ -406,16 +485,22 @@ class ForgivingDeclarationParser:
 
     def load_structs(self):
         for item in self.file_ast:
+            expanded_type = self.expand_type(item.type)
+
+            if not is_struct(expanded_type):
+                continue
+
+            type_ = self.resolve_type(expanded_type)
+
             if isinstance(item, c_ast.Typedef):
-                if isinstance(item.type, c_ast.TypeDecl):
-                    if isinstance(item.type.type, c_ast.Struct):
-                        if item.type.type.decls is not None:
-                            items = self.load_struct_members(item.type.type)
-                            self.struct_typedefs.append((item.name, items))
-            elif isinstance(item, c_ast.Decl):
-                if isinstance(item.type, c_ast.Struct):
-                    items = self.load_struct_members(item.type)
-                    self.structs.append((item.type.name, items))
+                if type_.decls is None:
+                    continue
+
+                items = self.load_struct_members(type_)
+                self.struct_typedefs.append((item.name, items))
+            else:
+                items = self.load_struct_members(type_)
+                self.structs.append((type_.name, items))
 
     def load_typedefs(self):
         for item in self.file_ast:
