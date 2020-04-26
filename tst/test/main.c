@@ -393,13 +393,22 @@ TEST(assert_substring_error_needle_null)
 
 static void assert_not_substring_error_entry()
 {
-    ASSERT_NOT_SUBSTRING("123", "3");
+    ASSERT_NOT_SUBSTRING("123\t\r\x01", "3\t\r\x01");
 }
 
 TEST(assert_not_substring_error)
 {
-    expect_error_in_subprocess(assert_not_substring_error_entry,
-                               "\"123\" contains \"3\"");
+    expect_error_in_subprocess(
+        assert_not_substring_error_entry,
+        "The haystack contains the needle. See below for details.\n"
+        "\x1b[0m  Haystack:\n"
+        "\n"
+        "    123\\t\\r\\x01\n"
+        "\n"
+        "  Needle:\n"
+        "\n"
+        "    3\\t\\r\\x01\n"
+        "\n");
 }
 
 static void assert_memory_eq_error_entry()

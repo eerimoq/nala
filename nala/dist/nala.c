@@ -1286,12 +1286,13 @@ static char *make_string_readable(const char *string_p)
              fputc(*string_p, file_p);
          } else if (*string_p == '\r') {
              fprintf(file_p, "\\r");
-             fputc(*string_p, file_p);
+         } else if (*string_p == '\t') {
+             fprintf(file_p, "\\t");
          } else if (*string_p == '\n') {
              fprintf(file_p, "\\n");
              fputc(*string_p, file_p);
          } else {
-             fprintf(file_p, "\\x%02x", *string_p);
+             fprintf(file_p, "\\x%02x", (*string_p) & 0xff);
          }
 
          string_p++;
@@ -1299,7 +1300,7 @@ static char *make_string_readable(const char *string_p)
 
     fputc(*string_p, file_p);
     fclose(file_p);
-    
+
     return (buf_p);
 }
 
@@ -1382,10 +1383,14 @@ static const char *nala_format_substring(const char *prefix_p,
         fprintf(file_p, " See below for details.\n");
         color_reset(file_p);
         fprintf(file_p, "  Haystack:\n\n");
+        haystack_p = make_string_readable(haystack_p);
         print_with_line_prefix(file_p, "    ", haystack_p);
+        free((void *)haystack_p);
         fprintf(file_p, "\n\n");
         fprintf(file_p, "  Needle:\n\n");
+        needle_p = make_string_readable(needle_p);
         print_with_line_prefix(file_p, "    ", needle_p);
+        free((void *)needle_p);
         fprintf(file_p, "\n");
     }
 
@@ -2359,11 +2364,13 @@ void nala_assert_substring(const char *haystack_p, const char *needle_p)
 
 void nala_assert_not_substring(const char *haystack_p, const char *needle_p)
 {
-    ASSERTION(haystack_p,
-              needle_p,
-              !nala_check_substring,
-              "%s contains %s\n",
-              nala_format);
+    if (nala_check_substring(haystack_p, needle_p)) {
+        nala_test_failure(
+            nala_format_substring(
+                "The haystack contains the needle.",
+                haystack_p,
+                needle_p));
+    }
 }
 
 void nala_assert_memory(const void *actual_p, const void *expected_p, size_t size)
