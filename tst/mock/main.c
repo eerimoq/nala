@@ -2161,3 +2161,18 @@ TEST(uint8_function)
     uint8_mock();
     uint8(NULL);
 }
+
+TEST(array_of_pointers_function)
+{
+    const char *argv[] = {
+        "a",
+        "b"
+    };
+
+    array_of_pointers_mock_once();
+    array_of_pointers_mock_set_argv_in(&argv[0], sizeof(argv));
+    array_of_pointers(&argv[0]);
+
+    array_of_pointers_mock_once();
+    array_of_pointers(NULL);
+}

@@ -459,3 +459,8 @@ void uint8(uint8_t *buf_p)
 {
     (void)buf_p;
 }
+
+void array_of_pointers(const char *argv[])
+{
+    (void)argv;
+}
