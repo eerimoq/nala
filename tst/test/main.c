@@ -337,7 +337,7 @@ static void assert_true_error_entry()
 TEST(assert_true_error)
 {
     expect_error_in_subprocess(assert_true_error_entry,
-                               "The condition is not true.");
+                               "False is not true.");
 }
 
 static void assert_false_error_entry()
@@ -348,7 +348,7 @@ static void assert_false_error_entry()
 TEST(assert_false_error)
 {
     expect_error_in_subprocess(assert_false_error_entry,
-                               "The condition is not false.");
+                               "True is not false.");
 }
 
 static void assert_substring_error_entry()
@@ -510,7 +510,7 @@ static void assert_error_entry()
 
 TEST(assert_error)
 {
-    expect_error_in_subprocess(assert_error_entry, "assert");
+    expect_error_in_subprocess(assert_error_entry, "The condition is not true.");
 }
 
 static void fail_error_entry()
