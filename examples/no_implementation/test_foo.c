@@ -1,6 +1,5 @@
 #include "foo.h"
 #include "nala.h"
-#include "nala_mocks.h"
 
 TEST(mock_function_without_implementation)
 {

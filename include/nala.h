@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NALA_VERSION "0.162.0"
+#define NALA_VERSION "0.163.0"
 
 /**
  * Assert that given characters, numbers, pointers or strings are
@@ -402,5 +402,9 @@ void nala_assert_false(bool actual);
 void nala_assert(bool cond);
 
 void nala_fail(const char *message_p);
+
+#ifdef NALA_INCLUDE_NALA_MOCKS_H
+#    include "nala_mocks.h"
+#endif
 
 #endif

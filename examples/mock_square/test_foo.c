@@ -1,6 +1,5 @@
 #include "foo.h"
 #include "nala.h"
-#include "nala_mocks.h"
 
 static int my_square(int x)
 {

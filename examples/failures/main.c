@@ -3,7 +3,6 @@
 #include <sys/mount.h>
 #include <fcntl.h>
 #include "nala.h"
-#include "nala_mocks.h"
 #include "foo.h"
 
 TEST(time_called_more_times_than_expected)

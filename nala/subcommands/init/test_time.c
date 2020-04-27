@@ -1,6 +1,5 @@
 #include <time.h>
 #include "nala.h"
-#include "nala_mocks.h"
 
 TEST(mock_time)
 {

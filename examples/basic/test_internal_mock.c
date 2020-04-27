@@ -1,5 +1,4 @@
 #include "nala.h"
-#include "nala_mocks.h"
 
 int foo(void)
 {

@@ -18,7 +18,6 @@
 
 #include "subprocess.h"
 #include "nala.h"
-#include "nala_mocks.h"
 /* Must be included before dummy_functions.h to find the foo-struct
    before all mocked functions. */
 #include "dummy_functions_not_mocked.h"

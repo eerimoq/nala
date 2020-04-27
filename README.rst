@@ -102,7 +102,6 @@ And the time tests:
 
    #include <time.h>
    #include "nala.h"
-   #include "nala_mocks.h"
 
    TEST(mock_time)
    {
@@ -129,7 +128,6 @@ from the time mock.
 
    #include <time.h>
    #include "nala.h"
-   #include "nala_mocks.h"
 
    TEST(mock_time)
    {

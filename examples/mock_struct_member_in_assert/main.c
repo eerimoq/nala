@@ -1,7 +1,6 @@
 #include <string.h>
 #include "foo.h"
 #include "nala.h"
-#include "nala_mocks.h"
 
 static void foo_p_in_assert(struct foo_t *actual_p,
                             struct foo_t *expected_p,

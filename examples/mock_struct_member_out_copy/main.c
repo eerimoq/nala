@@ -1,7 +1,6 @@
 #include <string.h>
 #include "foo.h"
 #include "nala.h"
-#include "nala_mocks.h"
 
 static void foo_p_out_copy(struct foo_t *dst_p,
                            struct foo_t *src_p,
