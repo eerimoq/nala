@@ -1,0 +1,1 @@
+-Wl,--wrap=rename_parameters_with_name -Wl,--wrap=rename_parameters_without_name

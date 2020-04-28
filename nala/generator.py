@@ -374,7 +374,10 @@ class FunctionMock:
 
     def assign_names_to_unnamed_params(self, params):
         for i, param in enumerate(params):
-            if not isinstance(param, c_ast.Typename):
+            if isinstance(param, c_ast.EllipsisParam):
+                continue
+
+            if param.name is not None:
                 continue
 
             if self.is_void(param):

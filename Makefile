@@ -33,6 +33,12 @@ test-python:
 test-c:
 	$(MAKE) -C tst
 
+github-ci:
+	python setup.py test
+	$(MAKE) -C tst/no_mock
+# Uncomment when traceback works.
+#	$(MAKE) -C tst/test
+
 dist:
 	amalgamate/amalgamate.py -c amalgamate/nala.h.json -s .
 	amalgamate/amalgamate.py -c amalgamate/nala.c.json -s .

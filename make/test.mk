@@ -19,11 +19,13 @@ CFLAGS += -no-pie
 CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -Wpedantic
-CFLAGS += -Wjump-misses-init
-CFLAGS += -Wlogical-op
 CFLAGS += -Werror
 CFLAGS += -Wshadow
 CFLAGS += -Wno-unused-command-line-argument
+CFLAGS_EXTRA += -Wjump-misses-init
+CFLAGS_EXTRA += -Wlogical-op
+CFLAGS += $(shell $(CC) -Werror $(CFLAGS_EXTRA) -c $(NALA_ROOT)/dummy.c -E 2> /dev/null \
+		  && echo $(CFLAGS_EXTRA))
 ifeq ($(SANITIZE), yes)
 CFLAGS += -fsanitize=address
 CFLAGS += -fsanitize=undefined
@@ -36,6 +38,7 @@ EXEARGS += $(ARGS)
 EXEARGS += $(JOBS:%=-j %)
 EXEARGS += $(REPORT_JSON:%=-r %)
 TESTS_PP_C = $(BUILD)/tests.pp.c
+WRAP_INTERNAL_SYMBOLS ?= yes
 
 .PHONY: all build generate clean coverage gdb gdb-run auto auto-run
 
@@ -82,7 +85,9 @@ $(patsubst %.c,$(BUILD)%.o,$(abspath $1)): $1
 	@echo "CC $1"
 	mkdir -p $$(@D)
 	$$(CC) -MMD $$(CFLAGS) -c -o $$@ $$<
+ifeq ($(WRAP_INTERNAL_SYMBOLS), yes)
 	$(NALA) wrap_internal_symbols $(BUILD)/nala_mocks.ldflags $$@
+endif
 endef
 $(foreach file,$(SRC),$(eval $(call COMPILE_template,$(file))))
 

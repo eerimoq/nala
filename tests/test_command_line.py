@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+import platform
 import unittest
 from unittest.mock import patch
 import shutil
@@ -53,13 +54,7 @@ class CommandLineTest(unittest.TestCase):
         self.assert_files_equal('output/nala_mocks.ldflags',
                                 f'tests/files/test_{name}_nala_mocks.ldflags')
 
-    def test_generate_mocks(self):
-        names = [
-            'empty',
-            'collect',
-            'dummy_functions'
-        ]
-
+    def generate_mocks(self, names):
         for name in names:
             argv = [
                 'nala',
@@ -75,6 +70,25 @@ class CommandLineTest(unittest.TestCase):
                 nala.cli.main()
 
             self.assert_generated_files(name)
+
+    @unittest.skipIf(platform.system() != 'Linux', 'Only Linux.')
+    def test_generate_mocks_linux(self):
+        names = [
+            'empty',
+            'collect',
+            'dummy_functions'
+        ]
+
+        self.generate_mocks(names)
+
+    @unittest.skipIf(platform.system() != 'Darwin', 'Only MacOS.')
+    def test_generate_mocks_darwin(self):
+        names = [
+            'empty',
+            'collect'
+        ]
+
+        self.generate_mocks(names)
 
     def test_generate_mocks_missing_declaration(self):
         argv = [
@@ -130,6 +144,23 @@ class CommandLineTest(unittest.TestCase):
 
         self.assert_generated_files('open')
 
+    def test_generate_mocks_rename_parameters_without_name(self):
+        argv = [
+            'nala',
+            'generate_mocks',
+            '-o', 'output',
+            '-r', 'tests/files/test_rename_parameters_without_name.txt',
+            'tests/files/test_rename_parameters_without_name_tests.pp.c'
+        ]
+
+        remove_optput()
+        pre_process_file('rename_parameters_without_name')
+
+        with patch('sys.argv', argv):
+            nala.cli.main()
+
+        self.assert_generated_files('rename_parameters_without_name')
+
     def test_generate_mocks_rename_underscores_tests(self):
         argv = [
             'nala',
@@ -182,6 +213,7 @@ class CommandLineTest(unittest.TestCase):
             filecmp.cmp('test_wrap_internal_symbols.o',
                         'tests/files/test_wrap_internal_symbols.wrapped.o'))
 
+    @unittest.skipIf(platform.system() != 'Linux', 'Only Linux.')
     def test_regenerate_mocks_cache_no_change(self):
         argv = [
             'nala',
@@ -209,6 +241,7 @@ class CommandLineTest(unittest.TestCase):
         self.assertEqual(os.stat('output/nala_mocks.c').st_mtime, 0)
         self.assertEqual(os.stat('output/nala_mocks.ldflags').st_mtime, 0)
 
+    @unittest.skipIf(platform.system() != 'Linux', 'Only Linux.')
     def test_regenerate_mocks_no_cache_no_change(self):
         argv = [
             'nala',

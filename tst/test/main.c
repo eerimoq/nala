@@ -535,9 +535,14 @@ TEST(capture_output)
     ASSERT_EQ(errput, "Bar!\n");
 }
 
+static void set_to_zero(int *value_p)
+{
+    *value_p = 0;
+}
+
 static void fail_segfault_entry()
 {
-    (*((int *)0)) = 1;
+    set_to_zero(NULL);
 }
 
 TEST(fail_segfault)

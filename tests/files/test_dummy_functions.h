@@ -3,10 +3,14 @@
 
 #include <stdarg.h>
 
+#pragma pack(4)
+
 typedef struct DummyStruct
 {
     int number;
 } DummyStruct;
+
+#pragma pack()
 
 struct struct_param_type
 {

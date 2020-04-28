@@ -1,0 +1,2 @@
+rename_parameters_with_name(path, flags);
+rename_parameters_without_name(path, flags);

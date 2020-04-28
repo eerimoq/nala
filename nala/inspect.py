@@ -104,6 +104,16 @@ def rename_parameters(function_declaration, param_names):
     if function_declaration.type.args is None:
         return function_declaration
 
+    params = []
+
+    for param in function_declaration.type.args.params:
+        if isinstance(param, c_ast.Typename):
+            param = c_ast.Decl(param.name, [], [], [], param.type, None, None)
+
+        params.append(param)
+
+    function_declaration.type.args.params = params
+
     for i, param in enumerate(function_declaration.type.args.params):
         if isinstance(param, c_ast.EllipsisParam):
             continue
@@ -125,7 +135,7 @@ def rename_parameters(function_declaration, param_names):
             param_type = param_type.type
 
         param_type.declname = param.name
-
+    
     return function_declaration
 
 
@@ -166,13 +176,15 @@ PRIMITIVE_TYPES = [
 LINEMARKER = re.compile(r'^# \d+ "((?:\\.|[^\\"])*)"((?: [1234])*)$')
 
 TOKENS = {
-    'LINEMARKER': r"^#.*$",
+    'LINEMARKER': r"^# \d+ .*$",
+    # Only single line for now. Can they be many lines?
+    'PRAGMA': r'^#pragma.*$',
     'KEYWORD': (
         "\\b(?:auto|break|case|char|const|continue|default|do|double|else|enum|"
         "extern|float"
         "|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct"
         "|switch|typedef|union|unsigned|void|volatile|while|__extension__|"
-        "__attribute__|__restrict|__signed__)\\b"
+        "__attribute__|__restrict|__signed__|__signed|_Nullable)\\b"
     ),
     'IDENTIFIER': r"\b[a-zA-Z_](?:[a-zA-Z_0-9])*\b",
     'CHARACTER': r"L?'(?:\\.|[^\\'])+'",
@@ -553,7 +565,14 @@ class ForgivingDeclarationParser:
                 self.next()
 
             self.mark_for_erase(begin, self.current.span[1])
-        elif self.current.is_keyword('__extension__', '__restrict', '__signed__'):
+        elif self.current.is_keyword('__extension__',
+                                     '__restrict',
+                                     '__signed__',
+                                     '__signed',
+                                     '_Nullable'):
+            self.mark_for_erase(*self.current.span)
+            self.next()
+        elif self.current.type == 'PRAGMA':
             self.mark_for_erase(*self.current.span)
             self.next()
 
