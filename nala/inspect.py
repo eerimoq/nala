@@ -135,7 +135,7 @@ def rename_parameters(function_declaration, param_names):
             param_type = param_type.type
 
         param_type.declname = param.name
-    
+
     return function_declaration
 
 
@@ -177,7 +177,6 @@ LINEMARKER = re.compile(r'^# \d+ "((?:\\.|[^\\"])*)"((?: [1234])*)$')
 
 TOKENS = {
     'LINEMARKER': r"^# \d+ .*$",
-    # Only single line for now. Can they be many lines?
     'PRAGMA': r'^#pragma.*$',
     'KEYWORD': (
         "\\b(?:auto|break|case|char|const|continue|default|do|double|else|enum|"

@@ -5,14 +5,18 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#pragma pack(4)
+/* Pragma on multiple lines. */
+#pragma pack(                                   \
+    4                                           \
+)
 
 typedef struct DummyStruct
 {
     int number;
 } DummyStruct;
 
-#pragma pack()
+/* Spaces after #. */
+#    pragma pack()
 
 struct struct_param_type
 {
