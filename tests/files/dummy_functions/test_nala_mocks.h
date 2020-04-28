@@ -23,7 +23,7 @@ Do not edit manually
 #include <poll.h>
 #include <mntent.h>
 #include "../nala/dist/nala.h"
-#include "../tests/files/test_dummy_functions.h"
+#include "../tests/files/dummy_functions/test.h"
 
 typedef void (*nala_mock_in_assert_t)(const void *actual_p,
                                       const void *expected_p,

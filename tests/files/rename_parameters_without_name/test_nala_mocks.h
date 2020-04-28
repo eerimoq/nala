@@ -13,7 +13,7 @@ Do not edit manually
 #include <stdarg.h>
 #include <stddef.h>
 #include "../nala/dist/nala.h"
-#include "../tests/files/test_rename_parameters_without_name.h"
+#include "../tests/files/rename_parameters_without_name/test.h"
 
 typedef void (*nala_mock_in_assert_t)(const void *actual_p,
                                       const void *expected_p,

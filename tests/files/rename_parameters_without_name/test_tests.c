@@ -1,5 +1,5 @@
 #include "nala.h"
-#include "test_rename_parameters_without_name.h"
+#include "test.h"
 
 TEST(test)
 {

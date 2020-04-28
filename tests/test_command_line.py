@@ -33,8 +33,8 @@ def pre_process_file(name):
         'gcc',
         '-E',
         '-I', 'nala/dist',
-        '-o', f'tests/files/test_{name}_tests.pp.c',
-        f'tests/files/test_{name}_tests.c'
+        '-o', f'tests/files/{name}/test_tests.pp.c',
+        f'tests/files/{name}/test_tests.c'
     ])
 
 
@@ -48,11 +48,11 @@ class CommandLineTest(unittest.TestCase):
 
     def assert_generated_files(self, name):
         self.assert_files_equal('output/nala_mocks.h',
-                                f'tests/files/test_{name}_nala_mocks.h')
+                                f'tests/files/{name}/test_nala_mocks.h')
         self.assert_files_equal('output/nala_mocks.c',
-                                f'tests/files/test_{name}_nala_mocks.c')
+                                f'tests/files/{name}/test_nala_mocks.c')
         self.assert_files_equal('output/nala_mocks.ldflags',
-                                f'tests/files/test_{name}_nala_mocks.ldflags')
+                                f'tests/files/{name}/test_nala_mocks.ldflags')
 
     def generate_mocks(self, names):
         for name in names:
@@ -60,7 +60,7 @@ class CommandLineTest(unittest.TestCase):
                 'nala',
                 'generate_mocks',
                 '-o', 'output',
-                f'tests/files/test_{name}_tests.pp.c'
+                f'tests/files/{name}/test_tests.pp.c'
             ]
 
             remove_optput()
@@ -96,7 +96,7 @@ class CommandLineTest(unittest.TestCase):
             '-d',
             'generate_mocks',
             '-o', 'output',
-            'tests/files/test_missing_declaration_tests.pp.c'
+            'tests/files/missing_declaration/test_tests.pp.c'
         ]
 
         remove_optput()
@@ -133,7 +133,7 @@ class CommandLineTest(unittest.TestCase):
             'generate_mocks',
             '-o', 'output',
             '--no-real-variadic-functions',
-            'tests/files/test_open_tests.pp.c'
+            'tests/files/open/test_tests.pp.c'
         ]
 
         remove_optput()
@@ -149,8 +149,8 @@ class CommandLineTest(unittest.TestCase):
             'nala',
             'generate_mocks',
             '-o', 'output',
-            '-r', 'tests/files/test_rename_parameters_without_name.txt',
-            'tests/files/test_rename_parameters_without_name_tests.pp.c'
+            '-r', 'tests/files/rename_parameters_without_name/test.txt',
+            'tests/files/rename_parameters_without_name/test_tests.pp.c'
         ]
 
         remove_optput()
@@ -166,7 +166,7 @@ class CommandLineTest(unittest.TestCase):
             'nala',
             'generate_mocks',
             '-o', 'output',
-            'tests/files/test_rename_underscores_tests.pp.c'
+            'tests/files/rename_underscores/test_tests.pp.c'
         ]
 
         remove_optput()
@@ -183,7 +183,7 @@ class CommandLineTest(unittest.TestCase):
             'generate_mocks',
             '-o', 'output',
             '--no-rename-parameters',
-            'tests/files/test_no_rename_underscores_tests.pp.c'
+            'tests/files/no_rename_underscores/test_tests.pp.c'
         ]
 
         remove_optput()
@@ -198,20 +198,20 @@ class CommandLineTest(unittest.TestCase):
         argv = [
             'nala',
             'wrap_internal_symbols',
-            'tests/files/test_wrap_internal_symbols.ldflags',
-            'test_wrap_internal_symbols.o'
+            'tests/files/wrap_internal_symbols/test.ldflags',
+            'wrap_internal_symbols_test.o'
         ]
 
         # The file is modified in place, so make a copy.
-        shutil.copyfile('tests/files/test_wrap_internal_symbols.o',
-                        'test_wrap_internal_symbols.o')
+        shutil.copyfile('tests/files/wrap_internal_symbols/test.o',
+                        'wrap_internal_symbols_test.o')
 
         with patch('sys.argv', argv):
             nala.cli.main()
 
         self.assertTrue(
-            filecmp.cmp('test_wrap_internal_symbols.o',
-                        'tests/files/test_wrap_internal_symbols.wrapped.o'))
+            filecmp.cmp('wrap_internal_symbols_test.o',
+                        'tests/files/wrap_internal_symbols/test.wrapped.o'))
 
     @unittest.skipIf(platform.system() != 'Linux', 'Only Linux.')
     def test_regenerate_mocks_cache_no_change(self):
@@ -219,7 +219,7 @@ class CommandLineTest(unittest.TestCase):
             'nala',
             'generate_mocks',
             '-o', 'output',
-            'tests/files/test_dummy_functions_tests.pp.c'
+            'tests/files/dummy_functions/test_tests.pp.c'
         ]
 
         remove_optput()
@@ -248,7 +248,7 @@ class CommandLineTest(unittest.TestCase):
             'generate_mocks',
             '-o', 'output',
             '--no-cache',
-            'tests/files/test_dummy_functions_tests.pp.c'
+            'tests/files/dummy_functions/test_tests.pp.c'
         ]
 
         remove_optput()
@@ -275,7 +275,7 @@ class CommandLineTest(unittest.TestCase):
             'nala',
             'generate_mocks',
             '-o', 'output',
-            'tests/files/test_empty_tests.pp.c'
+            'tests/files/empty/test_tests.pp.c'
         ]
 
         remove_optput()

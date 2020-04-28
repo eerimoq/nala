@@ -1,5 +1,5 @@
 #include "nala.h"
-#include "test_collect.h"
+#include "test.h"
 
 TEST(all)
 {

@@ -12,7 +12,7 @@
 #include <mntent.h>
 
 #include "nala.h"
-#include "test_dummy_functions.h"
+#include "test.h"
 
 static void function_error_in_subprocess(void (*entry)(void *arg_p),
                                          const char *expected_p)
