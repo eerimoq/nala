@@ -18,8 +18,6 @@ script:
   - coverage combine .coverage.*
   - make -C my-suite NALA="PYTHONPATH=.. python3 -m nala" clean
   - make -C my-suite NALA="PYTHONPATH=.. python3 -m nala"
-  - make -C my-suite NALA="PYTHONPATH=.. python3 -m nala" CC=clang clean
-  - make -C my-suite NALA="PYTHONPATH=.. python3 -m nala" CC=clang
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -X coveragepy
