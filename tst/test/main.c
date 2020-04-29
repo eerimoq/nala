@@ -1189,3 +1189,50 @@ TEST(subprocess_run_passed)
 
     subprocess_result_free(result_p);
 }
+
+static void with_two_messages_entry()
+{
+    WITH_MESSAGE("Additional message (i = %d).", 5) {
+        WITH_MESSAGE("Another additional message (j = %d).", 1) {
+            ASSERT(1 == 2);
+        }
+    }
+}
+
+TEST(with_two_messages)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(with_two_messages_entry, NULL);
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(
+        result_p->stdout.buf_p,
+        "  Messages: \x1b[0m\x1b[31m\x1b[1mAdditional message (i = 5).\n");
+    ASSERT_SUBSTRING(
+        result_p->stdout.buf_p,
+        "            \x1b[0m\x1b[31m\x1b[1mAnother additional message (j = 1).\n");
+    subprocess_result_free(result_p);
+}
+
+static void old_with_message_not_part_of_messages_entry()
+{
+    WITH_MESSAGE("Should not be shown.") {
+        ASSERT(1 == 1);
+    }
+
+    WITH_MESSAGE("This should be shown.") {
+        ASSERT(1 == 2);
+    }
+}
+
+TEST(old_with_message_not_part_of_messages)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(old_with_message_not_part_of_messages_entry,
+                                      NULL);
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_NOT_SUBSTRING(result_p->stdout.buf_p, "Should not be shown.");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "This should be shown.");
+    subprocess_result_free(result_p);
+}

@@ -2,6 +2,7 @@
 
 TEST(assertions)
 {
+    int i;
     int array[] = { 1, 5, 2 };
 
     ASSERT_EQ(NULL, NULL);
@@ -27,4 +28,10 @@ TEST(assertions)
 
     ASSERT_EQ(output, "output!\n");
     ASSERT_EQ(errput, "errput!\n");
+
+    for (i = 0; i < 3; i++) {
+        WITH_MESSAGE("i: %d", i) {
+            ASSERT_EQ(array[i], array[i]);
+        }
+    }
 }

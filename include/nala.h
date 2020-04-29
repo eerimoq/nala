@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NALA_VERSION "0.163.2"
+#define NALA_VERSION "0.164.0"
 
 /**
  * Assert that given characters, numbers, pointers or strings are
@@ -125,6 +125,15 @@
          stdout_name ## i++, nala_capture_output_stop())
 
 /**
+ * Additional message on error block.
+ */
+#define WITH_MESSAGE(format, ...)                                       \
+    int NALA_UNIQUE(i);                                                 \
+    for (NALA_UNIQUE(i) = 0, nala_with_message_push(format, ##__VA_ARGS__); \
+         NALA_UNIQUE(i) < 1;                                            \
+         NALA_UNIQUE(i)++, nala_with_message_pop())
+
+/**
  * A test case.
  */
 #define TEST(name)                                      \
@@ -161,6 +170,12 @@ void nala_exit(int status);
 #define NALA_CHECK_LE  3
 #define NALA_CHECK_GT  4
 #define NALA_CHECK_GE  5
+
+#define NALA_TOKENPASTE(x, y) NALA_TOKENPASTE2(x, y)
+
+#define NALA_TOKENPASTE2(x, y) x ## y
+
+#define NALA_UNIQUE(x)  NALA_TOKENPASTE(x, NALA_TOKENPASTE(___, __LINE__))
 
 struct nala_traceback_t {
     void *addresses[32];
@@ -402,6 +417,10 @@ void nala_assert_false(bool actual);
 void nala_assert(bool cond);
 
 void nala_fail(const char *message_p);
+
+void nala_with_message_push(const char *format_p, ...);
+
+void nala_with_message_pop(void);
 
 #ifdef NALA_INCLUDE_NALA_MOCKS_H
 #    include "nala_mocks.h"

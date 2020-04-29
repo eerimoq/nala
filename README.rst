@@ -69,6 +69,7 @@ The assertions tests looks like this:
 
    TEST(assertions)
    {
+       int i;
        int array[] = { 1, 5, 2 };
 
        ASSERT_EQ(NULL, NULL);
@@ -94,6 +95,12 @@ The assertions tests looks like this:
 
        ASSERT_EQ(output, "output!\n");
        ASSERT_EQ(errput, "errput!\n");
+
+       for (i = 0; i < 3; i++) {
+           WITH_MESSAGE("i: %d", i) {
+               ASSERT_EQ(array[i], array[i]);
+           }
+       }
    }
 
 And the time tests:
@@ -178,6 +185,8 @@ all defined in `include/nala.h`_.
    ASSERT(cond);                                 // Assert that given condition is true.
    FAIL(message);                                // Fail current test with given message.
    CAPTURE_OUTPUT(stdout_name, stderr_name);     // A capture output block.
+   WITH_MESSAGE(format, ...);                    // Additional message on error block.
+
 
 Mocking
 =======

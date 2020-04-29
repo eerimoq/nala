@@ -268,3 +268,15 @@ TEST(nested_inline_structs)
     value.e.d++;
     bar(&value);
 }
+
+TEST(with_message)
+{
+    bool values[] = { true, true, false, true };
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        WITH_MESSAGE("i: %d", i) {
+            ASSERT_TRUE(values[i]);
+        }
+    }
+}

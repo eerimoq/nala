@@ -59,6 +59,17 @@ struct capture_output_t {
     FILE *stdout_p;
 };
 
+struct with_message_t {
+    char *message_p;
+    struct with_message_t *next_p;
+    struct with_message_t *prev_p;
+};
+
+struct with_message_stack_t {
+    struct with_message_t *head_p;
+    struct with_message_t *tail_p;
+};
+
 static struct nala_test_t *current_test_p = NULL;
 
 static struct tests_t tests = {
@@ -68,6 +79,7 @@ static struct tests_t tests = {
 
 static struct capture_output_t capture_stdout;
 static struct capture_output_t capture_stderr;
+static struct with_message_stack_t with_message_stack;
 
 __attribute__ ((weak)) void nala_assert_all_mocks_completed(void)
 {
@@ -274,6 +286,68 @@ static void capture_output_stop(struct capture_output_t *self_p)
     printf("%s", *self_p->output_pp);
 }
 
+static void with_message_stack_init(struct with_message_stack_t *self_p)
+{
+    self_p->head_p = NULL;
+    self_p->tail_p = NULL;
+}
+
+static void with_message_stack_push(struct with_message_stack_t *self_p,
+                                    char *message_p)
+{
+    struct with_message_t *item_p;
+
+    item_p = malloc(sizeof(*item_p));
+    item_p->message_p = message_p;
+    item_p->next_p = NULL;
+
+    if (self_p->head_p == NULL) {
+        self_p->head_p = item_p;
+    } else {
+        item_p->prev_p = self_p->tail_p;
+        self_p->tail_p->next_p = item_p;
+    }
+
+    self_p->tail_p = item_p;
+}
+
+static void with_message_stack_pop(struct with_message_stack_t *self_p)
+{
+    struct with_message_t *item_p;
+
+    item_p = self_p->tail_p;
+
+    if (item_p == self_p->head_p) {
+        self_p->head_p = NULL;
+    } else {
+        self_p->tail_p = item_p->prev_p;
+        self_p->tail_p->next_p = NULL;
+    }
+
+    free(item_p->message_p);
+    free(item_p);
+}
+
+static bool with_message_stack_is_empty(struct with_message_stack_t *self_p)
+{
+    return (self_p->head_p == NULL);
+}
+
+static void with_message_stack_print(struct with_message_stack_t *self_p)
+{
+    struct with_message_t *item_p;
+    char *prefix_p;
+
+    prefix_p = "  Messages: ";
+    item_p = self_p->head_p;
+
+    while (item_p != NULL) {
+        printf("%s"COLOR_BOLD(RED, "%s\n"), prefix_p, item_p->message_p);
+        prefix_p = "            ";
+        item_p = item_p->next_p;
+    }
+}
+
 FILE *nala_get_stdout(void)
 {
     if (capture_stdout.running) {
@@ -461,6 +535,7 @@ static void test_entry(void *arg_p)
     test_p = (struct nala_test_t *)arg_p;
     capture_output_init(&capture_stdout, stdout);
     capture_output_init(&capture_stderr, stderr);
+    with_message_stack_init(&with_message_stack);
     nala_reset_all_mocks();
     test_p->func();
     nala_exit(0);
@@ -1178,16 +1253,30 @@ static bool traceback_skip_filter(void *arg_p, const char *line_p)
 void nala_test_failure(const char *message_p)
 {
     const char *traceback_p;
+    int width;
 
     nala_suspend_all_mocks();
     nala_capture_output_stop();
     capture_output_destroy(&capture_stdout);
     capture_output_destroy(&capture_stderr);
     print_test_failure_report_begin();
-    printf("  Test:  " COLOR_BOLD(CYAN, "%s\n"), full_test_name(current_test_p));
+
+    if (with_message_stack_is_empty(&with_message_stack)) {
+        width = 6;
+    } else {
+        width = 9;
+    }
+
+    printf("  Test: " COLOR_BOLD(CYAN, "%*s%s\n"),
+           width - 5,
+           "",
+           full_test_name(current_test_p));
+    with_message_stack_print(&with_message_stack);
 
     if (nala_mock_current_is_set()) {
-        printf("  Error: "COLOR_BOLD(RED, "Mocked %s(%s): %s\n"),
+        printf("  Error: "COLOR_BOLD(RED, "%*sMocked %s(%s): %s\n"),
+               width - 6,
+               "",
                nala_mock_func_p,
                nala_mock_param_p,
                message_p);
@@ -1195,7 +1284,7 @@ void nala_test_failure(const char *message_p)
         printf("%s", traceback_p);
         free((void *)traceback_p);
     } else {
-        printf("  Error: %s", message_p);
+        printf("  Error: %*s%s", width - 6, "", message_p);
     }
 
     printf("\n");
@@ -2102,6 +2191,31 @@ void nala_fail(const char *message_p)
     strcpy(&message[0], message_p);
     strcat(&message[0], "\n");
     nala_test_failure(nala_format(&message[0]));
+}
+
+void nala_with_message_push(const char *format_p, ...)
+{
+    char *message_p;
+    FILE *file_p;
+    size_t size;
+    va_list vl;
+
+    nala_suspend_all_mocks();
+    file_p = open_memstream(&message_p, &size);
+    va_start(vl, format_p);
+    vfprintf(file_p, format_p, vl);
+    va_end(vl);
+    fputc('\0', file_p);
+    fclose(file_p);
+    with_message_stack_push(&with_message_stack, message_p);
+    nala_resume_all_mocks();
+}
+
+void nala_with_message_pop(void)
+{
+    nala_suspend_all_mocks();
+    with_message_stack_pop(&with_message_stack);
+    nala_resume_all_mocks();
 }
 
 void nala_exit(int status)
