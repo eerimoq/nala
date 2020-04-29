@@ -337,12 +337,12 @@ class FunctionMock:
             if is_pointer_or_array(expanded_param.type):
                 if is_char_pointer(expanded_param.type):
                     self.char_pointer_params.append(param)
-                    self.ignore_params.append(param.name)
+                    self.ignore_params.append((param.name, True))
                 else:
                     self.pointer_params.append(param)
             else:
                 self.non_pointer_params.append(param)
-                self.ignore_params.append(param.name)
+                self.ignore_params.append((param.name, False))
                 continue
 
             param_buf = self.rename_param(param, 'buf_p')

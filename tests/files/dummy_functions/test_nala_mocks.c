@@ -740,9 +740,14 @@ void nala_set_param_buf(struct nala_set_param *self_p,
         nala_free(self_p->buf_p);
     }
 
-    self_p->buf_p = nala_xmalloc(size);
-    self_p->size = size;
-    memcpy(self_p->buf_p, buf_p, size);
+    if (buf_p != NULL) {
+        self_p->buf_p = nala_xmalloc(size);
+        self_p->size = size;
+        memcpy(self_p->buf_p, buf_p, size);
+    } else {
+        self_p->buf_p = NULL;
+        self_p->size = 0;
+    }
 }
 
 void nala_set_param_string(struct nala_set_param *self_p, const char *string_p)
@@ -6317,11 +6322,13 @@ struct nala_fopen_params_t *fopen_mock_get_params_in(int handle)
 void fopen_mock_ignore_path_in(void)
 {
     nala_get_params_fopen()->ignore_path_in = true;
+    nala_set_param_buf(&nala_get_params_fopen()->path_in, NULL, 0);
 }
 
 void fopen_mock_ignore_mode_in(void)
 {
     nala_get_params_fopen()->ignore_mode_in = true;
+    nala_set_param_buf(&nala_get_params_fopen()->mode_in, NULL, 0);
 }
 
 void fopen_mock_set_path_in(const char *buf_p, size_t size)
@@ -10676,16 +10683,19 @@ struct nala_mount_params_t *mount_mock_get_params_in(int handle)
 void mount_mock_ignore_source_in(void)
 {
     nala_get_params_mount()->ignore_source_in = true;
+    nala_set_param_buf(&nala_get_params_mount()->source_in, NULL, 0);
 }
 
 void mount_mock_ignore_target_in(void)
 {
     nala_get_params_mount()->ignore_target_in = true;
+    nala_set_param_buf(&nala_get_params_mount()->target_in, NULL, 0);
 }
 
 void mount_mock_ignore_filesystemtype_in(void)
 {
     nala_get_params_mount()->ignore_filesystemtype_in = true;
+    nala_set_param_buf(&nala_get_params_mount()->filesystemtype_in, NULL, 0);
 }
 
 void mount_mock_ignore_mountflags_in(void)
@@ -11228,6 +11238,7 @@ struct nala_output_message_params_t *output_message_mock_get_params_in(int handl
 void output_message_mock_ignore_message_in(void)
 {
     nala_get_params_output_message()->ignore_message_in = true;
+    nala_set_param_buf(&nala_get_params_output_message()->message_in, NULL, 0);
 }
 
 void output_message_mock_set_message_in(const char *buf_p, size_t size)
@@ -14728,6 +14739,7 @@ struct nala_statvfs_params_t *statvfs_mock_get_params_in(int handle)
 void statvfs_mock_ignore_path_in(void)
 {
     nala_get_params_statvfs()->ignore_path_in = true;
+    nala_set_param_buf(&nala_get_params_statvfs()->path_in, NULL, 0);
 }
 
 void statvfs_mock_set_path_in(const char *buf_p, size_t size)

@@ -740,9 +740,14 @@ void nala_set_param_buf(struct nala_set_param *self_p,
         nala_free(self_p->buf_p);
     }
 
-    self_p->buf_p = nala_xmalloc(size);
-    self_p->size = size;
-    memcpy(self_p->buf_p, buf_p, size);
+    if (buf_p != NULL) {
+        self_p->buf_p = nala_xmalloc(size);
+        self_p->size = size;
+        memcpy(self_p->buf_p, buf_p, size);
+    } else {
+        self_p->buf_p = NULL;
+        self_p->size = 0;
+    }
 }
 
 void nala_set_param_string(struct nala_set_param *self_p, const char *string_p)
@@ -1663,6 +1668,7 @@ struct nala_rename_parameters_with_name_params_t *rename_parameters_with_name_mo
 void rename_parameters_with_name_mock_ignore_path_in(void)
 {
     nala_get_params_rename_parameters_with_name()->ignore_path_in = true;
+    nala_set_param_buf(&nala_get_params_rename_parameters_with_name()->path_in, NULL, 0);
 }
 
 void rename_parameters_with_name_mock_ignore_flags_in(void)
@@ -2050,6 +2056,7 @@ struct nala_rename_parameters_without_name_params_t *rename_parameters_without_n
 void rename_parameters_without_name_mock_ignore_path_in(void)
 {
     nala_get_params_rename_parameters_without_name()->ignore_path_in = true;
+    nala_set_param_buf(&nala_get_params_rename_parameters_without_name()->path_in, NULL, 0);
 }
 
 void rename_parameters_without_name_mock_ignore_flags_in(void)

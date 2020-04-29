@@ -499,11 +499,14 @@ struct nala_{{mock.func_name}}_params_t *{{mock.func_name}}_mock_get_params_in(i
 
     return (&instance_p->data.params_in);
 }
-{% for param in mock.ignore_params %}
+{% for param, is_char_pointer in mock.ignore_params %}
 
 void {{mock.func_name}}_mock_ignore_{{param}}_in(void)
 {
     nala_get_params_{{mock.func_name}}()->ignore_{{param}}_in = true;
+{% if is_char_pointer %}
+    nala_set_param_buf(&nala_get_params_{{mock.func_name}}()->{{param}}_in, NULL, 0);
+{% endif %}
 }
 {% endfor %}
 {% for param, buf, actual, expected, dst, src, _ in mock.set_params %}

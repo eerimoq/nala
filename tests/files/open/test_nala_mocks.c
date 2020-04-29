@@ -740,9 +740,14 @@ void nala_set_param_buf(struct nala_set_param *self_p,
         nala_free(self_p->buf_p);
     }
 
-    self_p->buf_p = nala_xmalloc(size);
-    self_p->size = size;
-    memcpy(self_p->buf_p, buf_p, size);
+    if (buf_p != NULL) {
+        self_p->buf_p = nala_xmalloc(size);
+        self_p->size = size;
+        memcpy(self_p->buf_p, buf_p, size);
+    } else {
+        self_p->buf_p = NULL;
+        self_p->size = 0;
+    }
 }
 
 void nala_set_param_string(struct nala_set_param *self_p, const char *string_p)
@@ -1717,6 +1722,7 @@ struct nala_open_params_t *open_mock_get_params_in(int handle)
 void open_mock_ignore_pathname_in(void)
 {
     nala_get_params_open()->ignore_pathname_in = true;
+    nala_set_param_buf(&nala_get_params_open()->pathname_in, NULL, 0);
 }
 
 void open_mock_ignore_flags_in(void)

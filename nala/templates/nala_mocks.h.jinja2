@@ -56,7 +56,7 @@ int {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}});
 {{mock.set_errno_func | render}};
 void {{mock.func_name}}_mock_set_callback({{mock.callback_decl | render}});
 struct nala_{{mock.func_name}}_params_t *{{mock.func_name}}_mock_get_params_in(int handle);
-{% for param in mock.ignore_params %}
+{% for param, _ in mock.ignore_params %}
 void {{mock.func_name}}_mock_ignore_{{param}}_in(void);
 {% endfor %}
 {% for param, buf, actual, expected, dst, src, _ in mock.set_params %}

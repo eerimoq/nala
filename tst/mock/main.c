@@ -315,6 +315,18 @@ TEST(output_message_function_error_check_pointers)
         "Mocked output_message(message): 0x");
 }
 
+TEST(output_message_function_ignore_message)
+{
+    /* ignore_message_in() should ignore both NULL and "". */
+    output_message_mock_once(NULL);
+    output_message_mock_ignore_message_in();
+    output_message("bar");
+
+    output_message_mock_once("foo");
+    output_message_mock_ignore_message_in();
+    output_message("bar");
+}
+
 static void output_message_function_error_call_null_entry(void *arg_p)
 {
     (void)arg_p;
