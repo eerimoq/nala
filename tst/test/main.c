@@ -1216,11 +1216,11 @@ TEST(with_two_messages)
 
 static void old_with_message_not_part_of_messages_entry()
 {
-    WITH_MESSAGE("Should not be shown.") {
+    WITH_MESSAGE("Should not be shown.", NULL) {
         ASSERT(1 == 1);
     }
 
-    WITH_MESSAGE("This should be shown.") {
+    WITH_MESSAGE("This should be shown.", NULL) {
         ASSERT(1 == 2);
     }
 }
