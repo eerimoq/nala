@@ -5,7 +5,7 @@
 🦁 Nala
 =======
 
-A unit test framework for `C` projects.
+A delightful unit test framework for `C` projects.
 
 Based on `Narwhal`_ and `Narmock`_.
 
