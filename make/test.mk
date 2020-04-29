@@ -13,6 +13,7 @@ OBJDEPS = $(OBJ:%.o=%.d)
 MOCKGENDEPS = $(BUILD)/nala_mocks.ldflags.d
 DEPS = $(OBJDEPS) $(MOCKGENDEPS)
 CFLAGS += $(INC:%=-I%)
+CFLAGS += -std=gnu11
 CFLAGS += -g
 CFLAGS += -O0
 CFLAGS += -no-pie
