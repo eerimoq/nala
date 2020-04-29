@@ -185,7 +185,7 @@ all defined in `include/nala.h`_.
    ASSERT(cond);                                 // Assert that given condition is true.
    FAIL(message);                                // Fail current test with given message.
    CAPTURE_OUTPUT(stdout_name, stderr_name);     // A capture output block.
-   WITH_MESSAGE(format, ...);                    // Additional message on error block.
+   WITH_MESSAGE(format, ...);                    // Additional message on error block. May be nested.
 
 
 Mocking

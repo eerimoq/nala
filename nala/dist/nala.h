@@ -125,7 +125,7 @@
          stdout_name ## i++, nala_capture_output_stop())
 
 /**
- * Additional message on error block.
+ * Additional message on error block. May be nested.
  */
 #define WITH_MESSAGE(format, ...)                                       \
     int NALA_UNIQUE(i);                                                 \
