@@ -2082,7 +2082,8 @@ TEST(const_pointer_data_function)
 
 TEST(string_typedef_function)
 {
-    string_typedef_mock_once("hello");
+    string_typedef_mock_once();
+    string_typedef_mock_set_string_in("hello", 6);
     string_typedef("hello");
 }
 
@@ -2090,7 +2091,8 @@ static void string_typedef_error_message_entry(void *arg_p)
 {
     (void)arg_p;
 
-    string_typedef_mock_once("hello");
+    string_typedef_mock_once();
+    string_typedef_mock_set_string_in("hello", 6);
     string_typedef("HELLO");
 }
 
@@ -2132,7 +2134,8 @@ TEST(string_typedef_p_function)
 
 TEST(char_typedef_function)
 {
-    char_typedef_mock_once("hello");
+    char_typedef_mock_once();
+    char_typedef_mock_set_string_p_in("hello", 6);
     char_typedef("hello");
 }
 

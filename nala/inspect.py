@@ -307,7 +307,16 @@ def is_primitive_type_pointer(type_, types=None):
 
 
 def is_char_pointer(type_):
-    return is_primitive_type_pointer(type_, ['char'])
+    if not isinstance(type_, c_ast.PtrDecl):
+        return False
+
+    if not isinstance(type_.type, c_ast.TypeDecl):
+        return False
+
+    if not isinstance(type_.type.type, c_ast.IdentifierType):
+        return False
+
+    return ' '.join(type_.type.type.names) == 'char'
 
 
 class ForgivingDeclarationParser:
@@ -434,7 +443,7 @@ class ForgivingDeclarationParser:
 
             if name in PRIMITIVE_TYPES:
                 pass
-            elif name in ['__builtin_va_list', 'int8_t', 'uint8_t', 'void', '_Bool']:
+            elif name in ['__builtin_va_list', 'void', '_Bool']:
                 pass
             else:
                 type_ = self.expand_type(self.lookup_typedef(name).type)
