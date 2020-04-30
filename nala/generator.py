@@ -394,14 +394,8 @@ class FunctionMock:
     def find_check_function(self, param, expanded_param):
         if is_pointer_to_pointer(expanded_param.type):
             return f'nala_mock_assert_pointer'
-        elif is_primitive_type_pointer(expanded_param.type):
-            type_ = self.generator.parser.resolve_type(expanded_param.type)
-            name = type_.name.replace(" ", "_")
-
-            if name == 'char':
-                return 'nala_mock_assert_in_string'
-            else:
-                return f'nala_mock_assert_{name}'
+        elif is_char_pointer(expanded_param.type):
+            return 'nala_mock_assert_in_string'
         elif self.is_struct_typedef_pointer(param):
             param = self.lookup_typedef(param.type.type.type.names[0])
 
