@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <sys/types.h>
 #include "nala.h"
 #include "subprocess.h"
@@ -1235,4 +1236,16 @@ TEST(old_with_message_not_part_of_messages)
     ASSERT_NOT_SUBSTRING(result_p->stdout.buf_p, "Should not be shown.");
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "This should be shown.");
     subprocess_result_free(result_p);
+}
+
+TEST(capture_system_output)
+{
+    CAPTURE_OUTPUT(output, errput) {
+        ASSERT_EQ(system("build/app --help"), 0);
+    }
+
+    ASSERT_SUBSTRING(
+        output,
+        "usage: build/app [-h] [-v] [-c] [-a] [-r] [-f] [-j] [<test-pattern>]\n");
+    ASSERT_EQ(errput, "");
 }
