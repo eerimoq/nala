@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NALA_VERSION "0.165.1"
+#define NALA_VERSION "0.166.0"
 
 /**
  * Assert that given characters, numbers, pointers or strings are
@@ -74,6 +74,12 @@
  */
 #define ASSERT_MEMORY_EQ(actual, expected, size)        \
     nala_assert_memory(actual, expected, size)
+
+/**
+ * Assert that given files are equal.
+ */
+#define ASSERT_FILE_EQ(actual, expected)        \
+    nala_assert_file_eq(actual, expected)
 
 /**
  * Assert that given arrays are equal.
@@ -409,6 +415,8 @@ void nala_assert_substring(const char *haystack_p, const char *needle_p);
 void nala_assert_not_substring(const char *haystack_p, const char *needle_p);
 
 void nala_assert_memory(const void *actual_p, const void *expected_p, size_t size);
+
+void nala_assert_file_eq(const char *actual_p, const char *expected_p);
 
 void nala_assert_true(bool actual);
 

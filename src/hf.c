@@ -26,9 +26,12 @@
  * This file is part of the humanfriendly project.
  */
 
+#include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <errno.h>
+#include <limits.h>
 #include <pwd.h>
 #include "hf.h"
 
@@ -37,6 +40,19 @@
 static void nala_hf_null_last(char *buf_p, size_t size)
 {
     buf_p[size - 1] = '\0';
+}
+
+static int char_in_string(char c, const char *str_p)
+{
+    while (*str_p != '\0') {
+        if (c == *str_p) {
+            return (1);
+        }
+
+        str_p++;
+    }
+
+    return (0);
 }
 
 char *nala_hf_get_username(char *buf_p, size_t size, const char *default_p)
@@ -136,8 +152,8 @@ static const char *get_delimiter(bool is_first, bool is_last)
 }
 
 char *nala_hf_format_timespan(char *buf_p,
-                              size_t size,
-                              unsigned long long timespan_ms)
+                         size_t size,
+                         unsigned long long timespan_ms)
 {
     int i;
     int res;
@@ -174,4 +190,135 @@ char *nala_hf_format_timespan(char *buf_p,
     }
 
     return (buf_p);
+}
+
+long nala_hf_string_to_long(const char *string_p,
+                       long minimum,
+                       long maximum,
+                       long default_value,
+                       int base)
+{
+    long value;
+    char *end_p;
+
+    errno = 0;
+    value = strtol(string_p, &end_p, base);
+
+    if ((errno != 0) && (value == 0)) {
+        value = default_value;
+    } else if (end_p == string_p) {
+        value = default_value;
+    } else if (*end_p != '\0') {
+        value = default_value;
+    }
+
+    if (value < minimum) {
+        value = minimum;
+    }
+
+    if (value > maximum) {
+        value = maximum;
+    }
+
+    return (value);
+}
+
+char *nala_hf_buffer_to_string(char *dst_p,
+                          size_t dst_size,
+                          const void *src_p,
+                          size_t src_size)
+{
+    if (src_size > 0) {
+        if (src_size > (dst_size - 1)) {
+            src_size = (dst_size - 1);
+        }
+
+        memcpy(dst_p, src_p, src_size);
+    }
+
+    dst_p[src_size] = '\0';
+
+    return (dst_p);
+}
+
+char *nala_hf_strip(char *str_p, const char *strip_p)
+{
+    char *begin_p;
+    size_t length;
+
+    /* Strip whitespace characters by default. */
+    if (strip_p == NULL) {
+        strip_p = "\t\n\x0b\x0c\r ";
+    }
+
+    /* String leading characters. */
+    while ((*str_p != '\0') && char_in_string(*str_p, strip_p)) {
+        str_p++;
+    }
+
+    begin_p = str_p;
+
+    /* Strip training characters. */
+    length = strlen(str_p);
+    str_p += (length - 1);
+
+    while ((str_p >= begin_p) && char_in_string(*str_p, strip_p)) {
+        *str_p = '\0';
+        str_p--;
+    }
+
+    return (begin_p);
+}
+
+void *nala_hf_file_read_all(const char *path_p, size_t *size_p)
+{
+    FILE *file_p;
+    void *buf_p;
+    long file_size;
+
+    file_p = fopen(path_p, "rb");
+
+    if (file_p == NULL) {
+        return (NULL);
+    }
+
+    if (fseek(file_p, 0, SEEK_END) != 0) {
+        goto out1;
+    }
+
+    file_size = ftell(file_p);
+
+    if (file_size == -1) {
+        goto out1;
+    }
+
+    if (size_p != NULL) {
+        *size_p = (size_t)file_size;
+    }
+
+    buf_p = malloc((size_t)file_size);
+
+    if (buf_p == NULL) {
+        goto out1;
+    }
+
+    if (fseek(file_p, 0, SEEK_SET) != 0) {
+        goto out2;
+    }
+
+    if (fread(buf_p, (size_t)file_size, 1, file_p) != 1) {
+        goto out2;
+    }
+
+    fclose(file_p);
+
+    return (buf_p);
+
+ out2:
+    free(buf_p);
+
+ out1:
+    fclose(file_p);
+
+    return (NULL);
 }

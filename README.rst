@@ -179,6 +179,7 @@ all defined in `include/nala.h`_.
    ASSERT_NOT_SUBSTRING(haystack, needle);       // Assert that given haystack string does not contain
                                                  // given needle string.
    ASSERT_MEMORY_EQ(actual, expected, size);     // Assert that given memory regions are equal.
+   ASSERT_FILE_EQ(actual, expected);             // Assert that given files are equal.
    ASSERT_ARRAY_EQ(actual, expected, size);      // Assert that given arrays are equal.
    ASSERT_FUNCTION_POINTER_EQ(actual, expected); // Assert that given function pointers are equal.
    ASSERT_FUNCTION_POINTER_NE(actual, expected); // Assert that given function pointers are not equal.

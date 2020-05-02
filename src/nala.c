@@ -1213,6 +1213,53 @@ const char *nala_format_memory(const char *prefix_p,
     return (buf_p);
 }
 
+const char *nala_format_file(const char *prefix_p,
+                             const char *actual_p,
+                             const void *actual_buf_p,
+                             size_t actual_size,
+                             const char *expected_p,
+                             const void *expected_buf_p,
+                             size_t expected_size)
+{
+    size_t file_size;
+    char *buf_p;
+    FILE *file_p;
+    char *actual_hexdump_p;
+    char *expected_hexdump_p;
+
+    nala_suspend_all_mocks();
+
+    file_p = open_memstream(&buf_p, &file_size);
+
+    if (actual_buf_p == NULL) {
+        fprintf(file_p,
+                COLOR_BOLD(RED, "%sFile mismatch. Failed to read '%s'.\n"),
+                prefix_p,
+                actual_p);
+    } else if (expected_buf_p == NULL) {
+        fprintf(file_p,
+                COLOR_BOLD(RED, "%sFile mismatch. Failed to read '%s'.\n"),
+                prefix_p,
+                expected_p);
+    } else {
+        fprintf(file_p,
+                COLOR_BOLD(RED, "%sFile mismatch. See diff for details.\n"),
+                prefix_p);
+        actual_hexdump_p = nala_hexdump(actual_buf_p, actual_size, 16);
+        expected_hexdump_p = nala_hexdump(expected_buf_p, expected_size, 16);
+        print_string_diff(file_p, expected_hexdump_p, actual_hexdump_p);
+        free(actual_hexdump_p);
+        free(expected_hexdump_p);
+    }
+
+    fputc('\0', file_p);
+    fclose(file_p);
+
+    nala_resume_all_mocks();
+
+    return (buf_p);
+}
+
 bool nala_check_substring(const char *haystack_p, const char *needle_p)
 {
     if ((haystack_p == NULL) || (needle_p == NULL)) {
@@ -2161,6 +2208,37 @@ void nala_assert_memory(const void *actual_p, const void *expected_p, size_t siz
     if (!nala_check_memory(actual_p, expected_p, size)) {
         nala_test_failure(nala_format_memory("", actual_p, expected_p, size));
     }
+}
+
+void nala_assert_file_eq(const char *actual_p, const char *expected_p)
+{
+    void *actual_buf_p;
+    size_t actual_size;
+    void *expected_buf_p;
+    size_t expected_size;
+
+    nala_suspend_all_mocks();
+
+    actual_buf_p = nala_hf_file_read_all(actual_p, &actual_size);
+    expected_buf_p = nala_hf_file_read_all(expected_p, &expected_size);
+
+    if ((actual_buf_p == NULL)
+        || (expected_buf_p == NULL)
+        || (actual_size != expected_size)
+        || !nala_check_memory(actual_buf_p, expected_buf_p, expected_size)) {
+        nala_test_failure(nala_format_file("",
+                                           actual_p,
+                                           actual_buf_p,
+                                           actual_size,
+                                           expected_p,
+                                           expected_buf_p,
+                                           expected_size));
+    }
+
+    free(actual_buf_p);
+    free(expected_buf_p);
+
+    nala_resume_all_mocks();
 }
 
 void nala_assert_true(bool actual)

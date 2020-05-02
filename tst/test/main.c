@@ -480,6 +480,47 @@ TEST(assert_memory_eq_error_actual_and_expected_null)
         "Actual memory pointer is NULL.");
 }
 
+TEST(assert_file_eq)
+{
+    ASSERT_FILE_EQ("files/foo.txt", "files/foo.txt");
+}
+
+static void assert_file_eq_error_entry()
+{
+    ASSERT_FILE_EQ("files/foo.txt", "files/bar.txt");
+}
+
+TEST(assert_file_eq_error)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(assert_file_eq_error_entry,
+                                      NULL);
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "File mismatch. See diff for details.\n");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "ABC");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "DEF");
+    subprocess_result_free(result_p);
+}
+
+static void assert_file_eq_error_actual_null_entry()
+{
+    ASSERT_FILE_EQ(NULL, "files/bar.txt");
+}
+
+TEST(assert_file_eq_error_actual_null)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(assert_file_eq_error_actual_null_entry,
+                                      NULL);
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "File mismatch. Failed to read '(null)'.\n");
+    subprocess_result_free(result_p);
+}
+
 static void assert_function_pointers_eq_entry()
 {
     ASSERT_FUNCTION_POINTER_EQ(foo, bar);

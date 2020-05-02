@@ -28,7 +28,7 @@
 
 #include <unistd.h>
 
-#define NALA_HF_VERSION "0.2.0"
+#define NALA_HF_VERSION "0.4.0"
 
 /**
  * Get the username of the currently logged in user. Returns the
@@ -47,5 +47,32 @@ char *nala_hf_get_hostname(char *buf_p, size_t size, const char *default_p);
  * Format given timespan in milliseconds into given buffer.
  */
 char *nala_hf_format_timespan(char *buf_p,
-                              size_t size,
-                              unsigned long long timespan_ms);
+                         size_t size,
+                         unsigned long long timespan_ms);
+
+/**
+ * String to long conversion with limits and default value if out of
+ * range or if the string does not contain a number.
+ */
+long nala_hf_string_to_long(const char *string_p,
+                       long minimum,
+                       long maximum,
+                       long default_value,
+                       int base);
+
+char *nala_hf_buffer_to_string(char *dst_p,
+                          size_t dst_size,
+                          const void *src_p,
+                          size_t src_size);
+
+/**
+ * Strip leading and trailing characters from a string. The characters
+ * to strip are given by `strip_p`.
+ */
+char *nala_hf_strip(char *str_p, const char *strip_p);
+
+/**
+ * Read the whole file. The returned pointer should be freed with
+ * free(). Returns NULL on failure.
+ */
+void *nala_hf_file_read_all(const char *path_p, size_t *size_p);
