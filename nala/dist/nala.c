@@ -300,7 +300,7 @@ const char *nala_next_lines(const char *string, size_t lines);
 
 #include <unistd.h>
 
-#define NALA_HF_VERSION "0.4.0"
+#define NALA_HF_VERSION "0.4.1"
 
 /**
  * Get the username of the currently logged in user. Returns the
@@ -3584,18 +3584,22 @@ void *nala_hf_file_read_all(const char *path_p, size_t *size_p)
         *size_p = (size_t)file_size;
     }
 
-    buf_p = malloc((size_t)file_size);
+    if (file_size > 0) {
+        buf_p = malloc((size_t)file_size);
 
-    if (buf_p == NULL) {
-        goto out1;
-    }
+        if (buf_p == NULL) {
+            goto out1;
+        }
 
-    if (fseek(file_p, 0, SEEK_SET) != 0) {
-        goto out2;
-    }
+        if (fseek(file_p, 0, SEEK_SET) != 0) {
+            goto out2;
+        }
 
-    if (fread(buf_p, (size_t)file_size, 1, file_p) != 1) {
-        goto out2;
+        if (fread(buf_p, (size_t)file_size, 1, file_p) != 1) {
+            goto out2;
+        }
+    } else {
+        buf_p = malloc(1);
     }
 
     fclose(file_p);

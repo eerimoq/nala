@@ -483,6 +483,7 @@ TEST(assert_memory_eq_error_actual_and_expected_null)
 TEST(assert_file_eq)
 {
     ASSERT_FILE_EQ("files/foo.txt", "files/foo.txt");
+    ASSERT_FILE_EQ("files/empty.txt", "files/empty.txt");
 }
 
 static void assert_file_eq_error_entry()
