@@ -1130,7 +1130,7 @@ static char *make_string_readable(const char *string_p)
     return (make_string_readable_length(string_p, strlen(string_p)));
 }
 
-static bool is_printable_string(const char *buf_p, size_t size)
+static bool is_printable_memory(const char *buf_p, size_t size)
 {
     size_t i;
 
@@ -1141,6 +1141,15 @@ static bool is_printable_string(const char *buf_p, size_t size)
     }
 
     return (true);
+}
+
+static bool is_printable_string(const char *buf_p, size_t length)
+{
+    if (!is_printable_memory(buf_p, length)) {
+        return (false);
+    }
+
+    return (buf_p[length] == '\0');
 }
 
 const char *nala_format_string(const char *prefix_p,
@@ -1316,8 +1325,8 @@ const char *nala_format_file(const char *prefix_p,
                 COLOR_BOLD(RED, "%sFile mismatch. See diff for details.\n"),
                 prefix_p);
 
-        if (is_printable_string(actual_buf_p, actual_size)
-            && is_printable_string(expected_buf_p, expected_size)) {
+        if (is_printable_memory(actual_buf_p, actual_size)
+            && is_printable_memory(expected_buf_p, expected_size)) {
             actual_string_p = make_string_readable_length(actual_buf_p,
                                                           actual_size);
             expected_string_p = make_string_readable_length(expected_buf_p,
@@ -2287,6 +2296,28 @@ void nala_assert_memory(const void *actual_p, const void *expected_p, size_t siz
 {
     if (!nala_check_memory(actual_p, expected_p, size)) {
         nala_test_failure(nala_format_memory("", actual_p, expected_p, size));
+    }
+}
+
+void nala_assert_string_or_memory(const void *actual_p,
+                                  const void *expected_p,
+                                  size_t size)
+{
+    if (!nala_check_memory(actual_p, expected_p, size)) {
+        nala_suspend_all_mocks();
+
+        if ((actual_p != NULL)
+            && (expected_p != NULL)
+            && is_printable_string(actual_p, size - 1)
+            && is_printable_string(expected_p, size - 1)) {
+            nala_test_failure(nala_format_string("The strings are not equal.",
+                                                 actual_p,
+                                                 expected_p));
+        } else {
+            nala_test_failure(nala_format_memory("", actual_p, expected_p, size));
+        }
+
+        nala_resume_all_mocks();
     }
 }
 

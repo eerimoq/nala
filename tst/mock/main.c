@@ -354,7 +354,7 @@ TEST(output_message_function_error_mismatch)
 {
     function_error_in_subprocess(
         output_message_function_error_mismatch_entry,
-        "Memory mismatch. See diff for details.");
+        "The strings are not equal. See diff for details.");
 }
 
 TEST(time_function)

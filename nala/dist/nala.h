@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NALA_VERSION "0.168.0"
+#define NALA_VERSION "0.169.0"
 
 /**
  * Assert that given characters, numbers, pointers or strings are
@@ -427,6 +427,10 @@ void nala_assert_substring(const char *haystack_p, const char *needle_p);
 void nala_assert_not_substring(const char *haystack_p, const char *needle_p);
 
 void nala_assert_memory(const void *actual_p, const void *expected_p, size_t size);
+
+void nala_assert_string_or_memory(const void *actual_p,
+                                  const void *expected_p,
+                                  size_t size);
 
 void nala_assert_file_eq(const char *actual_p, const char *expected_p);
 

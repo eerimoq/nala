@@ -339,7 +339,7 @@ void nala_mock_assert_string(struct nala_traceback_t *traceback_p,
 
 void nala_mock_assert_in_string(void *acutal_p, void *expected_p, size_t size)
 {
-    nala_assert_memory(acutal_p, expected_p, size);
+    nala_assert_string_or_memory(acutal_p, expected_p, size);
 }
 
 void nala_mock_assert_pointer(void **acutal_pp, void **expected_pp, size_t size)
