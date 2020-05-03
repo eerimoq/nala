@@ -83,6 +83,7 @@ The assertions tests looks like this:
        ASSERT_SUBSTRING("12345", "34");
        ASSERT_NOT_SUBSTRING("12345", "4567");
        ASSERT_MEMORY_EQ("abcd", "abcd", 5);
+       ASSERT_FILE_EQ("test_assertions.c", "test_assertions.c");
        ASSERT_ARRAY_EQ(array, array, sizeof(array));
        ASSERT_FUNCTION_POINTER_EQ(assertions, assertions);
        ASSERT_FUNCTION_POINTER_NE(assertions, NULL);

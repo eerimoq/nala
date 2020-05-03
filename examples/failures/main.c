@@ -280,3 +280,8 @@ TEST(with_message)
         }
     }
 }
+
+TEST(assert_file_eq)
+{
+    ASSERT_FILE_EQ("v1.txt", "v2.txt");
+}
