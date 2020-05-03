@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NALA_VERSION "0.166.1"
+#define NALA_VERSION "0.167.0"
 
 /**
  * Assert that given characters, numbers, pointers or strings are
@@ -159,6 +159,18 @@
         nala_register_test(&nala_test_ ## name);        \
     }                                                   \
     static void name(void)
+
+/**
+ * Allocate a memory buffer of given size that is automatically freed
+ * after the test. Always returns a valid pointer.
+ */
+void *nala_alloc(size_t size);
+
+/**
+ * Automatically free given buffer after the test. free() is called to
+ * free the buffer.
+ */
+void nala_auto_free(void *buf_p);
 
 /**
  * Performs post-test checks and cleanup, and then exits with status

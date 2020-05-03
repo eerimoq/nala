@@ -155,11 +155,14 @@ Create a code coverage report and open it with Firefox.
    Code coverage report: /home/erik/workspace/nala/foo/build/coverage/index.html
    $ firefox /home/erik/workspace/nala/foo/build/coverage/index.html
 
-Assertions and other macros
-===========================
+API
+===
 
-Below is a list of all assertions and other useful macros. They are
-all defined in `include/nala.h`_.
+Below is a list of all macros and functions in the API. They are all
+defined/declared in `include/nala.h`_.
+
+Assertions
+----------
 
 .. code-block:: c
 
@@ -184,10 +187,29 @@ all defined in `include/nala.h`_.
    ASSERT_FUNCTION_POINTER_EQ(actual, expected); // Assert that given function pointers are equal.
    ASSERT_FUNCTION_POINTER_NE(actual, expected); // Assert that given function pointers are not equal.
    ASSERT(cond);                                 // Assert that given condition is true.
+
+Other macros
+------------
+
+.. code-block:: c
+
    FAIL(message);                                // Fail current test with given message.
    CAPTURE_OUTPUT(stdout_name, stderr_name);     // A capture output block.
    WITH_MESSAGE(format, ...);                    // Additional message on error block. May be nested.
 
+Functions
+---------
+
+.. code-block:: c
+
+   void *nala_alloc(size_t size);                // Allocate a memory buffer of given size that is
+                                                 // automatically freed after the test. Always returns
+                                                 // a valid pointer.
+   void nala_auto_free(void *buf_p);             // Automatically free given buffer after the test.
+                                                 //free() is called to free the buffer.
+   void nala_exit(int status);                   // Performs post-test checks and cleanup, and then
+                                                 // exits with status 0. The status parameter is
+                                                 // ignored.
 
 Mocking
 =======

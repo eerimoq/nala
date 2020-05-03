@@ -1291,3 +1291,9 @@ TEST(capture_system_output)
         "usage: build/app [-h] [-v] [-c] [-a] [-r] [-f] [-j] [<test-pattern>]\n");
     ASSERT_EQ(errput, "");
 }
+
+TEST(auto_free)
+{
+    nala_alloc(1);
+    nala_auto_free(malloc(1));
+}

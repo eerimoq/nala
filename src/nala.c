@@ -70,6 +70,18 @@ struct with_message_stack_t {
     struct with_message_t *tail_p;
 };
 
+struct auto_free_t {
+    void *buf_p;
+    struct auto_free_t *next_p;
+};
+
+struct auto_free_list_t {
+    struct auto_free_t *head_p;
+    struct auto_free_t *tail_p;
+};
+
+static struct auto_free_list_t auto_free_list;
+
 static struct nala_test_t *current_test_p = NULL;
 
 static struct tests_t tests = {
@@ -348,6 +360,46 @@ static void with_message_stack_print(struct with_message_stack_t *self_p)
     }
 }
 
+static void auto_free_list_init(struct auto_free_list_t *self_p)
+{
+    self_p->head_p = NULL;
+    self_p->tail_p = NULL;
+}
+
+static void auto_free_list_append(struct auto_free_list_t *self_p,
+                                  void *buf_p)
+{
+    struct auto_free_t *item_p;
+
+    item_p = malloc(sizeof(*item_p));
+    ASSERT_NE(item_p, NULL);
+    item_p->buf_p = buf_p;
+    item_p->next_p = NULL;
+
+    if (self_p->head_p == NULL) {
+        self_p->head_p = item_p;
+    } else {
+        self_p->tail_p->next_p = item_p;
+    }
+
+    self_p->tail_p = item_p;
+}
+
+static void auto_free_list_destroy(struct auto_free_list_t *self_p)
+{
+    struct auto_free_t *next_p;
+    struct auto_free_t *item_p;
+
+    next_p = self_p->head_p;
+
+    while (next_p != NULL) {
+        item_p = next_p;
+        next_p = next_p->next_p;
+        free(item_p->buf_p);
+        free(item_p);
+    }
+}
+
 FILE *nala_get_stdout(void)
 {
     if (capture_stdout.running) {
@@ -536,6 +588,7 @@ static void test_entry(void *arg_p)
     capture_output_init(&capture_stdout, stdout);
     capture_output_init(&capture_stderr, stderr);
     with_message_stack_init(&with_message_stack);
+    auto_free_list_init(&auto_free_list);
     nala_reset_all_mocks();
     test_p->func();
     nala_exit(0);
@@ -2296,6 +2349,26 @@ void nala_with_message_pop(void)
     nala_resume_all_mocks();
 }
 
+void *nala_alloc(size_t size)
+{
+    void *buf_p;
+
+    nala_suspend_all_mocks();
+    buf_p = malloc(size);
+    ASSERT_NE(buf_p, NULL);
+    nala_auto_free(buf_p);
+    nala_resume_all_mocks();
+
+    return (buf_p);
+}
+
+void nala_auto_free(void *buf_p)
+{
+    nala_suspend_all_mocks();
+    auto_free_list_append(&auto_free_list, buf_p);
+    nala_resume_all_mocks();
+}
+
 void nala_exit(int status)
 {
     (void)status;
@@ -2304,6 +2377,7 @@ void nala_exit(int status)
     nala_assert_all_mocks_completed();
     capture_output_destroy(&capture_stdout);
     capture_output_destroy(&capture_stderr);
+    auto_free_list_destroy(&auto_free_list);
     exit(0);
 }
 
