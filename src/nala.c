@@ -1095,35 +1095,52 @@ static void print_string_diff(FILE *file_p,
     nala_resume_all_mocks();
 }
 
-static char *make_string_readable(const char *string_p)
+static char *make_string_readable_length(const char *string_p, size_t length)
 {
     size_t size;
     char *buf_p;
     FILE *file_p;
+    size_t i;
 
     file_p = open_memstream(&buf_p, &size);
 
-    while (*string_p != '\0') {
-         if (isprint(*string_p)) {
-             fputc(*string_p, file_p);
-         } else if (*string_p == '\r') {
-             fprintf(file_p, "\\r");
-         } else if (*string_p == '\t') {
-             fprintf(file_p, "\\t");
-         } else if (*string_p == '\n') {
-             fprintf(file_p, "\\n");
-             fputc(*string_p, file_p);
-         } else {
-             fprintf(file_p, "\\x%02x", (*string_p) & 0xff);
-         }
-
-         string_p++;
+    for (i = 0; i < length; i++) {
+        if (isprint(string_p[i])) {
+            fputc(string_p[i], file_p);
+        } else if (string_p[i] == '\r') {
+            fprintf(file_p, "\\r");
+        } else if (string_p[i] == '\t') {
+            fprintf(file_p, "\\t");
+        } else if (string_p[i] == '\n') {
+            fprintf(file_p, "\\n");
+            fputc(string_p[i], file_p);
+        } else {
+            fprintf(file_p, "\\x%02x", (string_p[i]) & 0xff);
+        }
     }
 
-    fputc(*string_p, file_p);
+    fputc('\0', file_p);
     fclose(file_p);
 
     return (buf_p);
+}
+
+static char *make_string_readable(const char *string_p)
+{
+    return (make_string_readable_length(string_p, strlen(string_p)));
+}
+
+static bool is_printable_string(const char *buf_p, size_t size)
+{
+    size_t i;
+
+    for (i = 0; i < size; i++) {
+        if (!(isprint(buf_p[i]) || isspace(buf_p[i]))) {
+            return (false);
+        }
+    }
+
+    return (true);
 }
 
 const char *nala_format_string(const char *prefix_p,
@@ -1277,8 +1294,8 @@ const char *nala_format_file(const char *prefix_p,
     size_t file_size;
     char *buf_p;
     FILE *file_p;
-    char *actual_hexdump_p;
-    char *expected_hexdump_p;
+    char *actual_string_p;
+    char *expected_string_p;
 
     nala_suspend_all_mocks();
 
@@ -1298,11 +1315,21 @@ const char *nala_format_file(const char *prefix_p,
         fprintf(file_p,
                 COLOR_BOLD(RED, "%sFile mismatch. See diff for details.\n"),
                 prefix_p);
-        actual_hexdump_p = nala_hexdump(actual_buf_p, actual_size, 16);
-        expected_hexdump_p = nala_hexdump(expected_buf_p, expected_size, 16);
-        print_string_diff(file_p, expected_hexdump_p, actual_hexdump_p);
-        free(actual_hexdump_p);
-        free(expected_hexdump_p);
+
+        if (is_printable_string(actual_buf_p, actual_size)
+            && is_printable_string(expected_buf_p, expected_size)) {
+            actual_string_p = make_string_readable_length(actual_buf_p,
+                                                          actual_size);
+            expected_string_p = make_string_readable_length(expected_buf_p,
+                                                            expected_size);
+        } else {
+            actual_string_p = nala_hexdump(actual_buf_p, actual_size, 16);
+            expected_string_p = nala_hexdump(expected_buf_p, expected_size, 16);
+        }
+
+        print_string_diff(file_p, expected_string_p, actual_string_p);
+        free(actual_string_p);
+        free(expected_string_p);
     }
 
     fputc('\0', file_p);

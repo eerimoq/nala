@@ -486,22 +486,42 @@ TEST(assert_file_eq)
     ASSERT_FILE_EQ("files/empty.txt", "files/empty.txt");
 }
 
-static void assert_file_eq_error_entry()
+static void assert_file_eq_error_text_entry()
 {
     ASSERT_FILE_EQ("files/foo.txt", "files/bar.txt");
 }
 
-TEST(assert_file_eq_error)
+TEST(assert_file_eq_error_text)
 {
     struct subprocess_result_t *result_p;
 
-    result_p = subprocess_call_output(assert_file_eq_error_entry,
+    result_p = subprocess_call_output(assert_file_eq_error_text_entry,
                                       NULL);
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
                      "File mismatch. See diff for details.\n");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "ABC");
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "DEF");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "|  \x1b[0m\x1b[1mDEF\x1b[0m");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "|  \x1b[0m\x1b[0m\x1b[31m\x1b[1mABC\x1b[0m");
+    subprocess_result_free(result_p);
+}
+
+static void assert_file_eq_error_binary_entry()
+{
+    ASSERT_FILE_EQ("files/foo.bin", "files/bar.bin");
+}
+
+TEST(assert_file_eq_error_binary)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(assert_file_eq_error_binary_entry,
+                                      NULL);
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "File mismatch. See diff for details.\n");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "ELF............");
     subprocess_result_free(result_p);
 }
 

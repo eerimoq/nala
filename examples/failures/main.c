@@ -281,7 +281,12 @@ TEST(with_message)
     }
 }
 
-TEST(assert_file_eq)
+TEST(assert_file_eq_text)
 {
     ASSERT_FILE_EQ("v1.txt", "v2.txt");
+}
+
+TEST(assert_file_eq_binary)
+{
+    ASSERT_FILE_EQ("v1.bin", "v2.bin");
 }
