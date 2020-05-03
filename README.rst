@@ -206,7 +206,7 @@ Functions
                                                  // automatically freed after the test. Always returns
                                                  // a valid pointer.
    void nala_auto_free(void *buf_p);             // Automatically free given buffer after the test.
-                                                 //free() is called to free the buffer.
+                                                 // free() is called to free the buffer.
    void nala_exit(int status);                   // Performs post-test checks and cleanup, and then
                                                  // exits with status 0. The status parameter is
                                                  // ignored.
