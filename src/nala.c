@@ -2299,6 +2299,41 @@ void nala_assert_memory(const void *actual_p, const void *expected_p, size_t siz
     }
 }
 
+static bool are_strings(const char **actual_pp, const char *expected_p, size_t size)
+{
+    size_t length;
+    char *actual_p;
+
+    if ((expected_p == NULL) || (*actual_pp == NULL)) {
+        return (false);
+    }
+
+    if (!is_printable_string(expected_p, size - 1)) {
+        return (false);
+    }
+
+    length = strnlen(*actual_pp, size);
+
+    if (length == size) {
+        actual_p = malloc(length + 5);
+        memcpy(actual_p, *actual_pp, length);
+        strcpy(&actual_p[length], " ...");
+
+        if (!is_printable_string(actual_p, length + 4)) {
+            free(actual_p);
+
+            return (false);
+        }
+
+        *actual_pp = actual_p;
+
+        return (true);
+    } else {
+        return (is_printable_string(*actual_pp, length));
+    }
+
+}
+
 void nala_assert_string_or_memory(const void *actual_p,
                                   const void *expected_p,
                                   size_t size)
@@ -2306,10 +2341,7 @@ void nala_assert_string_or_memory(const void *actual_p,
     if (!nala_check_memory(actual_p, expected_p, size)) {
         nala_suspend_all_mocks();
 
-        if ((actual_p != NULL)
-            && (expected_p != NULL)
-            && is_printable_string(actual_p, size - 1)
-            && is_printable_string(expected_p, size - 1)) {
+        if (are_strings((const char **)&actual_p, expected_p, size)) {
             nala_test_failure(nala_format_string("The strings are not equal.",
                                                  actual_p,
                                                  expected_p));

@@ -352,9 +352,67 @@ static void output_message_function_error_mismatch_entry(void *arg_p)
 
 TEST(output_message_function_error_mismatch)
 {
-    function_error_in_subprocess(
-        output_message_function_error_mismatch_entry,
-        "The strings are not equal. See diff for details.");
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(output_message_function_error_mismatch_entry,
+                                      NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "The strings are not equal. See diff for details.");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, B("a"));
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, CBR("b"));
+
+    subprocess_result_free(result_p);
+}
+
+static void output_message_function_error_mismatch_2_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    output_message_mock_once("abc");
+    output_message("b");
+}
+
+TEST(output_message_function_error_mismatch_2)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(output_message_function_error_mismatch_2_entry,
+                                      NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "The strings are not equal. See diff for details.");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, B("a")"b"B("c")"\n");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "b\n");
+
+    subprocess_result_free(result_p);
+}
+
+static void output_message_function_error_mismatch_3_entry(void *arg_p)
+{
+    (void)arg_p;
+
+    output_message_mock_once("a");
+    output_message("abc");
+}
+
+TEST(output_message_function_error_mismatch_3)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(output_message_function_error_mismatch_3_entry,
+                                      NULL);
+
+    ASSERT_NE(result_p->exit_code, 0);
+
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "The strings are not equal. See diff for details.");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "a\n");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p, "a"CBR("b ...")"\n");
+
+    subprocess_result_free(result_p);
 }
 
 TEST(time_function)
@@ -2108,14 +2166,14 @@ TEST(int_array_fixed_function)
 TEST(int8_function)
 {
     int8_t value[] = { 1, 2, 3 };
-    
+
     int8_mock();
     int8_mock_set_buf_p_in(&value[0], 3);
     int8(&value[0]);
 }
 
 TEST(uint8_function)
-{    
+{
     uint8_t value[] = { 1, 2, 3 };
 
     uint8_mock();
