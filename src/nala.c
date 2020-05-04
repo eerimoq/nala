@@ -2299,6 +2299,27 @@ void nala_assert_memory(const void *actual_p, const void *expected_p, size_t siz
     }
 }
 
+static bool check_string_or_memory(const void *actual_p,
+                                   const void *expected_p,
+                                   size_t size)
+{
+    size_t length;
+
+    if ((actual_p == NULL) || (expected_p == NULL)) {
+        return (false);
+    }
+
+    length = strnlen(actual_p, size);
+
+    if (length < size) {
+        if (memcmp(actual_p, expected_p, length + 1) != 0) {
+            return (false);
+        }
+    }
+
+    return (memcmp(actual_p, expected_p, size) == 0);
+}
+
 static bool are_strings(const char **actual_pp, const char *expected_p, size_t size)
 {
     size_t length;
@@ -2338,7 +2359,7 @@ void nala_assert_string_or_memory(const void *actual_p,
                                   const void *expected_p,
                                   size_t size)
 {
-    if (!nala_check_memory(actual_p, expected_p, size)) {
+    if (!check_string_or_memory(actual_p, expected_p, size)) {
         nala_suspend_all_mocks();
 
         if (are_strings((const char **)&actual_p, expected_p, size)) {
