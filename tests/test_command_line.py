@@ -29,13 +29,15 @@ def remove_optput():
 
 
 def pre_process_file(name):
-    subprocess.run([
+    command = [
         'gcc',
         '-E',
         '-I', 'nala/dist',
         '-o', f'tests/files/{name}/test_tests.pp.c',
         f'tests/files/{name}/test_tests.c'
-    ])
+    ]
+
+    subprocess.run(command, check=True)
 
 
 class CommandLineTest(unittest.TestCase):
@@ -292,3 +294,39 @@ class CommandLineTest(unittest.TestCase):
             nala.cli.main()
 
         self.assert_generated_files('empty')
+
+    def test_cat(self):
+        argv = [
+            'nala',
+            'cat',
+            'tests/files/empty/test_tests.c',
+            'tests/files/pre_processor_error/test_tests.c'
+        ]
+
+        stdout = StringIO()
+
+        with patch('sys.argv', argv):
+            with patch('sys.stdout', stdout):
+                nala.cli.main()
+
+        remove_optput()
+        os.mkdir('output')
+
+        with open('output/tests.c', 'w') as fout:
+            fout.write(stdout.getvalue())
+
+        command = [
+            'gcc',
+            '-E',
+            '-I', 'nala/dist',
+            '-o', 'output/tests.pp.c',
+            'output/tests.c'
+        ]
+        stderr = subprocess.run(command,
+                                capture_output=True,
+                                encoding='utf-8').stderr
+        self.assertIn(
+            'tests/files/pre_processor_error/test_tests.c:4:10: error: '
+            'macro "FOO" passed 1 arguments, but takes just 0',
+            stderr)
+        self.assertIn('int FOO(1);', stderr)

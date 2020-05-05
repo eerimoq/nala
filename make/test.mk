@@ -39,6 +39,7 @@ EXEARGS += $(JOBS:%=-j %)
 EXEARGS += $(REPORT_JSON:%=-r %)
 TESTS_PP_C = $(BUILD)/tests.pp.c
 WRAP_INTERNAL_SYMBOLS ?= yes
+NALA_CAT ?= $(NALA) -d cat
 
 .PHONY: all build generate clean coverage gdb gdb-run auto auto-run
 
@@ -95,7 +96,7 @@ $(BUILD)/nala_mocks.ldflags: $(TESTS)
 	echo "MOCKGEN $(TESTS)"
 	mkdir -p $(@D)
 	[ -f $(BUILD)/nala_mocks.h ] || touch $(BUILD)/nala_mocks.h
-	cat $(TESTS) \
+	$(NALA_CAT) $(TESTS) \
 	    | $(CC) $(CFLAGS) -DNALA_GENERATE_MOCKS -x c -E - > $(TESTS_PP_C)
 	cat $(TESTS_PP_C) | $(NALA) -d generate_mocks $(MOCKGENFLAGS) -o $(BUILD)
 	cat $(TESTS) \

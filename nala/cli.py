@@ -83,6 +83,13 @@ def do_c_sources(args):
     print(os.path.join(DIST_DIR, 'nala.c'))
 
 
+def do_cat(args):
+    for cfile in args.cfiles:
+        with open(cfile, 'r') as fin:
+            print(f'#line 1 "{cfile}"')
+            sys.stdout.write(fin.read())
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog='nala',
@@ -163,6 +170,16 @@ def main():
         'c_sources',
         description='Print the C sources.')
     subparser.set_defaults(func=do_c_sources)
+
+    # The cat subcommand.
+    subparser = subparsers.add_parser(
+        'cat',
+        description=('Concatenate given files with pre-processor line control '
+                     'for correct error location information.'))
+    subparser.add_argument('cfiles',
+                           nargs='+',
+                           help='One of more C source files to concatename.')
+    subparser.set_defaults(func=do_cat)
 
     args = parser.parse_args()
 

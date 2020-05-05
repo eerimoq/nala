@@ -125,3 +125,4 @@ examples/*/tests.c
 *.d
 a.out
 /foo
+/output

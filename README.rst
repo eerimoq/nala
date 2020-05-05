@@ -256,10 +256,10 @@ Here is an example of how to generate mocks:
 
 .. code-block:: bash
 
-   $ cat *.c | gcc -DNALA_GENERATE_MOCKS -x c -E - | nala generate_mocks
+   $ nala cat *.c | gcc -DNALA_GENERATE_MOCKS -x c -E - | nala generate_mocks
 
-``cat *.c`` should only concatenate test source files, not any other
-source files in your project.
+``nala cat *.c`` should only concatenate test source files, not any
+other source files in your project.
 
 Nala requires test source code to be expanded by the preprocessor. You
 can directly pipe the output of ``gcc -DNALA_GENERATE_MOCKS -x c -E

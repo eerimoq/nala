@@ -164,7 +164,7 @@ TEST(mock_string_param)
 {
     mount_mock_once("fie", "foo", "bar", 0, 0);
 
-    mount("foo", "fie", "bar", 0, NULL);
+    mount("fie", "foo", "car", 0, NULL);
 }
 
 TEST(mock_integer_param)

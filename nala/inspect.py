@@ -17,13 +17,7 @@ class IncludeDirective(NamedTuple):
 
     @classmethod
     def from_source_context(cls, source_context):
-        if not source_context:
-            return None
-
         for filename in source_context:
-            if not os.path.isabs(filename):
-                continue
-
             dirname, basename = os.path.split(filename)
             fullname = basename
 
@@ -39,9 +33,6 @@ class IncludeDirective(NamedTuple):
                 fullname = os.path.join(basename, fullname)
 
         return cls(os.path.abspath(source_context[-1]), False)
-
-    def __str__(self):
-        return '#include ' + (f'<{self.path}>' if self.system else f'"{self.path}"')
 
 
 class MockedFunction(NamedTuple):
@@ -327,6 +318,7 @@ class ForgivingDeclarationParser:
         self.token_stream = self.tokenize(source_code)
         self.previous = None
         self.current = None
+        self.current_file = None
 
         self.chunks_to_erase = []
         self.bracket_stack = []
@@ -337,7 +329,6 @@ class ForgivingDeclarationParser:
         self.structs = []
         self.struct_typedefs = []
         self.includes = []
-        self.filename = None
 
         self.cparser = CParser()
         self.param_names = None
@@ -542,25 +533,19 @@ class ForgivingDeclarationParser:
         elif self.current.type == 'LINEMARKER':
             filename, flags = LINEMARKER.match(self.current.value).groups()
 
-            if self.filename is None:
-                self.filename = filename
+            if not flags and len(self.source_context) == 0:
+                self.current_file = filename
 
-            if '1' in flags:
-                self.source_context.append(filename)
+            if self.current_file not in ['<built-in>', '<command-line>']:
+                if '1' in flags:
+                    self.source_context.append(filename)
 
-                if len(self.source_context) == 2:
-                    if self.source_context[0] == self.filename:
-                        if self.source_context[-1] != '<built-in>':
-                            self.includes.append(
-                                IncludeDirective.from_source_context(
-                                    self.source_context))
-            elif '2' in flags:
-                self.source_context.pop()
-
-            try:
-                self.source_context[-1] = filename
-            except IndexError:
-                self.source_context.append(filename)
+                    if len(self.source_context) == 1:
+                        self.includes.append(
+                            IncludeDirective.from_source_context(
+                                self.source_context))
+                elif '2' in flags:
+                    self.source_context.pop()
 
             self.mark_for_erase(*self.current.span)
             self.next()
@@ -605,7 +590,7 @@ class ForgivingDeclarationParser:
             self.structs_code.append(code)
 
     def is_in_header_file(self):
-        return len(self.source_context) > 1
+        return len(self.source_context) > 0
 
     def parse_function_declaration_or_struct(self):
         while self.current.is_prefix:
