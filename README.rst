@@ -298,10 +298,10 @@ generate calls to the real function (taking a ``va_list`` instead of
 For all functions
 ^^^^^^^^^^^^^^^^^
 
-Same behaviour for every call.
-
 ``<params>`` is all char-pointer (string) and primitive type
 parameters of the mocked function.
+
+Same behaviour for every call.
 
 .. code-block:: c
 
