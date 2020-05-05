@@ -323,7 +323,7 @@ class CommandLineTest(unittest.TestCase):
             'output/tests.c'
         ]
         stderr = subprocess.run(command,
-                                capture_output=True,
+                                stderr=subprocess.PIPE,
                                 encoding='utf-8').stderr
         self.assertIn(
             'tests/files/pre_processor_error/test_tests.c:4:10: error: '
