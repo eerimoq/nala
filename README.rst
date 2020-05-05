@@ -295,6 +295,9 @@ default. Give ``--implementation`` to ``nala generate_mocks`` to
 generate calls to the real function (taking a ``va_list`` instead of
 ``...``).
 
+There are plenty of mock-examples in the `examples folder`_. The
+`mock_square`_ example is a good starting point.
+
 For all functions
 ^^^^^^^^^^^^^^^^^
 
@@ -533,3 +536,7 @@ Other C unit test frameworks with similar feature set as Nala.
 .. _Unity: https://github.com/ThrowTheSwitch/Unity
 
 .. _cmocka: https://cmocka.org/
+
+.. _examples folder: https://github.com/eerimoq/nala/tree/master/examples
+
+.. _mock_square: https://github.com/eerimoq/nala/tree/master/examples/mock_square
