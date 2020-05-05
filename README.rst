@@ -300,6 +300,9 @@ For all functions
 
 Same behaviour for every call.
 
+``<params>`` is all char-pointer (strings) and primitive type
+parameters of the mocked function.
+
 .. code-block:: c
 
    void FUNC_mock(<params>, <res>);     // check parameters and return
@@ -318,13 +321,15 @@ Per call control.
                                         // returns a mock instance handle
    void FUNC_mock_real_once();          // real implementation once (per call)
 
-Change behaviour of currect mock. Works for both per call and every
-call functions above.
+Changes the behaviour of currect mock (most recent ``*_mock()`` or
+``*_mock_once()`` call). Works for both per call and every call
+functions above.
 
 .. code-block:: c
 
    void FUNC_mock_set_errno(int);       // errno on return, 0 by default
    void FUNC_mock_set_callback(*);      // additional checks and/or actions
+                                        // called just before returning from the mock
 
 Get per call input parameters.
 
@@ -333,17 +338,31 @@ Get per call input parameters.
    *FUNC_mock_get_params_in(int);       // get input parameters for given mock instance
                                         // handle
 
-For selected function parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+For pointer and array function parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Changes the behaviour of currect mock (most recent ``*_mock()`` or
+``*_mock_once()`` call). Works for both per call and every call
+functions above.
 
 .. code-block:: c
 
-   void FUNC_mock_ignore_PARAM_in();        // ignore on input
    void FUNC_mock_set_PARAM_in(*, size_t);  // check on input
    void FUNC_mock_set_PARAM_in_assert(*);   // custom assert function on input
    void FUNC_mock_set_PARAM_in_pointer(*);  // check pointer (the address) on input
    void FUNC_mock_set_PARAM_out(*, size_t); // value on return
    void FUNC_mock_set_PARAM_out_copy(*);    // custom output copy function
+
+For function parameters part of <params>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Changes the behaviour of currect mock (most recent ``*_mock()`` or
+``*_mock_once()`` call). Works for both per call and every call
+functions above.
+
+.. code-block:: c
+
+   void FUNC_mock_ignore_PARAM_in();        // ignore on input
 
 For variadic functions
 ^^^^^^^^^^^^^^^^^^^^^^
