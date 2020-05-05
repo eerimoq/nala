@@ -300,7 +300,7 @@ For all functions
 
 Same behaviour for every call.
 
-``<params>`` is all char-pointer (strings) and primitive type
+``<params>`` is all char-pointer (string) and primitive type
 parameters of the mocked function.
 
 .. code-block:: c
