@@ -22,14 +22,11 @@ def do_init(args):
 
 
 def do_generate_mocks(args):
-    if not args.infiles:
+    if not args.infile:
         expanded_code = sys.stdin.read()
     else:
-        expanded_code = ''
-
-        for infile in args.infiles:
-            with open(infile, 'r') as fin:
-                expanded_code += fin.read()
+        with open(args.infile, 'r') as fin:
+            expanded_code = fin.read()
 
     if args.no_rename_parameters:
         rename_parameters_file = None
@@ -144,9 +141,9 @@ def main():
                                  'shell-style wildcards pattern. May be given '
                                  'multiple times.'))
     subparser.add_argument(
-        'infiles',
-        nargs='*',
-        help='Pre-processed source file(s) or - to read from stdin (default: -).')
+        'infile',
+        nargs='?',
+        help='Pre-processed source file or - to read from stdin (default: -).')
     subparser.set_defaults(func=do_generate_mocks)
 
     # The wrap_internal_symbols subparser.
