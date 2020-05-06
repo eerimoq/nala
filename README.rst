@@ -295,8 +295,9 @@ default. Give ``--implementation`` to ``nala generate_mocks`` to
 generate calls to the real function (taking a ``va_list`` instead of
 ``...``).
 
-There are plenty of mock-examples in the `examples folder`_. The
-`mock_square`_ example is a good starting point.
+There are plenty of mock-examples in the `examples folder`_. All
+inline examples below can also be found in the `mock_api_examples`_
+example.
 
 For all functions
 ^^^^^^^^^^^^^^^^^
@@ -314,6 +315,21 @@ Same behaviour for every call.
    void FUNC_mock_implementation(*);    // replace implementation
    void FUNC_mock_real();               // real implementation
 
+An example:
+
+.. code-block:: c
+
+   /* int foo(int value); */
+
+   TEST(foo_every_call)
+   {
+       foo_mock(1, 2);
+
+       /* All calls to foo() expects its parameter to be 1 and returns 2. */
+       ASSERT_EQ(foo(1), 2);
+       ASSERT_EQ(foo(1), 2);
+   }
+
 Per call control.
 
 .. code-block:: c
@@ -323,6 +339,23 @@ Per call control.
    int FUNC_mock_ignore_in_once(<res>); // ignore parameters and return once (per call)
                                         // returns a mock instance handle
    void FUNC_mock_real_once();          // real implementation once (per call)
+
+An example:
+
+.. code-block:: c
+
+   /* int foo(int value); */
+
+   TEST(foo_per_call)
+   {
+       foo_mock_once(1, 2);
+
+       /* First call to foo() expects its parameter to be 1 and returns 2. */
+       ASSERT_EQ(foo(1), 2);
+
+       /* Second call will fail and the test will end. */
+       foo(1);
+   }
 
 Changes the behaviour of currect mock (most recent ``*_mock()`` or
 ``*_mock_once()`` call). Works for both per call and every call
@@ -334,12 +367,50 @@ functions above.
    void FUNC_mock_set_callback(*);      // additional checks and/or actions
                                         // called just before returning from the mock
 
+An example:
+
+.. code-block:: c
+
+   /* int foo(int value); */
+
+   TEST(foo_set_errno)
+   {
+       foo_mock_once(1, 2);
+       foo_mock_set_errno(EINVAL);
+
+       ASSERT_EQ(foo(1), 2);
+       ASSERT_EQ(errno, EINVAL);
+   }
+
 Get per call input parameters.
 
 .. code-block:: c
 
    *FUNC_mock_get_params_in(int);       // get input parameters for given mock instance
                                         // handle
+
+An example:
+
+.. code-block:: c
+
+   /* typedef void (*callback_t)(void); */
+   /* void bar(callback_t callback); */
+
+   static void fie(void)
+   {
+   }
+
+   TEST(bar_get_params_call_callback)
+   {
+       int handle;
+
+       handle = bar_mock_once();
+
+       bar(fie);
+
+       /* Call the callback (calls fie()). */
+       bar_mock_get_params_in(handle)->callback();
+   }
 
 For pointer and array function parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -356,6 +427,27 @@ functions above.
    void FUNC_mock_set_PARAM_out(*, size_t); // value on return
    void FUNC_mock_set_PARAM_out_copy(*);    // custom output copy function
 
+An example:
+
+.. code-block:: c
+
+   /* void fum(int *value_p); */
+
+   TEST(fum_in_out)
+   {
+       int value;
+
+       fum_mock_once();
+       value = 1;
+       fum_mock_set_value_p_in(&value, sizeof(value));
+       value = 2;
+       fum_mock_set_value_p_out(&value, sizeof(value));
+
+       value = 1;
+       fum(&value);
+       ASSERT_EQ(value, 2);
+   }
+
 For function parameters part of <params>
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -366,6 +458,20 @@ functions above.
 .. code-block:: c
 
    void FUNC_mock_ignore_PARAM_in();        // ignore on input
+
+An example:
+
+.. code-block:: c
+
+   /* void foo(int value); */
+
+   TEST(foo_ignore_value)
+   {
+       foo_mock_once(1, 2);
+       foo_mock_ignore_value_in();
+
+       ASSERT_EQ(foo(9), 2);
+   }
 
 For variadic functions
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -539,4 +645,4 @@ Other C unit test frameworks with similar feature set as Nala.
 
 .. _examples folder: https://github.com/eerimoq/nala/tree/master/examples
 
-.. _mock_square: https://github.com/eerimoq/nala/tree/master/examples/mock_square
+.. _mock_api_examples: https://github.com/eerimoq/nala/tree/master/examples/mock_api_examples
