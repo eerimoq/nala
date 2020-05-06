@@ -74,6 +74,38 @@ static char *strip_discriminator(char *line_p)
     return (line_p);
 }
 
+static bool is_in(char ch, const char *strip_p)
+{
+    while (*strip_p != '\0') {
+        if (ch == *strip_p) {
+            return (true);
+        }
+
+        strip_p++;
+    }
+
+    return (false);
+}
+
+static char *rstrip(char *line_p)
+{
+    char *char_p;
+
+    char_p = line_p;
+
+    while (*char_p != '\0') {
+        if (is_in(*char_p, "\r\n")) {
+            break;
+        }
+
+        char_p++;
+    }
+
+    *char_p = '\0';
+
+    return (line_p);
+}
+
 static void print_line(FILE *stream_p, const char *prefix_p, char *line_p)
 {
     char *at_p;
@@ -92,10 +124,10 @@ static void print_line(FILE *stream_p, const char *prefix_p, char *line_p)
     location_p = &at_p[4];
 
     fprintf(stream_p,
-            "%s  " COLOR(GREEN, "%s") " at " COLOR(CYAN, "%s"),
+            "%s  at " COLOR(CYAN, "%s") " in " COLOR(GREEN, "%s()\n"),
             prefix_p,
-            function_p,
-            location_p);
+            rstrip(location_p),
+            function_p);
 }
 
 char *nala_traceback_format(void **buffer_pp,
@@ -119,7 +151,7 @@ char *nala_traceback_format(void **buffer_pp,
     }
 
     if (header_p == NULL) {
-        header_p = "Traceback (most recent call last):";
+        header_p = "Traceback (most recent call first):";
     }
 
     size = readlink("/proc/self/exe", &exe[0], sizeof(exe) - 1);
@@ -138,7 +170,7 @@ char *nala_traceback_format(void **buffer_pp,
 
     fprintf(stream_p, "%s%s\n", prefix_p, header_p);
 
-    for (i = (depth - 1); i >= 0; i--) {
+    for (i = 0; i < depth; i++) {
         snprintf(&command[0],
                  sizeof(command),
                  "addr2line -f -p -e %s %p",

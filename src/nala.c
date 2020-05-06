@@ -1425,7 +1425,7 @@ void nala_test_failure(const char *message_p)
 
     printf("\n");
     nala_traceback_print("  ",
-                         "Assert traceback (most recent call last):",
+                         "Assert traceback (most recent call first):",
                          traceback_skip_filter,
                          NULL);
     print_test_failure_report_end();
@@ -1659,7 +1659,7 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
     return (nala_traceback_format(buffer_pp,
                                   depth,
                                   "  ",
-                                  "Mock traceback (most recent call last):",
+                                  "Mock traceback (most recent call first):",
                                   mock_traceback_skip_filter,
                                   NULL));
 }

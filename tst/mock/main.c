@@ -103,9 +103,9 @@ TEST(add_function_error_wrong_x_two_tracebacks)
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
                      "Mocked add(x): 3 is not equal to 1 (0x3, 0x1)");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "Mock traceback (most recent call last):");
+                     "Mock traceback (most recent call first):");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "Assert traceback (most recent call last):");
+                     "Assert traceback (most recent call first):");
 
     subprocess_result_free(result_p);
 }
@@ -129,9 +129,9 @@ TEST(add_function_error_wrong_result_one_traceback)
     ASSERT_NE(result_p->exit_code, 0);
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "42 is not equal to 41 (0x2a, 0x29)");
     ASSERT_NOT_SUBSTRING(result_p->stdout.buf_p,
-                     "Mock traceback (most recent call last):");
+                     "Mock traceback (most recent call first):");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "Assert traceback (most recent call last):");
+                     "Assert traceback (most recent call first):");
 
     subprocess_result_free(result_p);
 }
@@ -1371,9 +1371,9 @@ TEST(in_assert_error_mock_traceback_message)
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
                      "5 is not equal to 4 (0x5, 0x4)");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "Mock traceback (most recent call last):");
+                     "Mock traceback (most recent call first):");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "Assert traceback (most recent call last):");
+                     "Assert traceback (most recent call first):");
 
     subprocess_result_free(result_p);
 }
@@ -1404,9 +1404,9 @@ TEST(struct_assert_error)
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
                      "3 is not equal to 2 (0x3, 0x2)");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "Mock traceback (most recent call last):");
+                     "Mock traceback (most recent call first):");
     ASSERT_SUBSTRING(result_p->stdout.buf_p,
-                     "Assert traceback (most recent call last):");
+                     "Assert traceback (most recent call first):");
 
     subprocess_result_free(result_p);
 }
