@@ -121,14 +121,14 @@
  * A capture output block.
  */
 #define CAPTURE_OUTPUT(stdout_name, stderr_name)                        \
-    int stdout_name ## i;                                               \
+    int NALA_UNIQUE(stdout_name);                                       \
     static char *stdout_name = NULL;                                    \
     static char *stderr_name = NULL;                                    \
                                                                         \
-    for (stdout_name ## i = 0, nala_capture_output_start(&stdout_name,  \
-                                                         &stderr_name); \
-         stdout_name ## i < 1;                                          \
-         stdout_name ## i++, nala_capture_output_stop())
+    for (NALA_UNIQUE(stdout_name) = 0,                                  \
+             nala_capture_output_start(&stdout_name, &stderr_name);     \
+         NALA_UNIQUE(stdout_name) < 1;                                  \
+         NALA_UNIQUE(stdout_name)++, nala_capture_output_stop())
 
 /**
  * Additional message on error block. May be nested.
@@ -148,7 +148,6 @@
     static struct nala_test_t nala_test_ ## name = {    \
         .name_p = #name,                                \
         .file_p = __FILE__,                             \
-        .line = __LINE__,                               \
         .func = name,                                   \
         .before_fork_func = name ## _before_fork,       \
         .next_p = NULL                                  \
@@ -258,7 +257,6 @@ struct nala_traceback_t {
 struct nala_test_t {
     const char *name_p;
     const char *file_p;
-    int line;
     void (*func)(void);
     void (*before_fork_func)(void);
     struct {
