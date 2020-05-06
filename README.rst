@@ -398,6 +398,7 @@ An example:
 
    static void fie(void)
    {
+       printf("fie() called!\n");
    }
 
    TEST(bar_get_params_call_callback)
