@@ -106,11 +106,60 @@ static char *rstrip(char *line_p)
     return (line_p);
 }
 
+static char *strip(char *line_p)
+{
+    line_p = rstrip(line_p);
+
+    while (*line_p != '\0') {
+        if (!is_in(*line_p, " \t\r\n")) {
+            break;
+        }
+
+        line_p++;
+    }
+
+    return (line_p);
+}
+
+static bool read_line_in_file(const char *filepath_p,
+                              int line,
+                              char *source_line_p,
+                              size_t source_line_size)
+{
+    FILE *file_p;
+    int i;
+
+    file_p = fopen(filepath_p, "r");
+
+    if (file_p == NULL) {
+        return (false);
+    }
+
+    for (i = 0; i < line; i++) {
+        if (fgets(source_line_p, (int)source_line_size, file_p) == NULL) {
+            goto out;
+        }
+    }
+
+    fclose(file_p);
+
+    return (true);
+
+ out:
+
+    fclose(file_p);
+
+    return (false);
+}
+
 static void print_line(FILE *stream_p, const char *prefix_p, char *line_p)
 {
     char *at_p;
     char *function_p;
     char *location_p;
+    char *filepath_p;
+    char source_line[512];
+    int line;
 
     function_p = line_p;
     at_p = strstr(line_p, " at ");
@@ -128,6 +177,21 @@ static void print_line(FILE *stream_p, const char *prefix_p, char *line_p)
             prefix_p,
             rstrip(location_p),
             function_p);
+
+    filepath_p = location_p;
+    line_p = strstr(location_p, ":");
+
+    if (line_p == NULL) {
+        return;
+    }
+
+    line_p[0] = '\0';
+    line_p++;
+    line = atoi(line_p);
+
+    if (read_line_in_file(filepath_p, line, &source_line[0], sizeof(source_line))) {
+        fprintf(stream_p, "%s      %s\n", prefix_p, strip(&source_line[0]));
+    }
 }
 
 char *nala_traceback_format(void **buffer_pp,

@@ -28,7 +28,7 @@
 
 #include <stdbool.h>
 
-#define NALA_TRACEBACK_VERSION "0.9.0"
+#define NALA_TRACEBACK_VERSION "0.10.0"
 
 typedef bool (*nala_traceback_skip_filter_t)(void *arg_p, const char *line_p);
 
