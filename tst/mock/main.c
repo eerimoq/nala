@@ -1155,6 +1155,7 @@ TEST(rename_parameters)
     epoll_ctl_mock_ignore_in(0);
     epoll_wait_mock_ignore_in(0);
     fclose_mock(0);
+    fcntl_mock_ignore_in(0, "");
     fgets_mock_ignore_in(NULL);
     fopen_mock_ignore_in(NULL);
     /* fread_mock(ptr, size, nmemb, stream); */

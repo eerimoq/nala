@@ -20,7 +20,7 @@ MOCKED_FUNC_REGEX = re.compile(
     r'|_mock_implementation)\s*\(')
 
 REAL_VARIADIC_FUNCTIONS_REGEX = re.compile(
-    r'// NALA_REAL_VARIADIC_FUNCTION_BEGIN (open)\n'
+    r'// NALA_REAL_VARIADIC_FUNCTION_BEGIN (.*?)\n'
     r'(.*?)\n'
     r'// NALA_REAL_VARIADIC_FUNCTION_END',
     re.MULTILINE | re.DOTALL)
