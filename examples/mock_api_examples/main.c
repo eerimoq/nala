@@ -67,11 +67,16 @@ TEST(fum_in_out)
     struct foo_t foo;
 
     fum_mock_once();
+
+    /* Expect *value_p to be 1 when fum() is called, and assign 2 to
+       it before returning. */
     value = 1;
     fum_mock_set_value_p_in(&value, sizeof(value));
     value = 2;
     fum_mock_set_value_p_out(&value, sizeof(value));
 
+    /* Use a custom parameter assert function to check that
+       foo_p->string_p is "Hello!"  when fum() is called. */
     foo.string_p = "Hello!";
     fum_mock_set_foo_p_in(&foo, sizeof(foo));
     fum_mock_set_foo_p_in_assert(assert_foo_string);
