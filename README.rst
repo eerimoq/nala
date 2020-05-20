@@ -288,7 +288,7 @@ Mock API
 --------
 
 A function mock will call the real implementation by default. Use the
-functions below to control mock behaviour.
+functions below to control mock object behaviour.
 
 Variadic functions will *not* call the real implementation by
 default. Give ``--implementation`` to ``nala generate_mocks`` to
@@ -361,8 +361,8 @@ An example:
        foo(10);
    }
 
-Changes the behaviour of currect mock (most recent ``*_mock()`` or
-``*_mock_once()`` call). Works for both per call and every call
+Changes the behaviour of currect mock object (most recent ``*_mock()``
+or ``*_mock_once()`` call). Works for both per call and every call
 functions above.
 
 .. code-block:: c
@@ -477,8 +477,8 @@ An example:
 For function parameters part of <params>
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Changes the behaviour of currect mock (most recent ``*_mock()`` or
-``*_mock_once()`` call). Works for both per call and every call
+Changes the behaviour of currect mock object (most recent ``*_mock()``
+or ``*_mock_once()`` call). Works for both per call and every call
 functions above.
 
 .. code-block:: c
@@ -635,6 +635,65 @@ Other C unit test frameworks with similar feature set as Nala.
 - `CMock`_ + `Unity`_
 
 - `cmocka`_
+
+Ideas
+=====
+
+New set of generated parameter functions where ``_in()`` functions are
+renamed to ``_in_buffer()``. New ``_in()`` functions are added,
+without the size parameter. Also remove the size parameter from the
+assert function, as it is seldom used.
+
+.. code-block:: c
+
+   void FUNC_mock_set_PARAM_in(*);                 // check on input
+   void FUNC_mock_set_PARAM_in_buffer(*, size_t);  // check on input
+   void FUNC_mock_set_PARAM_in_assert(*);          // custom assert function on input
+   void FUNC_mock_set_PARAM_in_pointer(*);         // check pointer (the address) on input
+   void FUNC_mock_set_PARAM_out(*);                // value on return
+   void FUNC_mock_set_PARAM_out_buffer(*, size_t); // value on return
+   void FUNC_mock_set_PARAM_out_copy(*);           // custom output copy function
+
+An example:
+
+.. code-block:: c
+
+   /* struct foo_t { char *string_p }; */
+
+   /* void fum(int *value_p, struct foo_t *foo_p); */
+
+   static void assert_foo_string(struct foo_t *actual_p, struct foo_t *expected_p)
+   {
+       /* Is size is needed (which is seldom is). */
+       ASSERT_EQ(nala_mock_get_param_in_size(), sizeof(*expected_p));
+       ASSERT_EQ(actual_p->string_p, expected_p->string_p);
+   }
+
+   TEST(fum_in_out)
+   {
+       int value;
+       struct foo_t foo;
+
+       fum_mock_once();
+
+       /* Expect *value_p to be 1 when fum() is called, and assign 2 to
+          it before returning. */
+       value = 1;
+       fum_mock_set_value_p_in(&value);
+       value = 2;
+       fum_mock_set_value_p_out(&value);
+
+       /* Use a custom parameter assert function to check that
+          foo_p->string_p is "Hello!"  when fum() is called. */
+       foo.string_p = "Hello!";
+       fum_mock_set_foo_p_in(&foo);
+       fum_mock_set_foo_p_in_assert(assert_foo_string);
+
+       value = 1;
+       foo.string_p = "Hello!";
+       fum(&value, &foo);
+       ASSERT_EQ(value, 2);
+   }
 
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/nala.svg?branch=master
 .. _buildstatus: https://travis-ci.org/eerimoq/nala
