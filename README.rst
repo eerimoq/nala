@@ -436,11 +436,22 @@ An example:
 
 .. code-block:: c
 
-   /* void fum(int *value_p); */
+   /* struct foo_t { char *string_p }; */
+
+   /* void fum(int *value_p, struct foo_t *foo_p); */
+
+   static void assert_foo_string(struct foo_t *actual_p,
+                                 struct foo_t *expected_p,
+                                 size_t size)
+   {
+       ASSERT_EQ(size, sizeof(*expected_p));
+       ASSERT_EQ(actual_p->string_p, expected_p->string_p);
+   }
 
    TEST(fum_in_out)
    {
        int value;
+       struct foo_t foo;
 
        fum_mock_once();
        value = 1;
@@ -448,8 +459,13 @@ An example:
        value = 2;
        fum_mock_set_value_p_out(&value, sizeof(value));
 
+       foo.string_p = "Hello!";
+       fum_mock_set_foo_p_in(&foo, sizeof(foo));
+       fum_mock_set_foo_p_in_assert(assert_foo_string);
+
        value = 1;
-       fum(&value);
+       foo.string_p = "Hello!";
+       fum(&value, &foo);
        ASSERT_EQ(value, 2);
    }
 

@@ -53,9 +53,18 @@ TEST(bar_get_params_call_callback)
     bar_mock_get_params_in(handle)->callback();
 }
 
+static void assert_foo_string(struct foo_t *actual_p,
+                              struct foo_t *expected_p,
+                              size_t size)
+{
+    ASSERT_EQ(size, sizeof(*expected_p));
+    ASSERT_EQ(actual_p->string_p, expected_p->string_p);
+}
+
 TEST(fum_in_out)
 {
     int value;
+    struct foo_t foo;
 
     fum_mock_once();
     value = 1;
@@ -63,8 +72,13 @@ TEST(fum_in_out)
     value = 2;
     fum_mock_set_value_p_out(&value, sizeof(value));
 
+    foo.string_p = "Hello!";
+    fum_mock_set_foo_p_in(&foo, sizeof(foo));
+    fum_mock_set_foo_p_in_assert(assert_foo_string);
+
     value = 1;
-    fum(&value);
+    foo.string_p = "Hello!";
+    fum(&value, &foo);
     ASSERT_EQ(value, 2);
 }
 
