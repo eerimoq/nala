@@ -771,8 +771,11 @@ static void print_signal_failure(struct nala_test_t *test_p)
 {
     print_test_failure_report_begin();
     printf("  Test:  " COLOR_BOLD(CYAN, "%s\n"), full_test_name(current_test_p));
-    printf("  Error: " COLOR_BOLD(RED, "Terminated by signal %d.\n"),
-           test_p->run.signal_number);
+    printf("  Error: " COLOR_BOLD(RED, "Terminated by signal %d (%s).\n"),
+           test_p->run.signal_number,
+           strsignal(test_p->run.signal_number));
+    printf("\n  Run '" COLOR(GREEN, "make gdb TEST=%s") "' to debug with GDB.\n",
+           full_test_name(current_test_p));
     print_test_failure_report_end();
 }
 

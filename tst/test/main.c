@@ -1169,7 +1169,14 @@ TEST(subtest_run_all_tests_continue_on_failure)
     result_p = subprocess_exec_output("subtest/build/app --continue-on-failure");
 
     ASSERT_EQ(result_p->exit_code, 1);
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Terminated by signal 11.");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "Terminated by signal 11 (Segmentation fault).");
+    ASSERT_SUBSTRING(
+        result_p->stdout.buf_p,
+        "Run '" "\x1b[0m\x1b[32m"
+        "make gdb TEST=test_fail::segfault" "\x1b[0m"
+        "' to debug "
+        "with GDB.\n");
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "2 failed");
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "4 passed");
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "6 total");
@@ -1186,7 +1193,8 @@ TEST(subtest_parallel_continue_on_with_failure)
         "subtest/build/app --jobs 2 --continue-on-failure");
 
     ASSERT_EQ(result_p->exit_code, 1);
-    ASSERT_SUBSTRING(result_p->stdout.buf_p, "Terminated by signal 11.");
+    ASSERT_SUBSTRING(result_p->stdout.buf_p,
+                     "Terminated by signal 11 (Segmentation fault).");
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "2 failed");
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "4 passed");
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "6 total");
