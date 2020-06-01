@@ -29,7 +29,7 @@ struct nala_traceback_t *nala_mock_traceback_p = NULL;
 
 #define NALA_INSTANCE_NEW(instance_p, mode_in)          \
     do {                                                \
-        instance_p = nala_xmalloc(sizeof(*instance_p)); \
+        instance_p = nala_alloc(sizeof(*instance_p)); \
         instance_p->mode = mode_in;                     \
         instance_p->handle = nala_next_handle++;        \
         instance_p->next_p = NULL;                      \
@@ -67,20 +67,12 @@ struct nala_traceback_t *nala_mock_traceback_p = NULL;
         }                                               \
     } while (0);
 
-#define NALA_INSTANCES_DESTROY(list, current_p, tmp_p)  \
-    do {                                                \
-        current_p = (list).head_p;                      \
-                                                        \
-        while (current_p != NULL) {                     \
-            tmp_p = current_p;                          \
-            current_p = current_p->next_p;              \
-            nala_free(tmp_p);                           \
-        }                                               \
-                                                        \
-        (list).head_p = NULL;                           \
-        (list).next_p = NULL;                           \
-        (list).tail_p = NULL;                           \
-        (list).length = 0;                              \
+#define NALA_INSTANCES_DESTROY(list)            \
+    do {                                        \
+        (list).head_p = NULL;                   \
+        (list).next_p = NULL;                   \
+        (list).tail_p = NULL;                   \
+        (list).length = 0;                      \
     } while (0);
 
 #define NALA_INSTANCES_FIND_USED(list, instance_pp, handle_in)  \
@@ -108,39 +100,15 @@ struct nala_traceback_t *nala_mock_traceback_p = NULL;
                 "Cannot change mock mode with mock instances enqueued.\n")); \
     }
 
-#define NALA_STATE_RESET(_state, current_p, tmp_p)                      \
-    (_state).state.mode = MODE_REAL;                                    \
-    (_state).state.suspended.count = 0;                                 \
-    NALA_INSTANCES_DESTROY((_state).instances, current_p, tmp_p)
+#define NALA_STATE_RESET(_state)                \
+    (_state).state.mode = MODE_REAL;            \
+    (_state).state.suspended.count = 0;         \
+    NALA_INSTANCES_DESTROY((_state).instances)
 
 struct nala_set_param {
     void *buf_p;
     size_t size;
 };
-
-static void *nala_xmalloc(size_t size)
-{
-    void *buf_p;
-
-    nala_suspend_all_mocks();
-    buf_p = malloc(size);
-
-    if (buf_p == NULL) {
-        perror("malloc");
-        exit(1);
-    }
-
-    nala_resume_all_mocks();
-
-    return (buf_p);
-}
-
-static void nala_free(void *buf_p)
-{
-    nala_suspend_all_mocks();
-    free(buf_p);
-    nala_resume_all_mocks();
-}
 
 char *nala_format_mock_traceback(const char *message_p,
                                  struct nala_traceback_t *traceback_p)
@@ -695,12 +663,8 @@ void nala_set_param_buf(struct nala_set_param *self_p,
                         const void *buf_p,
                         size_t size)
 {
-    if (self_p->buf_p != NULL) {
-        nala_free(self_p->buf_p);
-    }
-
     if (buf_p != NULL) {
-        self_p->buf_p = nala_xmalloc(size);
+        self_p->buf_p = nala_alloc(size);
         self_p->size = size;
         memcpy(self_p->buf_p, buf_p, size);
     } else {
@@ -762,28 +726,6 @@ void nala_va_arg_list_init(struct nala_va_arg_list_t *self_p,
     self_p->length = 0;
     self_p->traceback_p = traceback_p;
     self_p->func_p = func_p;
-}
-
-void nala_va_arg_list_destroy(struct nala_va_arg_list_t *self_p)
-{
-    struct nala_va_arg_item_t *item_p;
-    struct nala_va_arg_item_t *tmp_p;
-
-    item_p = self_p->head_p;
-
-    while (item_p != NULL) {
-        if (item_p->in.buf_p != NULL) {
-            nala_free(item_p->in.buf_p);
-        }
-
-        if (item_p->out.buf_p) {
-            nala_free(item_p->out.buf_p);
-        }
-
-        tmp_p = item_p;
-        item_p = tmp_p->next_p;
-        nala_free(tmp_p);
-    }
 }
 
 void nala_va_arg_list_append(struct nala_va_arg_list_t *self_p,
@@ -859,7 +801,6 @@ void nala_parse_va_arg_long(const char **format_pp,
         break;
 
     default:
-        nala_free(item_p);
         nala_test_failure(
             nala_format("Unsupported type specifier %%l%c.\n", **format_pp));
         exit(1);
@@ -929,7 +870,6 @@ void nala_parse_va_arg_non_long(const char **format_pp,
         break;
 
     default:
-        nala_free(item_p);
         nala_test_failure(
             nala_format("Unsupported type specifier %%%c.\n", **format_pp));
         exit(1);
@@ -944,7 +884,7 @@ struct nala_va_arg_item_t *nala_parse_va_arg(const char **format_pp,
 {
     struct nala_va_arg_item_t *item_p;
 
-    item_p = nala_xmalloc(sizeof(*item_p));
+    item_p = nala_alloc(sizeof(*item_p));
     item_p->in.buf_p = NULL;
     item_p->out.buf_p = NULL;
     item_p->in_assert = NULL;
@@ -1254,16 +1194,10 @@ void nala_traceback(struct nala_traceback_t *traceback_p)
 #define MOCK_ASSERT_COPY_SET_PARAM(instance_p, data_p, func, name)      \
     if ((data_p)->params.name ## _in.buf_p != NULL) {                   \
         MOCK_ASSERT_PARAM_IN(data_p, func, name);                       \
-        if (instance_p != NULL) {                                       \
-            nala_free((data_p)->params.name ## _in.buf_p);              \
-        }                                                               \
     }                                                                   \
                                                                         \
     if ((data_p)->params.name ## _out.buf_p != NULL) {                  \
         MOCK_COPY_PARAM_OUT(&(data_p)->params, name);                   \
-        if (instance_p != NULL) {                                       \
-            nala_free((data_p)->params.name ## _out.buf_p);             \
-        }                                                               \
     }
 
 void nala_state_suspend(struct nala_state_t *state_p)
@@ -1815,10 +1749,7 @@ void add_mock_resume(void)
 
 void add_mock_reset(void)
 {
-    struct nala_instance_add_t *current_p;
-    struct nala_instance_add_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_add, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_add);
 }
 
 void add_mock_assert_completed(void)
@@ -2176,10 +2107,7 @@ void call_mock_resume(void)
 
 void call_mock_reset(void)
 {
-    struct nala_instance_call_t *current_p;
-    struct nala_instance_call_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_call, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_call);
 }
 
 void call_mock_assert_completed(void)
@@ -2458,10 +2386,7 @@ void close_mock_resume(void)
 
 void close_mock_reset(void)
 {
-    struct nala_instance_close_t *current_p;
-    struct nala_instance_close_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_close, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_close);
 }
 
 void close_mock_assert_completed(void)
@@ -2913,10 +2838,7 @@ void compose_twice_mock_resume(void)
 
 void compose_twice_mock_reset(void)
 {
-    struct nala_instance_compose_twice_t *current_p;
-    struct nala_instance_compose_twice_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_compose_twice, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_compose_twice);
 }
 
 void compose_twice_mock_assert_completed(void)
@@ -3274,10 +3196,7 @@ void double_pointer_mock_resume(void)
 
 void double_pointer_mock_reset(void)
 {
-    struct nala_instance_double_pointer_t *current_p;
-    struct nala_instance_double_pointer_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_double_pointer, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_double_pointer);
 }
 
 void double_pointer_mock_assert_completed(void)
@@ -3556,10 +3475,7 @@ void dup_mock_resume(void)
 
 void dup_mock_reset(void)
 {
-    struct nala_instance_dup_t *current_p;
-    struct nala_instance_dup_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_dup, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_dup);
 }
 
 void dup_mock_assert_completed(void)
@@ -3853,10 +3769,7 @@ void dup2_mock_resume(void)
 
 void dup2_mock_reset(void)
 {
-    struct nala_instance_dup2_t *current_p;
-    struct nala_instance_dup2_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_dup2, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_dup2);
 }
 
 void dup2_mock_assert_completed(void)
@@ -4229,10 +4142,7 @@ void edit_number_mock_resume(void)
 
 void edit_number_mock_reset(void)
 {
-    struct nala_instance_edit_number_t *current_p;
-    struct nala_instance_edit_number_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_edit_number, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_edit_number);
 }
 
 void edit_number_mock_assert_completed(void)
@@ -4590,10 +4500,7 @@ void endmntent_mock_resume(void)
 
 void endmntent_mock_reset(void)
 {
-    struct nala_instance_endmntent_t *current_p;
-    struct nala_instance_endmntent_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_endmntent, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_endmntent);
 }
 
 void endmntent_mock_assert_completed(void)
@@ -4862,10 +4769,7 @@ void enum_param_mock_resume(void)
 
 void enum_param_mock_reset(void)
 {
-    struct nala_instance_enum_param_t *current_p;
-    struct nala_instance_enum_param_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_enum_param, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_enum_param);
 }
 
 void enum_param_mock_assert_completed(void)
@@ -5223,10 +5127,7 @@ void fclose_mock_resume(void)
 
 void fclose_mock_reset(void)
 {
-    struct nala_instance_fclose_t *current_p;
-    struct nala_instance_fclose_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_fclose, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_fclose);
 }
 
 void fclose_mock_assert_completed(void)
@@ -5584,10 +5485,7 @@ void fflush_mock_resume(void)
 
 void fflush_mock_reset(void)
 {
-    struct nala_instance_fflush_t *current_p;
-    struct nala_instance_fflush_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_fflush, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_fflush);
 }
 
 void fflush_mock_assert_completed(void)
@@ -5945,10 +5843,7 @@ void fileno_mock_resume(void)
 
 void fileno_mock_reset(void)
 {
-    struct nala_instance_fileno_t *current_p;
-    struct nala_instance_fileno_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_fileno, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_fileno);
 }
 
 void fileno_mock_assert_completed(void)
@@ -6444,10 +6339,7 @@ void fopen_mock_resume(void)
 
 void fopen_mock_reset(void)
 {
-    struct nala_instance_fopen_t *current_p;
-    struct nala_instance_fopen_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_fopen, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_fopen);
 }
 
 void fopen_mock_assert_completed(void)
@@ -6929,10 +6821,7 @@ void fread_mock_resume(void)
 
 void fread_mock_reset(void)
 {
-    struct nala_instance_fread_t *current_p;
-    struct nala_instance_fread_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_fread, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_fread);
 }
 
 void fread_mock_assert_completed(void)
@@ -7280,10 +7169,7 @@ void free_mock_resume(void)
 
 void free_mock_reset(void)
 {
-    struct nala_instance_free_t *current_p;
-    struct nala_instance_free_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_free, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_free);
 }
 
 void free_mock_assert_completed(void)
@@ -7671,10 +7557,7 @@ void fseek_mock_resume(void)
 
 void fseek_mock_reset(void)
 {
-    struct nala_instance_fseek_t *current_p;
-    struct nala_instance_fseek_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_fseek, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_fseek);
 }
 
 void fseek_mock_assert_completed(void)
@@ -8032,10 +7915,7 @@ void ftell_mock_resume(void)
 
 void ftell_mock_reset(void)
 {
-    struct nala_instance_ftell_t *current_p;
-    struct nala_instance_ftell_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_ftell, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_ftell);
 }
 
 void ftell_mock_assert_completed(void)
@@ -8517,10 +8397,7 @@ void fwrite_mock_resume(void)
 
 void fwrite_mock_reset(void)
 {
-    struct nala_instance_fwrite_t *current_p;
-    struct nala_instance_fwrite_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_fwrite, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_fwrite);
 }
 
 void fwrite_mock_assert_completed(void)
@@ -8878,10 +8755,7 @@ void getmntent_mock_resume(void)
 
 void getmntent_mock_reset(void)
 {
-    struct nala_instance_getmntent_t *current_p;
-    struct nala_instance_getmntent_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_getmntent, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_getmntent);
 }
 
 void getmntent_mock_assert_completed(void)
@@ -9229,10 +9103,7 @@ void in_out_mock_resume(void)
 
 void in_out_mock_reset(void)
 {
-    struct nala_instance_in_out_t *current_p;
-    struct nala_instance_in_out_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_in_out, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_in_out);
 }
 
 void in_out_mock_assert_completed(void)
@@ -9353,7 +9224,6 @@ int __wrap_io_control(int kind, ...)
                 va_start(nala_vl, kind);
                 nala_va_arg_list_assert(&nala_data_p->params.nala_va_arg_list, nala_vl);
                 va_end(nala_vl);
-                nala_va_arg_list_destroy(&nala_data_p->params.nala_va_arg_list);
             }
 
             errno = nala_data_p->errno_value;
@@ -9637,10 +9507,7 @@ void io_control_mock_resume(void)
 
 void io_control_mock_reset(void)
 {
-    struct nala_instance_io_control_t *current_p;
-    struct nala_instance_io_control_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_io_control, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_io_control);
 }
 
 void io_control_mock_assert_completed(void)
@@ -9920,10 +9787,7 @@ void io_vcontrol_mock_resume(void)
 
 void io_vcontrol_mock_reset(void)
 {
-    struct nala_instance_io_vcontrol_t *current_p;
-    struct nala_instance_io_vcontrol_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_io_vcontrol, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_io_vcontrol);
 }
 
 void io_vcontrol_mock_assert_completed(void)
@@ -10202,10 +10066,7 @@ void malloc_mock_resume(void)
 
 void malloc_mock_reset(void)
 {
-    struct nala_instance_malloc_t *current_p;
-    struct nala_instance_malloc_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_malloc, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_malloc);
 }
 
 void malloc_mock_assert_completed(void)
@@ -10926,10 +10787,7 @@ void mount_mock_resume(void)
 
 void mount_mock_reset(void)
 {
-    struct nala_instance_mount_t *current_p;
-    struct nala_instance_mount_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_mount, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_mount);
 }
 
 void mount_mock_assert_completed(void)
@@ -11299,10 +11157,7 @@ void output_message_mock_resume(void)
 
 void output_message_mock_reset(void)
 {
-    struct nala_instance_output_message_t *current_p;
-    struct nala_instance_output_message_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_output_message, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_output_message);
 }
 
 void output_message_mock_assert_completed(void)
@@ -11759,10 +11614,7 @@ void parameter_name_omitted_mock_resume(void)
 
 void parameter_name_omitted_mock_reset(void)
 {
-    struct nala_instance_parameter_name_omitted_t *current_p;
-    struct nala_instance_parameter_name_omitted_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_parameter_name_omitted, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_parameter_name_omitted);
 }
 
 void parameter_name_omitted_mock_assert_completed(void)
@@ -12120,10 +11972,7 @@ void pipe_mock_resume(void)
 
 void pipe_mock_reset(void)
 {
-    struct nala_instance_pipe_t *current_p;
-    struct nala_instance_pipe_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_pipe, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_pipe);
 }
 
 void pipe_mock_assert_completed(void)
@@ -12511,10 +12360,7 @@ void poll_mock_resume(void)
 
 void poll_mock_reset(void)
 {
-    struct nala_instance_poll_t *current_p;
-    struct nala_instance_poll_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_poll, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_poll);
 }
 
 void poll_mock_assert_completed(void)
@@ -12769,10 +12615,7 @@ void print_hello_mock_resume(void)
 
 void print_hello_mock_reset(void)
 {
-    struct nala_instance_print_hello_t *current_p;
-    struct nala_instance_print_hello_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_print_hello, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_print_hello);
 }
 
 void print_hello_mock_assert_completed(void)
@@ -13160,10 +13003,7 @@ void read_mock_resume(void)
 
 void read_mock_reset(void)
 {
-    struct nala_instance_read_t *current_p;
-    struct nala_instance_read_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_read, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_read);
 }
 
 void read_mock_assert_completed(void)
@@ -13675,10 +13515,7 @@ void sendto_mock_resume(void)
 
 void sendto_mock_reset(void)
 {
-    struct nala_instance_sendto_t *current_p;
-    struct nala_instance_sendto_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_sendto, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_sendto);
 }
 
 void sendto_mock_assert_completed(void)
@@ -14096,10 +13933,7 @@ void setsockopt_mock_resume(void)
 
 void setsockopt_mock_reset(void)
 {
-    struct nala_instance_setsockopt_t *current_p;
-    struct nala_instance_setsockopt_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_setsockopt, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_setsockopt);
 }
 
 void setsockopt_mock_assert_completed(void)
@@ -14378,10 +14212,7 @@ void sleep_mock_resume(void)
 
 void sleep_mock_reset(void)
 {
-    struct nala_instance_sleep_t *current_p;
-    struct nala_instance_sleep_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_sleep, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_sleep);
 }
 
 void sleep_mock_assert_completed(void)
@@ -14855,10 +14686,7 @@ void statvfs_mock_resume(void)
 
 void statvfs_mock_reset(void)
 {
-    struct nala_instance_statvfs_t *current_p;
-    struct nala_instance_statvfs_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_statvfs, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_statvfs);
 }
 
 void statvfs_mock_assert_completed(void)
@@ -15206,10 +15034,7 @@ void struct_param_mock_resume(void)
 
 void struct_param_mock_reset(void)
 {
-    struct nala_instance_struct_param_t *current_p;
-    struct nala_instance_struct_param_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_struct_param, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_struct_param);
 }
 
 void struct_param_mock_assert_completed(void)
@@ -15474,10 +15299,7 @@ void struct_param_and_return_type_mock_resume(void)
 
 void struct_param_and_return_type_mock_reset(void)
 {
-    struct nala_instance_struct_param_and_return_type_t *current_p;
-    struct nala_instance_struct_param_and_return_type_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_struct_param_and_return_type, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_struct_param_and_return_type);
 }
 
 void struct_param_and_return_type_mock_assert_completed(void)
@@ -15835,10 +15657,7 @@ void time_mock_resume(void)
 
 void time_mock_reset(void)
 {
-    struct nala_instance_time_t *current_p;
-    struct nala_instance_time_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_time, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_time);
 }
 
 void time_mock_assert_completed(void)
@@ -16320,10 +16139,7 @@ void timerfd_settime_mock_resume(void)
 
 void timerfd_settime_mock_reset(void)
 {
-    struct nala_instance_timerfd_settime_t *current_p;
-    struct nala_instance_timerfd_settime_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_timerfd_settime, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_timerfd_settime);
 }
 
 void timerfd_settime_mock_assert_completed(void)
@@ -16588,10 +16404,7 @@ void tmpfile_mock_resume(void)
 
 void tmpfile_mock_reset(void)
 {
-    struct nala_instance_tmpfile_t *current_p;
-    struct nala_instance_tmpfile_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_tmpfile, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_tmpfile);
 }
 
 void tmpfile_mock_assert_completed(void)
@@ -16856,10 +16669,7 @@ void typedef_struct_param_and_return_type_mock_resume(void)
 
 void typedef_struct_param_and_return_type_mock_reset(void)
 {
-    struct nala_instance_typedef_struct_param_and_return_type_t *current_p;
-    struct nala_instance_typedef_struct_param_and_return_type_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_typedef_struct_param_and_return_type, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_typedef_struct_param_and_return_type);
 }
 
 void typedef_struct_param_and_return_type_mock_assert_completed(void)
@@ -17124,10 +16934,7 @@ void typedef_union_param_and_return_type_mock_resume(void)
 
 void typedef_union_param_and_return_type_mock_reset(void)
 {
-    struct nala_instance_typedef_union_param_and_return_type_t *current_p;
-    struct nala_instance_typedef_union_param_and_return_type_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_typedef_union_param_and_return_type, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_typedef_union_param_and_return_type);
 }
 
 void typedef_union_param_and_return_type_mock_assert_completed(void)
@@ -17392,10 +17199,7 @@ void union_param_and_return_type_mock_resume(void)
 
 void union_param_and_return_type_mock_reset(void)
 {
-    struct nala_instance_union_param_and_return_type_t *current_p;
-    struct nala_instance_union_param_and_return_type_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_union_param_and_return_type, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_union_param_and_return_type);
 }
 
 void union_param_and_return_type_mock_assert_completed(void)
@@ -17674,10 +17478,7 @@ void usleep_mock_resume(void)
 
 void usleep_mock_reset(void)
 {
-    struct nala_instance_usleep_t *current_p;
-    struct nala_instance_usleep_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_usleep, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_usleep);
 }
 
 void usleep_mock_assert_completed(void)
@@ -18065,10 +17866,7 @@ void write_mock_resume(void)
 
 void write_mock_reset(void)
 {
-    struct nala_instance_write_t *current_p;
-    struct nala_instance_write_t *tmp_p;
-
-    NALA_STATE_RESET(nala_mock_write, current_p, tmp_p);
+    NALA_STATE_RESET(nala_mock_write);
 }
 
 void write_mock_assert_completed(void)

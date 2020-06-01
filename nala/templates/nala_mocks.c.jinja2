@@ -175,7 +175,6 @@ struct nala_params_{{mock.func_name}}_t *nala_get_params_{{mock.func_name}}()
                 va_start(nala_vl, {{mock.va_list_start_arg_name}});
                 nala_va_arg_list_assert(&nala_data_p->params.nala_va_arg_list, nala_vl);
                 va_end(nala_vl);
-                nala_va_arg_list_destroy(&nala_data_p->params.nala_va_arg_list);
             }
 
             {% endif %}
@@ -691,10 +690,7 @@ void {{mock.func_name}}_mock_resume(void)
 
 void {{mock.func_name}}_mock_reset(void)
 {
-    struct nala_instance_{{mock.func_name}}_t *current_p;
-    struct nala_instance_{{mock.func_name}}_t *tmp_p;
-
-    NALA_STATE_RESET({{mock.state_name}}, current_p, tmp_p);
+    NALA_STATE_RESET({{mock.state_name}});
 }
 
 void {{mock.func_name}}_mock_assert_completed(void)
