@@ -22,3 +22,14 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash) -X coveragepy
   - coveralls
+
+deploy:
+  provider: pypi
+  username: __token__
+  password:
+    secure: k7ZIrhez8I2Y4JsYz5yJ9ydfY08608lI2eABG1HGh+a5U36WP9cc569XQPak5uz7coolFxlBWiqzJni5uhJzhEd6H+Vp6oOaSKirSiQUJCHhjt987ahaveznnJorJrjYm+oDC26/sNb8FGirStSl7n+5ihw7aZn8kO4EIphhagu1BbsA+YID+tQQWaOTIFPo3QujP0EhKWEVH2S3UYRHP0g34tMLcFETMY/WDjp6Z2pdxkpmp/YZM5YZ2BgfbnJYfBeZMOlWwzZxKyKg83akYFOd/I5FTK6pNb7jR07YBUB74V3ev3uCNygN1IPcGyKeyBGXJikDQWWGJCE/mJtwaQLO8beyZ7YcYvYT6BGb7F25HmZW5iC+THqsHOG48Whckpq6BF9xwUjFeLP0VDZgZ/itVaQns9KNnyT6iUr37mf/Jzj6tnzLsp/VzwtpMY7LDGLdfRh7IUDc86rFlavjw9aIR2jLHZcO3uGdlElb2PtYqOmvoMy1EhW4jk33mkx9yIoOajU27QE7fvvTux/tGcV2xu6Wqjr/1qYx5NaSILMgXrbDOpEgkE3yygNyerbJWbV0kWryR9MAuM3WABTc4bQf/VbIq/QZjfWQJK9FQuw8CQfhp0vm9fMSrDRg4JlflKYVHyzFlPXwIbCIzU3GZxKi3QHBsebltR7ElbdNk4g=
+  edge: true
+  skip_existing: true
+  on:
+    tags: true
+  distributions: "sdist bdist_wheel"
