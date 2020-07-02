@@ -21,3 +21,14 @@ int fcntl_mock_va_arg_real(int fd, int cmd, va_list __nala_va_list)
 }
 
 // NALA_REAL_VARIADIC_FUNCTION_END
+
+// NALA_REAL_VARIADIC_FUNCTION_BEGIN fprintf
+
+int fprintf_mock_va_arg_real(FILE *stream,
+                             const char *format,
+                             va_list __nala_va_list)
+{
+    return (vfprintf(stream, format, __nala_va_list));
+}
+
+// NALA_REAL_VARIADIC_FUNCTION_END
