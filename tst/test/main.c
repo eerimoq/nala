@@ -1174,7 +1174,7 @@ TEST(subtest_run_all_tests_continue_on_failure)
     ASSERT_SUBSTRING(
         result_p->stdout.buf_p,
         "Run '" "\x1b[0m\x1b[32m"
-        "make gdb TEST=test_fail::segfault" "\x1b[0m"
+        "make gdb TEST=^test_fail::segfault\\$" "\x1b[0m"
         "' to debug "
         "with GDB.\n");
     ASSERT_SUBSTRING(result_p->stdout.buf_p, "2 failed");

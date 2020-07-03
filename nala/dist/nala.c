@@ -774,7 +774,7 @@ static void print_signal_failure(struct nala_test_t *test_p)
     printf("  Error: " COLOR_BOLD(RED, "Terminated by signal %d (%s).\n"),
            test_p->run.signal_number,
            strsignal(test_p->run.signal_number));
-    printf("\n  Run '" COLOR(GREEN, "make gdb TEST=%s") "' to debug with GDB.\n",
+    printf("\n  Run '" COLOR(GREEN, "make gdb TEST=^%s\\$") "' to debug with GDB.\n",
            full_test_name(current_test_p));
     print_test_failure_report_end();
 }
@@ -2688,7 +2688,6 @@ static bool are_strings(const char **actual_pp, const char *expected_p, size_t s
     } else {
         return (is_printable_string(*actual_pp, length));
     }
-
 }
 
 void nala_assert_string_or_memory(const void *actual_p,
@@ -2890,6 +2889,7 @@ int main(int argc, char *argv[])
 
         default:
             print_usage_and_exit(argv[0], 1);
+            break;
         }
     }
 

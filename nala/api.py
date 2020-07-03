@@ -12,7 +12,10 @@ NALA_C_FUNCTIONS = [
     'snprintf',
     'memcpy',
     'strcmp',
-    'strncmp'
+    'strncmp',
+    'strnlen',
+    'memcmp',
+    'strstr'
 ]
 
 MOCKED_FUNC_REGEX = re.compile(
