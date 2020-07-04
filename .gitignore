@@ -126,3 +126,4 @@ examples/*/tests.c
 a.out
 /foo
 /output
+tst/make/test

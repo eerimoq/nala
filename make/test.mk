@@ -82,6 +82,9 @@ $(EXE): $(OBJ)
 	$(CC) $(CFLAGS) @$(BUILD)/nala_mocks.ldflags $^ -o $@
 
 define COMPILE_template
+ifeq ($(WRAP_INTERNAL_SYMBOLS), yes)
+$(patsubst %.c,$(BUILD)%.o,$(abspath $1)): $(BUILD)/nala_mocks.ldflags
+endif
 $(patsubst %.c,$(BUILD)%.o,$(abspath $1)): $1
 	@echo "CC $1"
 	mkdir -p $$(@D)
