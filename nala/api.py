@@ -18,11 +18,11 @@ NALA_C_FUNCTIONS = [
     'strstr'
 ]
 
-MOCKED_FUNC_REGEX = re.compile(
+RE_MOCKED_FUNC = re.compile(
     r'(_mock|_mock_once|_mock_ignore_in|_mock_ignore_in_once|_mock_none'
     r'|_mock_implementation)\s*\(')
 
-REAL_VARIADIC_FUNCTIONS_REGEX = re.compile(
+RE_REAL_VARIADIC_FUNCTIONS = re.compile(
     r'// NALA_REAL_VARIADIC_FUNCTION_BEGIN (.*?)\n'
     r'(.*?)\n'
     r'// NALA_REAL_VARIADIC_FUNCTION_END',
@@ -50,7 +50,7 @@ def find_mocked_function_name(expanded_source_code, index):
 def find_mocked_functions(expanded_source_code):
     functions = set()
 
-    for match in MOCKED_FUNC_REGEX.finditer(expanded_source_code):
+    for match in RE_MOCKED_FUNC.finditer(expanded_source_code):
         function_name = find_mocked_function_name(expanded_source_code,
                                                   match.start())
 
@@ -89,7 +89,7 @@ def load_real_variadic_functions(filename):
 
     return {
         mo[0]: mo[1]
-        for mo in REAL_VARIADIC_FUNCTIONS_REGEX.findall(contents)
+        for mo in RE_REAL_VARIADIC_FUNCTIONS.findall(contents)
     }
 
 
