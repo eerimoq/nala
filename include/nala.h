@@ -281,8 +281,6 @@ const char *nala_format_memory(const char *prefix_p,
                                const void *expected_p,
                                size_t size);
 
-bool nala_check_substring(const char *string_p, const char *substring_p);
-
 bool nala_check_memory(const void *left_p, const void *right_p, size_t size);
 
 void nala_capture_output_start(char **stdout_pp, char **stderr_pp);

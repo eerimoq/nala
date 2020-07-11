@@ -1220,13 +1220,19 @@ static int run_tests(struct nala_test_t *tests_p)
 
 bool nala_check_string_equal(const char *actual_p, const char *expected_p)
 {
+    bool are_equal;
+
     if (actual_p == expected_p) {
         return (true);
     }
 
-    return ((actual_p != NULL)
-            && (expected_p != NULL)
-            && (strcmp(actual_p, expected_p) == 0));
+    nala_suspend_all_mocks();
+    are_equal = ((actual_p != NULL)
+                 && (expected_p != NULL)
+                 && (strcmp(actual_p, expected_p) == 0));
+    nala_resume_all_mocks();
+
+    return (are_equal);
 }
 
 const char *nala_format(const char *format_p, ...)
@@ -1331,7 +1337,6 @@ static void print_string_diff(FILE *file_p,
                               const char *original,
                               const char *modified)
 {
-    nala_suspend_all_mocks();
     fprintf(file_p, "  Diff:\n\n");
 
     struct NalaDiff diff = nala_diff_lines(original, modified);
@@ -1428,7 +1433,6 @@ static void print_string_diff(FILE *file_p,
 
     free(diff.chunks);
     fprintf(file_p, "\n");
-    nala_resume_all_mocks();
 }
 
 static char *make_string_readable_length(const char *string_p, size_t length)
@@ -1553,8 +1557,6 @@ static const char *nala_format_substring(const char *prefix_p,
     char *buf_p;
     FILE *file_p;
 
-    nala_suspend_all_mocks();
-
     file_p = open_memstream(&buf_p, &size);
 
     if (haystack_p == NULL) {
@@ -1580,8 +1582,6 @@ static const char *nala_format_substring(const char *prefix_p,
 
     fputc('\0', file_p);
     fclose(file_p);
-
-    nala_resume_all_mocks();
 
     return (buf_p);
 }
@@ -1685,7 +1685,7 @@ const char *nala_format_file(const char *prefix_p,
     return (buf_p);
 }
 
-bool nala_check_substring(const char *haystack_p, const char *needle_p)
+static bool nala_check_substring(const char *haystack_p, const char *needle_p)
 {
     if ((haystack_p == NULL) || (needle_p == NULL)) {
         return (false);
@@ -1696,11 +1696,17 @@ bool nala_check_substring(const char *haystack_p, const char *needle_p)
 
 bool nala_check_memory(const void *actual_p, const void *expected_p, size_t size)
 {
+    bool are_equal;
+
     if ((actual_p == NULL) || (expected_p == NULL)) {
         return (false);
     }
 
-    return (memcmp(actual_p, expected_p, size) == 0);
+    nala_suspend_all_mocks();
+    are_equal = (memcmp(actual_p, expected_p, size) == 0);
+    nala_resume_all_mocks();
+
+    return (are_equal);
 }
 
 static bool traceback_skip_filter(void *arg_p, const char *line_p)
@@ -2067,7 +2073,6 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
         if (!check(actual, expected)) {                                 \
             char _nala_assert_format[512];                              \
                                                                         \
-            nala_suspend_all_mocks();                                   \
             snprintf(&_nala_assert_format[0],                           \
                      sizeof(_nala_assert_format),                       \
                      format,                                            \
@@ -2165,84 +2170,116 @@ char *nala_mock_traceback_format(void **buffer_pp, int depth)
 
 void nala_assert_char(char actual, char expected, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION(actual, expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_schar(signed char actual, signed char expected, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION(actual, expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_uchar(unsigned char actual, unsigned char expected, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION(actual, expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_short(short actual, short expected, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION_WITH_HEX(actual, expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_ushort(unsigned short actual, unsigned short expected, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION_WITH_HEX(actual, expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_int(int actual, int expected, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION_WITH_HEX(actual, expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_uint(unsigned int actual, unsigned int expected, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION_WITH_HEX(actual, expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_long(long actual, long expected, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION_WITH_HEX(actual, expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_ulong(unsigned long actual, unsigned long expected, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION_WITH_HEX(actual, expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_llong(long long actual, long long expected, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION_WITH_HEX(actual, expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_ullong(unsigned long long actual,
                         unsigned long long expected,
                         int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION_WITH_HEX(actual, expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_float(float actual, float expected, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION((double)actual, (double)expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_double(double actual, double expected, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION(actual, expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_ldouble(long double actual, long double expected, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION(actual, expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_bool(bool actual, bool expected, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION(actual, expected, op);
+    nala_resume_all_mocks();
 }
 
 void nala_assert_ptr(const void *actual_p, const void *expected_p, int op)
 {
+    nala_suspend_all_mocks();
     BINARY_ASSERTION(actual_p, expected_p, op);
+    nala_resume_all_mocks();
 }
 
 typedef void (*format_array_item_t)(FILE *file_p, const void *value_p);
@@ -2417,19 +2454,23 @@ static void format_array_item_bool(FILE *file_p, const void *value_p)
     fprintf(file_p, "%d", *(bool *)value_p);
 }
 
-#define ASSERT_ARRAY_TYPE(type, actual_p, expected_p, item_size, size) \
+#define ASSERT_ARRAY_TYPE(type, actual_p, expected_p, item_size, size)  \
     size_t i;                                                           \
+                                                                        \
+    nala_suspend_all_mocks();                                           \
                                                                         \
     for (i = 0; i < size / item_size; i++) {                            \
         if (actual_p[i] != expected_p[i]) {                             \
-            assert_array_failure(actual_p,                             \
-                                  expected_p,                           \
-                                  item_size,                            \
-                                  size,                                 \
-                                  (int)i,                               \
-                                  format_array_item_ ## type);          \
+            assert_array_failure(actual_p,                              \
+                                 expected_p,                            \
+                                 item_size,                             \
+                                 size,                                  \
+                                 (int)i,                                \
+                                 format_array_item_ ## type);           \
         }                                                               \
     }                                                                   \
+                                                                        \
+    nala_resume_all_mocks();
 
 void nala_assert_array_char(const char *actual_p,
                              const char *expected_p,
@@ -2561,6 +2602,8 @@ void nala_assert_array(const void *actual_p,
     size_t i;
     char buf[512];
 
+    nala_suspend_all_mocks();
+
     c_actual_p = (const char *)actual_p;
     c_expected_p = (const char *)expected_p;
 
@@ -2576,10 +2619,14 @@ void nala_assert_array(const void *actual_p,
                                                  item_size));
         }
     }
+
+    nala_resume_all_mocks();
 }
 
 void nala_assert_string(const char *actual_p, const char *expected_p, int op)
 {
+    nala_suspend_all_mocks();
+
     switch (op) {
 
     case NALA_CHECK_EQ:
@@ -2604,10 +2651,14 @@ void nala_assert_string(const char *actual_p, const char *expected_p, int op)
         FAIL("Internal nala error.");
         break;
     }
+
+    nala_resume_all_mocks();
 }
 
 void nala_assert_substring(const char *haystack_p, const char *needle_p)
 {
+    nala_suspend_all_mocks();
+
     if (!nala_check_substring(haystack_p, needle_p)) {
         nala_test_failure(
             nala_format_substring(
@@ -2615,10 +2666,14 @@ void nala_assert_substring(const char *haystack_p, const char *needle_p)
                 haystack_p,
                 needle_p));
     }
+
+    nala_resume_all_mocks();
 }
 
 void nala_assert_not_substring(const char *haystack_p, const char *needle_p)
 {
+    nala_suspend_all_mocks();
+
     if (nala_check_substring(haystack_p, needle_p)) {
         nala_test_failure(
             nala_format_substring(
@@ -2626,6 +2681,8 @@ void nala_assert_not_substring(const char *haystack_p, const char *needle_p)
                 haystack_p,
                 needle_p));
     }
+
+    nala_resume_all_mocks();
 }
 
 void nala_assert_memory(const void *actual_p, const void *expected_p, size_t size)
@@ -2694,9 +2751,9 @@ void nala_assert_string_or_memory(const void *actual_p,
                                   const void *expected_p,
                                   size_t size)
 {
-    if (!check_string_or_memory(actual_p, expected_p, size)) {
-        nala_suspend_all_mocks();
+    nala_suspend_all_mocks();
 
+    if (!check_string_or_memory(actual_p, expected_p, size)) {
         if (are_strings((const char **)&actual_p, expected_p, size)) {
             nala_test_failure(nala_format_string("The strings are not equal.",
                                                  actual_p,
@@ -2704,9 +2761,9 @@ void nala_assert_string_or_memory(const void *actual_p,
         } else {
             nala_test_failure(nala_format_memory("", actual_p, expected_p, size));
         }
-
-        nala_resume_all_mocks();
     }
+
+    nala_resume_all_mocks();
 }
 
 void nala_assert_file_eq(const char *actual_p, const char *expected_p)

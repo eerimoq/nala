@@ -8,16 +8,6 @@ from .generator import header_file
 from .generator import does_generated_files_exist
 
 
-NALA_C_FUNCTIONS = [
-    'snprintf',
-    'memcpy',
-    'strcmp',
-    'strncmp',
-    'strnlen',
-    'memcmp',
-    'strstr'
-]
-
 RE_MOCKED_FUNC = re.compile(
     r'(_mock|_mock_once|_mock_ignore_in|_mock_ignore_in_once|_mock_none'
     r'|_mock_implementation)\s*\(')
@@ -130,10 +120,6 @@ def generate_mocks(expanded_code,
     generator = FileGenerator(parser)
 
     for function in parser.mocked_functions:
-        if function.name in NALA_C_FUNCTIONS:
-            raise Exception(
-                f"'{function.name}()' cannot be mocked as it is used by Nala.")
-
         generator.add_mock(function,
                            has_implementation(function.name,
                                               implementation,
