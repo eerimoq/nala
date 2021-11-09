@@ -1473,6 +1473,7 @@ int foo_mock_ignore_in_once(int return_value)
 
     nala_mock_foo.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.params.ignore___a_in = true;
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;

@@ -1516,6 +1516,7 @@ int rename_parameters_with_name_mock_ignore_in_once(void)
 
     nala_mock_rename_parameters_with_name.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.path_out);
     nala_set_param_init(&instance_p->data.params.path_in);
     instance_p->data.params.path_in_assert =
@@ -1901,6 +1902,7 @@ int rename_parameters_without_name_mock_ignore_in_once(void)
 
     nala_mock_rename_parameters_without_name.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.path_out);
     nala_set_param_init(&instance_p->data.params.path_in);
     instance_p->data.params.path_in_assert =

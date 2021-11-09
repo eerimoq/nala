@@ -1485,6 +1485,7 @@ int bar_mock_ignore_in_once(int return_value)
 
     nala_mock_bar.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
     instance_p->data.callback = NULL;
@@ -1750,6 +1751,7 @@ int fie_mock_ignore_in_once(int return_value)
 
     nala_mock_fie.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
     instance_p->data.callback = NULL;
@@ -2015,6 +2017,7 @@ int foo_mock_ignore_in_once(int return_value)
 
     nala_mock_foo.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
     instance_p->data.callback = NULL;
@@ -2280,6 +2283,7 @@ int fum_mock_ignore_in_once(int return_value)
 
     nala_mock_fum.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
     instance_p->data.callback = NULL;
@@ -2545,6 +2549,7 @@ int gam_mock_ignore_in_once(int return_value)
 
     nala_mock_gam.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
     instance_p->data.callback = NULL;
@@ -2810,6 +2815,7 @@ int hit_mock_ignore_in_once(int return_value)
 
     nala_mock_hit.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
     instance_p->data.callback = NULL;

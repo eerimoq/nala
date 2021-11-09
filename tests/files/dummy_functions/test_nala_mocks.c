@@ -1658,6 +1658,7 @@ int add_mock_ignore_in_once(int return_value)
 
     nala_mock_add.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.params.ignore_x_in = true;
     instance_p->data.params.ignore_y_in = true;
     instance_p->data.return_value = return_value;
@@ -1966,6 +1967,7 @@ int call_mock_ignore_in_once(int return_value)
 
     nala_mock_call.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.callback_out);
     nala_set_param_init(&instance_p->data.params.callback_in);
     instance_p->data.params.callback_in_assert =
@@ -2301,6 +2303,7 @@ int close_mock_ignore_in_once(int return_value)
 
     nala_mock_close.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.params.ignore_fd_in = true;
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
@@ -2635,6 +2638,7 @@ int compose_twice_mock_ignore_in_once(DummyStruct *return_value)
 
     nala_mock_compose_twice.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.dummy_struct_out);
     nala_set_param_init(&instance_p->data.params.dummy_struct_in);
     instance_p->data.params.dummy_struct_in_assert =
@@ -3055,6 +3059,7 @@ int double_pointer_mock_ignore_in_once(int return_value)
 
     nala_mock_double_pointer.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.value_pp_out);
     nala_set_param_init(&instance_p->data.params.value_pp_in);
     instance_p->data.params.value_pp_in_assert =
@@ -3390,6 +3395,7 @@ int dup_mock_ignore_in_once(int return_value)
 
     nala_mock_dup.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.params.ignore_oldfd_in = true;
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
@@ -3678,6 +3684,7 @@ int dup2_mock_ignore_in_once(int return_value)
 
     nala_mock_dup2.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.params.ignore_oldfd_in = true;
     instance_p->data.params.ignore_newfd_in = true;
     instance_p->data.return_value = return_value;
@@ -3995,6 +4002,7 @@ int edit_number_mock_ignore_in_once(DummyStruct *return_value)
 
     nala_mock_edit_number.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.dummy_struct_out);
     nala_set_param_init(&instance_p->data.params.dummy_struct_in);
     instance_p->data.params.dummy_struct_in_assert =
@@ -4359,6 +4367,7 @@ int endmntent_mock_ignore_in_once(int return_value)
 
     nala_mock_endmntent.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.streamp_out);
     nala_set_param_init(&instance_p->data.params.streamp_in);
     instance_p->data.params.streamp_in_assert =
@@ -4685,6 +4694,7 @@ int enum_param_mock_ignore_in_once(void)
 
     nala_mock_enum_param.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.params.ignore_value_in = true;
     instance_p->data.errno_value = 0;
     instance_p->data.callback = NULL;
@@ -4986,6 +4996,7 @@ int fclose_mock_ignore_in_once(int return_value)
 
     nala_mock_fclose.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.stream_out);
     nala_set_param_init(&instance_p->data.params.stream_in);
     instance_p->data.params.stream_in_assert =
@@ -5344,6 +5355,7 @@ int fflush_mock_ignore_in_once(int return_value)
 
     nala_mock_fflush.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.stream_out);
     nala_set_param_init(&instance_p->data.params.stream_in);
     instance_p->data.params.stream_in_assert =
@@ -5702,6 +5714,7 @@ int fileno_mock_ignore_in_once(int return_value)
 
     nala_mock_fileno.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.stream_out);
     nala_set_param_init(&instance_p->data.params.stream_in);
     instance_p->data.params.stream_in_assert =
@@ -6124,6 +6137,7 @@ int fopen_mock_ignore_in_once(FILE *return_value)
 
     nala_mock_fopen.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.path_out);
     nala_set_param_init(&instance_p->data.params.path_in);
     instance_p->data.params.path_in_assert =
@@ -6606,6 +6620,7 @@ int fread_mock_ignore_in_once(size_t return_value)
 
     nala_mock_fread.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.ptr_out);
     nala_set_param_init(&instance_p->data.params.ptr_in);
     instance_p->data.params.ptr_in_assert =
@@ -7029,6 +7044,7 @@ int free_mock_ignore_in_once(void)
 
     nala_mock_free.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.ptr_out);
     nala_set_param_init(&instance_p->data.params.ptr_in);
     instance_p->data.params.ptr_in_assert =
@@ -7404,6 +7420,7 @@ int fseek_mock_ignore_in_once(int return_value)
 
     nala_mock_fseek.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.stream_out);
     nala_set_param_init(&instance_p->data.params.stream_in);
     instance_p->data.params.stream_in_assert =
@@ -7774,6 +7791,7 @@ int ftell_mock_ignore_in_once(long int return_value)
 
     nala_mock_ftell.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.stream_out);
     nala_set_param_init(&instance_p->data.params.stream_in);
     instance_p->data.params.stream_in_assert =
@@ -8182,6 +8200,7 @@ int fwrite_mock_ignore_in_once(size_t return_value)
 
     nala_mock_fwrite.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.ptr_out);
     nala_set_param_init(&instance_p->data.params.ptr_in);
     instance_p->data.params.ptr_in_assert =
@@ -8614,6 +8633,7 @@ int getmntent_mock_ignore_in_once(struct mntent *return_value)
 
     nala_mock_getmntent.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.stream_out);
     nala_set_param_init(&instance_p->data.params.stream_in);
     instance_p->data.params.stream_in_assert =
@@ -8963,6 +8983,7 @@ int in_out_mock_ignore_in_once(void)
 
     nala_mock_in_out.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.buf_p_out);
     nala_set_param_init(&instance_p->data.params.buf_p_in);
     instance_p->data.params.buf_p_in_assert =
@@ -9337,6 +9358,7 @@ int io_control_mock_ignore_in_once(int return_value, const char *vafmt_p)
 
     nala_mock_io_control.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.params.vafmt_p = vafmt_p;
     nala_va_arg_list_init(&instance_p->data.params.nala_va_arg_list,
                           &instance_p->data.traceback,
@@ -9702,6 +9724,7 @@ int io_vcontrol_mock_ignore_in_once(int return_value)
 
     nala_mock_io_vcontrol.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.params.ignore_kind_in = true;
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
@@ -9981,6 +10004,7 @@ int malloc_mock_ignore_in_once(void *return_value)
 
     nala_mock_malloc.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.params.ignore_size_in = true;
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
@@ -10436,6 +10460,7 @@ int mount_mock_ignore_in_once(int return_value)
 
     nala_mock_mount.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.source_out);
     nala_set_param_init(&instance_p->data.params.source_in);
     instance_p->data.params.source_in_assert =
@@ -11011,6 +11036,7 @@ int output_message_mock_ignore_in_once(void)
 
     nala_mock_output_message.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.message_out);
     nala_set_param_init(&instance_p->data.params.message_in);
     instance_p->data.params.message_in_assert =
@@ -11406,6 +11432,7 @@ int parameter_name_omitted_mock_ignore_in_once(void)
 
     nala_mock_parameter_name_omitted.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.nala_1_out);
     nala_set_param_init(&instance_p->data.params.nala_1_in);
     instance_p->data.params.nala_1_in_assert =
@@ -11831,6 +11858,7 @@ int pipe_mock_ignore_in_once(int return_value)
 
     nala_mock_pipe.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.pipefd_out);
     nala_set_param_init(&instance_p->data.params.pipefd_in);
     instance_p->data.params.pipefd_in_assert =
@@ -12207,6 +12235,7 @@ int poll_mock_ignore_in_once(int return_value)
 
     nala_mock_poll.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.fds_out);
     nala_set_param_init(&instance_p->data.params.fds_in);
     instance_p->data.params.fds_in_assert =
@@ -12537,6 +12566,7 @@ int print_hello_mock_ignore_in_once(void)
 
     nala_mock_print_hello.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.errno_value = 0;
     instance_p->data.callback = NULL;
     NALA_INSTANCES_APPEND(nala_mock_print_hello.instances,
@@ -12850,6 +12880,7 @@ int read_mock_ignore_in_once(ssize_t return_value)
 
     nala_mock_read.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.buf_out);
     nala_set_param_init(&instance_p->data.params.buf_in);
     instance_p->data.params.buf_in_assert =
@@ -13288,6 +13319,7 @@ int sendto_mock_ignore_in_once(ssize_t return_value)
 
     nala_mock_sendto.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.buf_out);
     nala_set_param_init(&instance_p->data.params.buf_in);
     instance_p->data.params.buf_in_assert =
@@ -13768,6 +13800,7 @@ int setsockopt_mock_ignore_in_once(int return_value)
 
     nala_mock_setsockopt.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.optval_out);
     nala_set_param_init(&instance_p->data.params.optval_in);
     instance_p->data.params.optval_in_assert =
@@ -14127,6 +14160,7 @@ int sleep_mock_ignore_in_once(unsigned int return_value)
 
     nala_mock_sleep.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.params.ignore_seconds_in = true;
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
@@ -14477,6 +14511,7 @@ int statvfs_mock_ignore_in_once(int return_value)
 
     nala_mock_statvfs.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.path_out);
     nala_set_param_init(&instance_p->data.params.path_in);
     instance_p->data.params.path_in_assert =
@@ -14894,6 +14929,7 @@ int struct_param_mock_ignore_in_once(void)
 
     nala_mock_struct_param.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.data_out);
     nala_set_param_init(&instance_p->data.params.data_in);
     instance_p->data.params.data_in_assert =
@@ -15220,6 +15256,7 @@ int struct_param_and_return_type_mock_ignore_in_once(struct struct_param_type re
 
     nala_mock_struct_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
     instance_p->data.callback = NULL;
@@ -15516,6 +15553,7 @@ int time_mock_ignore_in_once(time_t return_value)
 
     nala_mock_time.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.tloc_out);
     nala_set_param_init(&instance_p->data.params.tloc_in);
     instance_p->data.params.tloc_in_assert =
@@ -15924,6 +15962,7 @@ int timerfd_settime_mock_ignore_in_once(int return_value)
 
     nala_mock_timerfd_settime.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.new_value_out);
     nala_set_param_init(&instance_p->data.params.new_value_in);
     instance_p->data.params.new_value_in_assert =
@@ -16325,6 +16364,7 @@ int tmpfile_mock_ignore_in_once(FILE *return_value)
 
     nala_mock_tmpfile.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
     instance_p->data.callback = NULL;
@@ -16590,6 +16630,7 @@ int typedef_struct_param_and_return_type_mock_ignore_in_once(struct_param_type r
 
     nala_mock_typedef_struct_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
     instance_p->data.callback = NULL;
@@ -16855,6 +16896,7 @@ int typedef_union_param_and_return_type_mock_ignore_in_once(union_type return_va
 
     nala_mock_typedef_union_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
     instance_p->data.callback = NULL;
@@ -17120,6 +17162,7 @@ int union_param_and_return_type_mock_ignore_in_once(union union_type return_valu
 
     nala_mock_union_param_and_return_type.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
     instance_p->data.callback = NULL;
@@ -17393,6 +17436,7 @@ int usleep_mock_ignore_in_once(int return_value)
 
     nala_mock_usleep.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     instance_p->data.params.ignore_usec_in = true;
     instance_p->data.return_value = return_value;
     instance_p->data.errno_value = 0;
@@ -17713,6 +17757,7 @@ int write_mock_ignore_in_once(ssize_t return_value)
 
     nala_mock_write.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.buf_out);
     nala_set_param_init(&instance_p->data.params.buf_in);
     instance_p->data.params.buf_in_assert =

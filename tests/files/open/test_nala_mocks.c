@@ -1561,6 +1561,7 @@ int open_mock_ignore_in_once(int return_value, const char *vafmt_p)
 
     nala_mock_open.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.params, 0, sizeof(instance_p->data.params));
     nala_set_param_init(&instance_p->data.params.pathname_out);
     nala_set_param_init(&instance_p->data.params.pathname_in);
     instance_p->data.params.pathname_in_assert =
