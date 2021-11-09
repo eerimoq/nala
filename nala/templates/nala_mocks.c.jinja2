@@ -435,6 +435,7 @@ int {{mock.func_name}}_mock_ignore_in_once({{mock.return_value_decl | render}})
 
     {{mock.state_name}}.state.mode = MODE_MOCK_ONCE;
     NALA_INSTANCE_NEW(instance_p, INSTANCE_MODE_NORMAL);
+    memset(&instance_p->data.parmas, 0, sizeof(instance_p->data.params));
     {% for param, _, _, _, _, _, check in mock.set_params %}
     nala_set_param_init(&instance_p->data.params.{{param.name}}_out);
     nala_set_param_init(&instance_p->data.params.{{param.name}}_in);
