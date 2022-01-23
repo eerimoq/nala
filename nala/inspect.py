@@ -99,7 +99,14 @@ def rename_parameters(function_declaration, param_names):
 
     for param in function_declaration.type.args.params:
         if isinstance(param, c_ast.Typename):
-            param = c_ast.Decl(param.name, [], [], [], param.type, None, None)
+            param = c_ast.Decl(param.name,
+                               [],
+                               None,
+                               [],
+                               [],
+                               param.type,
+                               None,
+                               None)
 
         params.append(param)
 

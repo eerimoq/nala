@@ -1,2 +1,2 @@
-pycparser
+pycparser>=2.21
 jinja2

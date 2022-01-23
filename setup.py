@@ -27,7 +27,7 @@ setup(name='nala',
       packages=find_packages(exclude=['tests']),
       test_suite="tests",
       install_requires=[
-          'pycparser',
+          'pycparser>=2.21',
           'jinja2'
       ],
       include_package_data=True,

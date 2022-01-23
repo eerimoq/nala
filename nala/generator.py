@@ -34,7 +34,7 @@ def is_ellipsis(param):
 
 
 def decl(name, type):
-    return c_ast.Decl(name, [], [], [], type, None, None)
+    return c_ast.Decl(name, [], None, [], [], type, None, None)
 
 
 def function_ptr_decl(name, return_type, parameters):
@@ -45,13 +45,14 @@ def function_ptr_decl(name, return_type, parameters):
 
 
 def bool_param(name):
-    return decl(name, c_ast.TypeDecl(name, [], c_ast.IdentifierType(['bool'])))
+    return decl(name, c_ast.TypeDecl(name, [], None, c_ast.IdentifierType(['bool'])))
 
 
 def set_member(name):
     return decl(name,
                 c_ast.TypeDecl(name,
                                [],
+                               None,
                                c_ast.IdentifierType(['struct nala_set_param'])))
 
 
@@ -65,7 +66,7 @@ def in_assert_member(name, param_actual, param_expected):
             param_actual,
             param_expected,
             decl('size',
-                 c_ast.TypeDecl('size', [], c_ast.IdentifierType(['size_t'])))
+                 c_ast.TypeDecl('size', [], None, c_ast.IdentifierType(['size_t'])))
         ])
 
 
@@ -79,21 +80,21 @@ def out_copy_member(name, param_dst, param_src):
             param_dst,
             param_src,
             decl('size',
-                 c_ast.TypeDecl('size', [], c_ast.IdentifierType(['size_t'])))
+                 c_ast.TypeDecl('size', [], None, c_ast.IdentifierType(['size_t'])))
         ])
 
 
 def va_list_param(name):
     return decl(None,
-                c_ast.TypeDecl(name, [], c_ast.IdentifierType(['va_list'])))
+                c_ast.TypeDecl(name, [], None, c_ast.IdentifierType(['va_list'])))
 
 
 def void_type(name):
-    return c_ast.TypeDecl(name, [], c_ast.IdentifierType(['void']))
+    return c_ast.TypeDecl(name, [], None, c_ast.IdentifierType(['void']))
 
 
 def int_type(name):
-    return c_ast.TypeDecl(name, [], c_ast.IdentifierType(['int']))
+    return c_ast.TypeDecl(name, [], None, c_ast.IdentifierType(['int']))
 
 
 def rename_return_type(return_type, name):
@@ -259,6 +260,7 @@ class FunctionMock:
                 c_ast.PtrDecl([],
                               c_ast.TypeDecl('vafmt_p',
                                              ['const'],
+                                             None,
                                              c_ast.IdentifierType(['char'])))))
             self.forward_args += ', nala_vl'
 
@@ -266,7 +268,7 @@ class FunctionMock:
         if not self.params_struct:
             self.params_struct = [
                 decl('dummy',
-                     c_ast.TypeDecl('dummy', [], c_ast.IdentifierType(['int'])))
+                     c_ast.TypeDecl('dummy', [], None, c_ast.IdentifierType(['int'])))
             ]
 
         return_type = self.func_decl.type
@@ -299,7 +301,7 @@ class FunctionMock:
             f'{self.func_name}_mock_set_errno',
             [decl(
                 'errno_value',
-                c_ast.TypeDecl('errno_value', [], c_ast.IdentifierType(['int'])),
+                c_ast.TypeDecl('errno_value', [], None, c_ast.IdentifierType(['int'])),
             )])
         self.callback_decl = function_ptr_decl(
             'callback',
@@ -310,12 +312,14 @@ class FunctionMock:
             c_ast.TypeDecl(
                 f'{self.func_name}_mock_va_arg_real',
                 [],
+                None,
                 return_type))
         self.default_variadic_func_real_wrapper_decl = c_ast.FuncDecl(
             c_ast.ParamList(create_implementation_params(self.func_params)),
             c_ast.TypeDecl(
                 f'nala_v{self.func_name}',
                 [],
+                None,
                 return_type))
         self.real_decl = self.rename_function(self.real_func)
         self.wrapped_decl = self.rename_function(self.wrapped_func)
@@ -557,6 +561,7 @@ class FunctionMock:
                 c_ast.PtrDecl([],
                               c_ast.TypeDecl('vafmt_p',
                                              ['const'],
+                                             None,
                                              c_ast.IdentifierType(['char'])))))
             mock_params.append(decl(None, c_ast.EllipsisParam()))
 
