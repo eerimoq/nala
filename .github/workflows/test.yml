@@ -21,7 +21,10 @@ jobs:
         pip install -r requirements.txt
     - name: Test
       run: |
+        source setup.sh
         python -m unittest
+        make dist
+        make test-c
 
   release:
     needs: [test]
