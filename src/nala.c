@@ -371,7 +371,7 @@ static void auto_free_list_append(struct auto_free_list_t *self_p,
 {
     struct auto_free_t *item_p;
 
-    item_p = malloc(sizeof(*item_p));
+    item_p = calloc(1, sizeof(*item_p));
     ASSERT_NE(item_p, NULL);
     item_p->buf_p = buf_p;
     item_p->next_p = NULL;
@@ -2524,7 +2524,7 @@ void *nala_alloc(size_t size)
     void *buf_p;
 
     nala_suspend_all_mocks();
-    buf_p = malloc(size);
+    buf_p = calloc(1, size);
     ASSERT_NE(buf_p, NULL);
     nala_auto_free(buf_p);
     nala_resume_all_mocks();
