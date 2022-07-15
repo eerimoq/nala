@@ -14,7 +14,7 @@ def find_version():
 setup(name='nala',
       version=find_version(),
       description='A test framework for C projects.',
-      long_description=open('README.rst', 'r').read(),
+      long_description=open('README.rst', 'r', encoding='utf-8').read(),
       author='Erik Moqvist and Valentin Berlier',
       author_email='erik.moqvist@gmail.com',
       license='MIT',
