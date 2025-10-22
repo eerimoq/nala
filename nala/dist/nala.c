@@ -3360,7 +3360,7 @@ void nala_subprocess_result_free(struct nala_subprocess_result_t *self_p)
 // #include "subprocess.h"
 
 
-#define DEPTH_MAX 100
+#define NALA_DEPTH_MAX 100
 
 #define ANSI_COLOR_GREEN "\x1b[32m"
 #define ANSI_COLOR_CYAN  "\x1b[36m"
@@ -3603,9 +3603,9 @@ char *nala_traceback_string(const char *prefix_p,
                        void *arg_p)
 {
     int depth;
-    void *addresses[DEPTH_MAX];
+    void *addresses[NALA_DEPTH_MAX];
 
-    depth = backtrace(&addresses[0], DEPTH_MAX);
+    depth = backtrace(&addresses[0], NALA_DEPTH_MAX);
 
     return (nala_traceback_format(addresses,
                              depth,

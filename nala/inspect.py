@@ -390,6 +390,16 @@ class ForgivingDeclarationParser:
             self.typedefs_code + self.structs_code + self.func_signatures)
         self.file_ast = self.cparser.parse(code)
         func_offset = len(self.typedefs_code + self.structs_code)
+        # PATCH BEGIN
+        # The above offset calculation sometimes doesn't point to the first element of
+        # type 'c_ast.FuncDecl'. In that case we use the below search to find the first
+        # 'c_ast.FuncDecl' and take this index as offset.
+        if not isinstance(self.file_ast.ext[func_offset].type, c_ast.FuncDecl):
+            for i in range(len(self.file_ast.ext)):
+                if isinstance(self.file_ast.ext[i].type, c_ast.FuncDecl):
+                    func_offset = i
+                    break
+        # PATCH END
 
         for i, func_name in enumerate(self.func_names, func_offset):
             if self.param_names is None:
