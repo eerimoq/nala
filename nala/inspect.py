@@ -137,40 +137,6 @@ def rename_parameters(function_declaration, param_names):
     return function_declaration
 
 
-PRIMITIVE_TYPES = [
-    'char',
-    'signed char',
-    'unsigned char',
-    'short',
-    'short int',
-    'signed short',
-    'signed short int',
-    'unsigned short',
-    'unsigned short int',
-    'int',
-    'signed',
-    'signed int',
-    'unsigned',
-    'unsigned int',
-    'long',
-    'long int',
-    'signed long',
-    'signed long int',
-    'unsigned long',
-    'unsigned long int',
-    'long unsigned int',
-    'long long',
-    'long long int',
-    'signed long long',
-    'signed long long int',
-    'unsigned long long',
-    'unsigned long long int',
-    'long long unsigned int',
-    'float',
-    'double',
-    'long double'
-]
-
 LINEMARKER = re.compile(r'^# \d+ "((?:\\.|[^\\"])*)"((?: [1234])*)$')
 
 TOKENS = {
@@ -281,25 +247,35 @@ def is_fixed_array(type_):
     return False
 
 
-def is_primitive_type_pointer_type(type_, types):
-    if isinstance(type_, c_ast.IdentifierType):
-        return ' '.join(type_.names) in types
+def is_primitive_type(type_):
+    PRIMITIVE_TYPES = set([
+        'char', 'signed', 'unsigned',
+        'short', 'int', 'long',
+        'float', 'double',
+    ])
 
-    if isinstance(type_, c_ast.TypeDecl):
-        return is_primitive_type_pointer_type(type_.type, types)
+    if isinstance(type_, c_ast.IdentifierType):
+        return set(type_.names) <= PRIMITIVE_TYPES
 
     return False
 
 
-def is_primitive_type_pointer(type_, types=None):
-    if types is None:
-        types = PRIMITIVE_TYPES
+def is_primitive_type_pointer_type(type_):
+    if isinstance(type_, c_ast.IdentifierType):
+        return is_primitive_type(type_)
 
     if isinstance(type_, c_ast.TypeDecl):
-        return is_primitive_type_pointer(type_.type, types)
+        return is_primitive_type_pointer_type(type_.type)
+
+    return False
+
+
+def is_primitive_type_pointer(type_):
+    if isinstance(type_, c_ast.TypeDecl):
+        return is_primitive_type_pointer(type_.type)
 
     if isinstance(type_, c_ast.PtrDecl):
-        return is_primitive_type_pointer_type(type_.type, types)
+        return is_primitive_type_pointer_type(type_.type)
 
     return False
 
@@ -410,7 +386,7 @@ class ForgivingDeclarationParser:
         if isinstance(type_, c_ast.IdentifierType):
             name = ' '.join(type_.names)
 
-            if name in PRIMITIVE_TYPES or name == '_Bool':
+            if is_primitive_type(type_) or name == '_Bool':
                 return PrimitiveType(name)
             elif name == '__builtin_va_list':
                 return VaList()
@@ -439,7 +415,7 @@ class ForgivingDeclarationParser:
         if isinstance(type_, c_ast.IdentifierType):
             name = ' '.join(type_.names)
 
-            if name in PRIMITIVE_TYPES:
+            if is_primitive_type(type_):
                 pass
             elif name in ['__builtin_va_list', 'void', '_Bool']:
                 pass
