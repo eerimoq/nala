@@ -398,7 +398,7 @@ class ForgivingDeclarationParser:
         # not the AST list is searched for the first 'c_ast.FuncDecl' starting from the
         # calculated `func_offset`. The index of the first detected 'c_ast.FuncDecl' is
         # then used as new `func_offset`!
-        if not isinstance(self.file_ast.ext[func_offset].type, c_ast.FuncDecl):
+        if func_offset < len(self.file_ast.ext) and not isinstance(self.file_ast.ext[func_offset].type, c_ast.FuncDecl):
             for i in range(func_offset, len(self.file_ast.ext)):
                 if isinstance(self.file_ast.ext[i].type, c_ast.FuncDecl):
                     func_offset = i
