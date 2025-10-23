@@ -31,6 +31,7 @@ def remove_optput():
 def pre_process_file(name):
     command = [
         'gcc',
+        '-std=c11',
         '-E',
         '-I', 'nala/dist',
         '-o', f'tests/files/{name}/test_tests.pp.c',
