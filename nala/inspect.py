@@ -366,6 +366,20 @@ class ForgivingDeclarationParser:
             self.typedefs_code + self.structs_code + self.func_signatures)
         self.file_ast = self.cparser.parse(code)
         func_offset = len(self.typedefs_code + self.structs_code)
+        # PATCH BEGIN
+        # The above offset calculation sometimes ends up giving a wrong start index.
+        # As a result the first function_declaration handed over to `rename_parameters`
+        # is of type 'Struct' which has no argument 'args'!
+        # Now we test if the element at index `func_offset` has the correct type, and if
+        # not the AST list is searched for the first 'c_ast.FuncDecl' starting from the
+        # calculated `func_offset`. The index of the first detected 'c_ast.FuncDecl' is
+        # then used as new `func_offset`!
+        if not isinstance(self.file_ast.ext[func_offset].type, c_ast.FuncDecl):
+            for i in range(func_offset, len(self.file_ast.ext)):
+                if isinstance(self.file_ast.ext[i].type, c_ast.FuncDecl):
+                    func_offset = i
+                    break
+        # PATCH END
 
         for i, func_name in enumerate(self.func_names, func_offset):
             if self.param_names is None:
