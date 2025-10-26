@@ -31,6 +31,7 @@ def remove_optput():
 def pre_process_file(name):
     command = [
         'gcc',
+        '-std=c17',	# this avoids gcc to use gnu extensions, which are not supported by pycparser
         '-E',
         '-I', 'nala/dist',
         '-o', f'tests/files/{name}/test_tests.pp.c',

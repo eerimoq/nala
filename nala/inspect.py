@@ -362,6 +362,16 @@ class ForgivingDeclarationParser:
         if self.functions:
             return
 
+        # PATCH BEGIN
+        # It turns out that at least gcc 15.2 outputs typedefs using '__int128' during preproccesing
+        # step which is not parsable by pycparser. For this reason we simply removeall 128-bit typedefs here!
+        typedefs_code = []
+        for elem in self.typedefs_code:
+            if "__int128" in elem:
+                continue
+            typedefs_code.append(elem)
+        self.typedefs_code = typedefs_code
+        # PATCH END
         code = '\n'.join(
             self.typedefs_code + self.structs_code + self.func_signatures)
         self.file_ast = self.cparser.parse(code)
@@ -374,7 +384,7 @@ class ForgivingDeclarationParser:
         # not the AST list is searched for the first 'c_ast.FuncDecl' starting from the
         # calculated `func_offset`. The index of the first detected 'c_ast.FuncDecl' is
         # then used as new `func_offset`!
-        if not isinstance(self.file_ast.ext[func_offset].type, c_ast.FuncDecl):
+        if func_offset < len(self.file_ast.ext) and not isinstance(self.file_ast.ext[func_offset].type, c_ast.FuncDecl):
             for i in range(func_offset, len(self.file_ast.ext)):
                 if isinstance(self.file_ast.ext[i].type, c_ast.FuncDecl):
                     func_offset = i
