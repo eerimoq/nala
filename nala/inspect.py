@@ -386,6 +386,16 @@ class ForgivingDeclarationParser:
         if self.functions:
             return
 
+        # PATCH BEGIN
+        # It turns out that at least gcc 15.2 outputs typedefs using '__int128' during preproccesing
+        # step which is not parsable by pycparser. For this reason we simply removeall 128-bit typedefs here!
+        typedefs_code = []
+        for elem in self.typedefs_code:
+            if "__int128" in elem:
+                continue
+            typedefs_code.append(elem)
+        self.typedefs_code = typedefs_code
+        # PATCH END
         code = '\n'.join(
             self.typedefs_code + self.structs_code + self.func_signatures)
         self.file_ast = self.cparser.parse(code)
