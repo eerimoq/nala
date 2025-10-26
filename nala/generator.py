@@ -9,7 +9,6 @@ from jinja2 import PackageLoader
 from pycparser import c_ast
 from pycparser.c_generator import CGenerator
 
-from .inspect import PRIMITIVE_TYPES
 from .inspect import VaList
 from .inspect import PrimitiveType
 from .inspect import is_struct_or_union
